@@ -26,4 +26,9 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Train with random crop of second half dataset
 
 -> 58% (after 25 epochs)
-## FCN8s Resnet101
+## FCN Resnet101
+* Lr 0.01 
+* Adam Optimizer
+* Crit CategoricalCross Entropy
+* Batchsize 10
+-> ~80%
