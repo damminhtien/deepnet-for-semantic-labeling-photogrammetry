@@ -4,12 +4,13 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 2D Semantic Labeling Contest - [Potsdam](http://www2.isprs.org/commissions/comm3/wg4/2d-sem-label-potsdam.html)
 # Expriment
 * Train image:  ['2_10', '2_11', '3_10', '4_12', '5_10', '6_7', '6_10', '7_9', '7_10']
-* Test image: 
-## Segnet Vgg16
+* Test image: ['2_12', '3_11', '3_12', '5_12']
+## Segnet
 * Iter/epoch: 12000
 * Window size: 224x224
 * Cross Entropy Loss
-* Adam Optimizer (weight_decay=0.005)
+* Adam Optimizer (weight_decay=0.005) 
+
 | Epochs     | BatchSize | BaseLR (x0.1 / n epochs) | TestTime/epoch | Acc  | Kappa |
 |------------|-----------|--------------------------|----------------|------|-------|
 | 0 -> 100   | 10        | 0.01 [10, 20, 30, 40]    |                | 53   | 42    |
