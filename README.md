@@ -4,31 +4,21 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 2D Semantic Labeling Contest - [Potsdam](http://www2.isprs.org/commissions/comm3/wg4/2d-sem-label-potsdam.html)
 # Expriment
 ## Segnet Vgg16
-1. Fine tune 1
-* Lr 0.01
-* SGD Optimizer
-* Crit NNLoss (pytorch)
-* Batchsize 10
-
--> All predict into only 2 class (Unbalance data?) 
-
--> fixed by Mixed loss (dice loss + focal loss)
-
-2. Fine tune 2
-* Lr 0.01 
-* Adam Optimizer
-* Crit MixedLoss
-* Batchsize 15
-* Train with random crop of first half dataset
-
--> 40% (after 25 epochs)
-* Lr 0.001
-* Train with random crop of second half dataset
-
--> 58% (after 25 epochs)
+* 58% (after 25 epochs)
 ## FCN Resnet101
 * Lr 0.01 
 * Adam Optimizer
 * Crit CategoricalCross Entropy
 * Batchsize 10
 -> ~80%
+* After 90 epochs
+* Total accuracy : 87.04862724541366%
+* Kappa: 0.7952076079553785 (Deeper net get higher acc at building but low acc at tree, car)
+## FCN8s VGG16_bn
+* After 40 epochs
+* Total accuracy : 84.97403337091006%
+* Kappa: 0.799597872523977
+## FCN8s VGG19_bn
+* After 40 epochs
+* Total accuracy : 82.30135182217282%
+* Kappa: 0.7630174827777142
