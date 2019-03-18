@@ -9,7 +9,7 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Iter/epoch: 12000
 * Window size: 224x224
 * Cross Entropy Loss
-* 
+* Adam Optimizer (weight_decay=0.005)
 | Epochs     | BatchSize | BaseLR (x0.1 / n epochs) | TestTime/epoch | Acc  | Kappa |
 |------------|-----------|--------------------------|----------------|------|-------|
 | 0 -> 100   | 10        | 0.01 [10, 20, 30, 40]    |                | 53   | 42    |
