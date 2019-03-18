@@ -12,8 +12,8 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Batchsize 10
 -> ~80%
 * After 90 epochs
-* Total accuracy : 87.04862724541366%
-* Kappa: 0.7952076079553785 (Deeper net get higher acc at building but low acc at tree, car)
+* Total accuracy : 82.21362315195232%
+* Kappa: 0.7600396832725298 (Deeper net get higher acc at building but low acc at tree, car)
 ## FCN8s VGG16_bn
 * After 40 epochs
 * Total accuracy : 84.97403337091006%
