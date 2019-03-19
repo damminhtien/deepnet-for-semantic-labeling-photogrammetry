@@ -50,3 +50,14 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * After 40 epochs
 * Total accuracy : 82.30135182217282%
 * Kappa: 0.7630174827777142
+## FCN8s VGG19
+* After 40 epochs
+### F1 score
+* roads: 0.8661849732399588
+* buildings: 0.9341539292198715
+* low veg.: 0.6371709864269042
+* trees: 0.30768265263939926
+* cars: 0.7025409129162437
+* clutter: 0.030470541857798166
+* Total accuracy : 82.56446028790151%
+* Kappa: 0.7661919835031442
