@@ -63,7 +63,6 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Kappa: 0.7630174827777142
 ## FCN8s VGG19
 * After 40 epochs
-### F1 score
 * roads: 0.8661849732399588
 * buildings: 0.9341539292198715
 * low veg.: 0.6371709864269042
