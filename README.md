@@ -42,6 +42,17 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * After 90 epochs
 * Total accuracy : 82.21362315195232%
 * Kappa: 0.7600396832725298 (Deeper net get higher acc at building but low acc at tree, car)
+## FCN16s Resnet101
+* After 20 epochs
+* Total accuracy : 79.23075590703559%
+* F1Score :
+* roads: 0.8656249792859144
+* buildings: 0.9027474906531127
+* low veg.: 0.7962001240659627
+* trees: 0.44243267855970525
+* cars: 0.6429814092272452
+* clutter: 0.2652907697476987
+* Kappa: 0.7200936976228167
 ## FCN8s VGG16_bn
 * After 40 epochs
 * Total accuracy : 84.97403337091006%
@@ -50,3 +61,13 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * After 40 epochs
 * Total accuracy : 82.30135182217282%
 * Kappa: 0.7630174827777142
+## FCN8s VGG19
+* After 40 epochs
+* roads: 0.8661849732399588
+* buildings: 0.9341539292198715
+* low veg.: 0.6371709864269042
+* trees: 0.30768265263939926
+* cars: 0.7025409129162437
+* clutter: 0.030470541857798166
+* Total accuracy : 82.56446028790151%
+* Kappa: 0.7661919835031442
