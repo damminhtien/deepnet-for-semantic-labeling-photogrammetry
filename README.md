@@ -20,8 +20,8 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Choose maxable batch size (6->32)
 * Adam optimizer
 * Small weight decay lr
-* 
+* Use less pooling
+* Use more skip connection
 
 ### Guide to run
 Install package and run notebook on your computer (with anaconda, or cloud such as kaggle, colab)
-
