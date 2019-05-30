@@ -23,7 +23,6 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Use less pooling
 * Use more skip connection
 * Normalize image before training
-* 
 
 ### Guide to run
 Install package and run notebook on your computer (with anaconda, or cloud such as kaggle, colab)
