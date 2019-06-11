@@ -6,12 +6,16 @@ Automated extraction of urban objects from data acquired by airborne sensors whi
 * Train/Valid/Test: 18/6/14
 # Expriment
 ## Segnet
+84%
 
 ## FCN-Resnet101
+85%
 
 ## Unet101-Resnet101
+89% (single model)
 
 ## PSPNet-Resnet101
+90% (aulixiary loss) (single model)
 
 ### `More`
 * Use cyclical learning rate
