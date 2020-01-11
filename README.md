@@ -1,4 +1,6 @@
 # DeepNet-for-Semantic-Labeling-Photogrammetry
+This deep learning project is my graduated thesis which is scored 9.5/10.
+It is also the first time i do end-to-end an applied research project by myself.  
 Automated extraction of urban objects from data acquired by airborne sensors which very high-resolution data,  leads to high intra-class variance while the inter-class variance is low, focus is on detailed 2D semantic segmentation that assigns labels to multiple object categories.
 # Dataset: 
 * 2D Semantic Labeling Contest - [Potsdam](http://www2.isprs.org/commissions/comm3/wg4/2d-sem-label-potsdam.html)
