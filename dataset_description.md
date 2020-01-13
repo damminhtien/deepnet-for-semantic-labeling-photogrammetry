@@ -19,8 +19,8 @@ The DSM are TIFF files with one band; the grey levels (corresponding to the DSM 
 
 Normalised DSMs, that is, after ground filtering the ground height is removed for each pixel, leading to an representation of heights above the terrain. 
 
-[!image_dsm_gt](http://www2.isprs.org/tl_files/isprs/wg34/images/potsdam_top_dsm_label.png)
+![image_dsm_gt](http://www2.isprs.org/tl_files/isprs/wg34/images/potsdam_top_dsm_label.png)
 
 Labelled ground truth is provided for only one part of the data. The ground truth of the remaining scenes will remain unreleased and stays with the benchmark test organizers to be used for evaluation of submitted results. Participants shall use all data with ground truth for training (see Table) or internal evaluation of their method.
 
-[!imagevslabel](http://www2.isprs.org/tl_files/isprs/wg34/images/potsdam2D_table.png)
+![magevslabel](http://www2.isprs.org/tl_files/isprs/wg34/images/potsdam2D_table.png)
