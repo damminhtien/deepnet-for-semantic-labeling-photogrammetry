@@ -16,7 +16,7 @@ This project aim to automated extraction of urban objects from data acquired by 
 6. Testing phase
 7. Report and submit
 
-> ## 1. Visualise and analysis data
+> ## 1. Visualise and analyse data
 See the [detail](https://github.com/damminhtien/deepnet-for-semantic-labeling-photogrammetry/blob/master/Insight-data-potsdam.ipynb).
 Conclusion:
 * Unbalance dataset: building, road and low vegetable class have highest acreage, while car class is negligible. 
