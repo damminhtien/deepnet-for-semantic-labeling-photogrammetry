@@ -33,3 +33,11 @@ Use this prompt for the new thread:
     Inspect only additional files required for the next unfinished item.
 
 Read PLAN.md and DECISIONS.md only as needed for the next unfinished item. Do not treat a successful local check as evidence of an experiment, deployment, or benchmark result unless that result was actually observed.
+
+## Google authentication boundaries
+
+Use the connected Google Drive integration for Drive file operations such as listing, uploading, downloading, and verifying files. Do not use gcloud Application Default Credentials (ADC) as a substitute for the Drive connection: ADC and Drive OAuth are separate credentials, and a successful Google login does not imply that an ADC token contains Drive API scopes.
+
+Use gcloud ADC only for Google Cloud APIs that accept the scopes on that ADC token. If a Drive API request made with ADC returns `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`, treat it as a credential-scope mismatch in the selected tool path, not as evidence that the user failed to log in. Switch to the connected Drive integration and verify the resulting files there. Do not ask the user to repeat OAuth when the Drive integration is already authorized, and never inspect or print credential contents.
+
+Mounting Drive inside Colab is a separate runtime action: use `google.colab.drive.mount()` in that Colab session when it needs access. Do not route that step through local gcloud ADC.

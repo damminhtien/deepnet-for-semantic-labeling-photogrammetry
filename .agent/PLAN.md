@@ -39,3 +39,9 @@
 - Evaluate SAM on six validation and fourteen held-out scenes; save overall accuracy, mean IoU, and visual previews.
 - Retrieve both cloud outputs under /Users/macbook/Data and compare the measured results with input/initialization caveats.
 - Update Graphify, run focused syntax/style/whitespace validation, and commit only task-owned paths.
+
+## M8: Prevent Drive OAuth/ADC confusion — complete
+
+- Document that Drive file work uses the connected Drive integration, while gcloud ADC is a separate credential with independent scopes.
+- Record the handling for `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` and keep Colab's in-runtime Drive mount separate.
+- Validation: inspect the workflow/decision/state documentation and run `git diff --check`.

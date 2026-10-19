@@ -11,7 +11,7 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 - Kaggle is assigned only to SAM. The private dataset `damminhtien/sam-vitb-lora-potsdam-20261019` is ready (3.88 GiB), and the private kernel `https://www.kaggle.com/code/damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation` is queued. The last quota query reported 30 GPU hours remaining.
 - Cloud code includes a SAM ViT-B wrapper with rank-4 LoRA on attention qkv/proj and a six-class decoder, a Kaggle trainer, a private bundle builder, and a private kernel stager. Local syntax/style checks passed; CUDA execution is pending.
 - The private Google Drive folder `https://drive.google.com/drive/folders/1Da5gI-FLnKsTRLxN0-xo_vPd13YVtZqn` now contains all 106 archive parts, `parts_manifest.json`, and the updated README (108 items total). Drive readback found no missing/duplicate parts or wrong sizes; total part size is 10,524,434,944 bytes. The remote manifest bytes match the local manifest exactly, and the README readback contains the Colab mount, verification, and extraction instructions. The folder remains private.
-- The gcloud ADC file exists but its access token lacks Drive scope: a direct Drive API request returned `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`. The gcloud help states that requesting an external Drive scope requires a custom OAuth Client ID. The connected Drive app had its own usable authorization, so no further Drive OAuth was needed for the completed upload.
+- Google OAuth was completed by the user. A direct Drive API request made with local gcloud ADC returned `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`; this was an ADC scope mismatch, not a missing user login. The Drive upload used the already-authorized connected Drive integration and was read back successfully. For future Drive file operations, use that integration; do not request another login because of an ADC scope error. Colab's `drive.mount()` is a separate in-runtime OAuth flow.
 
 ## Completed local preparation
 
@@ -42,7 +42,7 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 - No historical PSPNet checkpoint exists, so its new scratch run cannot exactly reproduce the historical reported score.
 - SAM's semantic experiment uses only three-band IRRG and SAM's pretrained normalization, while PSPNet uses five channels and `/255`; present their results separately with this caveat.
 - The held-out evaluation labels are used only for final evaluation, not model selection.
-- Local Python 3.14 currently has no installed `torch` or `tifffile`; model execution and CUDA validation must happen on Kaggle. Keep the Mac on data work and postprocessing.
+- Local Python 3.14.8 now has `torch`, `torchvision`, `numpy`, `scikit-image`, `scikit-learn`, `matplotlib`, `tqdm`, and `tifffile` installed in the user site. Imports were verified; MPS is available and CUDA is unavailable. Keep the Mac on data work and postprocessing; CUDA experiment validation remains on Kaggle/Colab.
 
 ## Validation so far
 
@@ -52,3 +52,4 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 - SAM source passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check`; CUDA execution remains pending while Kaggle is queued.
 - Historical Colab checks passed before its session disappeared: all 169 bundle checksums, cleanup of 38 non-manifest `._*.npz` sidecars, and a CUDA forward/backward smoke with finite loss `0.9889845848`. The last known original-run log reached epoch 3 batch 200/1250, with no epoch completion verified. The replacement T4 reports CUDA availability, but its model smoke and training have not yet run.
 - Drive readback verified 106 numbered parts with expected sizes and 10,524,434,944 total bytes. The remote `parts_manifest.json` matches the local bytes exactly; the README was fetched and checked for the Colab mount/hash/extract instructions. Cloud output retrieval, final result verification, and remaining training are pending.
+- Auth-routing fix is recorded in `docs/AGENT_WORKFLOW.md`: use the authorized Drive integration for Drive files, treat gcloud ADC as scope-independent, and use `drive.mount()` only inside Colab. This prevents a local ADC scope error from triggering another user login request.
