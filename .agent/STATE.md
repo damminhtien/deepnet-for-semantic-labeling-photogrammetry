@@ -26,7 +26,11 @@ Document verified segmentation evaluations and research, then push the resulting
 
 ## Carry-forward: separate cloud training remains unresolved
 
-The earlier split cloud experiment remains incomplete and was not resumed in this publication task. The last verified Colab log reached epoch 3 batch 200/1250, without a completed epoch 3; the last live check found no active Colab session. The Kaggle SAM job was queued, with CUDA execution and metrics still pending. Preserve this status if that cloud experiment is resumed; do not imply that these reports include PSPNet continuation or trained SAM results.
+- On 2026-10-19 the user resumed PSPNet training in Colab session `pspnet-colab-20261019-rerun` on a Tesla T4. The new run is `pspnet-colab-20261019-rerun`, resuming the saved epoch-2 MPS model and Adam state; it targets epochs 3–16. The CUDA smoke test passed.
+- The latest live probe reached epoch 3, batch 600/1250, with the process active and T4 utilization at 100%. No training epoch or held-out test has completed yet. At the observed rate, the remaining training is estimated at about 4.5–5 hours, plus validation and held-out evaluation; this is an estimate, not a completion guarantee.
+- A macOS LaunchAgent at `~/Library/LaunchAgents/com.codex.pspnet-colab-results-sync.plist` runs the Python 3.14 sync process. It copies logs and manifests periodically and verifies each downloaded checkpoint's SHA-256 before keeping it under `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/pspnet-colab-20261019-rerun-02/`. Colab outputs are still pending.
+- Potsdam/Vaihingen inputs and prior PSPNet, SAM, and evaluation artifacts are physically grouped under `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/inputs/` and `runs/`. Legacy paths under `/Users/macbook/Data/input/` and `/Users/macbook/Data/runs/` remain symlinks for compatibility.
+- The Kaggle SAM job's completion and metrics remain unverified. Do not imply that the published reports include this resumed PSPNet run or trained SAM results.
 
 ## Validation
 
