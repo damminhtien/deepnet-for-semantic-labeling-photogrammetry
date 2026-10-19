@@ -7,7 +7,7 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 ## Status
 
 - Local PSPNet training is paused after epoch 2/16 at `/Users/macbook/Data/runs/pspnet-mps-20261019/last.pt`.
-- Colab is assigned only to PSPNet. The active runtime is a Tesla T4. The 169-file bundle passed remote hash verification once, but training stopped before CUDA smoke because macOS `._` metadata sidecars inflated the label directory counts. Those 38 non-manifest sidecars were removed from the task-owned runtime bundle, and the job has been restarted; the current process is rechecking the bundle before smoke.
+- Colab is assigned only to PSPNet. The active runtime is a Tesla T4. All 169 bundle files passed remote SHA-256 checks. After removing 38 non-manifest macOS `._` metadata sidecars, CUDA forward/backward smoke passed with input `[8, 5, 256, 256]`, six-class outputs, and finite loss `0.9889845848`. The trainer resumed from epoch 2 and is running toward epoch 16; no new epoch has completed yet. Current remote log: `/content/pspnet-runs/pspnet-colab-20261019.log`.
 - Kaggle is assigned only to SAM. The private dataset `damminhtien/sam-vitb-lora-potsdam-20261019` is ready (3.88 GiB), and the private kernel `https://www.kaggle.com/code/damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation` is queued. The last quota query reported 30 GPU hours remaining.
 - Cloud code includes a SAM ViT-B wrapper with rank-4 LoRA on attention qkv/proj and a six-class decoder, a Kaggle trainer, a private bundle builder, and a private kernel stager. Local syntax/style checks passed; CUDA execution is pending.
 - The Google Drive folder and small README exist, but the large bundle has not been uploaded. The resumable upload is waiting for the user's manual Drive OAuth approval in the open tab/terminal.
@@ -32,7 +32,7 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 
 ## Pending
 
-1. Let the Colab bundle hash verification and CUDA forward/backward smoke finish, then continue PSPNet epochs 3–16 and preserve checkpoints/logs.
+1. Continue PSPNet epochs 3–16 on Colab and preserve checkpoints/logs after the verified bundle and passing CUDA smoke.
 2. Wait for the Kaggle SAM kernel to leave the queue; verify CUDA smoke, all five epochs, held-out evaluation, and saved outputs.
 3. Complete the user's Drive OAuth approval and upload the reusable PSPNet archive as one resumable file; verify Drive metadata and update the mount/extract README.
 4. Download cloud checkpoints, logs, manifests, previews, and metrics under `/Users/macbook/Data`; update state, refresh Graphify if source code changes, and commit only task-owned paths.
@@ -50,5 +50,5 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 - Existing local crop-pipeline equivalence and dataset sample checks passed.
 - Existing model/data scripts passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check` before the SAM changes.
 - SAM source passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check`; CUDA execution remains pending while Kaggle is queued.
-- Colab runtime reports CUDA available on Tesla T4. The first launch was blocked by 38 `._*.npz` metadata sidecars, not missing/corrupt manifest files; the relaunch is rechecking hashes, and no CUDA smoke or training epoch is yet confirmed.
+- Colab runtime reports CUDA available on Tesla T4; all 169 bundle checksums passed. The first launch was blocked by 38 `._*.npz` metadata sidecars, not missing/corrupt manifest files. The second launch removed those sidecars, passed forward/backward smoke with finite loss `0.9889845848`, and resumed from epoch 2. Epochs 3–16 remain in progress.
 - Drive archive creation and local part sizing passed, but no archive bytes have been uploaded yet. Cloud result retrieval, final output verification, Graphify refresh if code changes, and commit remain pending.

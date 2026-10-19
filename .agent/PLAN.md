@@ -29,7 +29,7 @@
 
 ## M6: Run the independent cloud jobs — in progress
 
-- Colab resumes PSPNet from epoch 2 through epoch 16; verify the clean 169-file bundle, then pass CUDA smoke before counting training progress.
+- Colab verified all 169 bundle checksums, removed 38 non-manifest macOS sidecars, passed CUDA forward/backward smoke on a T4, and resumed from epoch 2. Continue through epoch 16.
 - Kaggle trains SAM LoRA for five epochs of 256 random 512x512 patches, with a CUDA smoke run first. The kernel is currently queued.
 - Save per-epoch checkpoints, logs, and runtime manifests.
 
