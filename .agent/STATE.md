@@ -2,44 +2,48 @@
 
 ## Task
 
-Fix root causes behind the verified data, label, evaluation, and model-forward inconsistencies, then leave a clean base for the larger architecture refactor. See `.agent/TASK.md`.
+Run two independent cloud PSPNet replicas from the same epoch-2 MPS checkpoint; keep the Mac on analysis, preprocessing, augmentation, and postprocessing.
 
 ## Status
 
-Implementation, static validation, diff review, and the task-owned Git checkpoint are complete.
+- The local scratch run is paused after epoch 2/16 at `/Users/macbook/Data/runs/pspnet-mps-20261019/last.pt`.
+- Potsdam analysis and prepared labels are at `/Users/macbook/Data/runs/pspnet-preprocessed-20261019`.
+- Cloud training code and a checksummed bundle builder are in `model_script/`.
+- No cloud runtime has been allocated or data uploaded. The last safe quota queries found Kaggle unauthenticated and Colab awaiting manual OAuth; recheck status and quotas after sign-in. Credential clippings were not opened or used.
 
 ## Completed
 
-- Audited the evaluation script, five training notebooks, test notebook, data-inspection notebook, three model-visualization notebooks, and matching Python model scripts.
-- Added `semantic_labeling/` as the shared source for the six-class map, label conversion, five-channel assembly/scaling, patch/window sampling, ignore-aware loss and metrics, dataset loading, tiled inference, and model initialization.
-- Migrated training/evaluation callers and notebook copies to the shared contracts. Replaced duplicated label/data/evaluation helpers and removed unsafe import-time model execution from `test_kernel/test.py`.
-- Fixed the label mismatch: black is `IGNORE_LABEL = 6`, excluded from the six output classes by loss and metrics.
-- Fixed PSPNet evaluation so it does not access auxiliary logits in eval mode, repaired U-Net bilinear channel configuration, and replaced hardcoded five-channel model dimensions with `INPUT_CHANNELS` across source and notebook copies.
-- Made invalid sliding-window strides fail instead of leaving pixels unscored; made all-ignore batches produce a differentiable zero loss instead of NaN.
-- Kept the historical `/255` convention centralized and documented that it is not a calibrated normalization for float32 DSM values.
-- Updated architecture/invariant documentation and recorded this task's decisions.
+- The new PSPNet matches the notebook state-dict keys and starts randomly without pretrained weights.
+- The MPS training run completed epochs 1 and 2; its checkpoint contains the model, Adam state, and random states.
+- Prepared the 18 training labels and 20 no-boundary evaluation labels. The split is 18/6/14.
+- Sampled the five input-channel statistics and checked all train input rasters are aligned at 6000x6000.
+- Cached labels as compressed `.npz` class maps; the local label cache is about 27.3 MB.
+- The no-boundary `4_12` reference has palette-encoded color drift. A unique nearest-palette mapping with a 64-level per-channel bound mapped 33,463,460 pixels; the observed maximum error was 42. The audit is recorded in the preprocessing manifest. All other labels use exact palette decoding.
+- Verified all four flip/mirror combinations keep image and label transforms synchronized; saved `augmentation_preview.png`.
+- Verified crop-before-normalize exactly matches the old full-image pipeline on a real 256x256 patch (`array_equal=True`). A real cached dataset sample produced a finite `(5, 256, 256)` float32 input and valid integer labels.
+- Loaded the epoch-2 checkpoint strictly into the cloud PSPNet and restored the Adam state on CPU.
+- A checksum-current cloud bundle is at `/Users/macbook/Data/runs/pspnet-cloud-bundle-20261019` (169 files, 9.801 GiB, SHA-256 `0b3059cb164289b304e9f988de7cc4bac23519edf3471b3e6ee83024781e6e6e`). The runner verified every file against the manifest; no auth material or notebook files are present.
 
-## Current
+## Pending
 
-- Shared input, label, sampling, dataset, loss, metric, and inference behavior now has one implementation. Model architecture definitions still exist in both notebooks and scripts; moving them into importable modules is a separate next refactor.
-- Only task-owned tracked paths should be staged. Preserve `.jupyter/` and `.jupyter_ystore.db`; they are local Jupyter runtime state. Ignore and do not stage Graphify output or notebook checkpoint directories.
+1. Wait for manual Kaggle and Colab sign-in. Do not print or read credential files or auth codes.
+2. Check compute quotas, then upload the bundle privately and start both runs concurrently.
+3. Download logs, checkpoints, and metrics, compare both replicas, and finish the code review/Graphify/commit steps.
 
-## Next
+## Limitations
 
-- For the larger refactor, move one model architecture at a time from notebook copies into importable modules with an independently verifiable boundary.
+- No historical checkpoint exists, so a new scratch result cannot reproduce the historical reported accuracy exactly.
+- The 16-epoch target resumes at epoch 3 on two different CUDA runtimes; the replicas are independent and may diverge because of hardware/runtime randomness.
+- `/255` scaling is retained from the repository. The DSM channel includes negative values under this scale; preprocessing records the observed statistics without silently changing the model input contract.
+- Held-out class distributions are not calculated or used for model selection.
 
-## Known issues and limits
+## Validation so far
 
-- The checkout has no project dependency manifest, dataset, model checkpoint, or installed NumPy/PyTorch/scikit-learn environment. Training, inference, and benchmark runtime behavior therefore remain unverified.
-- Uniform `/255` scaling is retained to preserve the historical pipeline; DSM is described as float32, so physical normalization still needs a separate evidence-backed decision.
-- Notebook model architectures remain duplicated and require a future extraction. External notebook runtimes must have this repository on their Python path.
-- The README's historical accuracy figures have no matching run manifest or checkpoint in this checkout.
-
-## Validation
-
-- `rtk ruff check semantic_labeling model_script test_kernel/test.py`: passed.
-- `python3 -m compileall -q semantic_labeling model_script test_kernel/test.py`: passed.
-- Jupyter MCP `compile()` syntax pass over 43 changed code cells: passed; notebook training/inference cells were not executed.
-- `graphify update .`: passed; rebuilt 169 nodes, 260 edges, and 14 communities.
-- `git diff --check` and `git diff --cached --check`: passed after final edits and staging.
-- Model runtime, training, and benchmark checks: not run because dependencies, data, and checkpoints are absent.
+- `rtk ruff check` on changed model/data scripts and modules: passed.
+- Python 3.14 project-environment `compileall`: passed.
+- `git diff --check`: passed.
+- Bundle fingerprint and all 169 file checksums: passed.
+- Local crop-pipeline exact-equivalence check: passed.
+- Local dataset sample smoke check: passed.
+- The local notebook's saved warning now marks cells 4–5 as unexecuted training/evaluation cells; its run manifest still says `paused_for_cloud` at epoch 2.
+- Cloud CUDA smoke, full training, cloud evaluation, output download, Graphify refresh, and commit: pending.

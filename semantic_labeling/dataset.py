@@ -7,7 +7,7 @@ import torch
 from skimage import io
 
 from .constants import INPUT_SCALE
-from .labels import convert_from_color
+from .labels import load_label
 from .preprocessing import assemble_input, normalize_input
 from .sampling import get_random_pos
 
@@ -87,18 +87,23 @@ class ISPRS_dataset(torch.utils.data.Dataset):
         top = io.imread(self.data_files[index])
         dsm = io.imread(self.dsm_files[index])
         ndsm = io.imread(self.ndsm_files[index])
-        image = assemble_input(top, dsm, ndsm)
-        image = normalize_input(image, self.input_scale)
-        data = np.ascontiguousarray(image.transpose(2, 0, 1))
+        data = (top, dsm, ndsm)
         if self.cache:
             self.data_cache[index] = data
         return data
+
+    @staticmethod
+    def _crop(array, bounds):
+        top, bottom, left, right = bounds
+        if array.ndim == 2:
+            return array[top:bottom, left:right]
+        return array[top:bottom, left:right, :]
 
     def _load_label(self, index):
         if self.cache and index in self.label_cache:
             return self.label_cache[index]
 
-        label = convert_from_color(io.imread(self.label_files[index]))
+        label = load_label(self.label_files[index])
         if self.cache:
             self.label_cache[index] = label
         return label
@@ -106,12 +111,17 @@ class ISPRS_dataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         # Each index denotes one random sample from the configured epoch.
         tile_index = random.randrange(len(self.data_files))
-        data = self._load_data(tile_index)
+        top, dsm, ndsm = self._load_data(tile_index)
         label = self._load_label(tile_index)
 
-        top, bottom, left, right = get_random_pos(data, self.window_size)
-        data_patch = data[:, top:bottom, left:right]
-        label_patch = label[top:bottom, left:right]
+        bounds = get_random_pos(top.transpose(2, 0, 1), self.window_size)
+        top_patch, dsm_patch, ndsm_patch = (
+            self._crop(array, bounds) for array in (top, dsm, ndsm)
+        )
+        data_patch = normalize_input(
+            assemble_input(top_patch, dsm_patch, ndsm_patch), self.input_scale
+        ).transpose(2, 0, 1)
+        label_patch = self._crop(label, bounds)
         if self.augmentation:
             data_patch, label_patch = self.data_augmentation(data_patch, label_patch)
         else:

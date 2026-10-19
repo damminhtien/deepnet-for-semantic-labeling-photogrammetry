@@ -8,7 +8,7 @@ from skimage import io
 from tqdm import tqdm
 
 from .constants import N_CLASSES
-from .labels import convert_from_color
+from .labels import load_label
 from .metrics import metrics
 from .preprocessing import assemble_input, normalize_input
 from .sampling import count_sliding_window, grouper, sliding_window
@@ -51,9 +51,7 @@ def run_inference(
                 io.imread(ndsm_files.format(tile_id)),
             )
         )
-        ground_truth = convert_from_color(
-            io.imread(eroded_label_files.format(tile_id))
-        )
+        ground_truth = load_label(eroded_label_files.format(tile_id))
         if ground_truth.shape != image.shape[:2]:
             raise ValueError(
                 f"Tile {tile_id} input/reference dimensions do not match: "

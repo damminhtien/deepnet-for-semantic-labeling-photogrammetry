@@ -35,3 +35,23 @@ Require each sliding-window step to be no larger than its window size. Edge alig
 ## 2026-10-19: Preserve model parameter names while fixing forward paths
 
 Keep the six-class output and module names stable. In eval mode, PSPNet returns only main logits and skips auxiliary-head work; U-Net bilinear upsampling uses the configured feature-channel dimensions and rejects unknown methods.
+
+## 2026-10-19: Start a new PSPNet experiment from random initialization
+
+The user chose training from scratch. Initialize the ResNet-101 trunk and PSPNet heads randomly, with no historical PSPNet checkpoint or ImageNet weights. Use 18 labeled scenes for training, the notebook's six listed scenes for validation, and the remaining 14 scenes for held-out evaluation. Preserve `/255` scaling, six output classes, ignore label 6, and the original Adam loss setup.
+
+## 2026-10-19: Keep PSPNet pooling on MPS
+
+MPS adaptive average pooling rejects some non-divisible feature/bin sizes used by PSPNet. Use explicit separable mean reductions with the same floor/ceil bin boundaries, and verify output parity against CPU adaptive pooling before training.
+
+## 2026-10-19: Use the Mac for data work and two independent cloud replicas
+
+The user paused local training after epoch 2 and chose Colab and Kaggle for parallel runs. Both jobs resume from the same saved MPS model and Adam checkpoint, but maintain separate optimizers, randomness, checkpoints, and metrics. Do not describe them as distributed training. Keep the Kaggle dataset private and use manual OAuth; never include credential clippings or auth material in the bundle.
+
+## 2026-10-19: Preserve input semantics while reducing cache memory
+
+Cache raw aligned image rasters and normalize only sampled patches. A real patch matched the former full-tile `/255` pipeline exactly. Keep five-channel `/255` behavior unchanged and record the observed DSM range.
+
+## 2026-10-19: Restrict near-palette decoding to Potsdam no-boundary tile 4_12
+
+All train labels and the other evaluation references use exact RGB palette decoding. The no-boundary `4_12` tile has systematic color drift; accept nearest-palette mapping only for this tile, enforce unique nearest colors and a maximum channel error of 64, and record pixel count and observed error. Do not add validation/test class distributions to preprocessing summaries.

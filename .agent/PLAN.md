@@ -1,34 +1,37 @@
 # Plan
 
-## M1: Audit implementation copies
+## M1: Prepare the scratch experiment — complete
 
-Status: complete
+- Extract the notebook PSPNet into an importable module while preserving parameter names and random initialization.
+- Create a separate local reproduction notebook and pass the MPS real-batch forward/backward smoke run.
 
-- Compare the evaluation script, test notebook, model notebooks, and model scripts.
-- Verify dataset semantics against the checked-in description and official ISPRS material.
-- Completion check: root causes and duplicated implementations are recorded.
+## M2: Pause local training at the cloud handoff — complete
 
-## M2: Establish shared pipeline modules
+- Save the MPS model and Adam state after epoch 2 of 16.
+- Stop the local training kernel as requested; do not continue model updates on the Mac.
 
-Status: complete
+## M3: Analyze and prepare Potsdam data on the Mac — complete
 
-- Add shared constants, label conversion, normalization, sampling, loss, metrics, and dataset loading under `semantic_labeling/`.
-- Preserve existing call semantics where they are valid; reject malformed labels, image shapes, and misaligned modality lists explicitly.
-- Completion check: helpers have one implementation and clear validation boundaries.
+- Verify the 18/6/14 split, sample five-channel input statistics, and cache labels as compressed class-ID maps.
+- Audit all four synchronized vertical-flip/horizontal-mirror combinations.
+- Preserve the exact `/255` patch values while caching raw input rasters.
+- Record the bounded color remapping required by the no-boundary `4_12` reference tile.
 
-## M3: Move callers onto shared helpers and repair model paths
+## M4: Build and verify the cloud bundle — complete
 
-Status: complete
+- Package the selected 38 scenes, prepared labels, source code, preprocessing metadata, and epoch-2 checkpoint.
+- Hash every packaged file and verify all 169 inventory entries before upload.
 
-- Update the training and evaluation notebooks through Jupyter MCP and update `test_kernel/test.py`.
-- Fix PSPNet auxiliary inference and invalid U-Net upsampling configuration in both source and notebook copies.
-- Completion check: each caller imports the shared helpers and each source/notebook pair stays aligned.
+## M5: Authenticate and check quotas — pending user sign-in
 
-## M4: Validate and checkpoint
+- Complete manual Colab and Kaggle OAuth in the already opened login flows.
+- Check Colab compute units and Kaggle weekly GPU quota before allocating either runtime.
 
-Status: complete
+## M6: Train on Colab and Kaggle concurrently — pending
 
-- Inspect the complete diff, run syntax and whitespace checks, update Graphify, and commit task-owned paths.
-- Do not claim model or data-path runtime validation without the missing dependencies/data/checkpoints.
-- Update `.agent/STATE.md` and `.agent/DECISIONS.md` before committing.
-- Completion check: exact commands and remaining limitations are recorded.
+- Run separate 16-epoch targets from the same epoch-2 checkpoint, with CUDA smoke checks before training.
+- Save resumable checkpoints after every epoch and record runtime details.
+
+## M7: Download, compare, validate, and commit — pending
+
+- Download both runs to `/Users/macbook/Data`, compare validation and held-out results, update state docs, update Graphify, and commit only task-owned paths.
