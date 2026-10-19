@@ -29,7 +29,7 @@
 
 ## M6: Run the independent cloud jobs — in progress
 
-- The original Colab session was pruned by the backend before epoch 3 completed. A replacement T4 session is ready and reports CUDA, but the Colab content endpoint returned HTTP 500 for a full archive and a 95 MiB part. Mount the private Drive folder in the open Colab tab, verify/reconstruct the archive, then resume from epoch 2.
+- The original Colab session was pruned by the backend before epoch 3 completed; its last known log reached epoch 3 batch 200/1250. A live check on 2026-10-19 found no active Colab sessions, and `pspnet-colab-20261019-retry` was not found. The open tab is an empty `scratchpad` with no connected runtime. Reconnect a T4, mount the private Drive folder, verify/reconstruct the archive, then resume from epoch 2.
 - Kaggle trains SAM LoRA for five epochs of 256 random 512x512 patches, with a CUDA smoke run first. The kernel is currently queued.
 - Save per-epoch checkpoints, logs, and runtime manifests.
 
