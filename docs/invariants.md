@@ -21,3 +21,12 @@
 - Model definitions and experiment configuration still live in notebooks as well as `model_script/`. Check matching copies before changing model behavior; keep the shared data/evaluation helpers in `semantic_labeling/`.
 - Model constructors no longer run at import time. Their runtime import has not been exercised in this checkout because PyTorch and torchvision are absent.
 - Select validation based on the changed boundary. This repository has no root-level test configuration or dependency manifest in the current checkout; record the exact command and environment used instead of assuming a standard test command.
+
+## SAM cloud experiment
+
+- Colab is assigned only to the existing five-channel PSPNet continuation. Kaggle is assigned only to the SAM ViT-B experiment; neither service should duplicate the other's model job.
+- SAM initializes from the official ViT-B checkpoint. Its original image encoder parameters remain frozen; rank-4 LoRA updates are applied to each attention qkv/proj layer, and a separate semantic decoder outputs classes 0–5.
+- SAM training inputs are the stored three-band IRRG pixels in their original order. The branch omits DSM/nDSM and applies SAM's pretrained per-channel mean/std normalization in the 0–255 scale. This differs from PSPNet's five-channel /255 contract and from SAM's natural-RGB pretraining.
+- Use the fixed 18 training, 6 validation, and 14 held-out scene IDs. Training labels may come only from participant labels; no-boundary labels for validation and held-out scenes are reserved for scoring. Ignore class ID 6 in both loss and metrics.
+- Keep Kaggle uploads private and exclude the PSPNet epoch-2 checkpoint, credentials, tokens, auth files, and notebook outputs from the SAM dataset.
+- Record the official SAM source revision and checkpoint hash, data bundle hash, split, input semantics, LoRA configuration, decoder, runtime, and metric outputs with each cloud run.

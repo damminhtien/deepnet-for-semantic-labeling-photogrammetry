@@ -1,37 +1,41 @@
 # Plan
 
-## M1: Prepare the scratch experiment — complete
+## M1: Prepare and pause the PSPNet scratch run — complete
 
-- Extract the notebook PSPNet into an importable module while preserving parameter names and random initialization.
-- Create a separate local reproduction notebook and pass the MPS real-batch forward/backward smoke run.
+- Preserve PSPNet parameter names and random initialization.
+- Run on MPS through epoch 2, save model and Adam state, then keep local training paused.
 
-## M2: Pause local training at the cloud handoff — complete
+## M2: Analyze and prepare Potsdam data on the Mac — complete
 
-- Save the MPS model and Adam state after epoch 2 of 16.
-- Stop the local training kernel as requested; do not continue model updates on the Mac.
+- Verify the 18/6/14 split, five-channel input statistics, label decoding, and synchronized flips/mirrors.
+- Preserve PSPNet input scaling and record the no-boundary 4_12 palette correction.
 
-## M3: Analyze and prepare Potsdam data on the Mac — complete
+## M3: Build and verify the PSPNet cloud bundle — complete
 
-- Verify the 18/6/14 split, sample five-channel input statistics, and cache labels as compressed class-ID maps.
-- Audit all four synchronized vertical-flip/horizontal-mirror combinations.
-- Preserve the exact `/255` patch values while caching raw input rasters.
-- Record the bounded color remapping required by the no-boundary `4_12` reference tile.
+- Package 38 scenes, prepared labels, source code, preprocessing metadata, and the epoch-2 checkpoint.
+- Verify every bundle input with SHA-256.
 
-## M4: Build and verify the cloud bundle — complete
+## M4: Implement and stage the Kaggle SAM experiment — complete
 
-- Package the selected 38 scenes, prepared labels, source code, preprocessing metadata, and epoch-2 checkpoint.
-- Hash every packaged file and verify all 169 inventory entries before upload.
+- Add SAM ViT-B semantic segmentation with rank-4 attention LoRA on qkv/proj and a six-class decoder.
+- Keep the original SAM encoder weights frozen; use the official checkpoint and per-channel normalization.
+- Build and upload a private Kaggle dataset with three-band IRRG and labels for the fixed scene split.
+- Stage a private GPU kernel that trains SAM only, separate from Colab's PSPNet job.
 
-## M5: Authenticate and check quotas — pending user sign-in
+## M5: Authenticate and check cloud quotas — complete
 
-- Complete manual Colab and Kaggle OAuth in the already opened login flows.
-- Check Colab compute units and Kaggle weekly GPU quota before allocating either runtime.
+- Complete manual Kaggle and Colab authentication without inspecting or printing credentials.
+- Confirm Kaggle GPU quota and allocate the Colab T4 runtime.
 
-## M6: Train on Colab and Kaggle concurrently — pending
+## M6: Run the independent cloud jobs — in progress
 
-- Run separate 16-epoch targets from the same epoch-2 checkpoint, with CUDA smoke checks before training.
-- Save resumable checkpoints after every epoch and record runtime details.
+- Colab resumes PSPNet from epoch 2 through epoch 16; verify the clean 169-file bundle, then pass CUDA smoke before counting training progress.
+- Kaggle trains SAM LoRA for five epochs of 256 random 512x512 patches, with a CUDA smoke run first. The kernel is currently queued.
+- Save per-epoch checkpoints, logs, and runtime manifests.
 
-## M7: Download, compare, validate, and commit — pending
+## M7: Share the reusable bundle, evaluate, retrieve, validate, and commit — pending
 
-- Download both runs to `/Users/macbook/Data`, compare validation and held-out results, update state docs, update Graphify, and commit only task-owned paths.
+- Upload the checksummed PSPNet archive to a private Drive folder and add a concise mount/extract guide for reuse from multiple Colab notebooks.
+- Evaluate SAM on six validation and fourteen held-out scenes; save overall accuracy, mean IoU, and visual previews.
+- Retrieve both cloud outputs under /Users/macbook/Data and compare the measured results with input/initialization caveats.
+- Update Graphify, run focused syntax/style/whitespace validation, and commit only task-owned paths.

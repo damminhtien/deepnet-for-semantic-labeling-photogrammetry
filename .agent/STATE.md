@@ -2,48 +2,53 @@
 
 ## Task
 
-Run two independent cloud PSPNet replicas from the same epoch-2 MPS checkpoint; keep the Mac on analysis, preprocessing, augmentation, and postprocessing.
+Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle fine-tunes SAM ViT-B with LoRA and a six-class semantic decoder. The Mac remains on analysis, preprocessing, augmentation, and postprocessing.
 
 ## Status
 
-- The local scratch run is paused after epoch 2/16 at `/Users/macbook/Data/runs/pspnet-mps-20261019/last.pt`.
-- Potsdam analysis and prepared labels are at `/Users/macbook/Data/runs/pspnet-preprocessed-20261019`.
-- Cloud training code and a checksummed bundle builder are in `model_script/`.
-- No cloud runtime has been allocated or data uploaded. The last safe quota queries found Kaggle unauthenticated and Colab awaiting manual OAuth; recheck status and quotas after sign-in. Credential clippings were not opened or used.
+- Local PSPNet training is paused after epoch 2/16 at `/Users/macbook/Data/runs/pspnet-mps-20261019/last.pt`.
+- Colab is assigned only to PSPNet. The active runtime is a Tesla T4. The 169-file bundle passed remote hash verification once, but training stopped before CUDA smoke because macOS `._` metadata sidecars inflated the label directory counts. Those 38 non-manifest sidecars were removed from the task-owned runtime bundle, and the job has been restarted; the current process is rechecking the bundle before smoke.
+- Kaggle is assigned only to SAM. The private dataset `damminhtien/sam-vitb-lora-potsdam-20261019` is ready (3.88 GiB), and the private kernel `https://www.kaggle.com/code/damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation` is queued. The last quota query reported 30 GPU hours remaining.
+- Cloud code includes a SAM ViT-B wrapper with rank-4 LoRA on attention qkv/proj and a six-class decoder, a Kaggle trainer, a private bundle builder, and a private kernel stager. Local syntax/style checks passed; CUDA execution is pending.
+- The Google Drive folder and small README exist, but the large bundle has not been uploaded. The resumable upload is waiting for the user's manual Drive OAuth approval in the open tab/terminal.
 
-## Completed
+## Completed local preparation
 
-- The new PSPNet matches the notebook state-dict keys and starts randomly without pretrained weights.
-- The MPS training run completed epochs 1 and 2; its checkpoint contains the model, Adam state, and random states.
-- Prepared the 18 training labels and 20 no-boundary evaluation labels. The split is 18/6/14.
-- Sampled the five input-channel statistics and checked all train input rasters are aligned at 6000x6000.
-- Cached labels as compressed `.npz` class maps; the local label cache is about 27.3 MB.
-- The no-boundary `4_12` reference has palette-encoded color drift. A unique nearest-palette mapping with a 64-level per-channel bound mapped 33,463,460 pixels; the observed maximum error was 42. The audit is recorded in the preprocessing manifest. All other labels use exact palette decoding.
-- Verified all four flip/mirror combinations keep image and label transforms synchronized; saved `augmentation_preview.png`.
-- Verified crop-before-normalize exactly matches the old full-image pipeline on a real 256x256 patch (`array_equal=True`). A real cached dataset sample produced a finite `(5, 256, 256)` float32 input and valid integer labels.
-- Loaded the epoch-2 checkpoint strictly into the cloud PSPNet and restored the Adam state on CPU.
-- A checksum-current cloud bundle is at `/Users/macbook/Data/runs/pspnet-cloud-bundle-20261019` (169 files, 9.801 GiB, SHA-256 `0b3059cb164289b304e9f988de7cc4bac23519edf3471b3e6ee83024781e6e6e`). The runner verified every file against the manifest; no auth material or notebook files are present.
+- Prepared Potsdam data and labels at `/Users/macbook/Data/runs/pspnet-preprocessed-20261019`.
+- Verified the 18/6/14 train/validation/held-out split and five-channel input alignment.
+- Cached class-ID labels; audited palette decoding and the bounded no-boundary color remapping for tile `4_12`.
+- Verified synchronized flips/mirrors and crop-before-normalize equivalence on a real patch.
+- Saved the PSPNet epoch-2 model, Adam state, and random states. The SAM run starts from the separate official SAM ViT-B checkpoint, not the PSPNet checkpoint.
+- The PSPNet cloud bundle is at `/Users/macbook/Data/runs/pspnet-cloud-bundle-20261019` (169 files, 9.801 GiB, SHA-256 `0b3059cb164289b304e9f988de7cc4bac23519edf3471b3e6ee83024781e6e6e`); its checksums were verified.
+- The reusable archive is at `/Users/macbook/Data/runs/pspnet-colab-shared-bundle-20261019.tar` (10,524,434,944 bytes); it is staged for Drive upload. The Drive app's direct upload limit rejected files over 100 MiB, so use the separate, narrowly scoped resumable Drive API authorization rather than splitting the archive.
+
+## SAM experiment design
+
+- Train on the same 18 participant-labeled scenes, validate on 6 scenes, and evaluate on 14 held-out scenes.
+- Use the three stored IRRG channels only; omit DSM and nDSM. Apply official SAM channel mean/std while retaining the stored IRRG order. This is a spectral-domain difference from natural RGB pretraining and the PSPNet five-channel `/255` input.
+- Freeze the original SAM ViT-B image encoder weights; train rank-4 LoRA on attention qkv/proj and the new decoder for classes 0–5. Ignore label 6.
+- Default run: 5 epochs, 256 random 512x512 patches per epoch, batch size 1. Evaluate validation and held-out splits after training, and write an overlay preview, metrics, logs, and per-epoch adapter/decoder checkpoints under Kaggle working output.
+- Pin the official SAM source to commit `dca509fe793f601edb92606367a655c15ac00fdf`; download the ViT-B checkpoint from Meta's official URL at runtime and record its hash.
 
 ## Pending
 
-1. Wait for manual Kaggle and Colab sign-in. Do not print or read credential files or auth codes.
-2. Check compute quotas, then upload the bundle privately and start both runs concurrently.
-3. Download logs, checkpoints, and metrics, compare both replicas, and finish the code review/Graphify/commit steps.
+1. Let the Colab bundle hash verification and CUDA forward/backward smoke finish, then continue PSPNet epochs 3–16 and preserve checkpoints/logs.
+2. Wait for the Kaggle SAM kernel to leave the queue; verify CUDA smoke, all five epochs, held-out evaluation, and saved outputs.
+3. Complete the user's Drive OAuth approval and upload the reusable PSPNet archive as one resumable file; verify Drive metadata and update the mount/extract README.
+4. Download cloud checkpoints, logs, manifests, previews, and metrics under `/Users/macbook/Data`; update state, refresh Graphify if source code changes, and commit only task-owned paths.
 
 ## Limitations
 
-- No historical checkpoint exists, so a new scratch result cannot reproduce the historical reported accuracy exactly.
-- The 16-epoch target resumes at epoch 3 on two different CUDA runtimes; the replicas are independent and may diverge because of hardware/runtime randomness.
-- `/255` scaling is retained from the repository. The DSM channel includes negative values under this scale; preprocessing records the observed statistics without silently changing the model input contract.
-- Held-out class distributions are not calculated or used for model selection.
+- No historical PSPNet checkpoint exists, so its new scratch run cannot exactly reproduce the historical reported score.
+- SAM's semantic experiment uses only three-band IRRG and SAM's pretrained normalization, while PSPNet uses five channels and `/255`; present their results separately with this caveat.
+- The held-out evaluation labels are used only for final evaluation, not model selection.
+- Local Python 3.14 currently has no installed `torch` or `tifffile`; model execution and CUDA validation must happen on Kaggle. Keep the Mac on data work and postprocessing.
 
 ## Validation so far
 
-- `rtk ruff check` on changed model/data scripts and modules: passed.
-- Python 3.14 project-environment `compileall`: passed.
-- `git diff --check`: passed.
-- Bundle fingerprint and all 169 file checksums: passed.
-- Local crop-pipeline exact-equivalence check: passed.
-- Local dataset sample smoke check: passed.
-- The local notebook's saved warning now marks cells 4–5 as unexecuted training/evaluation cells; its run manifest still says `paused_for_cloud` at epoch 2.
-- Cloud CUDA smoke, full training, cloud evaluation, output download, Graphify refresh, and commit: pending.
+- Existing preprocessing bundle fingerprint and 169 checksums passed.
+- Existing local crop-pipeline equivalence and dataset sample checks passed.
+- Existing model/data scripts passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check` before the SAM changes.
+- SAM source passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check`; CUDA execution remains pending while Kaggle is queued.
+- Colab runtime reports CUDA available on Tesla T4. The first launch was blocked by 38 `._*.npz` metadata sidecars, not missing/corrupt manifest files; the relaunch is rechecking hashes, and no CUDA smoke or training epoch is yet confirmed.
+- Drive archive creation and local part sizing passed, but no archive bytes have been uploaded yet. Cloud result retrieval, final output verification, Graphify refresh if code changes, and commit remain pending.

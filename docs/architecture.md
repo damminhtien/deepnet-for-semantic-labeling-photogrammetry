@@ -8,13 +8,17 @@ This repository contains research code and notebooks for semantic labeling of th
 | --- | --- |
 | Insight-data-potsdam.ipynb | Data visualization and analysis notebook linked from the README |
 | model_kernel/ | Model experiment notebooks |
-| model_script/ | Python definitions for FCN-ResNet101, PSPNet-ResNet101, and UNet-ResNet101 variants |
-| semantic_labeling/ | Shared label, preprocessing, sampling, loss, metrics, dataset, inference, and model-initialization code |
+| model_script/ | Python definitions for FCN-ResNet101, PSPNet-ResNet101, UNet-ResNet101, and cloud experiment runners |
+| semantic_labeling/ | Shared label, preprocessing, sampling, loss, metrics, dataset, inference, model-initialization, and SAM LoRA code |
 | test_kernel/ | Evaluation notebook and a compatibility entry point in test.py |
 | visualize_net_structure/ | Notebooks for visualizing model structures |
 | dataset_description.md | Background on the Potsdam imagery, DSM data, and benchmark labels |
 
 The README describes the broad flow as data analysis, preprocessing, model building, experimentation, validation, and testing. The repository does not define package metadata, a command-line entry point, a dependency lockfile, or root test configuration at this snapshot.
+
+## Cloud model assignments
+
+model_script/train_pspnet_cloud.py resumes the five-channel scratch PSPNet from the saved MPS epoch-2 checkpoint. model_script/train_sam_kaggle.py independently fine-tunes the official SAM ViT-B image encoder using LoRA and a new six-class semantic decoder. Colab owns only PSPNet; Kaggle owns only SAM. The SAM-specific dataset and kernel stagers create private artifacts under /Users/macbook/Data.
 
 ## Model and notebook boundary
 

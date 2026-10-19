@@ -55,3 +55,13 @@ Cache raw aligned image rasters and normalize only sampled patches. A real patch
 ## 2026-10-19: Restrict near-palette decoding to Potsdam no-boundary tile 4_12
 
 All train labels and the other evaluation references use exact RGB palette decoding. The no-boundary `4_12` tile has systematic color drift; accept nearest-palette mapping only for this tile, enforce unique nearest colors and a maximum channel error of 64, and record pixel count and observed error. Do not add validation/test class distributions to preprocessing summaries.
+
+## 2026-10-19: Give Colab and Kaggle different model jobs
+
+Colab is the only PSPNet continuation, resuming the saved epoch-2 model through epoch 16. Kaggle runs a separate supervised SAM ViT-B experiment; do not upload the PSPNet checkpoint to its kernel or train PSPNet there. The Mac remains dedicated to data analysis, preprocessing, augmentation, and postprocessing.
+
+## 2026-10-19: Fine-tune SAM ViT-B with LoRA and a semantic decoder
+
+Initialize the Kaggle SAM branch from Meta's official ViT-B checkpoint, freeze its original image encoder weights, and train rank-4 LoRA updates on each attention qkv/proj projection together with a custom decoder for classes 0–5. Ignore label 6 in training and evaluation. The decoder predicts semantic class maps; SAM's prompt and object-mask decoder is not used for this task.
+
+Use the stored three-band IRRG imagery for SAM and omit DSM/nDSM. Apply the official SAM per-channel mean/std to the IRRG values while preserving their stored channel order. Record that IRRG is not natural RGB and that this input differs from PSPNet's five-channel /255 input.
