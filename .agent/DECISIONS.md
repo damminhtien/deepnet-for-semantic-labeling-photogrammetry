@@ -69,3 +69,7 @@ Use the stored three-band IRRG imagery for SAM and omit DSM/nDSM. Apply the offi
 ## 2026-10-19: Route Drive work through the authorized Drive integration
 
 Use the connected Google Drive integration for local Drive file operations. Treat gcloud ADC as a separate credential whose OAuth scopes may not include Drive. A `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` from an ADC-based Drive request is a tool/credential-scope mismatch, not a reason to ask the user to repeat Google login. Colab Drive mounting uses OAuth inside the Colab runtime and is separate from both local Drive integration and gcloud ADC.
+
+## 2026-10-19: Default the local Colab CLI to existing ADC
+
+The user has already authorized gcloud ADC for the Colab CLI. The CLI's built-in default is OAuth2, which is distinct from both ADC and the Colab website's browser session. On this Mac, the `~/.local/bin/colab` wrapper injects `--auth=adc` unless the user explicitly passes `--auth`; it preserves the option to select OAuth2. An empty `sessions` result is an authenticated account with no active CLI-listed assignments. Do not enable verbose HTTP logging for authenticated CLI calls because it can print authorization headers.

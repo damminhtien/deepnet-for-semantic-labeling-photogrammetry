@@ -45,3 +45,10 @@
 - Document that Drive file work uses the connected Drive integration, while gcloud ADC is a separate credential with independent scopes.
 - Record the handling for `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` and keep Colab's in-runtime Drive mount separate.
 - Validation: inspect the workflow/decision/state documentation and run `git diff --check`.
+
+## M9: Separate Colab CLI auth from browser and VM auth — complete
+
+- Verify the existing ADC path against the Colab assignments endpoint, distinguish an empty session list from an authentication failure, and inspect the open notebook state.
+- Configure the user-level Colab CLI command to default to ADC while preserving explicit `--auth` choices; redact authorization values from the local CLI log.
+- Record the auth boundary and avoid verbose HTTP logging for authenticated requests.
+- Validation: `colab sessions` and `colab --auth adc sessions` both return the authenticated empty result; inspect the notebook UI and verify the CLI log contains no unredacted authorization values.

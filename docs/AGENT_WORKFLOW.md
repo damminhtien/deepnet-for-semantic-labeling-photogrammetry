@@ -41,3 +41,9 @@ Use the connected Google Drive integration for Drive file operations such as lis
 Use gcloud ADC only for Google Cloud APIs that accept the scopes on that ADC token. If a Drive API request made with ADC returns `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`, treat it as a credential-scope mismatch in the selected tool path, not as evidence that the user failed to log in. Switch to the connected Drive integration and verify the resulting files there. Do not ask the user to repeat OAuth when the Drive integration is already authorized, and never inspect or print credential contents.
 
 Mounting Drive inside Colab is a separate runtime action: use `google.colab.drive.mount()` in that Colab session when it needs access. Do not route that step through local gcloud ADC.
+
+## Colab CLI authentication
+
+The Colab CLI's API authentication is separate from the Colab website session and from credentials injected into a running VM by `colab auth`. On this Mac, `/Users/macbook/.local/bin/colab` defaults commands to the existing gcloud ADC unless `--auth` is explicitly supplied. Use this wrapper rather than invoking the Python 3.14 entry point directly. On another machine without this wrapper, pass `--auth=adc` before the subcommand when using ADC. A successful `colab sessions` request with an empty assignment list means authentication succeeded but the account has no active CLI-listed sessions; it does not mean the browser notebook is signed in or running.
+
+The installed upstream CLI writes DEBUG request headers to `~/.config/colab-cli/colab.log`, including authorization headers. The local wrapper redacts bearer and token-like values before log records reach any handler. Keep using the wrapper, and do not print credential contents or raw debug logs.
