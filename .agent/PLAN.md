@@ -1,28 +1,34 @@
 # Plan
 
-## M1: Audit the existing repository
+## M1: Audit implementation copies
 
 Status: complete
 
-- Inspect the initial Git state, repository instructions, README, model scripts, and evaluation code.
-- Identify existing workflow files and preserve unrelated local state.
-- Completion check: architecture notes are limited to facts verified in the checkout.
+- Compare the evaluation script, test notebook, model notebooks, and model scripts.
+- Verify dataset semantics against the checked-in description and official ISPRS material.
+- Completion check: root causes and duplicated implementations are recorded.
 
-## M2: Externalize workflow and project guidance
-
-Status: complete
-
-- Keep AGENTS.md focused on engineering rules, routing, and key invariants.
-- Add task, plan, state, and decision files under .agent/.
-- Add architecture, data invariants, and resume workflow under docs/.
-- Completion check: the continuation order and fresh-thread prompt are explicit.
-
-## M3: Verify and checkpoint
+## M2: Establish shared pipeline modules
 
 Status: complete
 
-- Check changed-file scope, local Markdown references, and git diff --cached --check.
-- Verify the continuation prompt and keep AGENTS.md under 35 lines.
-- Do not run model or notebook workloads for this documentation-only task.
-- Stage only task-owned documentation and commit it; leave the installed .codex/ configuration unchanged.
-- Completion check: validation results and final task status are recorded in STATE.md.
+- Add shared constants, label conversion, normalization, sampling, loss, metrics, and dataset loading under `semantic_labeling/`.
+- Preserve existing call semantics where they are valid; reject malformed labels, image shapes, and misaligned modality lists explicitly.
+- Completion check: helpers have one implementation and clear validation boundaries.
+
+## M3: Move callers onto shared helpers and repair model paths
+
+Status: complete
+
+- Update the training and evaluation notebooks through Jupyter MCP and update `test_kernel/test.py`.
+- Fix PSPNet auxiliary inference and invalid U-Net upsampling configuration in both source and notebook copies.
+- Completion check: each caller imports the shared helpers and each source/notebook pair stays aligned.
+
+## M4: Validate and checkpoint
+
+Status: complete
+
+- Inspect the complete diff, run syntax and whitespace checks, update Graphify, and commit task-owned paths.
+- Do not claim model or data-path runtime validation without the missing dependencies/data/checkpoints.
+- Update `.agent/STATE.md` and `.agent/DECISIONS.md` before committing.
+- Completion check: exact commands and remaining limitations are recorded.

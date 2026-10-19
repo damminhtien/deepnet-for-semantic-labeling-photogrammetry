@@ -1,8 +1,22 @@
+import sys
+from pathlib import Path
+
+from torch import nn
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from semantic_labeling.constants import INPUT_CHANNELS, N_CLASSES
+
+IN_CHANNELS = INPUT_CHANNELS
+
+
 class Bottleneck(nn.Module):
     expansion = 4
 
     def __init__(self, in_channels, out_channels, stride=1, downsample=None):
-        super(Bottleneck, self).__init__()
+        super().__init__()
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3,
@@ -39,7 +53,7 @@ class Bottleneck(nn.Module):
 
 class DeconvBottleneck(nn.Module):
     def __init__(self, in_channels, out_channels, expansion=2, stride=1, upsample=None):
-        super(DeconvBottleneck, self).__init__()
+        super().__init__()
         self.expansion = expansion
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channels)
@@ -84,11 +98,11 @@ class DeconvBottleneck(nn.Module):
 
 class ResNet(nn.Module):
     def __init__(self, downblock, upblock, num_layers, n_classes=N_CLASSES):
-        super(ResNet, self).__init__()
+        super().__init__()
 
         self.in_channels = 64
 
-        self.conv1 = nn.Conv2d(5, 64, kernel_size=7, stride=2, padding=3,
+        self.conv1 = nn.Conv2d(IN_CHANNELS, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()
@@ -183,11 +197,8 @@ class ResNet(nn.Module):
 
         return x
 
-def FCN8s_Rn101(**kwargs):
-    return ResNet(Bottleneck, DeconvBottleneck, [3, 4, 23, 2], N_CLASSES, **kwargs)
+def FCN8s_Rn101(n_classes=N_CLASSES, **kwargs):
+    return ResNet(Bottleneck, DeconvBottleneck, [3, 4, 23, 2], n_classes=n_classes, **kwargs)
 
 
 # In[7]:
-
-
-net = FCN8s_Rn101()

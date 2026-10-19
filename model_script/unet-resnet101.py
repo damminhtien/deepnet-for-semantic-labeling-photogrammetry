@@ -1,3 +1,19 @@
+import sys
+from pathlib import Path
+
+import torch
+import torchvision
+from torch import nn
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from semantic_labeling.constants import INPUT_CHANNELS, N_CLASSES
+
+IN_CHANNELS = INPUT_CHANNELS
+
+
 class ConvBlock(nn.Module):
     """
     Helper module that consists of a Conv -> BN -> ReLU
@@ -43,18 +59,20 @@ class UpBlockForUNetWithResNet101(nn.Module):
                  upsampling_method="conv_transpose"):
         super().__init__()
 
-        if up_conv_in_channels == None:
+        if up_conv_in_channels is None:
             up_conv_in_channels = in_channels
-        if up_conv_out_channels == None:
+        if up_conv_out_channels is None:
             up_conv_out_channels = out_channels
 
         if upsampling_method == "conv_transpose":
             self.upsample = nn.ConvTranspose2d(up_conv_in_channels, up_conv_out_channels, kernel_size=2, stride=2)
         elif upsampling_method == "bilinear":
             self.upsample = nn.Sequential(
-                nn.Upsample(mode='bilinear', scale_factor=2),
-                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1)
+                nn.Upsample(mode='bilinear', scale_factor=2, align_corners=True),
+                nn.Conv2d(up_conv_in_channels, up_conv_out_channels, kernel_size=1, stride=1)
             )
+        else:
+            raise ValueError(f"Unsupported upsampling method: {upsampling_method!r}")
         self.conv_block_1 = ConvBlock(in_channels, out_channels)
         self.conv_block_2 = ConvBlock(out_channels, out_channels)
 
@@ -93,7 +111,7 @@ class UNetWithResnet101Encoder(nn.Module):
         up_blocks.append(UpBlockForUNetWithResNet101(512, 256))
         up_blocks.append(UpBlockForUNetWithResNet101(in_channels=128 + 64, out_channels=128,
                                                     up_conv_in_channels=256, up_conv_out_channels=128))
-        up_blocks.append(UpBlockForUNetWithResNet101(in_channels=64 + 5, out_channels=64,
+        up_blocks.append(UpBlockForUNetWithResNet101(in_channels=64 + IN_CHANNELS, out_channels=64,
                                                     up_conv_in_channels=128, up_conv_out_channels=64))
 
         self.up_blocks = nn.ModuleList(up_blocks)
@@ -101,10 +119,10 @@ class UNetWithResnet101Encoder(nn.Module):
         self.out = nn.Conv2d(64, n_classes, kernel_size=1, stride=1)
 
     def forward(self, x, with_output_feature_map=False):
-        pre_pools = dict()
-        pre_pools[f"layer_0"] = x
+        pre_pools = {}
+        pre_pools["layer_0"] = x
         x = self.input_block(x)
-        pre_pools[f"layer_1"] = x
+        pre_pools["layer_1"] = x
         x = self.input_pool(x)
 
         for i, block in enumerate(self.down_blocks, 2):
@@ -125,6 +143,3 @@ class UNetWithResnet101Encoder(nn.Module):
             return x, output_feature_map
         else:
             return x
-
-
-net = UNetWithResnet101Encoder()

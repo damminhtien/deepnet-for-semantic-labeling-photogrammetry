@@ -1,6 +1,24 @@
+import sys
+from pathlib import Path
+
+import torch
+import torch.nn.functional as F
+from torch import nn
+from torchvision import models
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from semantic_labeling.constants import INPUT_CHANNELS, N_CLASSES
+from semantic_labeling.model_utils import initialize_weights
+
+IN_CHANNELS = INPUT_CHANNELS
+
+
 class _PyramidPoolingModule(nn.Module):
     def __init__(self, in_dim, reduction_dim, setting):
-        super(_PyramidPoolingModule, self).__init__()
+        super().__init__()
         self.features = []
         for s in setting:
             self.features.append(nn.Sequential(
@@ -22,7 +40,7 @@ class _PyramidPoolingModule(nn.Module):
 
 class PSPNet(nn.Module):
     def __init__(self, num_classes=N_CLASSES, pretrained=True, use_aux=True):
-        super(PSPNet, self).__init__()
+        super().__init__()
         self.use_aux = use_aux
         resnet = models.resnet101()
         if pretrained:
@@ -69,11 +87,8 @@ class PSPNet(nn.Module):
         x = self.layer4(x)
         x = self.ppm(x)
         x = self.final(x)
-        interpolate_aux = F.interpolate(aux, x_size[2:], mode='bilinear', align_corners=True)
         if self.training and self.use_aux:
+            interpolate_aux = F.interpolate(aux, x_size[2:], mode='bilinear', align_corners=True)
             return F.interpolate(x, x_size[2:], mode='bilinear', align_corners=True) + interpolate_aux, interpolate_aux
-        
+
         return F.interpolate(x, x_size[2:], mode='bilinear', align_corners=True)
-
-
-net = PSPNet()
