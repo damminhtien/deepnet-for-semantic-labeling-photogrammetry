@@ -1,1 +1,10 @@
 /graphify-out/
+
+# Local Jupyter state and generated checkpoints
+/.jupyter/
+/.jupyter_ystore.db
+**/.ipynb_checkpoints/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
