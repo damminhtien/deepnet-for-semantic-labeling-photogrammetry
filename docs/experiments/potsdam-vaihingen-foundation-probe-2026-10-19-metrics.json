@@ -1,0 +1,3292 @@
+{
+  "schema_version": 1,
+  "run_date": "2026-10-19",
+  "purpose": "Frozen-encoder linear-probe comparison on Potsdam and Vaihingen; aggregate metrics only.",
+  "environment": {
+    "python": "3.14.8",
+    "pytorch": "2.14.1",
+    "device": "Apple MPS"
+  },
+  "protocol": {
+    "encoder_frozen": true,
+    "head": "single supervised linear layer on dense features",
+    "epochs": 100,
+    "optimizer": "AdamW",
+    "learning_rate": 0.02,
+    "weight_decay": 0.0001,
+    "class_weighting": "square-root inverse frequency from training labels only",
+    "seed": 20261019,
+    "scoring_grid": "approximately 5 m; class-wise majority downsampling",
+    "bands": [
+      "IR",
+      "R",
+      "G"
+    ],
+    "model_input_slots": [
+      "R",
+      "G",
+      "NIR-as-blue"
+    ],
+    "dsm_used": false,
+    "ndsm_used": false,
+    "input_normalization": "per-dataset mean/std computed from source training scenes only",
+    "ignored_label_id": 6,
+    "classes": [
+      "impervious surfaces",
+      "buildings",
+      "low vegetation",
+      "trees",
+      "cars",
+      "clutter/background"
+    ],
+    "full_reference_and_eroded_reference_scored": true,
+    "feature_grid_alignment": "AnySat and TerraMind maps bilinearly upsampled to the common 60x60 scoring grid."
+  },
+  "data_provenance": {
+    "potsdam": {
+      "source": "Existing local Potsdam imagery and labels; fixed 18/6/14 scene split.",
+      "raw_data_in_repository": false
+    },
+    "vaihingen": {
+      "source": "https://isprs.org/resources/datasets/benchmarks/UrbanSemLab/default.aspx",
+      "dataset": "ISPRS Vaihingen 2D semantic labeling",
+      "download_method": "HTTP byte ranges from the official ISPRS-linked Seafile ZIP; only selected 2D members fetched",
+      "outer_archive_size_bytes": 16016774527,
+      "excluded_members": [
+        "DSM",
+        "ALS/LAS",
+        "3D semantic labeling",
+        "3D reconstruction"
+      ],
+      "selected_2d_archive_members": [
+        {
+          "outer_member": "Vaihingen/ISPRS_semantic_labeling_Vaihingen.zip",
+          "bytes": 879699479,
+          "sha256": "2039eb9ad929d590e516fb136c4f132d5c3656d07424e4950a556d825674bd18"
+        },
+        {
+          "outer_member": "Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_COMPLETE.zip",
+          "bytes": 10528231,
+          "sha256": "bcf8959c0479988d68dca4361a380cf9405be6dd83b7730ed8f682d54e1ee9f7"
+        },
+        {
+          "outer_member": "Vaihingen/ISPRS_semantic_labeling_Vaihingen_ground_truth_eroded_COMPLETE.zip",
+          "bytes": 7642640,
+          "sha256": "a6a6aff769dff545301fc7a3817dcd2774e1d17358d2fac3a4b5cefe373ff0b1"
+        }
+      ],
+      "participant_labels_match_complete_reference_on_training_scenes": true,
+      "raw_data_in_repository": false
+    }
+  },
+  "source_code_sha256": {
+    "evaluate_foundation_model.py": "0f369447e9fc09c978e347c700d34d807fc48fadf9c4c2c6bdddb20cd59d9200",
+    "prepare_vaihingen_inputs.py": "0e9081ce165660173b0fa97775d6749c70b11082ea863666056dd31898b69028",
+    "download_vaihingen_members.py": "6adfc988bf5fca21c11961ca916f4659e63ad9da503277e51f01735a52dcacac"
+  },
+  "models": {
+    "universat": {
+      "source_commit": "4f55ee696ae384f7a07ae93a016f78e326f7f5eb",
+      "checkpoint_sha256": "5cc062c9d4960ad405bca730765e7c23bc43c52471dbef0d821382990385be82",
+      "runtime": {
+        "evaluation_elapsed_seconds_after_preload": 124.05795274999946,
+        "scope": "Elapsed after model/data preload; includes four-fold OOF probes, final in-domain fits/evaluations, and both cross-domain evaluations. It is not per-tile inference latency."
+      },
+      "native_feature_grid": "60x60",
+      "potsdam": {
+        "train_scene_ids": [
+          "2_10",
+          "2_11",
+          "2_12",
+          "3_10",
+          "3_11",
+          "5_10",
+          "5_12",
+          "6_10",
+          "6_11",
+          "6_7",
+          "6_8",
+          "6_9",
+          "7_10",
+          "7_11",
+          "7_12",
+          "7_7",
+          "7_8",
+          "7_9"
+        ],
+        "validation_scene_ids": [
+          "3_12",
+          "4_10",
+          "4_11",
+          "4_12",
+          "5_11",
+          "6_12"
+        ],
+        "held_out_scene_ids": [
+          "2_13",
+          "2_14",
+          "3_13",
+          "3_14",
+          "4_13",
+          "4_14",
+          "4_15",
+          "5_13",
+          "5_14",
+          "5_15",
+          "6_13",
+          "6_14",
+          "6_15",
+          "7_13"
+        ],
+        "validation": {
+          "overall_accuracy": 0.5206944444444445,
+          "mean_iou": 0.237547403672429,
+          "evaluated_cells": 21600,
+          "per_class_iou": {
+            "impervious surfaces": 0.37300696159892205,
+            "buildings": 0.4741419620312354,
+            "low vegetation": 0.21663185874311752,
+            "trees": 0.2812019805361106,
+            "cars": 0.01568627450980392,
+            "clutter/background": 0.06461538461538462
+          }
+        },
+        "held_out_full_reference": {
+          "overall_accuracy": 0.4718452380952381,
+          "mean_iou": 0.2295564870722637,
+          "macro_f1": 0.35241194046851326,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.47184523809523815,
+          "scene_macro_miou": 0.21037267116823724,
+          "scene_miou_std": 0.022643913009956548,
+          "per_class_iou": {
+            "impervious surfaces": 0.34582615578006426,
+            "buildings": 0.4004625259580895,
+            "low vegetation": 0.2938376431236331,
+            "trees": 0.22156846941242847,
+            "cars": 0.012448132780082987,
+            "clutter/background": 0.10319599537928378
+          },
+          "class_support": {
+            "impervious surfaces": 16918,
+            "buildings": 12554,
+            "low vegetation": 10327,
+            "trees": 8626,
+            "cars": 170,
+            "clutter/background": 1805
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.48055555555555557,
+              "mean_iou": 0.20157226234786332,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.5461111111111111,
+              "mean_iou": 0.20665411515088483,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.4713888888888889,
+              "mean_iou": 0.21181985995971964,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.47694444444444445,
+              "mean_iou": 0.22314661196547084,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.4722222222222222,
+              "mean_iou": 0.19925702886128674,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.4111111111111111,
+              "mean_iou": 0.19713742338130744,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.43972222222222224,
+              "mean_iou": 0.15852364073221278,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.49805555555555553,
+              "mean_iou": 0.23325243615754623,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.4772222222222222,
+              "mean_iou": 0.23748334547738148,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.4955555555555556,
+              "mean_iou": 0.22040516423724352,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.4633333333333333,
+              "mean_iou": 0.22712435651404025,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.44,
+              "mean_iou": 0.18616586795966303,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.4897222222222222,
+              "mean_iou": 0.24843642832025734,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.4438888888888889,
+              "mean_iou": 0.19423885529044363,
+              "evaluated_cells": 3600
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.3356746031746032,
+            "mean_iou": 0.055945767195767195,
+            "macro_f1": 0.5026293116254197
+          }
+        },
+        "held_out_eroded_reference": {
+          "overall_accuracy": 0.4722420634920635,
+          "mean_iou": 0.22962884864807162,
+          "macro_f1": 0.3523540729625813,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.4722420634920635,
+          "scene_macro_miou": 0.21052004442029726,
+          "scene_miou_std": 0.022537768995375865,
+          "per_class_iou": {
+            "impervious surfaces": 0.34522643533417285,
+            "buildings": 0.4023649126112969,
+            "low vegetation": 0.29326270912731733,
+            "trees": 0.2222222222222222,
+            "cars": 0.011627906976744186,
+            "clutter/background": 0.10306890561667632
+          },
+          "class_support": {
+            "impervious surfaces": 16854,
+            "buildings": 12649,
+            "low vegetation": 10234,
+            "trees": 8705,
+            "cars": 168,
+            "clutter/background": 1790
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.48083333333333333,
+              "mean_iou": 0.2020000126643974,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.5438888888888889,
+              "mean_iou": 0.20633006433735213,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.4708333333333333,
+              "mean_iou": 0.20988524110289788,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.47694444444444445,
+              "mean_iou": 0.22351005900657298,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.4741666666666667,
+              "mean_iou": 0.1996389680569254,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.4125,
+              "mean_iou": 0.1978704550558452,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.44055555555555553,
+              "mean_iou": 0.1583369558177743,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.5002777777777778,
+              "mean_iou": 0.23471696031743047,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.4766666666666667,
+              "mean_iou": 0.23700033806833598,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.49583333333333335,
+              "mean_iou": 0.22074034612806712,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.46444444444444444,
+              "mean_iou": 0.22733855332922726,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.4411111111111111,
+              "mean_iou": 0.1866629167038261,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.48833333333333334,
+              "mean_iou": 0.2477086718056513,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.445,
+              "mean_iou": 0.1955410794898579,
+              "evaluated_cells": 3600
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.3344047619047619,
+            "mean_iou": 0.05573412698412699,
+            "macro_f1": 0.5012043893300028
+          }
+        }
+      },
+      "vaihingen": {
+        "train_scene_ids": [
+          "1",
+          "3",
+          "5",
+          "7",
+          "11",
+          "13",
+          "15",
+          "17",
+          "21",
+          "23",
+          "26",
+          "28",
+          "30",
+          "32",
+          "34",
+          "37"
+        ],
+        "official_held_out_scene_ids": [
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16",
+          "20",
+          "22",
+          "24",
+          "27",
+          "29",
+          "31",
+          "33",
+          "35",
+          "38"
+        ],
+        "participant_labels_match_complete_reference": true,
+        "cross_validation_oof_eroded_reference": {
+          "overall_accuracy": 0.5841158368184329,
+          "mean_iou": 0.27686706222287016,
+          "macro_f1": 0.46970045713723796,
+          "evaluated_cells": 25346,
+          "per_class_iou": {
+            "impervious surfaces": 0.46389563106796117,
+            "buildings": 0.45218002812939523,
+            "low vegetation": 0.327940773238278,
+            "trees": 0.40768475325313036,
+            "cars": 0.009501187648456057,
+            "clutter/background": 0.0
+          },
+          "class_support": {
+            "impervious surfaces": 7359,
+            "buildings": 6815,
+            "low vegetation": 5093,
+            "trees": 5850,
+            "cars": 62,
+            "clutter/background": 167
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.29034167126962834,
+            "mean_iou": 0.048390278544938055,
+            "macro_f1": 0.4500229322733527
+          }
+        },
+        "cross_validation_folds": [
+          {
+            "fold": 1,
+            "train_scene_ids": [
+              "1",
+              "5",
+              "7",
+              "11",
+              "13",
+              "15",
+              "17",
+              "21",
+              "23",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "3",
+              "30",
+              "26",
+              "28"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.5596343586767266,
+              "mean_iou": 0.25377280550913534,
+              "macro_f1": 0.43865616422664877,
+              "evaluated_cells": 6892,
+              "scene_macro_overall_accuracy": 0.5601155730005367,
+              "scene_macro_miou": 0.2627130949411383,
+              "scene_miou_std": 0.011332844001147098,
+              "per_class_iou": {
+                "impervious surfaces": 0.4627113026184952,
+                "buildings": 0.45006657789613846,
+                "low vegetation": 0.2133592736705577,
+                "trees": 0.37427745664739887,
+                "cars": 0.022222222222222223,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 2148,
+                "buildings": 2055,
+                "low vegetation": 1241,
+                "trees": 1274,
+                "cars": 27,
+                "clutter/background": 147
+              },
+              "per_scene": {
+                "3": {
+                  "overall_accuracy": 0.5432098765432098,
+                  "mean_iou": 0.25787170703517315,
+                  "evaluated_cells": 1944
+                },
+                "30": {
+                  "overall_accuracy": 0.568944099378882,
+                  "mean_iou": 0.27255500013326694,
+                  "evaluated_cells": 1610
+                },
+                "26": {
+                  "overall_accuracy": 0.5798611111111112,
+                  "mean_iou": 0.2740137183601905,
+                  "evaluated_cells": 1728
+                },
+                "28": {
+                  "overall_accuracy": 0.5484472049689441,
+                  "mean_iou": 0.2464119542359227,
+                  "evaluated_cells": 1610
+                }
+              }
+            }
+          },
+          {
+            "fold": 2,
+            "train_scene_ids": [
+              "1",
+              "3",
+              "13",
+              "17",
+              "21",
+              "23",
+              "26",
+              "28",
+              "30",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "7",
+              "5",
+              "11",
+              "15"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.5956839098698826,
+              "mean_iou": 0.28046385504068794,
+              "macro_f1": 0.4715997616953896,
+              "evaluated_cells": 6302,
+              "scene_macro_overall_accuracy": 0.5957526488856413,
+              "scene_macro_miou": 0.2882174350873262,
+              "scene_miou_std": 0.04094061580213294,
+              "per_class_iou": {
+                "impervious surfaces": 0.4480700358137684,
+                "buildings": 0.4556436391090978,
+                "low vegetation": 0.28667563930013457,
+                "trees": 0.4853515625,
+                "cars": 0.007042253521126761,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1899,
+                "buildings": 1900,
+                "low vegetation": 930,
+                "trees": 1552,
+                "cars": 18,
+                "clutter/background": 3
+              },
+              "per_scene": {
+                "7": {
+                  "overall_accuracy": 0.6023017902813299,
+                  "mean_iou": 0.265460668177244,
+                  "evaluated_cells": 1564
+                },
+                "5": {
+                  "overall_accuracy": 0.5856777493606138,
+                  "mean_iou": 0.25510614331330983,
+                  "evaluated_cells": 1564
+                },
+                "11": {
+                  "overall_accuracy": 0.6086956521739131,
+                  "mean_iou": 0.3581615109380538,
+                  "evaluated_cells": 1564
+                },
+                "15": {
+                  "overall_accuracy": 0.5863354037267081,
+                  "mean_iou": 0.2741414179206972,
+                  "evaluated_cells": 1610
+                }
+              }
+            }
+          },
+          {
+            "fold": 3,
+            "train_scene_ids": [
+              "3",
+              "5",
+              "7",
+              "11",
+              "13",
+              "15",
+              "26",
+              "28",
+              "30",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "17",
+              "21",
+              "1",
+              "23"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.5678471248246845,
+              "mean_iou": 0.2622728544300882,
+              "macro_f1": 0.5626406488063849,
+              "evaluated_cells": 5704,
+              "scene_macro_overall_accuracy": 0.569332298136646,
+              "scene_macro_miou": 0.2769949050412858,
+              "scene_miou_std": 0.0401551548958172,
+              "per_class_iou": {
+                "impervious surfaces": 0.37539267015706806,
+                "buildings": 0.43160493827160495,
+                "low vegetation": 0.3169129720853859,
+                "trees": 0.44972654606647033,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1444,
+                "buildings": 1409,
+                "low vegetation": 1219,
+                "trees": 1630,
+                "cars": 0,
+                "clutter/background": 2
+              },
+              "per_scene": {
+                "17": {
+                  "overall_accuracy": 0.5838509316770186,
+                  "mean_iou": 0.34243418964474603,
+                  "evaluated_cells": 966
+                },
+                "21": {
+                  "overall_accuracy": 0.5601023017902813,
+                  "mean_iou": 0.2731005337947868,
+                  "evaluated_cells": 1564
+                },
+                "1": {
+                  "overall_accuracy": 0.5739130434782609,
+                  "mean_iou": 0.23485601572208337,
+                  "evaluated_cells": 1610
+                },
+                "23": {
+                  "overall_accuracy": 0.559462915601023,
+                  "mean_iou": 0.2575888810035271,
+                  "evaluated_cells": 1564
+                }
+              }
+            }
+          },
+          {
+            "fold": 4,
+            "train_scene_ids": [
+              "1",
+              "3",
+              "5",
+              "7",
+              "11",
+              "15",
+              "17",
+              "21",
+              "23",
+              "26",
+              "28",
+              "30"
+            ],
+            "validation_scene_ids": [
+              "37",
+              "32",
+              "34",
+              "13"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.6133684863523573,
+              "mean_iou": 0.29101390610750794,
+              "macro_f1": 0.6016400720326848,
+              "evaluated_cells": 6448,
+              "scene_macro_overall_accuracy": 0.62261345158031,
+              "scene_macro_miou": 0.31338947306901177,
+              "scene_miou_std": 0.03528948605207794,
+              "per_class_iou": {
+                "impervious surfaces": 0.5506535947712419,
+                "buildings": 0.46924428822495606,
+                "low vegetation": 0.43378433784337844,
+                "trees": 0.2924012158054711,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1868,
+                "buildings": 1451,
+                "low vegetation": 1703,
+                "trees": 1394,
+                "cars": 17,
+                "clutter/background": 15
+              },
+              "per_scene": {
+                "37": {
+                  "overall_accuracy": 0.6304012345679012,
+                  "mean_iou": 0.3290934065552284,
+                  "evaluated_cells": 1296
+                },
+                "32": {
+                  "overall_accuracy": 0.6986714975845411,
+                  "mean_iou": 0.2694625578446388,
+                  "evaluated_cells": 1656
+                },
+                "34": {
+                  "overall_accuracy": 0.6217391304347826,
+                  "mean_iou": 0.3621919969734025,
+                  "evaluated_cells": 1150
+                },
+                "13": {
+                  "overall_accuracy": 0.5396419437340153,
+                  "mean_iou": 0.29280993090277735,
+                  "evaluated_cells": 2346
+                }
+              }
+            }
+          }
+        ],
+        "held_out_full_reference": {
+          "overall_accuracy": 0.5852230166836908,
+          "mean_iou": 0.2945354115920515,
+          "macro_f1": 0.4227571818507651,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.5902618248961482,
+          "scene_macro_miou": 0.29217861850388205,
+          "scene_miou_std": 0.0417252426748627,
+          "per_class_iou": {
+            "impervious surfaces": 0.4573228346456693,
+            "buildings": 0.44754977029096477,
+            "low vegetation": 0.3169022895033154,
+            "trees": 0.43859462902027385,
+            "cars": 0.022284122562674095,
+            "clutter/background": 0.08455882352941177
+          },
+          "class_support": {
+            "impervious surfaces": 8493,
+            "buildings": 7729,
+            "low vegetation": 6228,
+            "trees": 6581,
+            "cars": 106,
+            "clutter/background": 233
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.5618181818181818,
+              "mean_iou": 0.33388299670891514,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.6547314578005116,
+              "mean_iou": 0.2724544816377262,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.5664961636828645,
+              "mean_iou": 0.24433936989650928,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.6508951406649617,
+              "mean_iou": 0.3367063813201003,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.5875959079283888,
+              "mean_iou": 0.26810238118056984,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.5894409937888199,
+              "mean_iou": 0.2776598094578364,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.6173913043478261,
+              "mean_iou": 0.3649848524296355,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.6440993788819875,
+              "mean_iou": 0.3692704377272665,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.5966386554621849,
+              "mean_iou": 0.282204001277157,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.6042199488491049,
+              "mean_iou": 0.33891016564655957,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.6016624040920716,
+              "mean_iou": 0.27678703903819546,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.5552380952380952,
+              "mean_iou": 0.2369198231901591,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.6770186335403726,
+              "mean_iou": 0.3098467651012584,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.5398550724637681,
+              "mean_iou": 0.28402162537005454,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.5527950310559007,
+              "mean_iou": 0.2683533032190227,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.5147058823529411,
+              "mean_iou": 0.22579986782829575,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.5198487712665406,
+              "mean_iou": 0.2767932135367327,
+              "evaluated_cells": 3174
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.2891726251276813,
+            "mean_iou": 0.04819543752128022,
+            "macro_f1": 0.44861738372553683
+          }
+        },
+        "held_out_eroded_reference": {
+          "overall_accuracy": 0.585665645216207,
+          "mean_iou": 0.2950922385154073,
+          "macro_f1": 0.42355171347821474,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.5907391688315087,
+          "scene_macro_miou": 0.29265495752444404,
+          "scene_miou_std": 0.04154007254814112,
+          "per_class_iou": {
+            "impervious surfaces": 0.45674139564256394,
+            "buildings": 0.44796035074342355,
+            "low vegetation": 0.31749025524959135,
+            "trees": 0.4399448743771865,
+            "cars": 0.023545706371191136,
+            "clutter/background": 0.08487084870848709
+          },
+          "class_support": {
+            "impervious surfaces": 8439,
+            "buildings": 7797,
+            "low vegetation": 6180,
+            "trees": 6611,
+            "cars": 111,
+            "clutter/background": 232
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.5604545454545454,
+              "mean_iou": 0.33484201414177667,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.6534526854219949,
+              "mean_iou": 0.2728190566170512,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.5684143222506394,
+              "mean_iou": 0.24547703365842202,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.6534526854219949,
+              "mean_iou": 0.33871754235356216,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.5907928388746803,
+              "mean_iou": 0.2700424871512482,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.593167701863354,
+              "mean_iou": 0.2798585741194908,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.6161490683229813,
+              "mean_iou": 0.3635083392621632,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.6440993788819875,
+              "mean_iou": 0.36901781220440455,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.5938375350140056,
+              "mean_iou": 0.28015203043822723,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.6054987212276215,
+              "mean_iou": 0.34002645863735825,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.6035805626598465,
+              "mean_iou": 0.2783896652078725,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.5542857142857143,
+              "mean_iou": 0.23646261888477027,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.6763975155279504,
+              "mean_iou": 0.30876716412993044,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.5380434782608695,
+              "mean_iou": 0.2828530810412431,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.5551242236024845,
+              "mean_iou": 0.2707292535052637,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.5147058823529411,
+              "mean_iou": 0.22584287234128067,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.5211090107120353,
+              "mean_iou": 0.2776282742214849,
+              "evaluated_cells": 3174
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.2873340143003064,
+            "mean_iou": 0.0478890023833844,
+            "macro_f1": 0.4464016504006982
+          }
+        }
+      },
+      "cross_domain_eroded_reference": {
+        "potsdam_train_to_vaihingen_official_test": {
+          "overall_accuracy": 0.19053455907388492,
+          "mean_iou": 0.10112849739451879,
+          "macro_f1": 0.17497003092727995,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.1996740440765532,
+          "scene_macro_miou": 0.08922759294439371,
+          "scene_miou_std": 0.029165743243703898,
+          "per_class_iou": {
+            "impervious surfaces": 0.15517241379310345,
+            "buildings": 0.08539848749272833,
+            "low vegetation": 0.07146477445514444,
+            "trees": 0.24204634721131185,
+            "cars": 0.0029908657343787892,
+            "clutter/background": 0.04969809568044589
+          },
+          "class_support": {
+            "impervious surfaces": 8439,
+            "buildings": 7797,
+            "low vegetation": 6180,
+            "trees": 6611,
+            "cars": 111,
+            "clutter/background": 232
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.10363636363636364,
+              "mean_iou": 0.06932829461882811,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.24872122762148338,
+              "mean_iou": 0.11869439832438687,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.19501278772378516,
+              "mean_iou": 0.1015647873303799,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.2071611253196931,
+              "mean_iou": 0.1024967860299107,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.18734015345268543,
+              "mean_iou": 0.08514225654189878,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.2546583850931677,
+              "mean_iou": 0.09093140209737129,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.1391304347826087,
+              "mean_iou": 0.056118801379879964,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.2093167701863354,
+              "mean_iou": 0.07608909825851966,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.29481792717086835,
+              "mean_iou": 0.1473370878550837,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.15920716112531969,
+              "mean_iou": 0.07982318656977486,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.29028132992327366,
+              "mean_iou": 0.12727474843217348,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.13095238095238096,
+              "mean_iou": 0.06626228138916669,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.3422360248447205,
+              "mean_iou": 0.12963187967714898,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.2916666666666667,
+              "mean_iou": 0.1081307138029291,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.140527950310559,
+              "mean_iou": 0.0619920814180924,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.11,
+              "mean_iou": 0.050572675309942756,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.08979206049149338,
+              "mean_iou": 0.045478601019205846,
+              "evaluated_cells": 3174
+            }
+          }
+        },
+        "vaihingen_train_to_potsdam_held_out": {
+          "overall_accuracy": 0.30702380952380953,
+          "mean_iou": 0.09405537628060995,
+          "macro_f1": 0.19175095485411062,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.3070238095238095,
+          "scene_macro_miou": 0.08891272153502892,
+          "scene_miou_std": 0.024193245637279565,
+          "per_class_iou": {
+            "impervious surfaces": 0.1881541277514432,
+            "buildings": 0.24159419946449304,
+            "low vegetation": 0.08392738332858093,
+            "trees": 0.03999123479785253,
+            "cars": 0.0,
+            "clutter/background": 0.010665312341289994
+          },
+          "class_support": {
+            "impervious surfaces": 16854,
+            "buildings": 12649,
+            "low vegetation": 10234,
+            "trees": 8705,
+            "cars": 168,
+            "clutter/background": 1790
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.29083333333333333,
+              "mean_iou": 0.10000268949745723,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.14444444444444443,
+              "mean_iou": 0.058006669626362424,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.24944444444444444,
+              "mean_iou": 0.055987776435133446,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.22694444444444445,
+              "mean_iou": 0.06041628795856243,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.35555555555555557,
+              "mean_iou": 0.08055990586481708,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.2477777777777778,
+              "mean_iou": 0.07629663146054748,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.3233333333333333,
+              "mean_iou": 0.08048825684698312,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.44,
+              "mean_iou": 0.14442836332097228,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.3477777777777778,
+              "mean_iou": 0.11768570946240886,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.29194444444444445,
+              "mean_iou": 0.08101027691383116,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.3411111111111111,
+              "mean_iou": 0.11321639035328508,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.34833333333333333,
+              "mean_iou": 0.08224799715440283,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.3,
+              "mean_iou": 0.0878634255123657,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.3908333333333333,
+              "mean_iou": 0.10656772108327563,
+              "evaluated_cells": 3600
+            }
+          }
+        }
+      }
+    },
+    "anysat": {
+      "source_commit": "5f6f475e1a22ce5e3a56a5b18f4ed6d24eca2a4a",
+      "checkpoint_sha256": "ce1246527a28bade624048c448a1fa473ca85791b998f562ce2bcc3dcac93d4f",
+      "runtime": {
+        "evaluation_elapsed_seconds_after_preload": 118.72457095800019,
+        "scope": "Elapsed after model/data preload; includes four-fold OOF probes, final in-domain fits/evaluations, and both cross-domain evaluations. It is not per-tile inference latency."
+      },
+      "native_feature_grid": "30x30",
+      "potsdam": {
+        "train_scene_ids": [
+          "2_10",
+          "2_11",
+          "2_12",
+          "3_10",
+          "3_11",
+          "5_10",
+          "5_12",
+          "6_10",
+          "6_11",
+          "6_7",
+          "6_8",
+          "6_9",
+          "7_10",
+          "7_11",
+          "7_12",
+          "7_7",
+          "7_8",
+          "7_9"
+        ],
+        "validation_scene_ids": [
+          "3_12",
+          "4_10",
+          "4_11",
+          "4_12",
+          "5_11",
+          "6_12"
+        ],
+        "held_out_scene_ids": [
+          "2_13",
+          "2_14",
+          "3_13",
+          "3_14",
+          "4_13",
+          "4_14",
+          "4_15",
+          "5_13",
+          "5_14",
+          "5_15",
+          "6_13",
+          "6_14",
+          "6_15",
+          "7_13"
+        ],
+        "validation": {
+          "overall_accuracy": 0.4124074074074074,
+          "mean_iou": 0.17150528834924986,
+          "evaluated_cells": 21600,
+          "per_class_iou": {
+            "impervious surfaces": 0.1279909386946057,
+            "buildings": 0.39787080476362324,
+            "low vegetation": 0.25229308298262654,
+            "trees": 0.22444161975667332,
+            "cars": 0.005291005291005291,
+            "clutter/background": 0.021144278606965175
+          }
+        },
+        "held_out_full_reference": {
+          "overall_accuracy": 0.3151388888888889,
+          "mean_iou": 0.13755681796768976,
+          "macro_f1": 0.23091756318485637,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.3151388888888889,
+          "scene_macro_miou": 0.10964584220181597,
+          "scene_miou_std": 0.049959174506203866,
+          "per_class_iou": {
+            "impervious surfaces": 0.1652896829494991,
+            "buildings": 0.2779662227300318,
+            "low vegetation": 0.17542499254399047,
+            "trees": 0.1538622347653392,
+            "cars": 0.007984031936127744,
+            "clutter/background": 0.04481374288115022
+          },
+          "class_support": {
+            "impervious surfaces": 16918,
+            "buildings": 12554,
+            "low vegetation": 10327,
+            "trees": 8626,
+            "cars": 170,
+            "clutter/background": 1805
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.25,
+              "mean_iou": 0.06914052664943797,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.4147222222222222,
+              "mean_iou": 0.19056726084952744,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.37416666666666665,
+              "mean_iou": 0.12504814194949587,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.395,
+              "mean_iou": 0.15533798936262447,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.3811111111111111,
+              "mean_iou": 0.097222247055189,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.29083333333333333,
+              "mean_iou": 0.08887784845375514,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.3788888888888889,
+              "mean_iou": 0.0903922638847794,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.0125,
+              "mean_iou": 0.0020839121978327314,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.33166666666666667,
+              "mean_iou": 0.15946939296993315,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.31416666666666665,
+              "mean_iou": 0.09970473663001811,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.5022222222222222,
+              "mean_iou": 0.16822432905284138,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.4286111111111111,
+              "mean_iou": 0.15592821651046523,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.2011111111111111,
+              "mean_iou": 0.06271308287078597,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.13694444444444445,
+              "mean_iou": 0.07033184238873802,
+              "evaluated_cells": 3600
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.3356746031746032,
+            "mean_iou": 0.055945767195767195,
+            "macro_f1": 0.5026293116254197
+          }
+        },
+        "held_out_eroded_reference": {
+          "overall_accuracy": 0.3156547619047619,
+          "mean_iou": 0.13725672060943236,
+          "macro_f1": 0.23022772189049853,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.3156547619047619,
+          "scene_macro_miou": 0.10907849450265909,
+          "scene_miou_std": 0.049499976263503526,
+          "per_class_iou": {
+            "impervious surfaces": 0.16523405136702568,
+            "buildings": 0.2793939393939394,
+            "low vegetation": 0.17534607778510217,
+            "trees": 0.15308027380211575,
+            "cars": 0.006,
+            "clutter/background": 0.044485981308411214
+          },
+          "class_support": {
+            "impervious surfaces": 16854,
+            "buildings": 12649,
+            "low vegetation": 10234,
+            "trees": 8705,
+            "cars": 168,
+            "clutter/background": 1790
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.25055555555555553,
+              "mean_iou": 0.06917366903174703,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.415,
+              "mean_iou": 0.19045097812949816,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.3775,
+              "mean_iou": 0.12611577204175362,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.3963888888888889,
+              "mean_iou": 0.15590888621812093,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.385,
+              "mean_iou": 0.09756724015317995,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.2925,
+              "mean_iou": 0.0891467256348465,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.38027777777777777,
+              "mean_iou": 0.09037717053180648,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.011666666666666667,
+              "mean_iou": 0.001944984717977216,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.3313888888888889,
+              "mean_iou": 0.15120238073042952,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.31472222222222224,
+              "mean_iou": 0.10007748415847706,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.5008333333333334,
+              "mean_iou": 0.16776105693395374,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.4280555555555556,
+              "mean_iou": 0.15575463477279025,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.1988888888888889,
+              "mean_iou": 0.06214325105732541,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.1363888888888889,
+              "mean_iou": 0.06947468892532123,
+              "evaluated_cells": 3600
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.3344047619047619,
+            "mean_iou": 0.05573412698412699,
+            "macro_f1": 0.5012043893300028
+          }
+        }
+      },
+      "vaihingen": {
+        "train_scene_ids": [
+          "1",
+          "3",
+          "5",
+          "7",
+          "11",
+          "13",
+          "15",
+          "17",
+          "21",
+          "23",
+          "26",
+          "28",
+          "30",
+          "32",
+          "34",
+          "37"
+        ],
+        "official_held_out_scene_ids": [
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16",
+          "20",
+          "22",
+          "24",
+          "27",
+          "29",
+          "31",
+          "33",
+          "35",
+          "38"
+        ],
+        "participant_labels_match_complete_reference": true,
+        "cross_validation_oof_eroded_reference": {
+          "overall_accuracy": 0.49640968989189616,
+          "mean_iou": 0.21985874550881288,
+          "macro_f1": 0.4918348144853838,
+          "evaluated_cells": 25346,
+          "per_class_iou": {
+            "impervious surfaces": 0.37640279041552926,
+            "buildings": 0.3978755124860231,
+            "low vegetation": 0.22032616913273573,
+            "trees": 0.32454800101858927,
+            "cars": 0.0,
+            "clutter/background": 0.0
+          },
+          "class_support": {
+            "impervious surfaces": 7359,
+            "buildings": 6815,
+            "low vegetation": 5093,
+            "trees": 5850,
+            "cars": 62,
+            "clutter/background": 167
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.29034167126962834,
+            "mean_iou": 0.048390278544938055,
+            "macro_f1": 0.4500229322733527
+          }
+        },
+        "cross_validation_folds": [
+          {
+            "fold": 1,
+            "train_scene_ids": [
+              "1",
+              "5",
+              "7",
+              "11",
+              "13",
+              "15",
+              "17",
+              "21",
+              "23",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "3",
+              "30",
+              "26",
+              "28"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.5474463145676146,
+              "mean_iou": 0.23956498184352712,
+              "macro_f1": 0.5167792857232574,
+              "evaluated_cells": 6892,
+              "scene_macro_overall_accuracy": 0.5481553569831046,
+              "scene_macro_miou": 0.25187587677630513,
+              "scene_miou_std": 0.029501322009525755,
+              "per_class_iou": {
+                "impervious surfaces": 0.390646492434663,
+                "buildings": 0.4746317512274959,
+                "low vegetation": 0.16426332288401255,
+                "trees": 0.4078483245149912,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 2148,
+                "buildings": 2055,
+                "low vegetation": 1241,
+                "trees": 1274,
+                "cars": 27,
+                "clutter/background": 147
+              },
+              "per_scene": {
+                "3": {
+                  "overall_accuracy": 0.5380658436213992,
+                  "mean_iou": 0.28311600784578184,
+                  "evaluated_cells": 1944
+                },
+                "30": {
+                  "overall_accuracy": 0.5571428571428572,
+                  "mean_iou": 0.2726401057347424,
+                  "evaluated_cells": 1610
+                },
+                "26": {
+                  "overall_accuracy": 0.5353009259259259,
+                  "mean_iou": 0.20687387733154858,
+                  "evaluated_cells": 1728
+                },
+                "28": {
+                  "overall_accuracy": 0.562111801242236,
+                  "mean_iou": 0.24487351619314768,
+                  "evaluated_cells": 1610
+                }
+              }
+            }
+          },
+          {
+            "fold": 2,
+            "train_scene_ids": [
+              "1",
+              "3",
+              "13",
+              "17",
+              "21",
+              "23",
+              "26",
+              "28",
+              "30",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "7",
+              "5",
+              "11",
+              "15"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.5252300856870835,
+              "mean_iou": 0.2326069038258948,
+              "macro_f1": 0.5038461945373799,
+              "evaluated_cells": 6302,
+              "scene_macro_overall_accuracy": 0.5248081841432225,
+              "scene_macro_miou": 0.2229637754459723,
+              "scene_miou_std": 0.02740624044709806,
+              "per_class_iou": {
+                "impervious surfaces": 0.36363636363636365,
+                "buildings": 0.5473760932944607,
+                "low vegetation": 0.190359477124183,
+                "trees": 0.29426948890036136,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1899,
+                "buildings": 1900,
+                "low vegetation": 930,
+                "trees": 1552,
+                "cars": 18,
+                "clutter/background": 3
+              },
+              "per_scene": {
+                "7": {
+                  "overall_accuracy": 0.4629156010230179,
+                  "mean_iou": 0.20683616933221882,
+                  "evaluated_cells": 1564
+                },
+                "5": {
+                  "overall_accuracy": 0.59846547314578,
+                  "mean_iou": 0.18663961945997667,
+                  "evaluated_cells": 1564
+                },
+                "11": {
+                  "overall_accuracy": 0.45524296675191817,
+                  "mean_iou": 0.2442262705025477,
+                  "evaluated_cells": 1564
+                },
+                "15": {
+                  "overall_accuracy": 0.5826086956521739,
+                  "mean_iou": 0.254153042489146,
+                  "evaluated_cells": 1610
+                }
+              }
+            }
+          },
+          {
+            "fold": 3,
+            "train_scene_ids": [
+              "3",
+              "5",
+              "7",
+              "11",
+              "13",
+              "15",
+              "26",
+              "28",
+              "30",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "17",
+              "21",
+              "1",
+              "23"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.4388148667601683,
+              "mean_iou": 0.19446727235761044,
+              "macro_f1": 0.4494514287476695,
+              "evaluated_cells": 5704,
+              "scene_macro_overall_accuracy": 0.44787480209475095,
+              "scene_macro_miou": 0.20699508145991274,
+              "scene_miou_std": 0.07097737553236477,
+              "per_class_iou": {
+                "impervious surfaces": 0.3345379452762003,
+                "buildings": 0.34465408805031444,
+                "low vegetation": 0.25456723569931117,
+                "trees": 0.2330443651198368,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1444,
+                "buildings": 1409,
+                "low vegetation": 1219,
+                "trees": 1630,
+                "cars": 0,
+                "clutter/background": 2
+              },
+              "per_scene": {
+                "17": {
+                  "overall_accuracy": 0.5289855072463768,
+                  "mean_iou": 0.30807056757888995,
+                  "evaluated_cells": 966
+                },
+                "21": {
+                  "overall_accuracy": 0.4929667519181586,
+                  "mean_iou": 0.2378496271836707,
+                  "evaluated_cells": 1564
+                },
+                "1": {
+                  "overall_accuracy": 0.37888198757763975,
+                  "mean_iou": 0.12919520574153562,
+                  "evaluated_cells": 1610
+                },
+                "23": {
+                  "overall_accuracy": 0.3906649616368286,
+                  "mean_iou": 0.15286492533555465,
+                  "evaluated_cells": 1564
+                }
+              }
+            }
+          },
+          {
+            "fold": 4,
+            "train_scene_ids": [
+              "1",
+              "3",
+              "5",
+              "7",
+              "11",
+              "15",
+              "17",
+              "21",
+              "23",
+              "26",
+              "28",
+              "30"
+            ],
+            "validation_scene_ids": [
+              "37",
+              "32",
+              "34",
+              "13"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.4646401985111663,
+              "mean_iou": 0.20489830414531962,
+              "macro_f1": 0.46566540454249483,
+              "evaluated_cells": 6448,
+              "scene_macro_overall_accuracy": 0.4642945439045183,
+              "scene_macro_miou": 0.17644028943355197,
+              "scene_miou_std": 0.050248269697229946,
+              "per_class_iou": {
+                "impervious surfaces": 0.3992473486144372,
+                "buildings": 0.23033203709243194,
+                "low vegetation": 0.24613745338305806,
+                "trees": 0.3536729857819905,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1868,
+                "buildings": 1451,
+                "low vegetation": 1703,
+                "trees": 1394,
+                "cars": 17,
+                "clutter/background": 15
+              },
+              "per_scene": {
+                "37": {
+                  "overall_accuracy": 0.3333333333333333,
+                  "mean_iou": 0.09894913941547434,
+                  "evaluated_cells": 1296
+                },
+                "32": {
+                  "overall_accuracy": 0.6195652173913043,
+                  "mean_iou": 0.18805921692578495,
+                  "evaluated_cells": 1656
+                },
+                "34": {
+                  "overall_accuracy": 0.48782608695652174,
+                  "mean_iou": 0.23929380176024528,
+                  "evaluated_cells": 1150
+                },
+                "13": {
+                  "overall_accuracy": 0.4164535379369139,
+                  "mean_iou": 0.17945899963270331,
+                  "evaluated_cells": 2346
+                }
+              }
+            }
+          }
+        ],
+        "held_out_full_reference": {
+          "overall_accuracy": 0.5620360912495744,
+          "mean_iou": 0.27816920797957195,
+          "macro_f1": 0.4046452517399939,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.5666671353936613,
+          "scene_macro_miou": 0.2648258625031532,
+          "scene_miou_std": 0.053854687382077264,
+          "per_class_iou": {
+            "impervious surfaces": 0.45445673389720237,
+            "buildings": 0.44245953414923017,
+            "low vegetation": 0.27337977622968124,
+            "trees": 0.3932549504950495,
+            "cars": 0.015432098765432098,
+            "clutter/background": 0.09003215434083602
+          },
+          "class_support": {
+            "impervious surfaces": 8493,
+            "buildings": 7729,
+            "low vegetation": 6228,
+            "trees": 6581,
+            "cars": 106,
+            "clutter/background": 233
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.4036363636363636,
+              "mean_iou": 0.2469942146405019,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.7033248081841432,
+              "mean_iou": 0.3100461628090874,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.6975703324808185,
+              "mean_iou": 0.3071835550495366,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.620843989769821,
+              "mean_iou": 0.3015465347197338,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.6425831202046036,
+              "mean_iou": 0.3326397152658672,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.5236024844720497,
+              "mean_iou": 0.20623480866867752,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.49751552795031057,
+              "mean_iou": 0.2708924150698163,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.6074534161490683,
+              "mean_iou": 0.33440920034354404,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.4649859943977591,
+              "mean_iou": 0.22316675931046218,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.6662404092071611,
+              "mean_iou": 0.3152901309131513,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.5748081841432225,
+              "mean_iou": 0.32117255794543814,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.5271428571428571,
+              "mean_iou": 0.21204498540890207,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.5366459627329192,
+              "mean_iou": 0.19452005475992462,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.607487922705314,
+              "mean_iou": 0.2870769638200559,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.4720496894409938,
+              "mean_iou": 0.14429127356213434,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.5505882352941176,
+              "mean_iou": 0.25290475476713087,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.5368620037807184,
+              "mean_iou": 0.24162557549964112,
+              "evaluated_cells": 3174
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.2891726251276813,
+            "mean_iou": 0.04819543752128022,
+            "macro_f1": 0.44861738372553683
+          }
+        },
+        "held_out_eroded_reference": {
+          "overall_accuracy": 0.5627170582226761,
+          "mean_iou": 0.2785877745763447,
+          "macro_f1": 0.40500883168677926,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.5673811048635258,
+          "scene_macro_miou": 0.2619029804943009,
+          "scene_miou_std": 0.050775071569544215,
+          "per_class_iou": {
+            "impervious surfaces": 0.4552726085537055,
+            "buildings": 0.44347227683837986,
+            "low vegetation": 0.2722075172048703,
+            "trees": 0.3950540958268934,
+            "cars": 0.015197568389057751,
+            "clutter/background": 0.09032258064516129
+          },
+          "class_support": {
+            "impervious surfaces": 8439,
+            "buildings": 7797,
+            "low vegetation": 6180,
+            "trees": 6611,
+            "cars": 111,
+            "clutter/background": 232
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.4009090909090909,
+              "mean_iou": 0.2490384193540837,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.7058823529411765,
+              "mean_iou": 0.3081031376480711,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.6982097186700768,
+              "mean_iou": 0.3076714174568878,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.6195652173913043,
+              "mean_iou": 0.3006587176934405,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.6406649616368286,
+              "mean_iou": 0.33044577921367546,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.5260869565217391,
+              "mean_iou": 0.207547859147319,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.4962732919254658,
+              "mean_iou": 0.27029332490702235,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.6093167701863355,
+              "mean_iou": 0.27981556057953,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.46288515406162467,
+              "mean_iou": 0.22225054160683624,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.6694373401534527,
+              "mean_iou": 0.3170218861247604,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.5754475703324808,
+              "mean_iou": 0.3216925164256307,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.5261904761904762,
+              "mean_iou": 0.2115204603133148,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.5391304347826087,
+              "mean_iou": 0.19539834321801694,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.6068840579710145,
+              "mean_iou": 0.2866239010090285,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.47282608695652173,
+              "mean_iou": 0.144753799763677,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.5576470588235294,
+              "mean_iou": 0.2571982583751495,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.5381222432262129,
+              "mean_iou": 0.24231674556667127,
+              "evaluated_cells": 3174
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.2873340143003064,
+            "mean_iou": 0.0478890023833844,
+            "macro_f1": 0.4464016504006982
+          }
+        }
+      },
+      "cross_domain_eroded_reference": {
+        "potsdam_train_to_vaihingen_official_test": {
+          "overall_accuracy": 0.27701736465781407,
+          "mean_iou": 0.11234113834718805,
+          "macro_f1": 0.22053672938347596,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.27955366708413193,
+          "scene_macro_miou": 0.08421840542242692,
+          "scene_miou_std": 0.040085731842304205,
+          "per_class_iou": {
+            "impervious surfaces": 0.29131409561003835,
+            "buildings": 0.0,
+            "low vegetation": 0.1867433673907444,
+            "trees": 0.17999421240474583,
+            "cars": 0.005,
+            "clutter/background": 0.010995154677599702
+          },
+          "class_support": {
+            "impervious surfaces": 8439,
+            "buildings": 7797,
+            "low vegetation": 6180,
+            "trees": 6611,
+            "cars": 111,
+            "clutter/background": 232
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.22954545454545455,
+              "mean_iou": 0.042500364059997096,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.007033248081841432,
+              "mean_iou": 0.013889578814321749,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.4782608695652174,
+              "mean_iou": 0.17935440027183147,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.13491048593350383,
+              "mean_iou": 0.06001789628199714,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.4296675191815857,
+              "mean_iou": 0.1269250615993911,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.3018633540372671,
+              "mean_iou": 0.07900993127354797,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.25403726708074537,
+              "mean_iou": 0.06396344396344397,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.2795031055900621,
+              "mean_iou": 0.07286831138016002,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.16036414565826332,
+              "mean_iou": 0.07034792085023742,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.3343989769820972,
+              "mean_iou": 0.0766679657159804,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.32161125319693096,
+              "mean_iou": 0.09786043183572303,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.039523809523809524,
+              "mean_iou": 0.021426338066180873,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.45217391304347826,
+              "mean_iou": 0.07749402214628039,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.4365942028985507,
+              "mean_iou": 0.10459836772978548,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.34860248447204967,
+              "mean_iou": 0.13581619876103862,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.21823529411764706,
+              "mean_iou": 0.09263798775995932,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.32608695652173914,
+              "mean_iou": 0.11633467167138148,
+              "evaluated_cells": 3174
+            }
+          }
+        },
+        "vaihingen_train_to_potsdam_held_out": {
+          "overall_accuracy": 0.34029761904761907,
+          "mean_iou": 0.11907233762370499,
+          "macro_f1": 0.22209356237171157,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.340297619047619,
+          "scene_macro_miou": 0.10837460258224864,
+          "scene_miou_std": 0.00992555497011814,
+          "per_class_iou": {
+            "impervious surfaces": 0.40321743642968344,
+            "buildings": 0.016021453620298425,
+            "low vegetation": 0.07766395236844409,
+            "trees": 0.2132000957395883,
+            "cars": 0.004331087584215592,
+            "clutter/background": 0.0
+          },
+          "class_support": {
+            "impervious surfaces": 16854,
+            "buildings": 12649,
+            "low vegetation": 10234,
+            "trees": 8705,
+            "cars": 168,
+            "clutter/background": 1790
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.2808333333333333,
+              "mean_iou": 0.09228774146117884,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.30194444444444446,
+              "mean_iou": 0.11797917239033782,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.29083333333333333,
+              "mean_iou": 0.10423489552372844,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.2513888888888889,
+              "mean_iou": 0.0927620629152142,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.29638888888888887,
+              "mean_iou": 0.09893175455675457,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.25805555555555554,
+              "mean_iou": 0.09837261766150528,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.39,
+              "mean_iou": 0.11289856103350804,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.3933333333333333,
+              "mean_iou": 0.11453040379719076,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.3402777777777778,
+              "mean_iou": 0.10378868496883774,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.415,
+              "mean_iou": 0.11950716289370157,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.36027777777777775,
+              "mean_iou": 0.10712593823885506,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.39944444444444444,
+              "mean_iou": 0.11775282471678254,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.35444444444444445,
+              "mean_iou": 0.12481114317323705,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.43194444444444446,
+              "mean_iou": 0.11226147282064912,
+              "evaluated_cells": 3600
+            }
+          }
+        }
+      }
+    },
+    "terramind": {
+      "source_commit": "53d61da09213c2c3629931b6322f94cce617886a",
+      "checkpoint_sha256": "83c3a0938067c83867a46e564443c2fa38383bf4f966d931b11cb025b847d7ec",
+      "runtime": {
+        "evaluation_elapsed_seconds_after_preload": 112.18498424999962,
+        "scope": "Elapsed after model/data preload; includes four-fold OOF probes, final in-domain fits/evaluations, and both cross-domain evaluations. It is not per-tile inference latency."
+      },
+      "native_feature_grid": "14x14",
+      "potsdam": {
+        "train_scene_ids": [
+          "2_10",
+          "2_11",
+          "2_12",
+          "3_10",
+          "3_11",
+          "5_10",
+          "5_12",
+          "6_10",
+          "6_11",
+          "6_7",
+          "6_8",
+          "6_9",
+          "7_10",
+          "7_11",
+          "7_12",
+          "7_7",
+          "7_8",
+          "7_9"
+        ],
+        "validation_scene_ids": [
+          "3_12",
+          "4_10",
+          "4_11",
+          "4_12",
+          "5_11",
+          "6_12"
+        ],
+        "held_out_scene_ids": [
+          "2_13",
+          "2_14",
+          "3_13",
+          "3_14",
+          "4_13",
+          "4_14",
+          "4_15",
+          "5_13",
+          "5_14",
+          "5_15",
+          "6_13",
+          "6_14",
+          "6_15",
+          "7_13"
+        ],
+        "validation": {
+          "overall_accuracy": 0.46069444444444446,
+          "mean_iou": 0.20391508497427083,
+          "evaluated_cells": 21600,
+          "per_class_iou": {
+            "impervious surfaces": 0.3199250606127397,
+            "buildings": 0.39911287278218194,
+            "low vegetation": 0.2620817843866171,
+            "trees": 0.1824975417895772,
+            "cars": 0.009216589861751152,
+            "clutter/background": 0.05065666041275797
+          }
+        },
+        "held_out_full_reference": {
+          "overall_accuracy": 0.4800595238095238,
+          "mean_iou": 0.22243327775079624,
+          "macro_f1": 0.34080460370704024,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.4800595238095239,
+          "scene_macro_miou": 0.20153841188270433,
+          "scene_miou_std": 0.029424858988318633,
+          "per_class_iou": {
+            "impervious surfaces": 0.40403716757449537,
+            "buildings": 0.3560085093751546,
+            "low vegetation": 0.2885243715409749,
+            "trees": 0.1920054663477964,
+            "cars": 0.007717750826901874,
+            "clutter/background": 0.08630640083945436
+          },
+          "class_support": {
+            "impervious surfaces": 16918,
+            "buildings": 12554,
+            "low vegetation": 10327,
+            "trees": 8626,
+            "cars": 170,
+            "clutter/background": 1805
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.4677777777777778,
+              "mean_iou": 0.20342222840427246,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.5144444444444445,
+              "mean_iou": 0.19747381022441676,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.44416666666666665,
+              "mean_iou": 0.18832642910866101,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.45166666666666666,
+              "mean_iou": 0.21145635390598813,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.4452777777777778,
+              "mean_iou": 0.17935133894172658,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.3827777777777778,
+              "mean_iou": 0.16729258561646565,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.4683333333333333,
+              "mean_iou": 0.16171009892148402,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.48055555555555557,
+              "mean_iou": 0.20647743165612678,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.4802777777777778,
+              "mean_iou": 0.22982627909816897,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.48777777777777775,
+              "mean_iou": 0.18778250866804724,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.5366666666666666,
+              "mean_iou": 0.22553746299568952,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.5097222222222222,
+              "mean_iou": 0.18866122439947264,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.4386111111111111,
+              "mean_iou": 0.1907909614504645,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.6127777777777778,
+              "mean_iou": 0.2834290529668767,
+              "evaluated_cells": 3600
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.3356746031746032,
+            "mean_iou": 0.055945767195767195,
+            "macro_f1": 0.5026293116254197
+          }
+        },
+        "held_out_eroded_reference": {
+          "overall_accuracy": 0.4803968253968254,
+          "mean_iou": 0.2227837226889812,
+          "macro_f1": 0.3413049278857465,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.4803968253968254,
+          "scene_macro_miou": 0.20179102816897693,
+          "scene_miou_std": 0.029456883636826515,
+          "per_class_iou": {
+            "impervious surfaces": 0.4036101083032491,
+            "buildings": 0.3577528755491929,
+            "low vegetation": 0.2887682616271277,
+            "trees": 0.19193205944798303,
+            "cars": 0.008849557522123894,
+            "clutter/background": 0.08578947368421053
+          },
+          "class_support": {
+            "impervious surfaces": 16854,
+            "buildings": 12649,
+            "low vegetation": 10234,
+            "trees": 8705,
+            "cars": 168,
+            "clutter/background": 1790
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.46694444444444444,
+              "mean_iou": 0.20320111114569897,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.5136111111111111,
+              "mean_iou": 0.19747724481671272,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.4425,
+              "mean_iou": 0.18760956265232032,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.4525,
+              "mean_iou": 0.21153457958530478,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.44555555555555554,
+              "mean_iou": 0.17914729447412403,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.38472222222222224,
+              "mean_iou": 0.16834270421840644,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.46805555555555556,
+              "mean_iou": 0.16052788635416407,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.4825,
+              "mean_iou": 0.20757648025878364,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.48055555555555557,
+              "mean_iou": 0.22982607677027456,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.4880555555555556,
+              "mean_iou": 0.1884227263872564,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.5383333333333333,
+              "mean_iou": 0.22634512542794386,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.5102777777777778,
+              "mean_iou": 0.18942000404171302,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.43916666666666665,
+              "mean_iou": 0.19228850125037364,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.6127777777777778,
+              "mean_iou": 0.2833550969826006,
+              "evaluated_cells": 3600
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.3344047619047619,
+            "mean_iou": 0.05573412698412699,
+            "macro_f1": 0.5012043893300028
+          }
+        }
+      },
+      "vaihingen": {
+        "train_scene_ids": [
+          "1",
+          "3",
+          "5",
+          "7",
+          "11",
+          "13",
+          "15",
+          "17",
+          "21",
+          "23",
+          "26",
+          "28",
+          "30",
+          "32",
+          "34",
+          "37"
+        ],
+        "official_held_out_scene_ids": [
+          "2",
+          "4",
+          "6",
+          "8",
+          "10",
+          "12",
+          "14",
+          "16",
+          "20",
+          "22",
+          "24",
+          "27",
+          "29",
+          "31",
+          "33",
+          "35",
+          "38"
+        ],
+        "participant_labels_match_complete_reference": true,
+        "cross_validation_oof_eroded_reference": {
+          "overall_accuracy": 0.4841000552355401,
+          "mean_iou": 0.2118216975414059,
+          "macro_f1": 0.4788393242013499,
+          "evaluated_cells": 25346,
+          "per_class_iou": {
+            "impervious surfaces": 0.38919890286579023,
+            "buildings": 0.3476213830308975,
+            "low vegetation": 0.2223168654173765,
+            "trees": 0.31179303393437113,
+            "cars": 0.0,
+            "clutter/background": 0.0
+          },
+          "class_support": {
+            "impervious surfaces": 7359,
+            "buildings": 6815,
+            "low vegetation": 5093,
+            "trees": 5850,
+            "cars": 62,
+            "clutter/background": 167
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.29034167126962834,
+            "mean_iou": 0.048390278544938055,
+            "macro_f1": 0.4500229322733527
+          }
+        },
+        "cross_validation_folds": [
+          {
+            "fold": 1,
+            "train_scene_ids": [
+              "1",
+              "5",
+              "7",
+              "11",
+              "13",
+              "15",
+              "17",
+              "21",
+              "23",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "3",
+              "30",
+              "26",
+              "28"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.4551654091700522,
+              "mean_iou": 0.19327602667991664,
+              "macro_f1": 0.44690601444983896,
+              "evaluated_cells": 6892,
+              "scene_macro_overall_accuracy": 0.45798748897707237,
+              "scene_macro_miou": 0.19395936184853305,
+              "scene_miou_std": 0.028834494249830166,
+              "per_class_iou": {
+                "impervious surfaces": 0.37092731829573933,
+                "buildings": 0.3042665836188103,
+                "low vegetation": 0.23652837386742967,
+                "trees": 0.24793388429752067,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 2148,
+                "buildings": 2055,
+                "low vegetation": 1241,
+                "trees": 1274,
+                "cars": 27,
+                "clutter/background": 147
+              },
+              "per_scene": {
+                "3": {
+                  "overall_accuracy": 0.3904320987654321,
+                  "mean_iou": 0.15029783347233797,
+                  "evaluated_cells": 1944
+                },
+                "30": {
+                  "overall_accuracy": 0.45900621118012425,
+                  "mean_iou": 0.2287438635898436,
+                  "evaluated_cells": 1610
+                },
+                "26": {
+                  "overall_accuracy": 0.484375,
+                  "mean_iou": 0.18917776637867767,
+                  "evaluated_cells": 1728
+                },
+                "28": {
+                  "overall_accuracy": 0.49813664596273294,
+                  "mean_iou": 0.2076179839532729,
+                  "evaluated_cells": 1610
+                }
+              }
+            }
+          },
+          {
+            "fold": 2,
+            "train_scene_ids": [
+              "1",
+              "3",
+              "13",
+              "17",
+              "21",
+              "23",
+              "26",
+              "28",
+              "30",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "7",
+              "5",
+              "11",
+              "15"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.5217391304347826,
+              "mean_iou": 0.23061182194156493,
+              "macro_f1": 0.5088890015010527,
+              "evaluated_cells": 6302,
+              "scene_macro_overall_accuracy": 0.5225840336134454,
+              "scene_macro_miou": 0.2238900191347119,
+              "scene_miou_std": 0.037267120180279355,
+              "per_class_iou": {
+                "impervious surfaces": 0.4070201643017177,
+                "buildings": 0.40709728867623607,
+                "low vegetation": 0.21871599564744287,
+                "trees": 0.35083748302399276,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1899,
+                "buildings": 1900,
+                "low vegetation": 930,
+                "trees": 1552,
+                "cars": 18,
+                "clutter/background": 3
+              },
+              "per_scene": {
+                "7": {
+                  "overall_accuracy": 0.5786445012787724,
+                  "mean_iou": 0.2386455066617527,
+                  "evaluated_cells": 1564
+                },
+                "5": {
+                  "overall_accuracy": 0.5601023017902813,
+                  "mean_iou": 0.21461030271979242,
+                  "evaluated_cells": 1564
+                },
+                "11": {
+                  "overall_accuracy": 0.5447570332480819,
+                  "mean_iou": 0.27232108609180805,
+                  "evaluated_cells": 1564
+                },
+                "15": {
+                  "overall_accuracy": 0.40683229813664595,
+                  "mean_iou": 0.1699831810654945,
+                  "evaluated_cells": 1610
+                }
+              }
+            }
+          },
+          {
+            "fold": 3,
+            "train_scene_ids": [
+              "3",
+              "5",
+              "7",
+              "11",
+              "13",
+              "15",
+              "26",
+              "28",
+              "30",
+              "32",
+              "34",
+              "37"
+            ],
+            "validation_scene_ids": [
+              "17",
+              "21",
+              "1",
+              "23"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.49684431977559607,
+              "mean_iou": 0.2207324667034958,
+              "macro_f1": 0.4962841794150651,
+              "evaluated_cells": 5704,
+              "scene_macro_overall_accuracy": 0.4947616002922908,
+              "scene_macro_miou": 0.23759212255473378,
+              "scene_miou_std": 0.024970214228555304,
+              "per_class_iou": {
+                "impervious surfaces": 0.3708206686930091,
+                "buildings": 0.31955645161290325,
+                "low vegetation": 0.2753831417624521,
+                "trees": 0.3586345381526104,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1444,
+                "buildings": 1409,
+                "low vegetation": 1219,
+                "trees": 1630,
+                "cars": 0,
+                "clutter/background": 2
+              },
+              "per_scene": {
+                "17": {
+                  "overall_accuracy": 0.4782608695652174,
+                  "mean_iou": 0.25414507002238446,
+                  "evaluated_cells": 966
+                },
+                "21": {
+                  "overall_accuracy": 0.5025575447570333,
+                  "mean_iou": 0.23806473412156598,
+                  "evaluated_cells": 1564
+                },
+                "1": {
+                  "overall_accuracy": 0.5385093167701863,
+                  "mean_iou": 0.2612887215839774,
+                  "evaluated_cells": 1610
+                },
+                "23": {
+                  "overall_accuracy": 0.45971867007672634,
+                  "mean_iou": 0.19686996449100727,
+                  "evaluated_cells": 1564
+                }
+              }
+            }
+          },
+          {
+            "fold": 4,
+            "train_scene_ids": [
+              "1",
+              "3",
+              "5",
+              "7",
+              "11",
+              "15",
+              "17",
+              "21",
+              "23",
+              "26",
+              "28",
+              "30"
+            ],
+            "validation_scene_ids": [
+              "37",
+              "32",
+              "34",
+              "13"
+            ],
+            "validation_eroded_reference": {
+              "overall_accuracy": 0.4669665012406948,
+              "mean_iou": 0.2018112804635067,
+              "macro_f1": 0.4564077556305351,
+              "evaluated_cells": 6448,
+              "scene_macro_overall_accuracy": 0.4775090185027312,
+              "scene_macro_miou": 0.22229621741749644,
+              "scene_miou_std": 0.06296623902630805,
+              "per_class_iou": {
+                "impervious surfaces": 0.4063759618908025,
+                "buildings": 0.36597110754414125,
+                "low vegetation": 0.1612756264236902,
+                "trees": 0.2772449869224063,
+                "cars": 0.0,
+                "clutter/background": 0.0
+              },
+              "class_support": {
+                "impervious surfaces": 1868,
+                "buildings": 1451,
+                "low vegetation": 1703,
+                "trees": 1394,
+                "cars": 17,
+                "clutter/background": 15
+              },
+              "per_scene": {
+                "37": {
+                  "overall_accuracy": 0.47762345679012347,
+                  "mean_iou": 0.20093146203437687,
+                  "evaluated_cells": 1296
+                },
+                "32": {
+                  "overall_accuracy": 0.5579710144927537,
+                  "mean_iou": 0.20983689138184222,
+                  "evaluated_cells": 1656
+                },
+                "34": {
+                  "overall_accuracy": 0.48782608695652174,
+                  "mean_iou": 0.32486824647826434,
+                  "evaluated_cells": 1150
+                },
+                "13": {
+                  "overall_accuracy": 0.386615515771526,
+                  "mean_iou": 0.15354826977550243,
+                  "evaluated_cells": 2346
+                }
+              }
+            }
+          }
+        ],
+        "held_out_full_reference": {
+          "overall_accuracy": 0.5089887640449439,
+          "mean_iou": 0.23580149831156905,
+          "macro_f1": 0.3532956233431575,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.5196760354583759,
+          "scene_macro_miou": 0.24443778701841357,
+          "scene_miou_std": 0.038938225605999334,
+          "per_class_iou": {
+            "impervious surfaces": 0.4046839174582378,
+            "buildings": 0.3577018514983776,
+            "low vegetation": 0.2375746647131748,
+            "trees": 0.3641735755865232,
+            "cars": 0.0223463687150838,
+            "clutter/background": 0.028328611898016998
+          },
+          "class_support": {
+            "impervious surfaces": 8493,
+            "buildings": 7729,
+            "low vegetation": 6228,
+            "trees": 6581,
+            "cars": 106,
+            "clutter/background": 233
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.47363636363636363,
+              "mean_iou": 0.26228103777496775,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.5824808184143222,
+              "mean_iou": 0.21846823708259433,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.48785166240409206,
+              "mean_iou": 0.25093592823368505,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.5556265984654731,
+              "mean_iou": 0.3228071007464552,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.5332480818414322,
+              "mean_iou": 0.2270331543822756,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.5211180124223602,
+              "mean_iou": 0.2659475073989773,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.5229813664596273,
+              "mean_iou": 0.27397638771820787,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.5503105590062112,
+              "mean_iou": 0.28395200905545287,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.5791316526610645,
+              "mean_iou": 0.2596296543024243,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.5441176470588235,
+              "mean_iou": 0.27559430278278274,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.5415601023017903,
+              "mean_iou": 0.2534823843478314,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.4704761904761905,
+              "mean_iou": 0.18924883684281943,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.5745341614906833,
+              "mean_iou": 0.24052049785311228,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.5374396135265701,
+              "mean_iou": 0.25003232335547376,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.5403726708074534,
+              "mean_iou": 0.2364483624110192,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.44941176470588234,
+              "mean_iou": 0.1901683081801898,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.37019533711405167,
+              "mean_iou": 0.15491634684476183,
+              "evaluated_cells": 3174
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.2891726251276813,
+            "mean_iou": 0.04819543752128022,
+            "macro_f1": 0.44861738372553683
+          }
+        },
+        "held_out_eroded_reference": {
+          "overall_accuracy": 0.508682328907048,
+          "mean_iou": 0.23556154726797937,
+          "macro_f1": 0.3529960547284181,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.5195671337824712,
+          "scene_macro_miou": 0.24448156664150456,
+          "scene_miou_std": 0.039411948205231265,
+          "per_class_iou": {
+            "impervious surfaces": 0.40497904855804784,
+            "buildings": 0.35758381612688767,
+            "low vegetation": 0.23704458022176964,
+            "trees": 0.3632125263898663,
+            "cars": 0.02214022140221402,
+            "clutter/background": 0.028409090909090908
+          },
+          "class_support": {
+            "impervious surfaces": 8439,
+            "buildings": 7797,
+            "low vegetation": 6180,
+            "trees": 6611,
+            "cars": 111,
+            "clutter/background": 232
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.4731818181818182,
+              "mean_iou": 0.26271791044141785,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.5824808184143222,
+              "mean_iou": 0.2178685487915263,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.48785166240409206,
+              "mean_iou": 0.2507824013291699,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.5549872122762148,
+              "mean_iou": 0.32218467075555735,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.5351662404092071,
+              "mean_iou": 0.22788434476933217,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.5192546583850932,
+              "mean_iou": 0.26476771365148866,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.5242236024844721,
+              "mean_iou": 0.27494179331577623,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.5546583850931677,
+              "mean_iou": 0.2865983681466275,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.5798319327731093,
+              "mean_iou": 0.2602452970847329,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.5447570332480819,
+              "mean_iou": 0.27596349665585435,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.540920716112532,
+              "mean_iou": 0.2532075111984463,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.46714285714285714,
+              "mean_iou": 0.18781798174473485,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.5770186335403726,
+              "mean_iou": 0.24215508752759604,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.5368357487922706,
+              "mean_iou": 0.2495725473929089,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.5395962732919255,
+              "mean_iou": 0.2364735919909128,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.4470588235294118,
+              "mean_iou": 0.1891858474766027,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.3676748582230624,
+              "mean_iou": 0.15381952063289284,
+              "evaluated_cells": 3174
+            }
+          },
+          "train_majority_baseline": {
+            "overall_accuracy": 0.2873340143003064,
+            "mean_iou": 0.0478890023833844,
+            "macro_f1": 0.4464016504006982
+          }
+        }
+      },
+      "cross_domain_eroded_reference": {
+        "potsdam_train_to_vaihingen_official_test": {
+          "overall_accuracy": 0.28726591760299625,
+          "mean_iou": 0.09196197016840275,
+          "macro_f1": 0.1584781644398401,
+          "evaluated_cells": 29370,
+          "scene_macro_overall_accuracy": 0.2894023780844249,
+          "scene_macro_miou": 0.08417609110755793,
+          "scene_miou_std": 0.026397549656228328,
+          "per_class_iou": {
+            "impervious surfaces": 0.11847672778561354,
+            "buildings": 0.2598352047822926,
+            "low vegetation": 0.022737964560137994,
+            "trees": 0.09145922156512172,
+            "cars": 0.016359918200409,
+            "clutter/background": 0.042902784116841626
+          },
+          "class_support": {
+            "impervious surfaces": 8439,
+            "buildings": 7797,
+            "low vegetation": 6180,
+            "trees": 6611,
+            "cars": 111,
+            "clutter/background": 232
+          },
+          "per_scene": {
+            "2": {
+              "overall_accuracy": 0.2731818181818182,
+              "mean_iou": 0.1153184285466961,
+              "evaluated_cells": 2200
+            },
+            "4": {
+              "overall_accuracy": 0.5543478260869565,
+              "mean_iou": 0.11617196109369454,
+              "evaluated_cells": 1564
+            },
+            "6": {
+              "overall_accuracy": 0.3772378516624041,
+              "mean_iou": 0.10898898905325577,
+              "evaluated_cells": 1564
+            },
+            "8": {
+              "overall_accuracy": 0.21163682864450128,
+              "mean_iou": 0.059060504860935246,
+              "evaluated_cells": 1564
+            },
+            "10": {
+              "overall_accuracy": 0.29731457800511507,
+              "mean_iou": 0.08031185692877234,
+              "evaluated_cells": 1564
+            },
+            "12": {
+              "overall_accuracy": 0.20683229813664597,
+              "mean_iou": 0.07971921590743174,
+              "evaluated_cells": 1610
+            },
+            "14": {
+              "overall_accuracy": 0.1919254658385093,
+              "mean_iou": 0.045657431789569956,
+              "evaluated_cells": 1610
+            },
+            "16": {
+              "overall_accuracy": 0.22919254658385094,
+              "mean_iou": 0.057088741269906235,
+              "evaluated_cells": 1610
+            },
+            "20": {
+              "overall_accuracy": 0.3473389355742297,
+              "mean_iou": 0.12315038047622533,
+              "evaluated_cells": 1428
+            },
+            "22": {
+              "overall_accuracy": 0.2231457800511509,
+              "mean_iou": 0.06330715327245108,
+              "evaluated_cells": 1564
+            },
+            "24": {
+              "overall_accuracy": 0.1815856777493606,
+              "mean_iou": 0.04905600933414233,
+              "evaluated_cells": 1564
+            },
+            "27": {
+              "overall_accuracy": 0.3280952380952381,
+              "mean_iou": 0.08389014782942515,
+              "evaluated_cells": 2100
+            },
+            "29": {
+              "overall_accuracy": 0.3391304347826087,
+              "mean_iou": 0.10942800644818373,
+              "evaluated_cells": 1610
+            },
+            "31": {
+              "overall_accuracy": 0.3164251207729469,
+              "mean_iou": 0.11773025927306761,
+              "evaluated_cells": 1656
+            },
+            "33": {
+              "overall_accuracy": 0.31754658385093165,
+              "mean_iou": 0.10101775610873709,
+              "evaluated_cells": 1288
+            },
+            "35": {
+              "overall_accuracy": 0.26529411764705885,
+              "mean_iou": 0.06157955133708606,
+              "evaluated_cells": 1700
+            },
+            "38": {
+              "overall_accuracy": 0.25960932577189666,
+              "mean_iou": 0.059517155298904334,
+              "evaluated_cells": 3174
+            }
+          }
+        },
+        "vaihingen_train_to_potsdam_held_out": {
+          "overall_accuracy": 0.3294642857142857,
+          "mean_iou": 0.11590088796944413,
+          "macro_f1": 0.19031668759659337,
+          "evaluated_cells": 50400,
+          "scene_macro_overall_accuracy": 0.3294642857142857,
+          "scene_macro_miou": 0.10783931121784232,
+          "scene_miou_std": 0.013283180558469238,
+          "per_class_iou": {
+            "impervious surfaces": 0.3270336303535499,
+            "buildings": 0.19861139612832615,
+            "low vegetation": 0.07441939311747754,
+            "trees": 0.07793923381770146,
+            "cars": 0.00632295719844358,
+            "clutter/background": 0.011078717201166181
+          },
+          "class_support": {
+            "impervious surfaces": 16854,
+            "buildings": 12649,
+            "low vegetation": 10234,
+            "trees": 8705,
+            "cars": 168,
+            "clutter/background": 1790
+          },
+          "per_scene": {
+            "2_13": {
+              "overall_accuracy": 0.29694444444444446,
+              "mean_iou": 0.10833769228742972,
+              "evaluated_cells": 3600
+            },
+            "2_14": {
+              "overall_accuracy": 0.25416666666666665,
+              "mean_iou": 0.09980418066994229,
+              "evaluated_cells": 3600
+            },
+            "3_13": {
+              "overall_accuracy": 0.2808333333333333,
+              "mean_iou": 0.09558646568145908,
+              "evaluated_cells": 3600
+            },
+            "3_14": {
+              "overall_accuracy": 0.24388888888888888,
+              "mean_iou": 0.08727327937737518,
+              "evaluated_cells": 3600
+            },
+            "4_13": {
+              "overall_accuracy": 0.36277777777777775,
+              "mean_iou": 0.11548651676966544,
+              "evaluated_cells": 3600
+            },
+            "4_14": {
+              "overall_accuracy": 0.24472222222222223,
+              "mean_iou": 0.08922065362813635,
+              "evaluated_cells": 3600
+            },
+            "4_15": {
+              "overall_accuracy": 0.32861111111111113,
+              "mean_iou": 0.100265636116173,
+              "evaluated_cells": 3600
+            },
+            "5_13": {
+              "overall_accuracy": 0.3269444444444444,
+              "mean_iou": 0.1119675170194724,
+              "evaluated_cells": 3600
+            },
+            "5_14": {
+              "overall_accuracy": 0.32083333333333336,
+              "mean_iou": 0.10297821147903712,
+              "evaluated_cells": 3600
+            },
+            "5_15": {
+              "overall_accuracy": 0.42833333333333334,
+              "mean_iou": 0.1169008143258155,
+              "evaluated_cells": 3600
+            },
+            "6_13": {
+              "overall_accuracy": 0.36527777777777776,
+              "mean_iou": 0.10791961995109299,
+              "evaluated_cells": 3600
+            },
+            "6_14": {
+              "overall_accuracy": 0.44666666666666666,
+              "mean_iou": 0.14072489093641435,
+              "evaluated_cells": 3600
+            },
+            "6_15": {
+              "overall_accuracy": 0.3552777777777778,
+              "mean_iou": 0.11434472970679378,
+              "evaluated_cells": 3600
+            },
+            "7_13": {
+              "overall_accuracy": 0.3572222222222222,
+              "mean_iou": 0.11894014910098544,
+              "evaluated_cells": 3600
+            }
+          }
+        }
+      }
+    }
+  },
+  "excluded_from_this_repository_artifact": [
+    "source imagery and label masks",
+    "segmentation sample rasters and preview image",
+    "model checkpoints, probe heads, and logs"
+  ]
+}

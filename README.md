@@ -59,3 +59,11 @@ I tried lots of models, but there are 3 main:
 Run a notebook with this repository as the working directory so the `semantic_labeling` helpers are importable. The raster paths still point to external ISPRS/Kaggle data directories; change the notebook path templates when your data is stored elsewhere. A Kaggle or Colab runtime must also have this repository's Python files available, not only the notebook.
 
 The repository does not pin Python or ML dependency versions. The notebooks require a compatible environment with NumPy, scikit-image, scikit-learn, Matplotlib, tqdm, PyTorch, and torchvision. Training and inference have not been run as part of the code consistency fixes.
+
+# Research notes and evaluation reports
+
+The reports below record frozen-encoder probes on Potsdam, Vaihingen, LandCover.ai, and LoveDA, along with research on the ISPRS leaderboard, SAM, and sidewalk segmentation. Their metrics are coarse-grid linear-probe results, not full-resolution benchmark submissions. Source imagery, labels, checkpoints, predictions, and preview images remain outside this repository.
+
+- [Frozen-encoder probe summary](docs/experiments/frozen-encoder-probes-2026-10-19.md) and [aggregate metrics](docs/experiments/frozen-encoder-probes-2026-10-19-metrics.json)
+- [Potsdam and Vaihingen deep evaluation](docs/experiments/potsdam-vaihingen-foundation-probe-2026-10-19.md) and [detailed metrics](docs/experiments/potsdam-vaihingen-foundation-probe-2026-10-19-metrics.json)
+- [Model and sidewalk segmentation research](docs/research/segmentation-model-and-sidewalk-research-2026-10-19.md)

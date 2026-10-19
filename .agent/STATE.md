@@ -2,57 +2,42 @@
 
 ## Task
 
-Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle fine-tunes SAM ViT-B with LoRA and a six-class semantic decoder. The Mac remains on analysis, preprocessing, augmentation, and postprocessing.
+Document verified segmentation evaluations and research, then push the resulting reports and all user-authorized local `master` commits to GitHub.
 
 ## Status
 
-- Local PSPNet training is paused after epoch 2/16 at `/Users/macbook/Data/runs/pspnet-mps-20261019/last.pt`.
-- The original Colab session `pspnet-colab-20261019` is no longer active; its last known log reached epoch 3 batch 200/1250, with no epoch 3 completion verified. A live check on 2026-10-19 using `colab --auth adc sessions` returned no active sessions, and `colab --auth adc status --session pspnet-colab-20261019-retry` returned not found. The open Colab tab is an empty `scratchpad`, shows Sign in/Connect, and has no connected runtime. No Colab checkpoint, log, or metrics output is present under the local run directory. Therefore epochs 3–16 are not complete. Resume by connecting a T4 runtime, mounting the private Drive bundle, reconstructing and verifying it, then loading the saved epoch-2 checkpoint.
-- Kaggle is assigned only to SAM. The private dataset `damminhtien/sam-vitb-lora-potsdam-20261019` is ready (3.88 GiB), and the private kernel `https://www.kaggle.com/code/damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation` is queued. The last quota query reported 30 GPU hours remaining.
-- Cloud code includes a SAM ViT-B wrapper with rank-4 LoRA on attention qkv/proj and a six-class decoder, a Kaggle trainer, a private bundle builder, and a private kernel stager. Local syntax/style checks passed; CUDA execution is pending.
-- The private Google Drive folder `https://drive.google.com/drive/folders/1Da5gI-FLnKsTRLxN0-xo_vPd13YVtZqn` now contains all 106 archive parts, `parts_manifest.json`, and the updated README (108 items total). Drive readback found no missing/duplicate parts or wrong sizes; total part size is 10,524,434,944 bytes. The remote manifest bytes match the local manifest exactly, and the README readback contains the Colab mount, verification, and extraction instructions. The folder remains private.
-- Google OAuth was completed by the user. A direct Drive API request made with local gcloud ADC returned `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`; this was an ADC scope mismatch, not a missing user login. The Drive upload used the already-authorized connected Drive integration and was read back successfully. For future Drive file operations, use that integration; do not request another login because of an ADC scope error. Colab's `drive.mount()` is a separate in-runtime OAuth flow.
-- `google-colab-cli 0.7.4` runs on Python 3.14.8. Its built-in auth default is OAuth2, but the user already has working gcloud ADC for Colab: a read-only request to `/tun/m/assignments` returned HTTP 200 with an empty list. The user-level `/Users/macbook/.local/bin/colab` wrapper now defaults to ADC and honors explicit `--auth=...`; both `colab sessions` and `colab --auth adc sessions` return no active sessions. The open in-app notebook is logged out (`Sign in`) and disconnected (`Connect`), so browser login/runtime is separate from CLI ADC and no training process is active.
-- The upstream CLI writes DEBUG request headers, including authorization, to `~/.config/colab-cli/colab.log`. The local wrapper now redacts bearer and token-like values before logging; historical entries were scrubbed and a fresh request verified redacted output. The user chose to keep ADC active, so no credentials were revoked.
+- The report drafts and aggregate metrics are present under `docs/experiments/` and `docs/research/`.
+- README and repository documentation link to the results and record the data boundary.
+- Next: validate JSON and whitespace, inspect/stage explicit paths, commit, push `master`, and verify the remote ref.
+- Local `master` contains six commits ahead of `origin/master`; the user explicitly said to push all of them along with this documentation.
 
-## Completed local preparation
+## Verified experiments recorded
 
-- Prepared Potsdam data and labels at `/Users/macbook/Data/runs/pspnet-preprocessed-20261019`.
-- Verified the 18/6/14 train/validation/held-out split and five-channel input alignment.
-- Cached class-ID labels; audited palette decoding and the bounded no-boundary color remapping for tile `4_12`.
-- Verified synchronized flips/mirrors and crop-before-normalize equivalence on a real patch.
-- Saved the PSPNet epoch-2 model, Adam state, and random states. The SAM run starts from the separate official SAM ViT-B checkpoint, not the PSPNet checkpoint.
-- The PSPNet cloud bundle is at `/Users/macbook/Data/runs/pspnet-cloud-bundle-20261019` (169 files, 9.801 GiB, SHA-256 `0b3059cb164289b304e9f988de7cc4bac23519edf3471b3e6ee83024781e6e6e`); its checksums were verified.
-- The reusable archive is at `/Users/macbook/Data/runs/pspnet-colab-shared-bundle-20261019.tar` (10,524,434,944 bytes; SHA-256 `b0bc76f02ad827795e1eaa1fa50f4d75f1069461cc68c4336a60c307de60f88f`). Because the Drive connector caps each uploaded file at 100 MiB, its bytes are stored as 106 numbered 95 MiB parts under `/Users/macbook/Data/runs/pspnet-drive-parts-95m-20261019`, with per-part hashes in `parts_manifest.json`. The private Drive README includes the Colab mount, reconstruction, hash verification, and extraction steps.
+- Potsdam frozen-encoder 5 m validation probe and 10 m sensitivity check for UniverSat, AnySat, and TerraMind.
+- Sampled RGB frozen-encoder probes on LandCover.ai v1 and LoveDA v1.
+- Deeper Potsdam held-out and Vaihingen four-fold OOF plus official held-out evaluation for the same three encoders, with full/eroded references and cross-domain results.
+- The reports distinguish the coarse scoring grids from full-resolution benchmark metrics. Source data, checkpoints, probe weights, feature caches, predictions, previews, and logs remain outside Git.
 
-## SAM experiment design
+## Research status
 
-- Train on the same 18 participant-labeled scenes, validate on 6 scenes, and evaluate on 14 held-out scenes.
-- Use the three stored IRRG channels only; omit DSM and nDSM. Apply official SAM channel mean/std while retaining the stored IRRG order. This is a spectral-domain difference from natural RGB pretraining and the PSPNet five-channel `/255` input.
-- Freeze the original SAM ViT-B image encoder weights; train rank-4 LoRA on attention qkv/proj and the new decoder for classes 0–5. Ignore label 6.
-- Default run: 5 epochs, 256 random 512x512 patches per epoch, batch size 1. Evaluate validation and held-out splits after training, and write an overlay preview, metrics, logs, and per-epoch adapter/decoder checkpoints under Kaggle working output.
-- Pin the official SAM source to commit `dca509fe793f601edb92606367a655c15ac00fdf`; download the ViT-B checkpoint from Meta's official URL at runtime and record its hash.
+- ISPRS Potsdam public results list the participant as `SWJ` with a 89.5% Overall score; this review did not find an official `SWJ_2` label. Other listed submissions exceed that score. The table's class-specific measures are F1 on eroded boundaries.
+- TerraMind is documented as the provisional next prototype candidate, with UniverSat retained as challenger. No production-sized per-tile latency or peak-memory result is available.
+- Tile2Net is the strongest direct sidewalk candidate found. Its 2023 paper metrics describe that paper's model and evaluation, not the current beta repository release.
+- The SAM ViT-B LoRA implementation and private cloud run were prepared, but no completed training or held-out metrics were verified in the state available for this report.
 
-## Pending
+## Carry-forward: separate cloud training remains unresolved
 
-1. In an authenticated Colab notebook with a connected T4 runtime, mount the private Drive folder with `from google.colab import drive; drive.mount('/content/drive')`. Then reconstruct and verify the archive from its parts, extract to `/content/pspnet-bundle`, and resume PSPNet from epoch 2. Preserve checkpoints/logs.
-2. Wait for the Kaggle SAM kernel to leave the queue; verify CUDA smoke, all five epochs, held-out evaluation, and saved outputs.
-3. Download cloud checkpoints, logs, manifests, previews, and metrics under `/Users/macbook/Data`; update state, refresh Graphify if source code changes, and commit only task-owned paths.
+The earlier split cloud experiment remains incomplete and was not resumed in this publication task. The last verified Colab log reached epoch 3 batch 200/1250, without a completed epoch 3; the last live check found no active Colab session. The Kaggle SAM job was queued, with CUDA execution and metrics still pending. Preserve this status if that cloud experiment is resumed; do not imply that these reports include PSPNet continuation or trained SAM results.
 
-## Limitations
+## Validation
 
-- No historical PSPNet checkpoint exists, so its new scratch run cannot exactly reproduce the historical reported score.
-- SAM's semantic experiment uses only three-band IRRG and SAM's pretrained normalization, while PSPNet uses five channels and `/255`; present their results separately with this caveat.
-- The held-out evaluation labels are used only for final evaluation, not model selection.
-- Local Python 3.14.8 now has `torch`, `torchvision`, `numpy`, `scikit-image`, `scikit-learn`, `matplotlib`, `tqdm`, and `tifffile` installed in the user site. Imports were verified; MPS is available and CUDA is unavailable. Keep the Mac on data work and postprocessing; CUDA experiment validation remains on Kaggle/Colab.
+- Both aggregate JSON files parse with Python 3.14.
+- Reported frozen-probe and deep-evaluation primary metrics match the saved run JSONs for all three encoders.
+- The metrics JSON artifacts contain no absolute local paths or sample predictions; raw datasets and model artifacts are not staged.
+- `git diff --cached --check` passes. Project tests were not run because this task changes documentation and aggregate JSON only.
 
-## Validation so far
+## Checkpoint
 
-- Existing preprocessing bundle fingerprint and 169 checksums passed.
-- Existing local crop-pipeline equivalence and dataset sample checks passed.
-- Existing model/data scripts passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check` before the SAM changes.
-- SAM source passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check`; CUDA execution remains pending while Kaggle is queued.
-- Historical Colab checks passed before the original session disappeared: all 169 bundle checksums, cleanup of 38 non-manifest `._*.npz` sidecars, and a CUDA forward/backward smoke with finite loss `0.9889845848`. The last known original-run log reached epoch 3 batch 200/1250, with no epoch completion verified. The replacement T4 had reported CUDA availability in an earlier check, but it is no longer active; no model smoke or training completion is verified for it.
-- Drive readback verified 106 numbered parts with expected sizes and 10,524,434,944 total bytes. The remote `parts_manifest.json` matches the local bytes exactly; the README was fetched and checked for the Colab mount/hash/extract instructions. Cloud output retrieval, final result verification, and remaining training are pending.
-- Auth-routing fix is recorded in `docs/AGENT_WORKFLOW.md`: use the authorized Drive integration for Drive files, treat gcloud ADC as scope-independent, and use `drive.mount()` only inside Colab. This prevents a local ADC scope error from triggering another user login request.
-- Latest Colab status is no active session; the replacement T4 session name is not found, the open tab is an empty scratchpad, and there is no local Colab training output. No completion is claimed beyond the last verified original-run log at epoch 3 batch 200/1250.
+- Working branch: `master`.
+- Current HEAD before report commit: `e1a7aec` (`docs: clarify Colab CLI auth and logging`).
+- Exact next action: commit the report set, push all local commits, verify `git ls-remote origin refs/heads/master` equals the resulting HEAD, then mark this state complete.

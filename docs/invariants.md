@@ -15,6 +15,8 @@
 - The README reports historical accuracy figures, but this checkout does not contain a run manifest or checkpoint that establishes those figures as reproducible results. Treat them as historical claims until a specific run can be tied to its code, data split, preprocessing, configuration, checkpoint, and metric output.
 - For new evaluation results, record the scene IDs and split, preprocessing, model configuration, random seed when applicable, execution environment, checkpoint, and metric output.
 - Keep training, validation, and benchmark evaluation claims separate. Do not infer performance from a code change or a successful static check.
+- The 2026-10-19 foundation-model reports in `docs/experiments/` are separate, coarse-grid linear-probe experiments with aggregate metrics and provenance. They do not reproduce the historical PSPNet accuracy and are not official ISPRS benchmark submissions.
+- Keep source imagery, labels, dataset archives, checkpoints, sample predictions, and rendered previews outside the public repository. Publish aggregate scores and provenance only.
 
 ## Model and notebook changes
 

@@ -13,6 +13,7 @@ This repository contains research code and notebooks for semantic labeling of th
 | test_kernel/ | Evaluation notebook and a compatibility entry point in test.py |
 | visualize_net_structure/ | Notebooks for visualizing model structures |
 | dataset_description.md | Background on the Potsdam imagery, DSM data, and benchmark labels |
+| docs/experiments/ and docs/research/ | Aggregate evaluation records and research notes; raw imagery and weights stay outside Git |
 
 The README describes the broad flow as data analysis, preprocessing, model building, experimentation, validation, and testing. The repository does not define package metadata, a command-line entry point, a dependency lockfile, or root test configuration at this snapshot.
 
@@ -27,3 +28,5 @@ The notebooks import the shared helpers from the repository root and retain thei
 Before changing model behavior, inspect the matching notebook and Python definition. Preserve their alignment or document which one is authoritative for the change. Use Jupyter MCP to inspect or edit notebook contents.
 
 `test_kernel/test.py` keeps the previous evaluation helper names and delegates to `semantic_labeling/`. Shared helpers are the source of truth for labels, input scaling, patch loading, sampling windows, loss, metrics, and tiled inference.
+
+Evaluation reports are linked from the [README](../README.md). Their scope and coarse-grid limitations are recorded with each result.

@@ -1,0 +1,469 @@
+{
+  "schema_version": 1,
+  "run_date": "2026-10-19",
+  "purpose": "Aggregate record for frozen-encoder linear segmentation probes; metrics only.",
+  "environment": {
+    "python": "3.14.8",
+    "pytorch": "2.14.1",
+    "torchvision": "0.29.1",
+    "device": "mps"
+  },
+  "protocol": {
+    "encoder_frozen": true,
+    "head": "single supervised linear layer on dense features",
+    "epochs": 100,
+    "optimizer": "AdamW",
+    "learning_rate": 0.02,
+    "weight_decay": 0.0001,
+    "class_weighting": "square-root inverse frequency from train targets",
+    "seed": 20261019,
+    "potsdam_split": "18 train / 6 validation; 14 held-out scenes were not accessed in the pilot probes.",
+    "class_reduction": "Majority class per scoring cell; ignored label IDs are excluded."
+  },
+  "datasets": {
+    "potsdam_approximately_5m_validation": {
+      "grid": "60x60 per 6000x6000 scene; approximately 5m cells",
+      "metrics_by_model": {
+        "universat": {
+          "overall_accuracy": 0.5206944444444445,
+          "mean_iou": 0.237547403672429,
+          "per_class_iou": {
+            "impervious surfaces": 0.37300696159892205,
+            "buildings": 0.4741419620312354,
+            "low vegetation": 0.21663185874311752,
+            "trees": 0.2812019805361106,
+            "cars": 0.01568627450980392,
+            "clutter/background": 0.06461538461538462
+          },
+          "evaluated_cells": 21600,
+          "class_counts_train": {
+            "impervious surfaces": 19472,
+            "buildings": 16643,
+            "low vegetation": 16000,
+            "trees": 9322,
+            "cars": 113,
+            "clutter/background": 3250
+          },
+          "class_counts_validation": {
+            "impervious surfaces": 6565,
+            "buildings": 7333,
+            "low vegetation": 4146,
+            "trees": 3138,
+            "cars": 57,
+            "clutter/background": 361
+          }
+        },
+        "anysat": {
+          "overall_accuracy": 0.4124074074074074,
+          "mean_iou": 0.17150528834924986,
+          "per_class_iou": {
+            "impervious surfaces": 0.1279909386946057,
+            "buildings": 0.39787080476362324,
+            "low vegetation": 0.25229308298262654,
+            "trees": 0.22444161975667332,
+            "cars": 0.005291005291005291,
+            "clutter/background": 0.021144278606965175
+          },
+          "evaluated_cells": 21600,
+          "class_counts_train": {
+            "impervious surfaces": 19472,
+            "buildings": 16643,
+            "low vegetation": 16000,
+            "trees": 9322,
+            "cars": 113,
+            "clutter/background": 3250
+          },
+          "class_counts_validation": {
+            "impervious surfaces": 6565,
+            "buildings": 7333,
+            "low vegetation": 4146,
+            "trees": 3138,
+            "cars": 57,
+            "clutter/background": 361
+          }
+        },
+        "terramind": {
+          "overall_accuracy": 0.46069444444444446,
+          "mean_iou": 0.20391508497427083,
+          "per_class_iou": {
+            "impervious surfaces": 0.3199250606127397,
+            "buildings": 0.39911287278218194,
+            "low vegetation": 0.2620817843866171,
+            "trees": 0.1824975417895772,
+            "cars": 0.009216589861751152,
+            "clutter/background": 0.05065666041275797
+          },
+          "evaluated_cells": 21600,
+          "class_counts_train": {
+            "impervious surfaces": 19472,
+            "buildings": 16643,
+            "low vegetation": 16000,
+            "trees": 9322,
+            "cars": 113,
+            "clutter/background": 3250
+          },
+          "class_counts_validation": {
+            "impervious surfaces": 6565,
+            "buildings": 7333,
+            "low vegetation": 4146,
+            "trees": 3138,
+            "cars": 57,
+            "clutter/background": 361
+          }
+        }
+      }
+    },
+    "potsdam_approximately_10m_validation": {
+      "grid": "30x30 per 6000x6000 scene; approximately 10m cells",
+      "note": "Majority reduction removes cars from train and validation; mIoU averages the five represented classes.",
+      "metrics_by_model": {
+        "universat": {
+          "overall_accuracy": 0.5874074074074074,
+          "mean_iou": 0.33161846581027815,
+          "per_class_iou": {
+            "impervious surfaces": 0.4214320038443056,
+            "buildings": 0.5303140978816655,
+            "low vegetation": 0.3225563909774436,
+            "trees": 0.2985185185185185,
+            "cars": null,
+            "clutter/background": 0.08527131782945736
+          },
+          "evaluated_cells": 5400,
+          "class_counts_train": {
+            "impervious surfaces": 4883,
+            "buildings": 4469,
+            "low vegetation": 3904,
+            "trees": 2180,
+            "cars": 0,
+            "clutter/background": 764
+          },
+          "class_counts_validation": {
+            "impervious surfaces": 1628,
+            "buildings": 2011,
+            "low vegetation": 948,
+            "trees": 759,
+            "cars": 0,
+            "clutter/background": 54
+          }
+        },
+        "anysat": {
+          "overall_accuracy": 0.5346296296296297,
+          "mean_iou": 0.2771077787283568,
+          "per_class_iou": {
+            "impervious surfaces": 0.39152759948652116,
+            "buildings": 0.42296918767507,
+            "low vegetation": 0.3478473581213307,
+            "trees": 0.22319474835886213,
+            "cars": null,
+            "clutter/background": 0.0
+          },
+          "evaluated_cells": 5400,
+          "class_counts_train": {
+            "impervious surfaces": 4883,
+            "buildings": 4469,
+            "low vegetation": 3904,
+            "trees": 2180,
+            "cars": 0,
+            "clutter/background": 764
+          },
+          "class_counts_validation": {
+            "impervious surfaces": 1628,
+            "buildings": 2011,
+            "low vegetation": 948,
+            "trees": 759,
+            "cars": 0,
+            "clutter/background": 54
+          }
+        },
+        "terramind": {
+          "overall_accuracy": 0.5027777777777778,
+          "mean_iou": 0.27102152432923277,
+          "per_class_iou": {
+            "impervious surfaces": 0.35856573705179284,
+            "buildings": 0.4533533158486324,
+            "low vegetation": 0.24208566108007448,
+            "trees": 0.20545073375262055,
+            "cars": null,
+            "clutter/background": 0.09565217391304348
+          },
+          "evaluated_cells": 5400,
+          "class_counts_train": {
+            "impervious surfaces": 4883,
+            "buildings": 4469,
+            "low vegetation": 3904,
+            "trees": 2180,
+            "cars": 0,
+            "clutter/background": 764
+          },
+          "class_counts_validation": {
+            "impervious surfaces": 1628,
+            "buildings": 2011,
+            "low vegetation": 948,
+            "trees": 759,
+            "cars": 0,
+            "clutter/background": 54
+          }
+        }
+      }
+    },
+    "landcover_ai_v1": {
+      "source": "https://landcover.ai.linuxpolska.com/",
+      "sample_design": "96 train and 96 validation non-overlapping 256m patches; orthophoto-level split.",
+      "target_grid": "32x32 per image; majority-class label reduction.",
+      "metrics_by_model": {
+        "universat": {
+          "overall_accuracy": 0.7735799153645834,
+          "mean_iou": 0.42068670873653513,
+          "per_class_iou": {
+            "background": 0.6813243979313932,
+            "building": 0.2094958394517866,
+            "woodland": 0.6535128747969081,
+            "water": 0.42306134845110344,
+            "road": 0.1360390830514844
+          },
+          "evaluated_cells": 98304,
+          "class_support": {
+            "background": 51170,
+            "building": 895,
+            "woodland": 37133,
+            "water": 7692,
+            "road": 1414
+          },
+          "class_counts_train": {
+            "background": 65071,
+            "building": 1819,
+            "woodland": 25843,
+            "water": 3761,
+            "road": 1810
+          },
+          "class_counts_validation": {
+            "background": 51170,
+            "building": 895,
+            "woodland": 37133,
+            "water": 7692,
+            "road": 1414
+          }
+        },
+        "anysat": {
+          "overall_accuracy": 0.5779012044270834,
+          "mean_iou": 0.23796360673452735,
+          "per_class_iou": {
+            "background": 0.5251713754885002,
+            "building": 0.16233155750548417,
+            "woodland": 0.3356099226772691,
+            "water": 0.11594780356609224,
+            "road": 0.05075737443529099
+          },
+          "evaluated_cells": 98304,
+          "class_support": {
+            "background": 51170,
+            "building": 895,
+            "woodland": 37133,
+            "water": 7692,
+            "road": 1414
+          },
+          "class_counts_train": {
+            "background": 65071,
+            "building": 1819,
+            "woodland": 25843,
+            "water": 3761,
+            "road": 1810
+          },
+          "class_counts_validation": {
+            "background": 51170,
+            "building": 895,
+            "woodland": 37133,
+            "water": 7692,
+            "road": 1414
+          }
+        },
+        "terramind": {
+          "overall_accuracy": 0.7982076009114584,
+          "mean_iou": 0.4523710273638642,
+          "per_class_iou": {
+            "background": 0.699751532217989,
+            "building": 0.20314547837483618,
+            "woodland": 0.7331403478644849,
+            "water": 0.45792480177338224,
+            "road": 0.16789297658862876
+          },
+          "evaluated_cells": 98304,
+          "class_support": {
+            "background": 51170,
+            "building": 895,
+            "woodland": 37133,
+            "water": 7692,
+            "road": 1414
+          },
+          "class_counts_train": {
+            "background": 65071,
+            "building": 1819,
+            "woodland": 25843,
+            "water": 3761,
+            "road": 1810
+          },
+          "class_counts_validation": {
+            "background": 51170,
+            "building": 895,
+            "woodland": 37133,
+            "water": 7692,
+            "road": 1414
+          }
+        }
+      }
+    },
+    "loveda_v1": {
+      "source": "https://doi.org/10.5281/zenodo.5706578",
+      "sample_design": "96 train and 96 validation chips balanced across urban and rural domains; public Train and Val splits only.",
+      "target_grid": "32x32 per image; majority-class label reduction.",
+      "metrics_by_model": {
+        "universat": {
+          "overall_accuracy": 0.40425863250347793,
+          "mean_iou": 0.23004901480242163,
+          "per_class_iou": {
+            "background": 0.266755779802696,
+            "building": 0.3433152808750133,
+            "road": 0.19162065605716141,
+            "water": 0.40201889782264216,
+            "barren": 0.04354862439311461,
+            "forest": 0.11755313840934038,
+            "agriculture": 0.24553072625698324
+          },
+          "evaluated_cells": 96322,
+          "class_support": {
+            "background": 35172,
+            "building": 10349,
+            "road": 5175,
+            "water": 11591,
+            "barren": 2570,
+            "forest": 7028,
+            "agriculture": 24437
+          },
+          "class_counts_train": {
+            "background": 36786,
+            "building": 10203,
+            "road": 4765,
+            "water": 5580,
+            "barren": 4960,
+            "forest": 11761,
+            "agriculture": 21623
+          },
+          "class_counts_validation": {
+            "background": 35172,
+            "building": 10349,
+            "road": 5175,
+            "water": 11591,
+            "barren": 2570,
+            "forest": 7028,
+            "agriculture": 24437
+          }
+        },
+        "anysat": {
+          "overall_accuracy": 0.20129357779115883,
+          "mean_iou": 0.11674960686945261,
+          "per_class_iou": {
+            "background": 0.07239512855209743,
+            "building": 0.233223538665749,
+            "road": 0.09558889587638128,
+            "water": 0.08502328376145411,
+            "barren": 0.08629300776914539,
+            "forest": 0.06512816904711649,
+            "agriculture": 0.1795952244142246
+          },
+          "evaluated_cells": 96322,
+          "class_support": {
+            "background": 35172,
+            "building": 10349,
+            "road": 5175,
+            "water": 11591,
+            "barren": 2570,
+            "forest": 7028,
+            "agriculture": 24437
+          },
+          "class_counts_train": {
+            "background": 36786,
+            "building": 10203,
+            "road": 4765,
+            "water": 5580,
+            "barren": 4960,
+            "forest": 11761,
+            "agriculture": 21623
+          },
+          "class_counts_validation": {
+            "background": 35172,
+            "building": 10349,
+            "road": 5175,
+            "water": 11591,
+            "barren": 2570,
+            "forest": 7028,
+            "agriculture": 24437
+          }
+        },
+        "terramind": {
+          "overall_accuracy": 0.4801499138306929,
+          "mean_iou": 0.2833334195558355,
+          "per_class_iou": {
+            "background": 0.3703665157586165,
+            "building": 0.31455851858996,
+            "road": 0.4021589054851262,
+            "water": 0.32715633423180596,
+            "barren": 0.059363957597173146,
+            "forest": 0.24325748923833787,
+            "agriculture": 0.26647221598982873
+          },
+          "evaluated_cells": 96322,
+          "class_support": {
+            "background": 35172,
+            "building": 10349,
+            "road": 5175,
+            "water": 11591,
+            "barren": 2570,
+            "forest": 7028,
+            "agriculture": 24437
+          },
+          "class_counts_train": {
+            "background": 36786,
+            "building": 10203,
+            "road": 4765,
+            "water": 5580,
+            "barren": 4960,
+            "forest": 11761,
+            "agriculture": 21623
+          },
+          "class_counts_validation": {
+            "background": 35172,
+            "building": 10349,
+            "road": 5175,
+            "water": 11591,
+            "barren": 2570,
+            "forest": 7028,
+            "agriculture": 24437
+          }
+        }
+      }
+    }
+  },
+  "models": {
+    "universat": {
+      "source_commit": "4f55ee696ae384f7a07ae93a016f78e326f7f5eb",
+      "pretrained_checkpoint_sha256": "5cc062c9d4960ad405bca730765e7c23bc43c52471dbef0d821382990385be82"
+    },
+    "anysat": {
+      "source_commit": "5f6f475e1a22ce5e3a56a5b18f4ed6d24eca2a4a",
+      "pretrained_checkpoint_sha256": "ce1246527a28bade624048c448a1fa473ca85791b998f562ce2bcc3dcac93d4f"
+    },
+    "terramind": {
+      "source_commit": "53d61da09213c2c3629931b6322f94cce617886a",
+      "pretrained_checkpoint_sha256": "83c3a0938067c83867a46e564443c2fa38383bf4f966d931b11cb025b847d7ec"
+    }
+  },
+  "source_code_sha256": {
+    "potsdam_probe_runner.py": "a5b91f92f3ba479863755473ddb3e2debb7f6d0dcfad2456091956e3c00b50b6",
+    "external_probe_runner.py": "6864ad4ec82d930ddc881af898d8ba087e9fa8319c4c7b490079e02cc7936f18"
+  },
+  "excluded_from_repository": [
+    "source imagery, label rasters, and dataset archives",
+    "probe weights, dense feature caches, and sample predictions",
+    "preview images and runtime logs"
+  ]
+}
