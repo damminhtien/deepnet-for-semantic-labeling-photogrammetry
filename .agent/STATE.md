@@ -6,10 +6,9 @@ Document verified segmentation evaluations and research, then push the resulting
 
 ## Status
 
-- The report drafts and aggregate metrics are present under `docs/experiments/` and `docs/research/`.
-- README and repository documentation link to the results and record the data boundary.
-- Next: validate JSON and whitespace, inspect/stage explicit paths, commit, push `master`, and verify the remote ref.
-- Local `master` contains six commits ahead of `origin/master`; the user explicitly said to push all of them along with this documentation.
+- Complete: reports and aggregate metrics are published under `docs/experiments/` and `docs/research/`; README and repository docs link to them.
+- Published report commit `4da7c9e` and all six prior local commits to GitHub `master`.
+- Verified remote `master` at report commit `4da7c9eece479e903e2ff786b8bdfcfd4fe7ee51`; all six earlier commits are included in its history. The working tree was clean after that push.
 
 ## Verified experiments recorded
 
@@ -39,5 +38,6 @@ The earlier split cloud experiment remains incomplete and was not resumed in thi
 ## Checkpoint
 
 - Working branch: `master`.
-- Current HEAD before report commit: `e1a7aec` (`docs: clarify Colab CLI auth and logging`).
-- Exact next action: commit the report set, push all local commits, verify `git ls-remote origin refs/heads/master` equals the resulting HEAD, then mark this state complete.
+- Report publication commit parent: `e1a7aec` (`docs: clarify Colab CLI auth and logging`).
+- Report commit `4da7c9eece479e903e2ff786b8bdfcfd4fe7ee51` was verified on `origin/master`; this completion-state commit follows it.
+- Next task, if continued: resume the separate incomplete Colab PSPNet and Kaggle SAM runs; this report-publication task is complete.

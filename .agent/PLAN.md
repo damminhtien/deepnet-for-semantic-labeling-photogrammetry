@@ -16,9 +16,10 @@ Validation: compare tables and metadata against the saved run reports and JSON; 
 
 Validation: Python 3.14 JSON parsing; compare the reported metrics with the source JSONs; scan for raw artifact paths.
 
-## M3: Review and publish on GitHub — in progress
+## M3: Review and publish on GitHub — complete
 
 - Inspect status and diff; stage explicit files only.
 - Run `git diff --check` and narrow JSON validation.
 - Commit the report set, push local `master` including the six user-authorized existing commits, and verify remote `master` against local HEAD.
-- Record the verified publication state.
+- Published commit `4da7c9e` and the six existing local commits to `master`.
+- Verified `git ls-remote origin refs/heads/master` equals local HEAD `4da7c9eece479e903e2ff786b8bdfcfd4fe7ee51`.
