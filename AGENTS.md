@@ -1,12 +1,27 @@
-## graphify
+# Engineering rules
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+- Keep changes focused and code readable.
+- Add regression coverage for behavior changes where the repository has a suitable test path.
+- Validate at the narrowest relevant boundary and report only checks that actually ran.
+- Treat model scripts, experiment notebooks, and evaluation code as related; inspect relevant counterparts before changing model behavior.
 
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
+# Repository map
 
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- Architecture and file roles: [docs/architecture.md](docs/architecture.md)
+- Data and experiment constraints: [docs/invariants.md](docs/invariants.md)
+- Long-running task state: .agent/TASK.md and .agent/STATE.md
+- Milestones and resume procedure: .agent/PLAN.md and [docs/AGENT_WORKFLOW.md](docs/AGENT_WORKFLOW.md)
+- Current task decisions: .agent/DECISIONS.md
+
+# Task workflow
+
+- Start or resume from AGENTS.md, .agent/TASK.md, then .agent/STATE.md.
+- For multi-file work, make .agent/PLAN.md milestones independently verifiable.
+- Update .agent/STATE.md after each milestone and before a context handoff.
+
+# Graphify
+
+- If the user invokes /graphify, follow .codex/skills/graphify/SKILL.md.
+- If graphify-out/graph.json exists, use graphify query for codebase exploration and graphify path or explain for focused relationships.
+- After code changes, run graphify update .
+- Keep generated graphify-out/ local; it is ignored by Git.
