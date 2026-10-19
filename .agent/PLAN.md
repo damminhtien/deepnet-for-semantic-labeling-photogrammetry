@@ -29,13 +29,13 @@
 
 ## M6: Run the independent cloud jobs — in progress
 
-- Colab verified all 169 bundle checksums, removed 38 non-manifest macOS sidecars, passed CUDA forward/backward smoke on a T4, and resumed from epoch 2. Continue through epoch 16.
+- The original Colab session was pruned by the backend before epoch 3 completed. A replacement T4 session is ready and reports CUDA, but the Colab content endpoint returned HTTP 500 for a full archive and a 95 MiB part. Mount the private Drive folder in the open Colab tab, verify/reconstruct the archive, then resume from epoch 2.
 - Kaggle trains SAM LoRA for five epochs of 256 random 512x512 patches, with a CUDA smoke run first. The kernel is currently queued.
 - Save per-epoch checkpoints, logs, and runtime manifests.
 
-## M7: Share the reusable bundle, evaluate, retrieve, validate, and commit — pending
+## M7: Share the reusable bundle, evaluate, retrieve, validate, and commit — in progress
 
-- Upload the checksummed PSPNet archive to a private Drive folder and add a concise mount/extract guide for reuse from multiple Colab notebooks.
+- Completed: uploaded the PSPNet archive as 106 numbered 95 MiB parts, plus `parts_manifest.json` and a mount/reconstruct/extract README, to the private Drive folder. Drive readback found all expected names and sizes; the remote manifest matches the local manifest byte-for-byte.
 - Evaluate SAM on six validation and fourteen held-out scenes; save overall accuracy, mean IoU, and visual previews.
 - Retrieve both cloud outputs under /Users/macbook/Data and compare the measured results with input/initialization caveats.
 - Update Graphify, run focused syntax/style/whitespace validation, and commit only task-owned paths.

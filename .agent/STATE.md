@@ -7,10 +7,11 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 ## Status
 
 - Local PSPNet training is paused after epoch 2/16 at `/Users/macbook/Data/runs/pspnet-mps-20261019/last.pt`.
-- Colab is assigned only to PSPNet. The active runtime is a Tesla T4. All 169 bundle files passed remote SHA-256 checks. After removing 38 non-manifest macOS `._` metadata sidecars, CUDA forward/backward smoke passed with input `[8, 5, 256, 256]`, six-class outputs, and finite loss `0.9889845848`. The trainer resumed from epoch 2 and is running toward epoch 16; no new epoch has completed yet. Current remote log: `/content/pspnet-runs/pspnet-colab-20261019.log`.
+- The original Colab session `pspnet-colab-20261019` is no longer active: `colab sessions` reported no active sessions and `status` returned not found. Its last known log reached epoch 3 batch 200/1250; no epoch 3 completion was verified. A fresh T4 session, `pspnet-colab-20261019-retry`, is available and reports Python 3.13.15, Torch 2.11.0+cu130, and CUDA on Tesla T4. Its training has not restarted because Colab CLI upload returned HTTP 500 for both the 10.5 GB archive and one 95 MiB part. Mount the Drive folder in the open Colab tab before rebuilding the archive and resuming from epoch 2.
 - Kaggle is assigned only to SAM. The private dataset `damminhtien/sam-vitb-lora-potsdam-20261019` is ready (3.88 GiB), and the private kernel `https://www.kaggle.com/code/damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation` is queued. The last quota query reported 30 GPU hours remaining.
 - Cloud code includes a SAM ViT-B wrapper with rank-4 LoRA on attention qkv/proj and a six-class decoder, a Kaggle trainer, a private bundle builder, and a private kernel stager. Local syntax/style checks passed; CUDA execution is pending.
-- The Google Drive folder and small README exist, but the large bundle has not been uploaded. The resumable upload is waiting for the user's manual Drive OAuth approval in the open tab/terminal.
+- The private Google Drive folder `https://drive.google.com/drive/folders/1Da5gI-FLnKsTRLxN0-xo_vPd13YVtZqn` now contains all 106 archive parts, `parts_manifest.json`, and the updated README (108 items total). Drive readback found no missing/duplicate parts or wrong sizes; total part size is 10,524,434,944 bytes. The remote manifest bytes match the local manifest exactly, and the README readback contains the Colab mount, verification, and extraction instructions. The folder remains private.
+- The gcloud ADC file exists but its access token lacks Drive scope: a direct Drive API request returned `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`. The gcloud help states that requesting an external Drive scope requires a custom OAuth Client ID. The connected Drive app had its own usable authorization, so no further Drive OAuth was needed for the completed upload.
 
 ## Completed local preparation
 
@@ -20,7 +21,7 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 - Verified synchronized flips/mirrors and crop-before-normalize equivalence on a real patch.
 - Saved the PSPNet epoch-2 model, Adam state, and random states. The SAM run starts from the separate official SAM ViT-B checkpoint, not the PSPNet checkpoint.
 - The PSPNet cloud bundle is at `/Users/macbook/Data/runs/pspnet-cloud-bundle-20261019` (169 files, 9.801 GiB, SHA-256 `0b3059cb164289b304e9f988de7cc4bac23519edf3471b3e6ee83024781e6e6e`); its checksums were verified.
-- The reusable archive is at `/Users/macbook/Data/runs/pspnet-colab-shared-bundle-20261019.tar` (10,524,434,944 bytes); it is staged for Drive upload. The Drive app's direct upload limit rejected files over 100 MiB, so use the separate, narrowly scoped resumable Drive API authorization rather than splitting the archive.
+- The reusable archive is at `/Users/macbook/Data/runs/pspnet-colab-shared-bundle-20261019.tar` (10,524,434,944 bytes; SHA-256 `b0bc76f02ad827795e1eaa1fa50f4d75f1069461cc68c4336a60c307de60f88f`). Because the Drive connector caps each uploaded file at 100 MiB, its bytes are stored as 106 numbered 95 MiB parts under `/Users/macbook/Data/runs/pspnet-drive-parts-95m-20261019`, with per-part hashes in `parts_manifest.json`. The private Drive README includes the Colab mount, reconstruction, hash verification, and extraction steps.
 
 ## SAM experiment design
 
@@ -32,10 +33,9 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 
 ## Pending
 
-1. Continue PSPNet epochs 3–16 on Colab and preserve checkpoints/logs after the verified bundle and passing CUDA smoke.
+1. In the open Colab tab, mount the private Drive folder with `from google.colab import drive; drive.mount('/content/drive')`. Then reconstruct and verify the archive from its parts, extract to `/content/pspnet-bundle`, and resume PSPNet from epoch 2 on the fresh T4. Preserve checkpoints/logs.
 2. Wait for the Kaggle SAM kernel to leave the queue; verify CUDA smoke, all five epochs, held-out evaluation, and saved outputs.
-3. Complete the user's Drive OAuth approval and upload the reusable PSPNet archive as one resumable file; verify Drive metadata and update the mount/extract README.
-4. Download cloud checkpoints, logs, manifests, previews, and metrics under `/Users/macbook/Data`; update state, refresh Graphify if source code changes, and commit only task-owned paths.
+3. Download cloud checkpoints, logs, manifests, previews, and metrics under `/Users/macbook/Data`; update state, refresh Graphify if source code changes, and commit only task-owned paths.
 
 ## Limitations
 
@@ -50,5 +50,5 @@ Run two different cloud jobs: Colab continues PSPNet from epoch 2 to 16; Kaggle 
 - Existing local crop-pipeline equivalence and dataset sample checks passed.
 - Existing model/data scripts passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check` before the SAM changes.
 - SAM source passed `rtk ruff check`, Python 3.14 `compileall`, and `git diff --check`; CUDA execution remains pending while Kaggle is queued.
-- Colab runtime reports CUDA available on Tesla T4; all 169 bundle checksums passed. The first launch was blocked by 38 `._*.npz` metadata sidecars, not missing/corrupt manifest files. The second launch removed those sidecars, passed forward/backward smoke with finite loss `0.9889845848`, and resumed from epoch 2. Epochs 3–16 remain in progress.
-- Drive archive creation and local part sizing passed, but no archive bytes have been uploaded yet. Cloud result retrieval, final output verification, Graphify refresh if code changes, and commit remain pending.
+- Historical Colab checks passed before its session disappeared: all 169 bundle checksums, cleanup of 38 non-manifest `._*.npz` sidecars, and a CUDA forward/backward smoke with finite loss `0.9889845848`. The last known original-run log reached epoch 3 batch 200/1250, with no epoch completion verified. The replacement T4 reports CUDA availability, but its model smoke and training have not yet run.
+- Drive readback verified 106 numbered parts with expected sizes and 10,524,434,944 total bytes. The remote `parts_manifest.json` matches the local bytes exactly; the README was fetched and checked for the Colab mount/hash/extract instructions. Cloud output retrieval, final result verification, and remaining training are pending.
