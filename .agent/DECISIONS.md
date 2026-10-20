@@ -19,3 +19,7 @@ The SAM ViT-B LoRA implementation and private cloud job were prepared, but compl
 ## 2026-10-19: Push the full local master history
 
 The user explicitly authorized pushing all commits on local `master`, including the six earlier local commits. Keep the publication as a new forward commit and verify the remote branch after push.
+
+## 2026-10-20: Persist cloud reruns outside ephemeral runtimes
+
+Write Colab run artifacts into a unique subfolder of the existing project Drive folder while training proceeds; keep the latest resumable checkpoint and hash-verified logs/manifests there and copy them to local project Data. Kaggle SAM remains a separate job and consumes the fixed Potsdam dataset plus a small private source-code dataset so its imports are present in `/kaggle/input` without re-uploading the multi-gigabyte image dataset. Keep Kaggle outputs local only; do not upload them to Drive.

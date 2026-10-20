@@ -2,6 +2,7 @@
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import platform
@@ -15,6 +16,65 @@ import urllib.request
 from datetime import UTC, datetime
 from pathlib import Path
 
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def ensure_runtime_dependencies():
+    core_modules = ("numpy", "torch", "torchvision")
+    missing_core = [name for name in core_modules if importlib.util.find_spec(name) is None]
+    if missing_core:
+        raise RuntimeError(
+            "Kaggle GPU image is missing required core packages: "
+            + ", ".join(missing_core)
+            + ". Select the standard Kaggle GPU image; torch is not installed from PyPI here."
+        )
+
+    optional_packages = (
+        ("tifffile", "tifffile"),
+        ("PIL", "pillow"),
+        ("cv2", "opencv-python-headless"),
+        ("matplotlib", "matplotlib"),
+        ("tqdm", "tqdm"),
+    )
+    for module_name, package_name in optional_packages:
+        if importlib.util.find_spec(module_name) is None:
+            print(f"Installing missing Kaggle runtime package: {package_name}", flush=True)
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "--quiet", package_name],
+                check=True,
+            )
+
+
+def verify_source_package(project_root):
+    manifest_path = project_root / "source_manifest.json"
+    if not manifest_path.is_file():
+        return None
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    records = manifest.get("files")
+    if not isinstance(records, list) or not records:
+        raise RuntimeError("Kaggle source package has no file inventory")
+    for record in records:
+        source = project_root / record["path"]
+        if not source.is_file() or source.stat().st_size != record["bytes"]:
+            raise RuntimeError(f"Missing or wrong-sized Kaggle source file: {source}")
+        if sha256_file(source) != record["sha256"]:
+            raise RuntimeError(f"Kaggle source checksum mismatch: {source}")
+    expected = hashlib.sha256(
+        json.dumps(records, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    if expected != manifest.get("source_sha256"):
+        raise RuntimeError("Kaggle source package fingerprint does not match")
+    return sha256_file(manifest_path)
+
+
+ensure_runtime_dependencies()
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -22,12 +82,28 @@ import torchvision
 from torch.utils.data import DataLoader, Dataset
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-if (SCRIPT_DIR / "semantic_labeling").is_dir():
-    PROJECT_ROOT = SCRIPT_DIR
-elif (SCRIPT_DIR.parent / "semantic_labeling").is_dir():
-    PROJECT_ROOT = SCRIPT_DIR.parent
-else:
-    PROJECT_ROOT = SCRIPT_DIR.parent
+PROJECT_ROOT_CANDIDATES = [SCRIPT_DIR, SCRIPT_DIR.parent]
+KAGGLE_INPUT = Path("/kaggle/input")
+if KAGGLE_INPUT.is_dir():
+    PROJECT_ROOT_CANDIDATES.extend(
+        package_dir.parent
+        for package_dir in KAGGLE_INPUT.rglob("semantic_labeling")
+        if package_dir.is_dir() and (package_dir / "__init__.py").is_file()
+    )
+PROJECT_ROOT = next(
+    (
+        root.resolve()
+        for root in PROJECT_ROOT_CANDIDATES
+        if (root / "semantic_labeling" / "__init__.py").is_file()
+    ),
+    None,
+)
+if PROJECT_ROOT is None:
+    raise ModuleNotFoundError(
+        "Could not find semantic_labeling in the kernel files or attached Kaggle "
+        "datasets; attach the SAM source dataset to this kernel."
+    )
+SOURCE_PACKAGE_MANIFEST_SHA256 = verify_source_package(PROJECT_ROOT)
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -43,17 +119,12 @@ SAM_CHECKPOINT_URL = (
 DEFAULT_PATCH_SIZE = 512
 DEFAULT_STEPS_PER_EPOCH = 256
 DEFAULT_EPOCHS = 5
+DEFAULT_RUN_ID = "sam-vitb-lora-potsdam-20261020-rerun-02"
+DEFAULT_OUTPUT_DIR = Path("/kaggle/working") / DEFAULT_RUN_ID
+DEFAULT_CHECKPOINT_PATH = Path("/tmp/sam-vitb-lora-cache/sam_vit_b_01ec64.pth")
 TRAIN_IDS_KEY = "train_ids"
 VALIDATION_IDS_KEY = "validation_ids"
 TEST_IDS_KEY = "held_out_test_ids"
-
-
-def sha256_file(path):
-    digest = hashlib.sha256()
-    with Path(path).open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def atomic_json_write(path, payload):
@@ -75,11 +146,7 @@ def find_data_root(requested_root):
 
     input_root = Path("/kaggle/input")
     roots = sorted(
-        {
-            manifest.parent
-            for manifest in input_root.rglob("bundle_manifest.json")
-            if manifest.parent.name == "sam_potsdam_bundle"
-        }
+        {manifest.parent.resolve() for manifest in input_root.rglob("bundle_manifest.json")}
     )
     if len(roots) == 1:
         return roots[0]
@@ -121,9 +188,8 @@ def find_data_root(requested_root):
                 archive.extractall(archive_target)
         roots = sorted(
             {
-                manifest.parent
+                manifest.parent.resolve()
                 for manifest in extraction_root.rglob("bundle_manifest.json")
-                if manifest.parent.name == "sam_potsdam_bundle"
             }
         )
         if len(roots) == 1:
@@ -571,7 +637,7 @@ def parse_args():
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("/kaggle/working/sam-vitb-lora-potsdam"),
+        default=DEFAULT_OUTPUT_DIR,
     )
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--resume-from", type=Path)
@@ -586,11 +652,35 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--run-id", default=DEFAULT_RUN_ID
+    )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    import cv2
+    import matplotlib
+    import PIL
+    import tifffile
+    import tqdm
+
+    runtime = {
+        "python_version": platform.python_version(),
+        "numpy_version": np.__version__,
+        "torch_version": torch.__version__,
+        "torchvision_version": torchvision.__version__,
+        "cuda_version": torch.version.cuda,
+        "tifffile_version": tifffile.__version__,
+        "pillow_version": PIL.__version__,
+        "opencv_version": cv2.__version__,
+        "matplotlib_version": matplotlib.__version__,
+        "tqdm_version": tqdm.__version__,
+        "cuda_available": torch.cuda.is_available(),
+        "gpu_count": torch.cuda.device_count(),
+    }
+    print("runtime_preflight=" + json.dumps(runtime, sort_keys=True), flush=True)
     if not torch.cuda.is_available():
         raise RuntimeError("This Kaggle SAM training run requires a CUDA GPU")
     if args.epochs <= 0 or args.steps_per_epoch <= 0:
@@ -603,7 +693,6 @@ def main():
     if args.patch_size % 16:
         raise ValueError("Patch size must be divisible by SAM ViT-B's 16-pixel patch")
 
-    sam_package_root = ensure_segment_anything()
     data_root = find_data_root(args.data_root)
     bundle_manifest = verify_data_bundle(data_root)
     split = bundle_manifest["split"]
@@ -613,10 +702,12 @@ def main():
     if (len(train_ids), len(validation_ids), len(test_ids)) != (18, 6, 14):
         raise ValueError("Expected the repository's fixed 18/6/14 scene split")
 
+    sam_package_root = ensure_segment_anything()
+
     output_dir = args.output_dir.expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_path = args.checkpoint or (
-        output_dir / "sam_vit_b_01ec64.pth"
+        DEFAULT_CHECKPOINT_PATH
     )
     checkpoint_path = checkpoint_path.expanduser().resolve()
     download_checkpoint(checkpoint_path)
@@ -678,7 +769,7 @@ def main():
 
     manifest_path = output_dir / "run_manifest.json"
     run_manifest = {
-        "run_id": "sam-vitb-lora-potsdam-20261019",
+        "run_id": args.run_id,
         "status": "running",
         "created_utc": datetime.now(UTC).isoformat(),
         "sam_model": "SAM ViT-B",
@@ -688,6 +779,7 @@ def main():
         "sam_checkpoint_url": SAM_CHECKPOINT_URL,
         "sam_checkpoint_sha256": checkpoint_sha,
         "trainer_script_sha256": sha256_file(Path(__file__).resolve()),
+        "source_package_manifest_sha256": SOURCE_PACKAGE_MANIFEST_SHA256,
         "model_wrapper_sha256": sha256_file(
             PROJECT_ROOT / "semantic_labeling" / "sam_lora.py"
         ),
@@ -702,6 +794,7 @@ def main():
         "gpu_name": torch.cuda.get_device_name(device),
         "gpu_count": torch.cuda.device_count(),
         "python_version": platform.python_version(),
+        "runtime_preflight": runtime,
         "torch_version": torch.__version__,
         "torchvision_version": torchvision.__version__,
         "cuda_version": torch.version.cuda,
