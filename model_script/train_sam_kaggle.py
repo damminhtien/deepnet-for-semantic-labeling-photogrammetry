@@ -978,6 +978,8 @@ def sweep_candidates(sweep_id):
             "alpha": 8,
             "patch_size": 512,
             "steps_per_epoch": 256,
+            "status": "pending",
+            "held_out_evaluation_count": 0,
         },
         {
             "name": "candidate-b-r4-p384",
@@ -986,6 +988,8 @@ def sweep_candidates(sweep_id):
             "alpha": 8,
             "patch_size": 384,
             "steps_per_epoch": 455,
+            "status": "pending",
+            "held_out_evaluation_count": 0,
         },
         {
             "name": "candidate-c-r8-p512",
@@ -994,6 +998,8 @@ def sweep_candidates(sweep_id):
             "alpha": 16,
             "patch_size": 512,
             "steps_per_epoch": 256,
+            "status": "pending",
+            "held_out_evaluation_count": 0,
         },
     ]
 
@@ -1024,48 +1030,17 @@ def select_sweep_winner(candidates, tie_tolerance=0.1):
     return max(tied, key=lambda item: float(item["validation_miou_percent"]))
 
 
-def run_sweep(args):
-    """Train all candidates on validation, then evaluate heldout once."""
-    if args.resume_from or args.validation_only or args.evaluate_held_out_only:
-        raise ValueError("--sweep cannot be combined with a single-run mode")
-    if args.epochs <= 0 or args.steps_per_epoch <= 0:
-        raise ValueError("Epochs and steps per epoch must be positive")
-    if args.early_stopping_patience <= 0:
-        raise ValueError("early-stopping-patience must be positive")
-    if args.learning_rate <= 0 or args.decoder_learning_rate <= 0:
-        raise ValueError("Learning rates must be positive")
-    if args.weight_decay < 0 or not 0 <= args.warmup_fraction < 1:
-        raise ValueError("Invalid weight decay or warmup fraction")
-    if args.min_learning_rate <= 0 or args.min_learning_rate >= min(
-        args.learning_rate, args.decoder_learning_rate
-    ):
-        raise ValueError("min-learning-rate must be positive and below both base rates")
-    data_root = find_data_root(args.data_root)
-    bundle_manifest = verify_data_bundle(data_root)
+def build_sweep_manifest(args, candidates, bundle_manifest, gpu_name):
+    """Build the sweep record with each candidate tracked in place."""
     split = bundle_manifest["split"]
-    if (
-        len(split[TRAIN_IDS_KEY]),
-        len(split[VALIDATION_IDS_KEY]),
-        len(split[TEST_IDS_KEY]),
-    ) != (18, 6, 14):
-        raise ValueError("Expected the repository's fixed 18/6/14 scene split")
-
-    sweep_dir = (
-        args.output_dir if args.output_dir is not None else DEFAULT_OUTPUT_ROOT / args.run_id
-    ).expanduser().resolve()
-    if sweep_dir.exists():
-        raise FileExistsError(f"Refusing to overwrite sweep directory: {sweep_dir}")
-    sweep_dir.mkdir(parents=True)
-    manifest_path = sweep_dir / "sweep_manifest.json"
-    candidates = sweep_candidates(args.run_id)
-    manifest = {
+    return {
         "schema_version": 1,
         "run_id": args.run_id,
         "status": "smoke_tests_running",
         "created_utc": datetime.now(UTC).isoformat(),
         "backend": "kaggle",
         "device": "cuda",
-        "gpu_name": torch.cuda.get_device_name(0),
+        "gpu_name": gpu_name,
         "trainer_script_sha256": sha256_file(Path(__file__).resolve()),
         "source_package_manifest_sha256": SOURCE_PACKAGE_MANIFEST_SHA256,
         "dataset_bundle_sha256": bundle_manifest["bundle_sha256"],
@@ -1106,8 +1081,47 @@ def run_sweep(args):
             "validation_miou_percent": BASELINE_VALIDATION_MIOU,
             "held_out_miou_percent": BASELINE_HELD_OUT_MIOU,
         },
-        "candidates": [],
+        "candidates": candidates,
     }
+
+
+def run_sweep(args):
+    """Train all candidates on validation, then evaluate heldout once."""
+    if args.resume_from or args.validation_only or args.evaluate_held_out_only:
+        raise ValueError("--sweep cannot be combined with a single-run mode")
+    if args.epochs <= 0 or args.steps_per_epoch <= 0:
+        raise ValueError("Epochs and steps per epoch must be positive")
+    if args.early_stopping_patience <= 0:
+        raise ValueError("early-stopping-patience must be positive")
+    if args.learning_rate <= 0 or args.decoder_learning_rate <= 0:
+        raise ValueError("Learning rates must be positive")
+    if args.weight_decay < 0 or not 0 <= args.warmup_fraction < 1:
+        raise ValueError("Invalid weight decay or warmup fraction")
+    if args.min_learning_rate <= 0 or args.min_learning_rate >= min(
+        args.learning_rate, args.decoder_learning_rate
+    ):
+        raise ValueError("min-learning-rate must be positive and below both base rates")
+    data_root = find_data_root(args.data_root)
+    bundle_manifest = verify_data_bundle(data_root)
+    split = bundle_manifest["split"]
+    if (
+        len(split[TRAIN_IDS_KEY]),
+        len(split[VALIDATION_IDS_KEY]),
+        len(split[TEST_IDS_KEY]),
+    ) != (18, 6, 14):
+        raise ValueError("Expected the repository's fixed 18/6/14 scene split")
+
+    sweep_dir = (
+        args.output_dir if args.output_dir is not None else DEFAULT_OUTPUT_ROOT / args.run_id
+    ).expanduser().resolve()
+    if sweep_dir.exists():
+        raise FileExistsError(f"Refusing to overwrite sweep directory: {sweep_dir}")
+    sweep_dir.mkdir(parents=True)
+    manifest_path = sweep_dir / "sweep_manifest.json"
+    candidates = sweep_candidates(args.run_id)
+    manifest = build_sweep_manifest(
+        args, candidates, bundle_manifest, torch.cuda.get_device_name(0)
+    )
 
     def save_manifest():
         manifest["updated_utc"] = datetime.now(UTC).isoformat()
@@ -1255,6 +1269,8 @@ def run_sweep(args):
         )
         manifest["status"] = "held_out_evaluation_running"
         manifest["held_out_evaluation_count"] = 1
+        winner["status"] = "held_out_evaluation_running"
+        winner["held_out_evaluation_count"] = 1
         save_manifest()
         subprocess.run(
             child_command(
@@ -1271,6 +1287,10 @@ def run_sweep(args):
         )
         if winner_metrics.get("held_out_test") is None:
             raise RuntimeError("Selected candidate has no heldout metrics")
+        winner["status"] = "complete"
+        winner["held_out_miou_percent"] = winner_metrics["held_out_test"][
+            "mean_iou_percent"
+        ]
         manifest["held_out_test"] = winner_metrics["held_out_test"]
         manifest["held_out_miou_delta_vs_run_03"] = (
             winner_metrics["held_out_test"]["mean_iou_percent"]
