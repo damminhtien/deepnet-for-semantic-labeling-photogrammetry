@@ -7,10 +7,14 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = Path(
-    "/Users/macbook/Data/runs/sam-vitb-lora-kaggle-kernel-20261019"
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/"
+    "runs/sam-vitb-lora-kaggle-kernel-20261020-rerun-03"
 )
-DATASET_ID = "damminhtien/sam-vitb-lora-potsdam-20261019"
-KERNEL_ID = "damminhtien/sam-vitb-lora-potsdam-20261019"
+DATASET_IDS = (
+    "damminhtien/sam-vitb-lora-potsdam-20261019",
+    "damminhtien/sam-vitb-lora-source-20261020",
+)
+KERNEL_ID = "damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation"
 
 
 def main():
@@ -22,11 +26,7 @@ def main():
         raise FileExistsError(f"Refusing to overwrite existing kernel directory: {output_dir}")
 
     output_dir.mkdir(parents=True)
-    package_dir = output_dir / "semantic_labeling"
-    package_dir.mkdir()
     try:
-        for filename in ("__init__.py", "constants.py", "sam_lora.py"):
-            shutil.copy2(PROJECT_ROOT / "semantic_labeling" / filename, package_dir)
         shutil.copy2(
             PROJECT_ROOT / "model_script" / "train_sam_kaggle.py",
             output_dir / "train_sam_kaggle.py",
@@ -40,7 +40,7 @@ def main():
             "is_private": "true",
             "enable_gpu": "true",
             "enable_internet": "true",
-            "dataset_sources": [DATASET_ID],
+            "dataset_sources": list(DATASET_IDS),
             "competition_sources": [],
             "kernel_sources": [],
             "model_sources": [],
@@ -57,7 +57,7 @@ def main():
             {
                 "kernel_dir": str(output_dir),
                 "kernel_id": KERNEL_ID,
-                "dataset_id": DATASET_ID,
+                "dataset_ids": list(DATASET_IDS),
                 "private": True,
                 "gpu": True,
                 "internet": True,

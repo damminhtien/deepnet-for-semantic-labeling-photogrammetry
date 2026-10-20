@@ -13,12 +13,13 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT_DIR = Path(
     "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/"
-    "runs/sam-vitb-lora-source-20261020"
+    "runs/sam-vitb-lora-source-20261020-rerun-03"
 )
 DEFAULT_DATASET_ID = "damminhtien/sam-vitb-lora-source-20261020"
 SOURCE_FILES = (
     Path("semantic_labeling/__init__.py"),
     Path("semantic_labeling/constants.py"),
+    Path("semantic_labeling/losses.py"),
     Path("semantic_labeling/sam_lora.py"),
 )
 
