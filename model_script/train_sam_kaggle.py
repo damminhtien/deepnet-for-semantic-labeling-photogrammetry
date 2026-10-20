@@ -8,14 +8,17 @@ import math
 import os
 import platform
 import random
+import shutil
+import stat
 import subprocess
 import sys
 import tarfile
 import tempfile
 import time
 import urllib.request
+import zipfile
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 
 def sha256_file(path):
@@ -55,8 +58,9 @@ def ensure_runtime_dependencies():
             )
 
 
-def verify_source_package(project_root):
-    manifest_path = project_root / "source_manifest.json"
+def verify_source_package(project_root, manifest_path=None):
+    project_root = Path(project_root).resolve()
+    manifest_path = Path(manifest_path or project_root / "source_manifest.json")
     if not manifest_path.is_file():
         return None
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -64,7 +68,12 @@ def verify_source_package(project_root):
     if not isinstance(records, list) or not records:
         raise RuntimeError("Kaggle source package has no file inventory")
     for record in records:
-        source = project_root / record["path"]
+        relative_path = PurePosixPath(record["path"])
+        if relative_path.is_absolute() or ".." in relative_path.parts:
+            raise RuntimeError(f"Unsafe path in Kaggle source manifest: {record['path']}")
+        source = (project_root / Path(*relative_path.parts)).resolve()
+        if source != project_root and project_root not in source.parents:
+            raise RuntimeError(f"Unsafe path in Kaggle source manifest: {record['path']}")
         if not source.is_file() or source.stat().st_size != record["bytes"]:
             raise RuntimeError(f"Missing or wrong-sized Kaggle source file: {source}")
         if sha256_file(source) != record["sha256"]:
@@ -77,6 +86,54 @@ def verify_source_package(project_root):
     return sha256_file(manifest_path)
 
 
+def extract_source_archive(archive_path, destination_root):
+    """Safely extract the Kaggle CLI zip containing the source package."""
+    destination_root = Path(destination_root).resolve()
+    destination_root.mkdir(parents=True, exist_ok=False)
+    try:
+        with zipfile.ZipFile(archive_path) as archive:
+            for member in archive.infolist():
+                relative_path = PurePosixPath(member.filename)
+                if (
+                    relative_path.is_absolute()
+                    or ".." in relative_path.parts
+                    or not relative_path.parts
+                ):
+                    raise RuntimeError(
+                        f"Unsafe path in Kaggle source archive: {member.filename}"
+                    )
+                member_path = destination_root.joinpath(*relative_path.parts)
+                resolved_path = member_path.resolve()
+                if (
+                    resolved_path != destination_root
+                    and destination_root not in resolved_path.parents
+                ):
+                    raise RuntimeError(
+                        f"Unsafe path in Kaggle source archive: {member.filename}"
+                    )
+                file_type = stat.S_IFMT(member.external_attr >> 16)
+                if file_type == stat.S_IFLNK:
+                    raise RuntimeError(
+                        f"Unexpected link in Kaggle source archive: {member.filename}"
+                    )
+                if member.is_dir():
+                    member_path.mkdir(parents=True, exist_ok=True)
+                    continue
+                if file_type not in (0, stat.S_IFREG):
+                    raise RuntimeError(
+                        f"Unexpected file type in Kaggle source archive: {member.filename}"
+                    )
+                member_path.parent.mkdir(parents=True, exist_ok=True)
+                with archive.open(member) as source, member_path.open("wb") as target:
+                    shutil.copyfileobj(source, target)
+        if not (destination_root / "semantic_labeling" / "__init__.py").is_file():
+            raise RuntimeError("Kaggle source archive has no semantic_labeling package")
+    except Exception:
+        shutil.rmtree(destination_root, ignore_errors=True)
+        raise
+    return destination_root
+
+
 ensure_runtime_dependencies()
 
 import numpy as np
@@ -86,8 +143,17 @@ from torch.utils.data import DataLoader, Dataset
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT_CANDIDATES = [SCRIPT_DIR, SCRIPT_DIR.parent]
+SOURCE_PACKAGE_MANIFEST_PATHS = {}
 KAGGLE_INPUT = Path("/kaggle/input")
 if KAGGLE_INPUT.is_dir():
+    for archive_path in KAGGLE_INPUT.rglob("semantic_labeling.zip"):
+        extraction_parent = Path(tempfile.mkdtemp(prefix="sam-source-package-"))
+        package_root = extraction_parent / "source"
+        extract_source_archive(archive_path, package_root)
+        PROJECT_ROOT_CANDIDATES.append(package_root)
+        SOURCE_PACKAGE_MANIFEST_PATHS[package_root.resolve()] = (
+            archive_path.parent / "source_manifest.json"
+        )
     PROJECT_ROOT_CANDIDATES.extend(
         package_dir.parent
         for package_dir in KAGGLE_INPUT.rglob("semantic_labeling")
@@ -106,9 +172,17 @@ if PROJECT_ROOT is None:
         "Could not find semantic_labeling in the kernel files or attached Kaggle "
         "datasets; attach the SAM source dataset to this kernel."
     )
-SOURCE_PACKAGE_MANIFEST_SHA256 = verify_source_package(PROJECT_ROOT)
+SOURCE_PACKAGE_MANIFEST_PATH = SOURCE_PACKAGE_MANIFEST_PATHS.get(
+    PROJECT_ROOT, PROJECT_ROOT / "source_manifest.json"
+)
+SOURCE_PACKAGE_MANIFEST_SHA256 = verify_source_package(
+    PROJECT_ROOT, SOURCE_PACKAGE_MANIFEST_PATH
+)
 if (
-    PROJECT_ROOT.is_relative_to(KAGGLE_INPUT.resolve())
+    (
+        PROJECT_ROOT.is_relative_to(KAGGLE_INPUT.resolve())
+        or PROJECT_ROOT in SOURCE_PACKAGE_MANIFEST_PATHS
+    )
     and SOURCE_PACKAGE_MANIFEST_SHA256 is None
 ):
     raise RuntimeError("The attached SAM source package is missing its checksum manifest")
