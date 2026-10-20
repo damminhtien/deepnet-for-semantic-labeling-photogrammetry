@@ -203,13 +203,18 @@ SAM_CHECKPOINT_URL = (
     "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
 )
 DEFAULT_PATCH_SIZE = 512
+DEFAULT_EVAL_PATCH_SIZE = 512
 DEFAULT_STEPS_PER_EPOCH = 256
 DEFAULT_EPOCHS = 30
-DEFAULT_RUN_ID = "sam-vitb-lora-potsdam-20261020-rerun-03"
+DEFAULT_RUN_ID = "sam-vitb-lora-potsdam-20261020-retrain-04"
 DEFAULT_OUTPUT_ROOT = Path("/kaggle/working")
 DEFAULT_CHECKPOINT_PATH = Path("/tmp/sam-vitb-lora-cache/sam_vit_b_01ec64.pth")
 CE_LOSS_WEIGHT = 0.7
 DICE_LOSS_WEIGHT = 0.3
+BASELINE_RUN_ID = "sam-vitb-lora-potsdam-20261020-rerun-03"
+BASELINE_VALIDATION_MIOU = 74.09872004468109
+BASELINE_HELD_OUT_MIOU = 73.15631832360778
+CLUTTER_CLASS_ID = 5
 TRAIN_IDS_KEY = "train_ids"
 VALIDATION_IDS_KEY = "validation_ids"
 TEST_IDS_KEY = "held_out_test_ids"
@@ -403,19 +408,63 @@ def compute_training_class_counts(data_root, scene_ids):
     return counts
 
 
-class PotsdamPatchDataset(Dataset):
-    """Sample random aligned 512-pixel patches from the 18 training scenes."""
+def sample_crop_origin(height, width, patch_size, target_point=None):
+    """Choose a crop origin, optionally constraining it to contain a point."""
+    if patch_size <= 0 or height < patch_size or width < patch_size:
+        raise ValueError("Patch size must fit within the source image")
 
-    def __init__(self, data_root, scene_ids, patch_size, epoch_size):
+    if target_point is None:
+        return (
+            random.randint(0, height - patch_size),
+            random.randint(0, width - patch_size),
+        )
+
+    row, column = target_point
+    if not (0 <= row < height and 0 <= column < width):
+        raise ValueError("Target point must lie inside the source image")
+    top_min = max(0, row - patch_size + 1)
+    top_max = min(row, height - patch_size)
+    left_min = max(0, column - patch_size + 1)
+    left_max = min(column, width - patch_size)
+    return random.randint(top_min, top_max), random.randint(left_min, left_max)
+
+
+def apply_spatial_augmentation(image, labels, rotation_k, flip_horizontal):
+    """Apply an aligned right-angle rotation and optional horizontal flip."""
+    if rotation_k not in range(4):
+        raise ValueError("rotation_k must be one of 0, 1, 2, or 3")
+    image = np.rot90(image, k=rotation_k, axes=(0, 1))
+    labels = np.rot90(labels, k=rotation_k, axes=(0, 1))
+    if flip_horizontal:
+        image = image[:, ::-1]
+        labels = labels[:, ::-1]
+    return image, labels
+
+
+class PotsdamPatchDataset(Dataset):
+    """Sample aligned training patches with optional clutter-targeted crops."""
+
+    def __init__(
+        self,
+        data_root,
+        scene_ids,
+        patch_size,
+        epoch_size,
+        clutter_patch_fraction=0.5,
+    ):
         if not scene_ids:
             raise ValueError("At least one training scene is required")
         if patch_size <= 0 or epoch_size <= 0:
             raise ValueError("Patch size and epoch size must be positive")
+        if not 0 <= clutter_patch_fraction <= 1:
+            raise ValueError("clutter-patch-fraction must be in [0, 1]")
         self.data_root = data_root
         self.scene_ids = list(scene_ids)
         self.patch_size = patch_size
         self.epoch_size = epoch_size
+        self.clutter_patch_fraction = clutter_patch_fraction
         self.cache = {}
+        self.clutter_pixel_indices = {}
 
     def __len__(self):
         return self.epoch_size
@@ -448,21 +497,51 @@ class PotsdamPatchDataset(Dataset):
             self.cache[scene_id] = image, labels
         return self.cache[scene_id]
 
-    def __getitem__(self, _index):
+    def _sample_uniform_crop(self):
         scene_id = random.choice(self.scene_ids)
         image, labels = self._load_scene(scene_id)
         height, width = labels.shape
-        top = random.randint(0, height - self.patch_size)
-        left = random.randint(0, width - self.patch_size)
+        top, left = sample_crop_origin(height, width, self.patch_size)
+        return image, labels, top, left
+
+    def _sample_clutter_crop(self):
+        for scene_id in random.sample(self.scene_ids, len(self.scene_ids)):
+            image, labels = self._load_scene(scene_id)
+            pixel_indices = self.clutter_pixel_indices.get(scene_id)
+            if pixel_indices is None:
+                pixel_indices = np.flatnonzero(
+                    labels.reshape(-1) == CLUTTER_CLASS_ID
+                ).astype(np.int32, copy=False)
+                self.clutter_pixel_indices[scene_id] = pixel_indices
+            if pixel_indices.size == 0:
+                continue
+
+            flat_index = int(pixel_indices[random.randrange(pixel_indices.size)])
+            row, column = divmod(flat_index, labels.shape[1])
+            top, left = sample_crop_origin(
+                *labels.shape,
+                self.patch_size,
+                target_point=(row, column),
+            )
+            return image, labels, top, left
+
+        return self._sample_uniform_crop()
+
+    def __getitem__(self, _index):
+        sampler = (
+            self._sample_clutter_crop
+            if random.random() < self.clutter_patch_fraction
+            else self._sample_uniform_crop
+        )
+        image, labels, top, left = sampler()
         image = image[top : top + self.patch_size, left : left + self.patch_size]
         labels = labels[top : top + self.patch_size, left : left + self.patch_size]
-
-        if random.random() < 0.5:
-            image = image[::-1]
-            labels = labels[::-1]
-        if random.random() < 0.5:
-            image = image[:, ::-1]
-            labels = labels[:, ::-1]
+        image, labels = apply_spatial_augmentation(
+            image,
+            labels,
+            rotation_k=random.randrange(4),
+            flip_horizontal=random.random() < 0.5,
+        )
 
         image = np.ascontiguousarray(image.transpose(2, 0, 1))
         labels = np.ascontiguousarray(labels.astype(np.int64, copy=False))
@@ -856,7 +935,7 @@ def write_artifact_sha256_manifest(output_dir):
     )
 
 
-def parse_args():
+def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-root", type=Path)
     parser.add_argument("--output-dir", type=Path)
@@ -867,9 +946,13 @@ def parse_args():
         "--steps-per-epoch", type=int, default=DEFAULT_STEPS_PER_EPOCH
     )
     parser.add_argument("--patch-size", type=int, default=DEFAULT_PATCH_SIZE)
+    parser.add_argument(
+        "--eval-patch-size", type=int, default=DEFAULT_EVAL_PATCH_SIZE
+    )
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--rank", type=int, default=4)
     parser.add_argument("--alpha", type=int, default=8)
+    parser.add_argument("--clutter-patch-fraction", type=float, default=0.5)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--decoder-learning-rate", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
@@ -878,11 +961,457 @@ def parse_args():
     parser.add_argument("--min-learning-rate", type=float, default=1e-6)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--run-id", default=DEFAULT_RUN_ID)
-    return parser.parse_args()
+    parser.add_argument("--sweep", action="store_true")
+    parser.add_argument("--smoke-only", action="store_true")
+    parser.add_argument("--validation-only", action="store_true")
+    parser.add_argument("--evaluate-held-out-only", action="store_true")
+    return parser.parse_args(argv)
+
+
+def sweep_candidates(sweep_id):
+    """Return the three predeclared SAM retraining candidates."""
+    return [
+        {
+            "name": "candidate-a-r4-p512",
+            "run_id": f"{sweep_id}-candidate-a-r4-p512",
+            "rank": 4,
+            "alpha": 8,
+            "patch_size": 512,
+            "steps_per_epoch": 256,
+        },
+        {
+            "name": "candidate-b-r4-p384",
+            "run_id": f"{sweep_id}-candidate-b-r4-p384",
+            "rank": 4,
+            "alpha": 8,
+            "patch_size": 384,
+            "steps_per_epoch": 455,
+        },
+        {
+            "name": "candidate-c-r8-p512",
+            "run_id": f"{sweep_id}-candidate-c-r8-p512",
+            "rank": 8,
+            "alpha": 16,
+            "patch_size": 512,
+            "steps_per_epoch": 256,
+        },
+    ]
+
+
+def select_sweep_winner(candidates, tie_tolerance=0.1):
+    """Select by validation mIoU, preferring rank 4 / patch 512 near a tie."""
+    if not candidates:
+        raise ValueError("Cannot select a winner from an empty candidate list")
+    scores = [float(item["validation_miou_percent"]) for item in candidates]
+    if not all(math.isfinite(score) for score in scores):
+        raise ValueError("Every candidate must have a finite validation mIoU")
+    highest_score = max(scores)
+    tied = [
+        item
+        for item in candidates
+        if highest_score - float(item["validation_miou_percent"]) <= tie_tolerance
+    ]
+    simple_candidate = next(
+        (
+            item
+            for item in tied
+            if item.get("rank") == 4 and item.get("patch_size") == 512
+        ),
+        None,
+    )
+    if simple_candidate is not None:
+        return simple_candidate
+    return max(tied, key=lambda item: float(item["validation_miou_percent"]))
+
+
+def run_sweep(args):
+    """Train all candidates on validation, then evaluate heldout once."""
+    if args.resume_from or args.validation_only or args.evaluate_held_out_only:
+        raise ValueError("--sweep cannot be combined with a single-run mode")
+    if args.epochs <= 0 or args.steps_per_epoch <= 0:
+        raise ValueError("Epochs and steps per epoch must be positive")
+    if args.early_stopping_patience <= 0:
+        raise ValueError("early-stopping-patience must be positive")
+    if args.learning_rate <= 0 or args.decoder_learning_rate <= 0:
+        raise ValueError("Learning rates must be positive")
+    if args.weight_decay < 0 or not 0 <= args.warmup_fraction < 1:
+        raise ValueError("Invalid weight decay or warmup fraction")
+    if args.min_learning_rate <= 0 or args.min_learning_rate >= min(
+        args.learning_rate, args.decoder_learning_rate
+    ):
+        raise ValueError("min-learning-rate must be positive and below both base rates")
+    data_root = find_data_root(args.data_root)
+    bundle_manifest = verify_data_bundle(data_root)
+    split = bundle_manifest["split"]
+    if (
+        len(split[TRAIN_IDS_KEY]),
+        len(split[VALIDATION_IDS_KEY]),
+        len(split[TEST_IDS_KEY]),
+    ) != (18, 6, 14):
+        raise ValueError("Expected the repository's fixed 18/6/14 scene split")
+
+    sweep_dir = (
+        args.output_dir if args.output_dir is not None else DEFAULT_OUTPUT_ROOT / args.run_id
+    ).expanduser().resolve()
+    if sweep_dir.exists():
+        raise FileExistsError(f"Refusing to overwrite sweep directory: {sweep_dir}")
+    sweep_dir.mkdir(parents=True)
+    manifest_path = sweep_dir / "sweep_manifest.json"
+    candidates = sweep_candidates(args.run_id)
+    manifest = {
+        "schema_version": 1,
+        "run_id": args.run_id,
+        "status": "smoke_tests_running",
+        "created_utc": datetime.now(UTC).isoformat(),
+        "backend": "kaggle",
+        "device": "cuda",
+        "gpu_name": torch.cuda.get_device_name(0),
+        "trainer_script_sha256": sha256_file(Path(__file__).resolve()),
+        "source_package_manifest_sha256": SOURCE_PACKAGE_MANIFEST_SHA256,
+        "dataset_bundle_sha256": bundle_manifest["bundle_sha256"],
+        "split": {
+            "train_ids": split[TRAIN_IDS_KEY],
+            "validation_ids": split[VALIDATION_IDS_KEY],
+            "held_out_test_ids": split[TEST_IDS_KEY],
+        },
+        "selection_metric": "six-class validation mean IoU; label 6 ignored",
+        "common_training_config": {
+            "batch_size": 1,
+            "seed": args.seed,
+            "optimizer": "AdamW",
+            "weight_decay": args.weight_decay,
+            "target_epochs": args.epochs,
+            "early_stopping_patience": args.early_stopping_patience,
+            "learning_rate_lora": args.learning_rate,
+            "learning_rate_decoder": args.decoder_learning_rate,
+            "scheduler": "linear warmup then cosine decay",
+            "warmup_fraction": args.warmup_fraction,
+            "minimum_learning_rate": args.min_learning_rate,
+            "loss": "0.7 * weighted cross entropy + 0.3 * macro soft Dice",
+            "class_weighting": (
+                "train-only inverse-square-root pixel frequency, mean normalized "
+                "to 1 and clipped to [0.5, 2.0]"
+            ),
+            "ignore_label": IGNORE_LABEL,
+            "sampler": "50% uniform crops and 50% clutter-targeted crops",
+            "augmentation": "random 0/90/180/270-degree rotation and horizontal flip",
+            "train_patch_sizes": sorted(
+                {candidate["patch_size"] for candidate in candidates}
+            ),
+            "eval_patch_size": 512,
+        },
+        "held_out_evaluation_count": 0,
+        "baseline": {
+            "run_id": BASELINE_RUN_ID,
+            "validation_miou_percent": BASELINE_VALIDATION_MIOU,
+            "held_out_miou_percent": BASELINE_HELD_OUT_MIOU,
+        },
+        "candidates": [],
+    }
+
+    def save_manifest():
+        manifest["updated_utc"] = datetime.now(UTC).isoformat()
+        atomic_json_write(manifest_path, manifest)
+
+    def child_command(candidate, mode, output_dir=None):
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            mode,
+            "--data-root",
+            str(data_root),
+            "--run-id",
+            candidate["run_id"],
+            "--rank",
+            str(candidate["rank"]),
+            "--alpha",
+            str(candidate["alpha"]),
+            "--patch-size",
+            str(candidate["patch_size"]),
+            "--steps-per-epoch",
+            str(candidate["steps_per_epoch"]),
+            "--eval-patch-size",
+            "512",
+            "--epochs",
+            str(args.epochs),
+            "--batch-size",
+            "1",
+            "--seed",
+            str(args.seed),
+            "--clutter-patch-fraction",
+            "0.5",
+            "--learning-rate",
+            str(args.learning_rate),
+            "--decoder-learning-rate",
+            str(args.decoder_learning_rate),
+            "--weight-decay",
+            str(args.weight_decay),
+            "--early-stopping-patience",
+            str(args.early_stopping_patience),
+            "--warmup-fraction",
+            str(args.warmup_fraction),
+            "--min-learning-rate",
+            str(args.min_learning_rate),
+        ]
+        if output_dir is not None:
+            command.extend(["--output-dir", str(output_dir)])
+        return command
+
+    try:
+        save_manifest()
+        for candidate in candidates:
+            candidate_dir = sweep_dir / candidate["name"]
+            smoke_log = sweep_dir / f"{candidate['name']}-smoke.log"
+            smoke_result = subprocess.run(
+                child_command(candidate, "--smoke-only"),
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            smoke_log.write_text(
+                smoke_result.stdout + smoke_result.stderr, encoding="utf-8"
+            )
+            if smoke_result.returncode != 0:
+                raise RuntimeError(
+                    f"CUDA smoke test failed for {candidate['name']}; see {smoke_log}"
+                )
+            candidate["smoke_status"] = "passed"
+            candidate["smoke_log"] = smoke_log.name
+            save_manifest()
+
+        manifest["status"] = "training_candidates"
+        save_manifest()
+        summaries = []
+        for candidate in candidates:
+            candidate_dir = sweep_dir / candidate["name"]
+            candidate["status"] = "training"
+            candidate["output_directory"] = candidate_dir.name
+            save_manifest()
+            subprocess.run(
+                child_command(
+                    candidate,
+                    "--validation-only",
+                    output_dir=candidate_dir,
+                ),
+                check=True,
+            )
+            run_manifest = json.loads(
+                (candidate_dir / "run_manifest.json").read_text(encoding="utf-8")
+            )
+            metrics = json.loads(
+                (candidate_dir / "metrics.json").read_text(encoding="utf-8")
+            )
+            if run_manifest.get("status") != "validation_complete":
+                raise RuntimeError(
+                    f"Candidate {candidate['name']} did not finish validation"
+                )
+            if metrics.get("held_out_test") is not None:
+                raise RuntimeError(
+                    f"Candidate {candidate['name']} unexpectedly evaluated heldout"
+                )
+            best_path = candidate_dir / "best.pt"
+            last_path = candidate_dir / "last.pt"
+            if (
+                not best_path.is_file()
+                or sha256_file(best_path) != run_manifest.get("best_checkpoint_sha256")
+            ):
+                raise RuntimeError(
+                    f"Candidate {candidate['name']} best.pt hash is invalid"
+                )
+            if (
+                not last_path.is_file()
+                or sha256_file(last_path) != run_manifest.get("last_checkpoint_sha256")
+            ):
+                raise RuntimeError(
+                    f"Candidate {candidate['name']} last.pt hash is invalid"
+                )
+            candidate["status"] = "validation_complete"
+            candidate["validation_miou_percent"] = metrics["validation"][
+                "mean_iou_percent"
+            ]
+            candidate["validation_metrics_path"] = (
+                Path(candidate["name"]) / "metrics.json"
+            ).as_posix()
+            candidate["best_checkpoint_sha256"] = run_manifest.get(
+                "best_checkpoint_sha256"
+            )
+            candidate["last_checkpoint_sha256"] = run_manifest.get(
+                "last_checkpoint_sha256"
+            )
+            summaries.append(candidate)
+            save_manifest()
+
+        winner = select_sweep_winner(summaries)
+        manifest["selected_candidate"] = winner["name"]
+        manifest["selected_candidate_run_id"] = winner["run_id"]
+        manifest["selected_validation_miou_percent"] = winner[
+            "validation_miou_percent"
+        ]
+        manifest["validation_miou_delta_vs_run_03"] = (
+            winner["validation_miou_percent"] - BASELINE_VALIDATION_MIOU
+        )
+        manifest["improved_validation_vs_run_03"] = (
+            winner["validation_miou_percent"] > BASELINE_VALIDATION_MIOU
+        )
+        manifest["status"] = "held_out_evaluation_running"
+        manifest["held_out_evaluation_count"] = 1
+        save_manifest()
+        subprocess.run(
+            child_command(
+                winner,
+                "--evaluate-held-out-only",
+                output_dir=sweep_dir / winner["name"],
+            ),
+            check=True,
+        )
+        winner_metrics = json.loads(
+            (sweep_dir / winner["name"] / "metrics.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        if winner_metrics.get("held_out_test") is None:
+            raise RuntimeError("Selected candidate has no heldout metrics")
+        manifest["held_out_test"] = winner_metrics["held_out_test"]
+        manifest["held_out_miou_delta_vs_run_03"] = (
+            winner_metrics["held_out_test"]["mean_iou_percent"]
+            - BASELINE_HELD_OUT_MIOU
+        )
+        manifest["status"] = "complete"
+        manifest["completed_utc"] = datetime.now(UTC).isoformat()
+        save_manifest()
+        write_artifact_sha256_manifest(sweep_dir)
+        print(json.dumps(manifest, indent=2), flush=True)
+    except Exception as error:
+        manifest.update(
+            {
+                "status": "failed",
+                "failure": {"type": type(error).__name__, "message": str(error)},
+                "failed_utc": datetime.now(UTC).isoformat(),
+            }
+        )
+        save_manifest()
+        raise
+
+
+def evaluate_selected_held_out(
+    args, output_dir, data_root, held_out_ids, model, checkpoint_sha, bundle_manifest
+):
+    """Evaluate a validation-selected checkpoint on heldout exactly once."""
+    manifest_path = output_dir / "run_manifest.json"
+    metrics_path = output_dir / "metrics.json"
+    best_checkpoint_path = output_dir / "best.pt"
+    if not manifest_path.is_file() or not metrics_path.is_file():
+        raise FileNotFoundError("Heldout evaluation requires a completed validation run")
+    run_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    if run_manifest.get("status") != "validation_complete":
+        raise RuntimeError("Heldout evaluation requires status validation_complete")
+    if run_manifest.get("held_out_evaluation_count", 0) != 0:
+        raise RuntimeError("Heldout evaluation was already attempted for this run")
+    if metrics.get("held_out_test") is not None:
+        raise RuntimeError("Refusing to evaluate heldout a second time")
+    if run_manifest.get("sam_checkpoint_sha256") != checkpoint_sha:
+        raise RuntimeError("Heldout run uses a different SAM base checkpoint")
+    if run_manifest.get("dataset_bundle_sha256") != bundle_manifest["bundle_sha256"]:
+        raise RuntimeError("Heldout run uses a different Potsdam data bundle")
+    lora_config = run_manifest.get("lora", {})
+    if (lora_config.get("rank"), lora_config.get("alpha")) != (
+        args.rank,
+        args.alpha,
+    ):
+        raise RuntimeError("Heldout LoRA rank/alpha differs from the selected run")
+    training_config = run_manifest.get("training_config", {})
+    if training_config.get("eval_patch_size") != args.eval_patch_size:
+        raise RuntimeError("Heldout tile size differs from the selected run")
+    if not best_checkpoint_path.is_file():
+        raise FileNotFoundError("Selected run has no best.pt checkpoint")
+
+    best_checkpoint = torch.load(
+        best_checkpoint_path, map_location="cpu", weights_only=False
+    )
+    if best_checkpoint.get("training_config_sha256") != run_manifest.get(
+        "training_config_sha256"
+    ):
+        raise RuntimeError("Best checkpoint does not match the selected run manifest")
+    if best_checkpoint.get("sam_checkpoint_sha256") != checkpoint_sha:
+        raise RuntimeError("Best checkpoint uses a different SAM base checkpoint")
+    if best_checkpoint.get("dataset_bundle_sha256") != bundle_manifest[
+        "bundle_sha256"
+    ]:
+        raise RuntimeError("Best checkpoint uses a different Potsdam data bundle")
+    selected_validation = metrics.get("validation")
+    checkpoint_validation = best_checkpoint.get("best_validation_metrics")
+    if (
+        selected_validation is None
+        or checkpoint_validation is None
+        or selected_validation.get("confusion_matrix")
+        != checkpoint_validation.get("confusion_matrix")
+    ):
+        raise RuntimeError("Selected validation metrics do not match best.pt")
+
+    run_manifest["status"] = "held_out_evaluation_running"
+    run_manifest["held_out_evaluation_count"] = 1
+    run_manifest["held_out_evaluation_started_utc"] = datetime.now(UTC).isoformat()
+    atomic_json_write(manifest_path, run_manifest)
+    restore_trainable_state(model, best_checkpoint["trainable_state_dict"])
+    held_out = evaluate_split(
+        model,
+        data_root,
+        held_out_ids,
+        "held_out",
+        args.eval_patch_size,
+        torch.device("cuda"),
+        output_dir,
+        save_previews=True,
+    )
+    metrics.update(
+        {
+            "held_out_test": held_out,
+            "baseline_comparison": {
+                "run_id": BASELINE_RUN_ID,
+                "validation_miou_percent": BASELINE_VALIDATION_MIOU,
+                "held_out_miou_percent": BASELINE_HELD_OUT_MIOU,
+                "validation_miou_delta_percentage_points": (
+                    metrics["validation"]["mean_iou_percent"]
+                    - BASELINE_VALIDATION_MIOU
+                ),
+                "held_out_miou_delta_percentage_points": (
+                    held_out["mean_iou_percent"] - BASELINE_HELD_OUT_MIOU
+                ),
+                "held_out_used_for_selection": False,
+            },
+            "held_out_evaluation_count": 1,
+            "evaluated_utc": datetime.now(UTC).isoformat(),
+        }
+    )
+    atomic_json_write(metrics_path, metrics)
+    run_manifest.update(
+        {
+            "status": "complete",
+            "held_out_evaluation_count": 1,
+            "metrics": metrics,
+            "completed_utc": datetime.now(UTC).isoformat(),
+            "best_checkpoint_sha256": sha256_file(best_checkpoint_path),
+            "last_checkpoint_sha256": sha256_file(output_dir / "last.pt"),
+        }
+    )
+    atomic_json_write(manifest_path, run_manifest)
+    write_artifact_sha256_manifest(output_dir)
+    print(json.dumps(metrics, indent=2), flush=True)
 
 
 def main():
     args = parse_args()
+    if KAGGLE_INPUT.is_dir() and not any(
+        (
+            args.sweep,
+            args.smoke_only,
+            args.validation_only,
+            args.evaluate_held_out_only,
+        )
+    ):
+        args.sweep = True
+        print("Kaggle kernel entrypoint selected the predeclared three-run sweep", flush=True)
     import cv2
     import matplotlib
     import PIL
@@ -906,6 +1435,20 @@ def main():
     print("runtime_preflight=" + json.dumps(runtime, sort_keys=True), flush=True)
     if not torch.cuda.is_available():
         raise RuntimeError("This Kaggle SAM training run requires a CUDA GPU")
+    selected_modes = sum(
+        bool(value)
+        for value in (
+            args.sweep,
+            args.smoke_only,
+            args.validation_only,
+            args.evaluate_held_out_only,
+        )
+    )
+    if selected_modes > 1:
+        raise ValueError("Select only one sweep, smoke, validation, or heldout mode")
+    if args.sweep:
+        run_sweep(args)
+        return
     if args.epochs <= 0 or args.steps_per_epoch <= 0:
         raise ValueError("Epochs and steps per epoch must be positive")
     if args.early_stopping_patience <= 0:
@@ -925,8 +1468,20 @@ def main():
             "The validated Kaggle memory profile uses batch size 1; "
             "change it only after a CUDA smoke run"
         )
-    if args.patch_size % 16:
+    if args.patch_size <= 0 or args.patch_size % 16:
         raise ValueError("Patch size must be divisible by SAM ViT-B's 16-pixel patch")
+    if args.eval_patch_size <= 0 or args.eval_patch_size % 16:
+        raise ValueError(
+            "Evaluation patch size must be divisible by SAM ViT-B's 16-pixel patch"
+        )
+    if args.rank <= 0 or args.alpha <= 0:
+        raise ValueError("LoRA rank and alpha must be positive")
+    if not 0 <= args.clutter_patch_fraction <= 1:
+        raise ValueError("clutter-patch-fraction must be in [0, 1]")
+    if args.smoke_only and (args.resume_from or args.evaluate_held_out_only):
+        raise ValueError("--smoke-only cannot be combined with resume or heldout mode")
+    if args.evaluate_held_out_only and args.resume_from:
+        raise ValueError("--evaluate-held-out-only cannot be combined with resume")
 
     data_root = find_data_root(args.data_root)
     bundle_manifest = verify_data_bundle(data_root)
@@ -937,29 +1492,48 @@ def main():
     if (len(train_ids), len(validation_ids), len(test_ids)) != (18, 6, 14):
         raise ValueError("Expected the repository's fixed 18/6/14 scene split")
 
-    train_class_counts = compute_training_class_counts(data_root, train_ids)
-    train_class_frequencies = train_class_counts / train_class_counts.sum()
-    class_weights = inverse_sqrt_class_weights(train_class_frequencies)
+    if args.evaluate_held_out_only:
+        train_class_counts = None
+        train_class_frequencies = None
+        class_weights = None
+    else:
+        train_class_counts = compute_training_class_counts(data_root, train_ids)
+        train_class_frequencies = train_class_counts / train_class_counts.sum()
+        class_weights = inverse_sqrt_class_weights(train_class_frequencies)
 
     sam_package_root = ensure_segment_anything()
 
-    output_dir = (
-        args.output_dir
-        if args.output_dir is not None
-        else DEFAULT_OUTPUT_ROOT / args.run_id
-    ).expanduser().resolve()
-    manifest_path = output_dir / "run_manifest.json"
-    if args.resume_from:
-        if not manifest_path.is_file():
-            raise FileNotFoundError(
-                "Resume requires the original run manifest in the output directory"
-            )
-        run_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if run_manifest.get("run_id") != args.run_id:
-            raise RuntimeError("Resume output directory belongs to a different run ID")
-    elif output_dir.exists():
-        raise FileExistsError(f"Refusing to overwrite existing run directory: {output_dir}")
-    output_dir.mkdir(parents=True, exist_ok=True)
+    output_dir = None
+    manifest_path = None
+    run_manifest = None
+    if not args.smoke_only:
+        output_dir = (
+            args.output_dir
+            if args.output_dir is not None
+            else DEFAULT_OUTPUT_ROOT / args.run_id
+        ).expanduser().resolve()
+        manifest_path = output_dir / "run_manifest.json"
+        if args.evaluate_held_out_only:
+            if not output_dir.is_dir() or not manifest_path.is_file():
+                raise FileNotFoundError(
+                    "Heldout evaluation requires an existing validation run"
+                )
+        elif args.resume_from:
+            if not manifest_path.is_file():
+                raise FileNotFoundError(
+                    "Resume requires the original run manifest in the output directory"
+                )
+            run_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            if run_manifest.get("run_id") != args.run_id:
+                raise RuntimeError(
+                    "Resume output directory belongs to a different run ID"
+                )
+        else:
+            if output_dir.exists():
+                raise FileExistsError(
+                    f"Refusing to overwrite existing run directory: {output_dir}"
+                )
+            output_dir.mkdir(parents=True, exist_ok=True)
 
     checkpoint_path = args.checkpoint or DEFAULT_CHECKPOINT_PATH
     checkpoint_path = checkpoint_path.expanduser().resolve()
@@ -975,6 +1549,31 @@ def main():
         alpha=args.alpha,
         gradient_checkpointing=True,
     ).to(device)
+
+    if args.smoke_only:
+        smoke_dataset = PotsdamPatchDataset(
+            data_root,
+            train_ids,
+            args.patch_size,
+            1,
+            clutter_patch_fraction=args.clutter_patch_fraction,
+        )
+        smoke = cuda_smoke_test(model, smoke_dataset, class_weights, device)
+        print(json.dumps({"smoke_status": "passed", "cuda_smoke": smoke}), flush=True)
+        return
+
+    if args.evaluate_held_out_only:
+        evaluate_selected_held_out(
+            args,
+            output_dir,
+            data_root,
+            test_ids,
+            model,
+            checkpoint_sha,
+            bundle_manifest,
+        )
+        return
+
     optimizer = build_optimizer(
         model,
         learning_rate=args.learning_rate,
@@ -991,11 +1590,17 @@ def main():
 
     training_config = {
         "patch_size": args.patch_size,
+        "eval_patch_size": args.eval_patch_size,
         "batch_size": args.batch_size,
         "steps_per_epoch": args.steps_per_epoch,
         "target_epochs": args.epochs,
         "max_optimizer_steps": args.epochs * args.steps_per_epoch,
-        "sampler": "uniform random training scene and aligned random crop per step",
+        "sampler": (
+            "uniform random scene/crop mixed with clutter-targeted crops; "
+            f"clutter_patch_fraction={args.clutter_patch_fraction}"
+        ),
+        "clutter_patch_fraction": args.clutter_patch_fraction,
+        "augmentation": "random 0/90/180/270-degree rotation and horizontal flip",
         "random_patches_per_epoch": args.steps_per_epoch,
         "seed": args.seed,
         "optimizer": "AdamW",
@@ -1070,7 +1675,11 @@ def main():
             )
 
     train_dataset = PotsdamPatchDataset(
-        data_root, train_ids, args.patch_size, args.steps_per_epoch
+        data_root,
+        train_ids,
+        args.patch_size,
+        args.steps_per_epoch,
+        clutter_patch_fraction=args.clutter_patch_fraction,
     )
     train_loader = DataLoader(
         train_dataset,
@@ -1153,6 +1762,7 @@ def main():
             "training_config_sha256": training_config_sha256,
             "starting_epoch": start_epoch,
             "early_stopped": False,
+            "held_out_evaluation_count": 0,
             "cuda_smoke": smoke,
             "data_root": str(data_root),
             "run_directory": str(output_dir),
@@ -1216,7 +1826,7 @@ def main():
                 data_root,
                 validation_ids,
                 "validation",
-                args.patch_size,
+                args.eval_patch_size,
                 device,
                 output_dir,
                 save_previews=False,
@@ -1301,7 +1911,7 @@ def main():
             data_root,
             validation_ids,
             "validation",
-            args.patch_size,
+            args.eval_patch_size,
             device,
             output_dir,
             save_previews=True,
@@ -1323,21 +1933,18 @@ def main():
         ):
             raise RuntimeError("Re-evaluated validation mIoU differs from best checkpoint")
 
-        held_out = evaluate_split(
-            model,
-            data_root,
-            test_ids,
-            "held_out",
-            args.patch_size,
-            device,
-            output_dir,
-            save_previews=True,
-        )
-        baseline = {
-            "run_id": "sam-vitb-lora-potsdam-20261020-rerun-02",
-            "validation_miou_percent": 62.70276804696081,
-            "held_out_miou_percent": 60.021338817378165,
-        }
+        held_out = None
+        if not args.validation_only:
+            held_out = evaluate_split(
+                model,
+                data_root,
+                test_ids,
+                "held_out",
+                args.eval_patch_size,
+                device,
+                output_dir,
+                save_previews=True,
+            )
         results = {
             "selected_checkpoint": "best.pt",
             "selected_checkpoint_sha256": sha256_file(best_checkpoint_path),
@@ -1346,31 +1953,39 @@ def main():
             "validation": validation,
             "held_out_test": held_out,
             "baseline_comparison": {
-                **baseline,
+                "run_id": BASELINE_RUN_ID,
+                "validation_miou_percent": BASELINE_VALIDATION_MIOU,
+                "held_out_miou_percent": BASELINE_HELD_OUT_MIOU,
                 "validation_miou_delta_percentage_points": (
                     validation["mean_iou_percent"]
-                    - baseline["validation_miou_percent"]
+                    - BASELINE_VALIDATION_MIOU
                 ),
-                "held_out_miou_delta_percentage_points": (
-                    held_out["mean_iou_percent"] - baseline["held_out_miou_percent"]
-                ),
+                "held_out_miou_delta_percentage_points": None
+                if held_out is None
+                else held_out["mean_iou_percent"] - BASELINE_HELD_OUT_MIOU,
                 "held_out_used_for_selection": False,
             },
+            "held_out_evaluation_count": 0 if held_out is None else 1,
             "evaluated_utc": datetime.now(UTC).isoformat(),
         }
         atomic_json_write(output_dir / "metrics.json", results)
         run_manifest.update(
             {
-                "status": "complete",
+                "status": "validation_complete"
+                if args.validation_only
+                else "complete",
+                "held_out_evaluation_count": 0 if held_out is None else 1,
                 "best_epoch": best_checkpoint["best_epoch"],
                 "early_stopped": bool(run_manifest.get("early_stopped", False)),
                 "best_validation_miou_percent": validation["mean_iou_percent"],
                 "metrics": results,
-                "completed_utc": datetime.now(UTC).isoformat(),
+                "validation_completed_utc": datetime.now(UTC).isoformat(),
                 "best_checkpoint_sha256": sha256_file(best_checkpoint_path),
                 "last_checkpoint_sha256": sha256_file(output_dir / "last.pt"),
             }
         )
+        if held_out is not None:
+            run_manifest["completed_utc"] = datetime.now(UTC).isoformat()
         atomic_json_write(manifest_path, run_manifest)
         write_artifact_sha256_manifest(output_dir)
         print(json.dumps(results, indent=2), flush=True)
