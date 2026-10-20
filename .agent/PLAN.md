@@ -30,3 +30,12 @@ Validation: kernel status/logs show dependency versions, CUDA GPU, verified bund
 - Report completed metrics only when final manifests, checkpoints, and evaluation outputs agree.
 
 Validation: final status and artifact hashes on Drive and Kaggle/local storage; no training artifacts staged in Git.
+
+## M5: Improved SAM ViT-B + LoRA Kaggle rerun — running
+
+- Add train-frequency inverse-square-root class weights, weighted CE + macro soft Dice, separate LoRA/decoder AdamW rates, warmup/cosine decay, validation mIoU checkpoint selection, early stopping, and resumable `last.pt`/`best.pt` checkpoints.
+- Keep the fixed 18/6/14 split, 512 patches, batch 1, seed 42, and 256 random patches per epoch. Evaluate all six validation tiles after each epoch and evaluate the 14 held-out tiles once after selecting `best.pt`.
+- Verify the private source package and Potsdam bundle hashes before the run. Save only under `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/sam-vitb-lora-kaggle-output-20261020/snapshot-20261020-03/`; keep all training artifacts out of Git and Drive.
+- Do not modify or restart the PSPNet Colab job in M2.
+
+Validation so far: eight local unit tests pass; Ruff, Python compilation, CLI help, data bundle checksum, and remote Kaggle source download/hash checks pass. Kaggle kernel version 4 was pushed and reports `RUNNING`; still verify CUDA smoke, completion manifest, checkpoint hashes, metrics, and downloaded artifacts.

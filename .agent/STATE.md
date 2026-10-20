@@ -63,3 +63,13 @@ Document verified segmentation evaluations and research, then push the resulting
 - Report publication commit parent: `e1a7aec` (`docs: clarify Colab CLI auth and logging`).
 - Report commit `4da7c9eece479e903e2ff786b8bdfcfd4fe7ee51` was verified on `origin/master`; this completion-state commit follows it.
 - Next task, if continued: resume the separate incomplete Colab PSPNet and Kaggle SAM runs; this report-publication task is complete.
+
+## SAM rerun 03 — current status
+
+- The improved trainer and tests are committed as `57a789c` and `c3ceeeb`. The training configuration uses patch size 512, batch 1, seed 42, 256 random patches per epoch, 30 maximum epochs, patience 6, AdamW, LoRA LR `1e-4`, decoder LR `3e-4`, weight decay `1e-4`, 5% warmup, and cosine decay to `1e-6`.
+- The new loss is `0.7 * weighted CE + 0.3 * macro soft Dice`; training-only class frequencies determine inverse-square-root weights normalized to mean 1 and clipped to `[0.5, 2.0]`. Ignore label 6 is excluded from loss and metrics.
+- Local validation passed: eight `unittest` cases, Ruff, Python compilation, CLI help, the full 77-file data bundle hash, and train-only frequency/weight computation. Bundle SHA-256 is `1f93e42f5464c9bf74c30f32ddefe8e175d7ccb679a3d84653f99aeb6eda29f1`.
+- The source package SHA-256 is `dee63435e200731cc8ae435efd1bc0cabac7b6851ee2c5a1b161350cf3138e31`; a download from the private Kaggle dataset was unpacked and all four source files matched `source_manifest.json`. The initial upload attempt skipped the package directory; it was corrected with Kaggle directory ZIP mode and verified by downloading the resulting dataset.
+- Kaggle kernel `damminhtien/sam-vit-b-lora-six-class-potsdam-segmentation`, version 4, was pushed for run ID `sam-vitb-lora-potsdam-20261020-rerun-03`. Latest status is `KernelWorkerStatus.RUNNING`.
+- Intended local-only run output is `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/sam-vitb-lora-kaggle-output-20261020/snapshot-20261020-03/`. The CUDA smoke result, per-epoch validation, selected checkpoint, held-out metrics, and downloaded artifact hashes are pending.
+- The existing PSPNet Colab state and job were not modified.
