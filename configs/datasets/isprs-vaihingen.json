@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "dataset_id": "isprs-vaihingen",
+  "provider": "ISPRS",
+  "source_uri": "https://www.isprs.org/education/benchmarks/UrbanSemLab/2d-sem-label-vaihingen.aspx",
+  "license_id": null,
+  "root_name": "inputs",
+  "discovery_asset": "irrg",
+  "discovery_glob": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area*.tif",
+  "discovery_regex": "^top_mosaic_09cm_area(?P<scene_id>[0-9]+)\\.tif$",
+  "reference_asset": "irrg",
+  "assets": {
+    "irrg": {
+      "path": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area{area}.tif",
+      "bands": ["ir", "red", "green"],
+      "categorical": false
+    },
+    "label_participant": {
+      "path": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area{area}.tif",
+      "bands": ["red", "green", "blue"],
+      "categorical": true,
+      "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata."
+    },
+    "label_full": {
+      "path": "vaihingen-isprs-official-20261019/labels_full/top_mosaic_09cm_area{area}.tif",
+      "bands": ["red", "green", "blue"],
+      "categorical": true,
+      "alignment_evidence": "ISPRS official image/full-reference pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata."
+    },
+    "label_eroded": {
+      "path": "vaihingen-isprs-official-20261019/labels_eroded/top_mosaic_09cm_area{area}_noBoundary.tif",
+      "bands": ["red", "green", "blue"],
+      "categorical": true,
+      "alignment_evidence": "ISPRS official image/eroded-reference pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata."
+    }
+  },
+  "label_ontology": "isprs-six-class-v1",
+  "notes": [
+    "The downloaded Vaihingen GeoTIFFs inspected locally do not contain CRS or affine tags; catalog records preserve pixel-local status rather than inventing georeferencing.",
+    "license_id is intentionally null until the applicable redistribution/license terms are verified from the source."
+  ]
+}

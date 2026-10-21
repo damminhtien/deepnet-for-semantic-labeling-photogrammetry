@@ -1,0 +1,18 @@
+{
+  "model_id": "isprs-irrg-zscore",
+  "version": 1,
+  "channels": ["ir", "red", "green"],
+  "channel_sources": [
+    ["ir", "irrg", "ir"],
+    ["red", "irrg", "red"],
+    ["green", "irrg", "green"]
+  ],
+  "normalization": [
+    {"channel": "ir", "method": "zscore"},
+    {"channel": "red", "method": "zscore"},
+    {"channel": "green", "method": "zscore"}
+  ],
+  "layout": "CHW",
+  "dtype": "float32",
+  "pixel_semantics": "Each named IR-R-G band is standardized using valid pixels from training scenes only."
+}

@@ -1,0 +1,22 @@
+{
+  "model_id": "isprs-irrg-dsm-ndsm-zscore",
+  "version": 1,
+  "channels": ["ir", "red", "green", "dsm", "ndsm"],
+  "channel_sources": [
+    ["ir", "irrg", "ir"],
+    ["red", "irrg", "red"],
+    ["green", "irrg", "green"],
+    ["dsm", "dsm", "dsm"],
+    ["ndsm", "ndsm", "ndsm"]
+  ],
+  "normalization": [
+    {"channel": "ir", "method": "scale", "scale": 255.0},
+    {"channel": "red", "method": "scale", "scale": 255.0},
+    {"channel": "green", "method": "scale", "scale": 255.0},
+    {"channel": "dsm", "method": "zscore"},
+    {"channel": "ndsm", "method": "zscore"}
+  ],
+  "layout": "CHW",
+  "dtype": "float32",
+  "pixel_semantics": "IRRG is scaled to [0,1]. DSM and nDSM use statistics fitted from the selected training split. Each source must pass spatial alignment validation."
+}

@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "dataset_id": "isprs-potsdam",
+  "provider": "ISPRS",
+  "source_uri": "https://www.isprs.org/education/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx",
+  "license_id": null,
+  "root_name": "inputs",
+  "discovery_asset": "irrg",
+  "discovery_glob": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_*_IRRG.tif",
+  "discovery_regex": "^top_potsdam_(?P<scene_id>[0-9]+_[0-9]+)_IRRG\\.tif$",
+  "reference_asset": "irrg",
+  "assets": {
+    "irrg": {
+      "path": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_{scene_id}_IRRG.tif",
+      "bands": ["ir", "red", "green"],
+      "categorical": false
+    },
+    "dsm": {
+      "path": "potsdamvaihingen/1_dsm/1_DSM/dsm_potsdam_{row:02d}_{column:02d}.tif",
+      "bands": ["dsm"],
+      "categorical": false
+    },
+    "ndsm": {
+      "path": "potsdamvaihingen/1_dsm_normalisation/1_DSM_normalisation/dsm_potsdam_{row:02d}_{column:02d}_normalized_lastools.jpg",
+      "bands": ["ndsm"],
+      "categorical": false,
+      "alignment_evidence": null,
+      "alignment_note": "The source is a JPEG without CRS/affine sidecar. The model view must reject it until a verified coregistration record is supplied."
+    },
+    "label_participant": {
+      "path": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_{scene_id}_label.tif",
+      "bands": ["red", "green", "blue"],
+      "categorical": true,
+      "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing."
+    },
+    "label_full": {
+      "path": "label-all-potsdam-vaihingen/5_labels_all/top_potsdam_{scene_id}_label.tif",
+      "bands": ["red", "green", "blue"],
+      "categorical": true,
+      "alignment_evidence": "Official scene-matched participant label for the same Potsdam tile; catalog validation must additionally verify its grid metadata or record the source pairing."
+    },
+    "label_eroded": {
+      "path": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_{scene_id}_label_noBoundary.tif",
+      "bands": ["red", "green", "blue"],
+      "categorical": true,
+      "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing."
+    }
+  },
+  "label_ontology": "isprs-six-class-v1",
+  "notes": [
+    "Scene IDs are canonicalized as row_column without zero padding; DSM filenames use two-digit row and column components.",
+    "license_id is intentionally null until the applicable redistribution/license terms are verified from the source."
+  ]
+}

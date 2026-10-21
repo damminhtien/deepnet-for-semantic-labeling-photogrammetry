@@ -1,0 +1,18 @@
+{
+  "model_id": "isprs-irrg-native",
+  "version": 1,
+  "channels": ["ir", "red", "green"],
+  "channel_sources": [
+    ["ir", "irrg", "ir"],
+    ["red", "irrg", "red"],
+    ["green", "irrg", "green"]
+  ],
+  "normalization": [
+    {"channel": "ir", "method": "identity"},
+    {"channel": "red", "method": "identity"},
+    {"channel": "green", "method": "identity"}
+  ],
+  "layout": "CHW",
+  "dtype": "float32",
+  "pixel_semantics": "Native source IR-R-G values are preserved in float32 on their original numeric scale; a model adapter may apply a separately versioned model-specific transform."
+}
