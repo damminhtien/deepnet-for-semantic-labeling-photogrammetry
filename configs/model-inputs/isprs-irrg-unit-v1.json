@@ -1,0 +1,18 @@
+{
+  "model_id": "isprs-irrg-unit",
+  "version": 1,
+  "channels": ["ir", "red", "green"],
+  "channel_sources": [
+    ["ir", "irrg", "ir"],
+    ["red", "irrg", "red"],
+    ["green", "irrg", "green"]
+  ],
+  "normalization": [
+    {"channel": "ir", "method": "scale", "scale": 255.0},
+    {"channel": "red", "method": "scale", "scale": 255.0},
+    {"channel": "green", "method": "scale", "scale": 255.0}
+  ],
+  "layout": "CHW",
+  "dtype": "float32",
+  "pixel_semantics": "IRRG source values are converted to [0,1]; the learnable spectral adapter maps the sensor channel semantics to the pretrained encoder input space."
+}

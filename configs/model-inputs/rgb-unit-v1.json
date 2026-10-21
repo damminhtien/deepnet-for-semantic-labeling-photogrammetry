@@ -1,0 +1,18 @@
+{
+  "model_id": "rgb-unit",
+  "version": 1,
+  "channels": ["red", "green", "blue"],
+  "channel_sources": [
+    ["red", "rgb", "red"],
+    ["green", "rgb", "green"],
+    ["blue", "rgb", "blue"]
+  ],
+  "normalization": [
+    {"channel": "red", "method": "scale", "scale": 255.0},
+    {"channel": "green", "method": "scale", "scale": 255.0},
+    {"channel": "blue", "method": "scale", "scale": 255.0}
+  ],
+  "layout": "CHW",
+  "dtype": "float32",
+  "pixel_semantics": "RGB digital numbers are converted to [0,1]; the configured identity spectral path preserves channel order before pretrained normalization."
+}

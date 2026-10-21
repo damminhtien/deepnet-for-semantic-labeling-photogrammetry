@@ -10,6 +10,8 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .contracts import (
+    AugmentationSpec,
+    DomainSpec,
     ModelInputSpec,
     PreprocessingSpec,
     RasterAsset,
@@ -37,6 +39,8 @@ DEFAULT_DATASET_CONFIG_DIR = _config_dir("datasets")
 DEFAULT_SPLIT_CONFIG_DIR = _config_dir("splits")
 DEFAULT_PREPROCESSING_CONFIG_DIR = _config_dir("preprocessing")
 DEFAULT_MODEL_INPUT_CONFIG_DIR = _config_dir("model-inputs")
+DEFAULT_DOMAIN_CONFIG_DIR = _config_dir("domains")
+DEFAULT_AUGMENTATION_CONFIG_DIR = _config_dir("augmentations")
 
 
 @dataclass(frozen=True, slots=True)
@@ -154,6 +158,24 @@ def load_model_input_spec(
 
     path = Path(config_dir) / f"{model_input_id}.json"
     return ModelInputSpec.from_dict(json.loads(path.read_text(encoding="utf-8")))
+
+
+def load_domain_spec(
+    domain_id: str,
+    config_dir: Path = DEFAULT_DOMAIN_CONFIG_DIR,
+) -> DomainSpec:
+    """Load one versioned sensor/domain specification by stable ID."""
+    path = Path(config_dir) / f"{domain_id}.json"
+    return DomainSpec.from_dict(json.loads(path.read_text(encoding="utf-8")))
+
+
+def load_augmentation_spec(
+    augmentation_id: str,
+    config_dir: Path = DEFAULT_AUGMENTATION_CONFIG_DIR,
+) -> AugmentationSpec:
+    """Load one domain-specific augmentation policy by stable ID."""
+    path = Path(config_dir) / f"{augmentation_id}.json"
+    return AugmentationSpec.from_dict(json.loads(path.read_text(encoding="utf-8")))
 
 
 def load_scene_catalog(

@@ -236,34 +236,3 @@ def sample_rng(seed: int, epoch: int, index: int) -> random.Random:
     payload = f"{seed}:{epoch}:{index}".encode("ascii")
     derived_seed = int.from_bytes(hashlib.sha256(payload).digest()[:8], "big")
     return random.Random(derived_seed)
-
-
-def augment_aligned(
-    image: np.ndarray,
-    labels: np.ndarray,
-    valid_mask: np.ndarray,
-    rng: random.Random,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Apply identical right-angle rotation and flips to image, labels, and validity."""
-    image = np.asarray(image)
-    labels = np.asarray(labels)
-    valid_mask = np.asarray(valid_mask, dtype=bool)
-    if (
-        image.ndim != 3
-        or image.shape[:2] != labels.shape
-        or labels.shape != valid_mask.shape
-    ):
-        raise ValueError("Image, labels, and validity mask must be spatially aligned")
-    rotation = rng.randrange(4)
-    image = np.rot90(image, k=rotation, axes=(0, 1))
-    labels = np.rot90(labels, k=rotation, axes=(0, 1))
-    valid_mask = np.rot90(valid_mask, k=rotation, axes=(0, 1))
-    if rng.random() < 0.5:
-        image = image[:, ::-1]
-        labels = labels[:, ::-1]
-        valid_mask = valid_mask[:, ::-1]
-    return (
-        np.ascontiguousarray(image),
-        np.ascontiguousarray(labels),
-        np.ascontiguousarray(valid_mask),
-    )

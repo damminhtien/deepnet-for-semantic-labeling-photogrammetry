@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import numpy as np
 from typing_extensions import Self
@@ -19,12 +19,20 @@ from .contracts import (
 )
 from .preprocessing import apply_model_view, decode_rgb_labels
 from .raster import RasterioSceneReader
-from .sampling import (
-    UniformSampler,
-    augment_aligned,
-    grid_windows,
-    sample_rng,
-)
+from .sampling import UniformSampler, grid_windows, sample_rng
+
+
+class SampleAugmenter(Protocol):
+    """Transform named, aligned raw bands and masks with a sample seed."""
+
+    def __call__(
+        self,
+        channels: Mapping[str, np.ndarray],
+        labels: np.ndarray,
+        valid_mask: np.ndarray,
+        *,
+        seed: int,
+    ) -> tuple[Mapping[str, np.ndarray], np.ndarray, np.ndarray]: ...
 
 
 class SceneAccess:
@@ -140,8 +148,8 @@ class SceneAccess:
         scene_id: str,
         window: WindowSpec,
         *,
-        augment: bool = False,
-        rng: Any | None = None,
+        augmenter: SampleAugmenter | None = None,
+        augmentation_seed: int | None = None,
     ) -> Sample:
         if scene_id not in self.selected_scene_ids:
             raise ValueError(
@@ -166,22 +174,50 @@ class SceneAccess:
             source_arrays[(asset_name, band_name)] = assets[asset_name][..., band_index]
         for array in source_arrays.values():
             valid &= np.isfinite(array)
+        labels, label_valid = self.read_labels(scene_id, window)
+        valid &= label_valid
+        labels[~valid] = self.preprocessing.ignore_label
+
+        if augmenter is not None:
+            if self.split_name != "train":
+                raise ValueError("Stochastic augmentation is restricted to training")
+            if augmentation_seed is None:
+                raise ValueError("A deterministic seed is required for augmentation")
+            named_channels = {
+                channel: source_arrays[(asset_name, band_name)]
+                for channel, asset_name, band_name in self.channel_sources
+            }
+            named_channels, labels, valid = augmenter(
+                named_channels,
+                labels,
+                valid,
+                seed=augmentation_seed,
+            )
+            if set(named_channels) != set(self.model_input.channels):
+                raise ValueError(
+                    "Augmenter must return every named model input channel"
+                )
+            source_arrays = {
+                (asset_name, band_name): named_channels[channel]
+                for channel, asset_name, band_name in self.channel_sources
+            }
+            labels = np.asarray(labels)
+            valid = np.asarray(valid, dtype=bool)
+            if (
+                labels.shape != (window.height, window.width)
+                or valid.shape != labels.shape
+            ):
+                raise ValueError("Augmenter changed the sample spatial dimensions")
+            labels = labels.copy()
+            labels[~valid] = self.preprocessing.ignore_label
+
         image_chw = apply_model_view(
             source_arrays,
             self.model_input,
             self.preprocessing,
             valid_mask=valid,
         )
-        image_hwc = np.ascontiguousarray(image_chw.transpose(1, 2, 0))
-
-        labels, label_valid = self.read_labels(scene_id, window)
-        valid &= label_valid
-        labels[~valid] = self.preprocessing.ignore_label
-        if augment:
-            if rng is None:
-                raise ValueError("A deterministic RNG is required for augmentation")
-            image_hwc, labels, valid = augment_aligned(image_hwc, labels, valid, rng)
-        image_chw = np.ascontiguousarray(image_hwc.transpose(2, 0, 1), dtype=np.float32)
+        image_chw = np.ascontiguousarray(image_chw, dtype=np.float32)
         labels = np.ascontiguousarray(labels.astype(np.int64, copy=False))
         valid = np.ascontiguousarray(valid)
         return Sample(
@@ -257,7 +293,7 @@ class ScenePatchDataset:
         *,
         seed: int,
         sampler: Any | None = None,
-        augmentation: bool = True,
+        augmenter: SampleAugmenter | None = None,
     ) -> None:
         if access.split_name != "train":
             raise ValueError(
@@ -265,15 +301,17 @@ class ScenePatchDataset:
             )
         if epoch_size <= 0:
             raise ValueError("epoch_size must be positive")
-        if window_size[0] != window_size[1]:
-            raise ValueError(
-                "Synchronized right-angle augmentation requires square windows"
-            )
+        if (
+            augmenter is not None
+            and getattr(augmenter, "requires_square_windows", False)
+            and window_size[0] != window_size[1]
+        ):
+            raise ValueError("The selected augmentation policy requires square windows")
         self.access = access
         self.window_size = window_size
         self.epoch_size = epoch_size
         self.seed = seed
-        self.augmentation = augmentation
+        self.augmenter = augmenter
         self.epoch = 0
         self.sampler = sampler or UniformSampler(
             access.scene_shapes,
@@ -294,11 +332,12 @@ class ScenePatchDataset:
             raise IndexError(index)
         rng = sample_rng(self.seed, self.epoch, index)
         scene_id, window = self.sampler.sample(rng)
+        augmentation_seed = rng.getrandbits(32) if self.augmenter is not None else None
         sample = self.access.read_sample(
             scene_id,
             window,
-            augment=self.augmentation,
-            rng=rng,
+            augmenter=self.augmenter,
+            augmentation_seed=augmentation_seed,
         )
         return sample
 

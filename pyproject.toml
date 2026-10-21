@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 train = ["torch>=2.1"]
+vision = ["albumentations==2.0.8"]
 notebooks = [
   "matplotlib>=3.8",
   "scikit-image>=0.22",
@@ -35,6 +36,8 @@ include = ["deepnet*", "semantic_labeling*"]
 "share/deepnet-satellite-labeling/configs/splits" = ["configs/splits/*.json"]
 "share/deepnet-satellite-labeling/configs/preprocessing" = ["configs/preprocessing/*.json"]
 "share/deepnet-satellite-labeling/configs/model-inputs" = ["configs/model-inputs/*.json"]
+"share/deepnet-satellite-labeling/configs/domains" = ["configs/domains/*.json"]
+"share/deepnet-satellite-labeling/configs/augmentations" = ["configs/augmentations/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

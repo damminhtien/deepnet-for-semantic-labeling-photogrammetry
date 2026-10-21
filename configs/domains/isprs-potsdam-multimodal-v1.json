@@ -1,0 +1,13 @@
+{
+  "domain_id": "isprs-potsdam-multimodal-v1",
+  "version": 1,
+  "sensor": "ISPRS aerial orthophoto and elevation rasters",
+  "gsd_m": null,
+  "bands": [
+    {"name": "ir", "role": "optical", "representation": "source digital number", "value_range": [0, 255]},
+    {"name": "red", "role": "optical", "representation": "source digital number", "value_range": [0, 255]},
+    {"name": "green", "role": "optical", "representation": "source digital number", "value_range": [0, 255]},
+    {"name": "dsm", "role": "auxiliary", "unit": "metres", "representation": "digital surface model"},
+    {"name": "ndsm", "role": "auxiliary", "representation": "source-encoded JPEG; decoding and coregistration require verification"}
+  ]
+}

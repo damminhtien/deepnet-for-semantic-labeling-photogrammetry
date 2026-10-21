@@ -1,0 +1,11 @@
+{
+  "domain_id": "rgb-image-v1",
+  "version": 1,
+  "sensor": "visible-light RGB image",
+  "gsd_m": null,
+  "bands": [
+    {"name": "red", "role": "optical", "value_range": [0, 255]},
+    {"name": "green", "role": "optical", "value_range": [0, 255]},
+    {"name": "blue", "role": "optical", "value_range": [0, 255]}
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "augmentation_id": "isprs-potsdam-v1",
+  "version": 1,
+  "domain_id": "isprs-potsdam-multimodal-v1",
+  "geometry": [
+    {"name": "square_symmetry", "probability": 1.0},
+    {
+      "name": "affine",
+      "probability": 0.3,
+      "parameters": {
+        "scale": [0.9, 1.1],
+        "rotate": [0.0, 0.0],
+        "translate_percent": [0.0, 0.0],
+        "interpolation": "linear",
+        "mask_interpolation": "nearest",
+        "border_mode": "reflect101"
+      }
+    }
+  ],
+  "optical": [
+    {
+      "name": "random_brightness_contrast",
+      "probability": 0.35,
+      "parameters": {
+        "brightness_limit": [-0.08, 0.08],
+        "contrast_limit": [-0.1, 0.1]
+      }
+    }
+  ]
+}

@@ -681,6 +681,242 @@ class ModelInputSpec:
 
 
 @dataclass(frozen=True, slots=True)
+class BandSpec:
+    """Describe one named sensor band independently of model channel order."""
+
+    name: str
+    role: str
+    unit: str | None = None
+    representation: str | None = None
+    center_wavelength_nm: float | None = None
+    value_range: tuple[float, float] | None = None
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Band name must not be empty")
+        if self.role not in {"optical", "auxiliary"}:
+            raise ValueError(f"Unsupported band role: {self.role}")
+        if self.unit is not None and not self.unit.strip():
+            raise ValueError("Band unit must not be empty when supplied")
+        if self.representation is not None and not self.representation.strip():
+            raise ValueError("Band representation must not be empty when supplied")
+        if self.center_wavelength_nm is not None and (
+            not math.isfinite(self.center_wavelength_nm)
+            or self.center_wavelength_nm <= 0
+        ):
+            raise ValueError("Band center wavelength must be finite and positive")
+        if self.value_range is not None:
+            low, high = self.value_range
+            if not math.isfinite(low) or not math.isfinite(high) or low >= high:
+                raise ValueError(
+                    "Band value_range must contain increasing finite values"
+                )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "role": self.role,
+            "unit": self.unit,
+            "representation": self.representation,
+            "center_wavelength_nm": self.center_wavelength_nm,
+            "value_range": list(self.value_range) if self.value_range else None,
+        }
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> BandSpec:
+        value_range = value.get("value_range")
+        return cls(
+            name=value["name"],
+            role=value["role"],
+            unit=value.get("unit"),
+            representation=value.get("representation"),
+            center_wavelength_nm=(
+                float(value["center_wavelength_nm"])
+                if value.get("center_wavelength_nm") is not None
+                else None
+            ),
+            value_range=(
+                (float(value_range[0]), float(value_range[1]))
+                if value_range is not None
+                else None
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class DomainSpec:
+    """Versioned sensor/domain metadata and semantic band roles."""
+
+    domain_id: str
+    version: int
+    sensor: str
+    bands: tuple[BandSpec, ...]
+    gsd_m: float | None = None
+
+    def __post_init__(self) -> None:
+        if not self.domain_id.strip() or self.version <= 0 or not self.sensor.strip():
+            raise ValueError("Domain ID, positive version, and sensor are required")
+        names = [band.name for band in self.bands]
+        if not names or len(names) != len(set(names)):
+            raise ValueError("Domain bands must be non-empty and uniquely named")
+        if not any(band.role == "optical" for band in self.bands):
+            raise ValueError("A domain must declare at least one optical band")
+        if self.gsd_m is not None and (
+            not math.isfinite(self.gsd_m) or self.gsd_m <= 0
+        ):
+            raise ValueError("gsd_m must be finite and positive when supplied")
+
+    @property
+    def optical_bands(self) -> tuple[str, ...]:
+        """Return optical channels in their declared sensor order."""
+        return tuple(band.name for band in self.bands if band.role == "optical")
+
+    @property
+    def auxiliary_bands(self) -> tuple[str, ...]:
+        """Return continuous side-branch channels in their declared order."""
+        return tuple(band.name for band in self.bands if band.role == "auxiliary")
+
+    def validate_model_input(self, model_input: ModelInputSpec) -> None:
+        """Ensure every selected model channel has a declared domain role."""
+        missing = set(model_input.channels) - {band.name for band in self.bands}
+        if missing:
+            raise ValueError(
+                "Model input contains channels absent from domain spec: "
+                + ", ".join(sorted(missing))
+            )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "domain_id": self.domain_id,
+            "version": self.version,
+            "sensor": self.sensor,
+            "gsd_m": self.gsd_m,
+            "bands": [band.to_dict() for band in self.bands],
+        }
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> DomainSpec:
+        return cls(
+            domain_id=value["domain_id"],
+            version=int(value["version"]),
+            sensor=value["sensor"],
+            bands=tuple(BandSpec.from_dict(item) for item in value["bands"]),
+            gsd_m=float(value["gsd_m"]) if value.get("gsd_m") is not None else None,
+        )
+
+    @property
+    def content_hash(self) -> str:
+        return canonical_hash(self.to_dict())
+
+
+AugmentationValue = str | int | float | bool | tuple[float, ...] | None
+
+
+@dataclass(frozen=True, slots=True)
+class TransformSpec:
+    """Serializable transform name, probability, and scalar parameters."""
+
+    name: str
+    probability: float = 1.0
+    parameters: tuple[tuple[str, AugmentationValue], ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Transform name must not be empty")
+        if not math.isfinite(self.probability) or not 0 <= self.probability <= 1:
+            raise ValueError("Transform probability must be within [0, 1]")
+        names = [name for name, _ in self.parameters]
+        if len(names) != len(set(names)) or any(not name.strip() for name in names):
+            raise ValueError("Transform parameter names must be unique and non-empty")
+        for _, value in self.parameters:
+            values = value if isinstance(value, tuple) else (value,)
+            if any(
+                isinstance(item, float) and not math.isfinite(item) for item in values
+            ):
+                raise ValueError("Transform parameters must be finite")
+            if any(
+                not isinstance(item, (str, int, float, bool, type(None)))
+                for item in values
+            ):
+                raise ValueError("Transform parameters must be JSON scalar values")
+
+    def parameter_map(self) -> dict[str, AugmentationValue]:
+        """Return a fresh parameter dictionary suitable for transform factories."""
+        return dict(self.parameters)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "probability": self.probability,
+            "parameters": {
+                key: list(value) if isinstance(value, tuple) else value
+                for key, value in self.parameters
+            },
+        }
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> TransformSpec:
+        parameters = value.get("parameters", {})
+        return cls(
+            name=value["name"],
+            probability=float(value.get("probability", 1.0)),
+            parameters=tuple(
+                sorted(
+                    (
+                        key,
+                        tuple(item) if isinstance(item, list) else item,
+                    )
+                    for key, item in parameters.items()
+                )
+            ),
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class AugmentationSpec:
+    """Domain-scoped stochastic training transforms; validation stays deterministic."""
+
+    augmentation_id: str
+    version: int
+    domain_id: str
+    geometry: tuple[TransformSpec, ...] = ()
+    optical: tuple[TransformSpec, ...] = ()
+
+    def __post_init__(self) -> None:
+        if not self.augmentation_id.strip() or not self.domain_id.strip():
+            raise ValueError("Augmentation and domain IDs are required")
+        if self.version <= 0:
+            raise ValueError("Augmentation version must be positive")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "augmentation_id": self.augmentation_id,
+            "version": self.version,
+            "domain_id": self.domain_id,
+            "geometry": [transform.to_dict() for transform in self.geometry],
+            "optical": [transform.to_dict() for transform in self.optical],
+        }
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> AugmentationSpec:
+        return cls(
+            augmentation_id=value["augmentation_id"],
+            version=int(value["version"]),
+            domain_id=value["domain_id"],
+            geometry=tuple(
+                TransformSpec.from_dict(item) for item in value.get("geometry", ())
+            ),
+            optical=tuple(
+                TransformSpec.from_dict(item) for item in value.get("optical", ())
+            ),
+        )
+
+    @property
+    def content_hash(self) -> str:
+        return canonical_hash(self.to_dict())
+
+
+@dataclass(frozen=True, slots=True)
 class Sample:
     """One model-ready image/label pair with explicit window provenance."""
 

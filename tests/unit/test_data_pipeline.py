@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import random
 import sys
 from contextlib import nullcontext
 from pathlib import Path
@@ -44,7 +43,6 @@ from deepnet.data.raster import RasterioSceneReader, inspect_raster
 from deepnet.data.sampling import (
     ClassAwareSampler,
     UniformSampler,
-    augment_aligned,
     coverage_counts,
     grid_windows,
     sample_rng,
@@ -467,18 +465,31 @@ def test_class_aware_sampler_rejects_validation_candidates(pipeline_fixture):
         )
 
 
-def test_aligned_augmentation_keeps_label_pixels_in_register():
-    image = np.arange(25).reshape(5, 5, 1)
-    labels = image[..., 0] % 2
-    valid = np.ones((5, 5), dtype=bool)
-    transformed_image, transformed_labels, transformed_valid = augment_aligned(
-        image,
-        labels,
-        valid,
-        random.Random(5),
+def test_scene_access_augments_raw_bands_before_model_normalization(pipeline_fixture):
+    data_root, scenes, split, preprocessing, model_input = pipeline_fixture
+    access = SceneAccess(scenes, data_root, split, "train", preprocessing, model_input)
+    observed = {}
+
+    def augmenter(channels, labels, valid_mask, *, seed):
+        observed["seed"] = seed
+        observed["maximum"] = int(channels["red"].max())
+        return (
+            {name: values.astype(np.float32) * 2 for name, values in channels.items()},
+            labels,
+            valid_mask,
+        )
+
+    window = WindowSpec(1, 1, 2, 2)
+    sample = access.read_sample(
+        "train-a",
+        window,
+        augmenter=augmenter,
+        augmentation_seed=19,
     )
-    np.testing.assert_array_equal(transformed_image[..., 0] % 2, transformed_labels)
-    assert transformed_valid.all()
+    expected_raw = np.array([[8, 9], [15, 16]], dtype=np.float32)
+    np.testing.assert_allclose(sample.image[0], expected_raw * (2 / 255.0))
+    assert observed == {"seed": 19, "maximum": 16}
+    access.close()
 
 
 def test_window_reader_preserves_nodata_mask_and_boundless_padding(pipeline_fixture):
@@ -515,7 +526,6 @@ def test_shared_dataset_and_bundle_round_trip_are_reproducible(
         (4, 4),
         3,
         seed=9,
-        augmentation=False,
     )
     sample = dataset[0]
     assert sample.image.shape == (1, 4, 4)
