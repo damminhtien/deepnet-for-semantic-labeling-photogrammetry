@@ -1,5 +1,9 @@
 # Segmentation model and sidewalk research notes
 
+> **Historical research snapshot.** Any experiment metrics referenced here predate
+> the contract-driven data pipeline and must be rerun before they are treated as
+> current results.
+
 Date checked: 2026-10-19.
 
 This note records the public benchmark context, the current model recommendation based on our measured probes, the SAM experiment boundary, and the best supported direction for pedestrian-path segmentation.

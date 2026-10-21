@@ -2,6 +2,8 @@
   "schema_version": 1,
   "run_date": "2026-10-19",
   "purpose": "Aggregate record for frozen-encoder linear segmentation probes; metrics only.",
+  "evidence_status": "historical",
+  "rerun_required_with_current_data_pipeline": true,
   "environment": {
     "python": "3.14.8",
     "pytorch": "2.14.1",

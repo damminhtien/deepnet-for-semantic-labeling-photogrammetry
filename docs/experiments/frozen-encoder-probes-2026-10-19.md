@@ -1,5 +1,10 @@
 # Frozen encoder segmentation probes
 
+> **Historical results — rerun required.** These experiments predate the
+> contract-driven data pipeline. Their metrics remain archived evidence and have
+> not been reproduced through the current catalog, preprocessing, or evaluation
+> contracts.
+
 Date: 2026-10-19
 Environment: Python 3.14.8, PyTorch 2.14.1, torchvision 0.29.1, Apple MPS.
 
