@@ -89,3 +89,14 @@ Document verified segmentation evaluations and research, then push the resulting
 - The Kaggle root sweep manifest's `candidates` array is empty due to the executed script version. Candidate configs/scores are present in the three child run manifests and metrics; the original Kaggle artifacts remain unchanged. Commit `41eab3e` fixes recording candidate results for future sweeps; implementation and initial tests are in `b501abf`.
 
 - The PSPNet Colab rerun was canceled by the user. No Colab session is active; do not resume without an explicit request.
+
+## Data-pipeline migration — implementation status 2026-10-21
+
+- The shared `deepnet.data` layer now provides immutable contracts, ID-based dataset catalogs, split manifests, geospatial validation, lazy raster windows, train-only statistics, sampling, aligned augmentation, scene evaluation, portable bundles, and run lineage. Generic named input specs keep model adapters configurable.
+- Local Mac and Kaggle use the same source code and bundle format. Runtime selection prefers CUDA, then MPS, then CPU; CUDA-only pinned-memory and non-blocking transfer settings are enabled only for CUDA. The model adapter accepts a caller-created model and does not hardcode an architecture.
+- Potsdam and Vaihingen source catalogs were built with SHA-256 outside the repository under `/tmp`; 38 Potsdam and 33 Vaihingen scenes were indexed. Potsdam IRRG validation passed with the frozen 18/6/14 split. Vaihingen IRRG validation passed. The Potsdam 5-channel view remains blocked by missing verified nDSM co-registration; Vaihingen's participant labels are absent for 17 scenes and require a future explicit split/label policy.
+- The pure-Python wheel was built and installed with `--no-deps` in an isolated environment, preserving the existing Torch install. Its CLI and packaged dataset descriptors load, and `pip check` reports no broken requirements in that environment.
+- Local Python 3.14.8 with Torch 2.14.1 selected MPS; a generic six-logit convolution forward pass through `TorchSegmentationAdapter` completed on MPS. The CUDA selection path and transfer settings are covered by mocked runtime tests; no Kaggle session or GPU training was launched.
+- Focused validation passed: 20 synthetic GeoTIFF tests, Ruff checks and formatting, and Python compilation. Historical experiment metrics and notebook outputs are marked for rerun; the prior PSPNet/SAM training loops remain historical and do not yet consume the new bundles.
+- `graphify update .` completed in code-only mode and rebuilt the ignored local index (752 nodes, 1,725 edges).
+- Raw source rasters were only read during catalog creation. Catalogs and wheel artifacts remained under `/tmp`; no raw data or generated bundles were added to Git.
