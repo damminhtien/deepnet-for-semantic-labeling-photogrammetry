@@ -5,6 +5,14 @@
 /.jupyter_ystore.db
 **/.ipynb_checkpoints/
 
+# Local development and build artifacts
+.venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+*.egg-info/
+
 # Python bytecode
 __pycache__/
 *.py[cod]

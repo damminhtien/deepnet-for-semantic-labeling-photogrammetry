@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepnet-satellite-labeling"
+version = "0.1.0"
+description = "Contract-driven geospatial data pipeline for semantic labeling"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.24",
+  "rasterio>=1.4,<2",
+  "typing-extensions>=4.8",
+]
+
+[project.optional-dependencies]
+train = ["torch>=2.1"]
+notebooks = [
+  "matplotlib>=3.8",
+  "scikit-image>=0.22",
+  "tifffile>=2024.2",
+  "tqdm>=4.66",
+]
+dev = ["pytest>=8.0", "ruff>=0.13"]
+
+[project.scripts]
+deepnet-data = "deepnet.data.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["deepnet*", "semantic_labeling*"]
+
+[tool.setuptools.data-files]
+"share/deepnet-satellite-labeling/configs/datasets" = ["configs/datasets/*.json"]
+"share/deepnet-satellite-labeling/configs/splits" = ["configs/splits/*.json"]
+"share/deepnet-satellite-labeling/configs/preprocessing" = ["configs/preprocessing/*.json"]
+"share/deepnet-satellite-labeling/configs/model-inputs" = ["configs/model-inputs/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "PYI"]
