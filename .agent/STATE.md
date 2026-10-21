@@ -100,3 +100,13 @@ Document verified segmentation evaluations and research, then push the resulting
 - Focused validation passed: 20 synthetic GeoTIFF tests, Ruff checks and formatting, and Python compilation. Historical experiment metrics and notebook outputs are marked for rerun; the prior PSPNet/SAM training loops remain historical and do not yet consume the new bundles.
 - `graphify update .` completed in code-only mode and rebuilt the ignored local index (752 nodes, 1,725 edges).
 - Raw source rasters were only read during catalog creation. Catalogs and wheel artifacts remained under `/tmp`; no raw data or generated bundles were added to Git.
+
+## Multimodal architecture follow-up — implementation status 2026-10-21
+
+- Added versioned domain/band and augmentation contracts. Albumentations policies are injected into training datasets and operate on raw aligned bands, labels, and validity masks before model-view normalization; optical radiometry excludes auxiliary bands.
+- Added configurable spectral input adaptation, a separate optical detail/elevation branch, an injectable dense-feature backbone protocol, a lazy Hugging Face wrapper, and a DPT-style four-scale decoder with a stride-four skip. RGB identity mapping and non-RGB learned projection are decided by config channel semantics.
+- Added DINOv3 ViT-B/16 and DINOv2 ViT-B/14 model specs, an injected SAM feature-backbone baseline spec, Potsdam augmentation/domain configs, and a Potsdam run plan. Model weight loading is explicit; no pretrained weights were downloaded and no training was started.
+- The five-channel Potsdam run plan remains gated on verified nDSM decoding, registration, and train-only elevation statistics. The IRRG-only model-input spec is available for a data view that does not use elevation.
+- Synthetic unit tests passed for Albumentations API/config construction, synchronized geometry, deterministic optical-only radiometry, transformer prefix-token removal, 3/5-channel forward/backward, ignore-index loss handling, and patch-size 14/16 padding. A local MPS synthetic forward/backward smoke test also passed.
+- A wheel built and installed with `--no-deps` in a temporary environment; installed config loaders successfully found packaged domain, augmentation, model-input, and model specs. No Kaggle GPU job was run.
+- `graphify update .` rebuilt the ignored code index (933 nodes, 2,144 edges). The generated graph remains outside Git.

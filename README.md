@@ -1,9 +1,11 @@
 # DeepNet Satellite Image Labeling
 
-DeepNet provides a reusable data pipeline for high-resolution geospatial semantic
-segmentation. The same versioned scene catalog, split manifest, preprocessing spec,
-model-input spec, sampler, and bundle format are used on a local machine and on
-Kaggle. A model caller can pass a contract-checked tensor through a thin adapter.
+DeepNet provides reusable data contracts and configurable model components for
+high-resolution geospatial semantic segmentation. The same versioned scene catalog,
+split manifest, preprocessing spec, model-input spec, sampler, and bundle format are
+used on a local machine and on Kaggle. A caller can compose a spectral adapter,
+replaceable encoder, and segmentation head or pass a model through the thin tensor
+adapter.
 
 Historical experiment reports, training runners, and notebook outputs remain
 available as records. They predate this pipeline and must be rerun before their
@@ -21,17 +23,20 @@ flowchart LR
     D --> E[Lazy windows, labels, and masks]
     E --> F[Sampling and model input view]
     F --> G[DataLoader]
-    G --> H[Thin model adapter]
-    H --> I[Caller-owned model and training loop]
-    I --> J[Evaluation and run provenance]
+    G --> H[Contract-checked model input]
+    H --> I[Domain adapter and spatial branch]
+    I --> J[Replaceable feature backbone]
+    J --> K[Multi-scale decoder and task head]
+    K --> L[Evaluation and run provenance]
 ```
 
 Dataset IDs and versioned JSON contracts describe source assets, labels, splits,
 preprocessing, and model inputs. Machine-specific data paths are passed at runtime.
 The same verified bundle and data contracts work on a local Mac, Kaggle GPU, or
-server; runtime selection uses MPS, CUDA, or CPU as available. Adapters only enforce
-the tensor boundary, leaving model construction and training to the caller. See the
-[data pipeline guide](docs/data-pipeline.md) for setup and end-to-end commands.
+server; runtime selection uses MPS, CUDA, or CPU as available. The shared model
+components define model construction; training orchestration and run execution remain
+caller-owned. See the [data pipeline guide](docs/data-pipeline.md) for setup and
+end-to-end commands.
 
 ## Supported data
 
@@ -58,7 +63,7 @@ IRRG-only views can be exported from the same catalog without weakening that che
 Use Python 3.10 or newer. `uv` is recommended for an isolated local environment:
 
 ```bash
-uv sync --extra dev --extra train
+uv sync --extra dev --extra train --extra models --extra vision
 ```
 
 Or use pip in a virtual environment:
@@ -68,8 +73,10 @@ python -m pip install -e ".[dev,train]"
 ```
 
 `rasterio` is a required data dependency. PyTorch is optional for catalog, quality,
-and bundle operations, and is installed by the `train` extra for local model runs.
-Ruff is the configured source-style checker.
+and bundle operations. The `models` extra provides Hugging Face Transformers and PEFT;
+the `vision` extra pins Albumentations 2.0.8. None of these optional packages
+downloads model weights during installation or import. Ruff is the configured
+source-style checker.
 
 ## Prepare data locally
 
@@ -190,6 +197,89 @@ device belong in each run manifest.
 | `deepnet.data.lineage` | Run manifest provenance and contract hashes |
 | `deepnet.runtime` | CUDA/MPS/CPU selection and host-aware loader defaults |
 | `deepnet.models.adapter` | Thin tensor-contract boundary around a caller-provided model |
+| `deepnet.models.specs` | Versioned backbone, adapter, decoder, and task-head settings |
+| `deepnet.models.backbones` | Lazy Hugging Face wrapper and injectable dense-feature interface |
+| `deepnet.models.adapters` | Optical projection and auxiliary spatial feature branches |
+| `deepnet.models.decoders` | Multi-scale DPT-style fusion and segmentation classifier |
+| `deepnet.models.segmenter` | Composition of the domain adapter, backbone, and decoder |
+
+## Configurable segmentation architecture
+
+The model path is composable: `DomainSpec` describes band meaning, the input adapter
+maps optical bands to the encoder and sends auxiliary rasters through a separate
+spatial branch, a feature-backbone interface exposes selected dense features, and a
+DPT-style decoder combines four scales with high-resolution convolutional features.
+The classifier head owns its class count and label ontology; the ignore ID is used by
+the loss and is not an output class.
+
+RGB uses an identity projection only when its declared channel order matches the
+model specification. Other optical domains use a learnable 1x1 projection. Auxiliary
+channels such as DSM and nDSM never pass through optical brightness transforms.
+Geometry transforms run on raw aligned bands, labels, and validity masks before
+`ModelInputSpec` normalization. Each sample receives a deterministic augmentation
+seed, so DataLoader worker scheduling does not change its transforms.
+
+Versioned examples live in `configs/domains/`, `configs/augmentations/`, and
+`configs/models/`:
+
+- `dinov3-vitb16-multimodal-v1` is the configured research default: ViT-B/16,
+  feature blocks 3/6/9/12, LoRA rank 8, and a 256-channel decoder.
+- `dinov2-vitb14-multimodal-v1` is an alternative with patch stride 14.
+- `sam-vitb-injected-baseline-v1` documents the same backbone interface for an
+  externally supplied SAM feature adapter and records the existing rank-4/alpha-8
+  LoRA target modules. The caller supplies the SAM encoder and wraps it with
+  `apply_lora` before adding its feature adapter.
+
+DINOv3 carries its own license restrictions, including restrictions on military and
+warfare use; review the [DINOv3 license](https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md)
+for each intended use. The configured [DINOv3 Hub checkpoint](https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m)
+is access-gated and requires accepting its model terms before `from_pretrained` can
+load it. DINOv2 is distributed under
+[Apache 2.0](https://github.com/facebookresearch/dinov2/blob/main/LICENSE). The model
+specification records each license reference. The implementation does not fetch
+weights unless the caller explicitly invokes `from_pretrained`.
+
+The fixed Potsdam settings are recorded in
+`configs/training/potsdam-dinov3-multimodal-v1.json`. They specify 512-pixel crops,
+AdamW, cosine warmup, cross-entropy plus soft Dice, a 70/30 uniform-to-aware sampler,
+and validation-mIoU checkpoint selection. This is configuration only; no model has
+been trained by this change. The config requires nDSM decoding, coregistration, and
+train-fitted elevation statistics to pass data preflight first. The catalog does not
+currently establish those nDSM guarantees.
+
+To construct the optional augmenter and model after installing the relevant extras:
+
+```python
+from deepnet.data.augmentations import AlbumentationsAugmenter
+from deepnet.data.catalog import (
+    load_augmentation_spec,
+    load_domain_spec,
+    load_model_input_spec,
+)
+from deepnet.models.backbones import TransformerFeatureBackbone
+from deepnet.models.segmenter import MultimodalSegmenter
+from deepnet.models.specs import load_model_spec
+from deepnet.runtime import configure_torch_runtime
+
+domain = load_domain_spec("isprs-potsdam-multimodal-v1")
+model_input = load_model_input_spec("isprs-irrg-unit-v1")
+augmentation = load_augmentation_spec("isprs-potsdam-v1")
+augmenter = AlbumentationsAugmenter(
+    domain, model_input, augmentation, ignore_label=6
+)
+model_spec = load_model_spec("dinov3-vitb16-multimodal-v1")
+backbone = TransformerFeatureBackbone.from_pretrained(model_spec.backbone)
+runtime = configure_torch_runtime()
+model = MultimodalSegmenter(domain, model_input, model_spec, backbone).to(
+    runtime.device
+)
+```
+
+Weight loading above is an explicit caller action and requires access to the selected
+model repository. Keep local Mac and Kaggle on the same JSON specs and data bundle;
+select the device through `deepnet.runtime` and save run outputs to durable storage.
+Kaggle should retain its preinstalled Torch build and install only needed optional
+packages, such as `albumentations==2.0.8`, Transformers, and PEFT.
 
 ## Development checks
 
@@ -203,6 +293,8 @@ The data tests use synthetic GeoTIFFs and do not read, rewrite, or require the r
 raw datasets. Existing experiment notebooks and training artifacts are historical;
 new metrics must record the catalog, split, preprocessing, model-input, sampler,
 checkpoint, source revision, and runtime hashes and versions.
+Install the `models` and `vision` extras to run transformer-contract and augmentation
+tests; those tests use fake weights and synthetic arrays and do not download models.
 
 ## Historical evidence
 

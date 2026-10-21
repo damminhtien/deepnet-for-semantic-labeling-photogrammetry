@@ -6,10 +6,11 @@ reproducible local or Kaggle run. Large data and outputs belong outside Git.
 ## Install
 
 The package requires Python 3.10 or newer. For local development, create an
-isolated environment and install the data, training, and lint/test dependencies:
+isolated environment and install the data, training, model, augmentation, and
+lint/test dependencies:
 
 ```bash
-uv sync --extra dev --extra train
+uv sync --extra dev --extra train --extra models --extra vision
 ```
 
 On Apple Silicon, the runtime selects MPS when the installed Torch build exposes
@@ -39,6 +40,17 @@ The wheel contains the command-line entry point and default JSON contracts. Chec
 that `numpy`, `rasterio`, and the existing `torch` import before running. If Rasterio
 is missing, install a compatible Rasterio wheel in that notebook environment; do
 not reinstall Torch as part of data setup.
+
+For DINOv2/DINOv3 or domain-specific augmentation, install the optional packages in
+the active Kaggle environment while retaining its existing Torch package:
+
+```python
+%pip install "albumentations==2.0.8" "transformers>=4.57,<6" "peft>=0.14,<1"
+```
+
+The local and Kaggle installs read the same packaged JSON configuration. Pretrained
+weights are fetched only when the user code explicitly invokes the configured
+backbone loader.
 
 ## Create and validate a scene catalog
 

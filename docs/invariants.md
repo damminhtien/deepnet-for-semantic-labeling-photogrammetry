@@ -22,6 +22,14 @@
   not contribute to normalization, loss, or metrics.
 - Canonical preprocessing is deterministic and versioned. Model views select named
   bands and define normalization without changing source files.
+- `DomainSpec` assigns each selected band an optical or auxiliary role. RGB reaches
+  a pretrained encoder through a configured identity path only when channel names
+  and order match; other optical combinations use a learned 1x1 projection.
+- Auxiliary channels use a separate spatial branch and do not receive optical
+  brightness or contrast transforms.
+- Geometric augmentation runs on raw, aligned channels, labels, and validity masks
+  before deterministic model-view normalization. Per-sample seeds make the result
+  independent of DataLoader worker scheduling.
 - Any fitted statistics use only the train scenes and record the exact split hash
   and scene IDs. A changed split or fitted-statistics result creates a different
   preprocessing contract hash.
@@ -51,6 +59,11 @@
 - A successful static check or test does not establish model training completion or
   reproduce a published score. Training, validation, and held-out results remain
   separate claims.
+- Model output dimensions are defined by each task spec. The ignore ID is excluded
+  from output classes and must be honored by the caller's loss and metrics.
+- The DINOv3 license reference and restrictions travel with its model spec. Check the
+  selected weights' license before use; choosing another backbone does not change
+  data contracts or decoder interfaces.
 
 ## Historical experiment records
 

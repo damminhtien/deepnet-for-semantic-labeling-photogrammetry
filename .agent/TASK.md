@@ -1,4 +1,49 @@
-# Goal
+# Completed follow-up: multimodal segmentation architecture
+
+## Status
+
+Architecture, versioned configs, synthetic coverage, and documentation are complete.
+No pretrained weights were downloaded and no training job was started. The five-band
+Potsdam plan remains blocked on verified nDSM decoding and spatial registration.
+
+## Goal
+
+Implement a configurable multi-domain segmentation model on top of the shared data
+pipeline. Use a replaceable pretrained ViT backbone, domain-aware spectral and
+auxiliary-input adapters, a DPT-style multi-scale decoder with a high-resolution
+skip, and deterministic Albumentations policies. Keep DINOv3 as the research
+configuration, DINOv2 as an alternative, and SAM as an injectable baseline. Do not
+start model training in this task.
+
+## Acceptance
+
+- Domain and augmentation specs are versioned, typed, and validated independently
+  of model architecture.
+- Training augmentation operates on raw aligned bands before model-view
+  normalization; geometry synchronizes all bands, labels, and valid masks, while
+  radiometric transforms touch configured optical bands only.
+- RGB inputs retain an identity path into the pretrained normalization; IRRG uses a
+  learned spectral projection, and elevation inputs use a separate spatial branch.
+- Backbone loading is lazy and configurable. Tests use a small fake backbone and do
+  not download pretrained weights.
+- The multi-scale decoder accepts selected intermediate features and a high-resolution
+  spatial feature map, returns the requested class logits, preserves original image
+  size after patch-stride padding, and propagates gradients.
+- Model and training JSON configs encode the selected Potsdam defaults and preserve
+  the DINOv3 license limitation and DINOv2 alternative.
+- Focused tests cover augmentation synchronization, optical-only photometric
+  changes, spectral channel selection, shape handling, deterministic seeds, and
+  forward/backward gradients.
+
+## Scope
+
+Implement reusable modules, configuration, tests, and documentation only. Do not
+download model weights, run a Kaggle job, or train a checkpoint. Potsdam elevation
+training remains unavailable until the nDSM alignment evidence is verified.
+
+# Completed foundation: contract-driven data pipeline
+
+## Goal
 
 Build a scalable, contract-driven data layer that future model callers can use on a local Mac or Kaggle GPU through thin, configurable adapters. Old experiment outputs are historical and must be rerun under this pipeline before they are treated as current.
 

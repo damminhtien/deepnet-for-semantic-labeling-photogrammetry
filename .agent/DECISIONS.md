@@ -1,5 +1,25 @@
 # Decisions
 
+## 2026-10-21: Build a replaceable multi-domain segmentation model
+
+- Keep the model layer separate from the geospatial data contracts. A configured
+  `DomainSpec` describes named bands and their roles; a versioned augmentation spec
+  describes synchronized geometry and optical-only radiometric transforms.
+- Use DINOv3 ViT-B/16 as the research default only where its DINOv3 License permits
+  the intended use. Keep DINOv2 ViT-B/14 as a separately configured alternative and
+  SAM as an injected baseline. Do not fetch pretrained weights during package import
+  or tests.
+- Feed RGB through an identity spectral path, project IRRG with a learnable 1x1
+  adapter, and route DSM/nDSM through an auxiliary spatial branch. Fuse selected ViT
+  block features with a DPT-style decoder and a high-resolution skip.
+- Apply Albumentations geometry to raw aligned channels and labels before canonical
+  model-view normalization. Apply radiometric transforms to optical channels only.
+- PyPI currently returns 404 for Albumentations 2.4.13; use the available pinned
+  release verified during implementation and record the API version in project
+  metadata.
+- Implement the architecture and fixed Potsdam config without starting training.
+  Actual Potsdam elevation training remains gated on verified nDSM co-registration.
+
 ## 2026-10-21: Adopt a contract-driven data layer
 
 - Put the reusable pipeline in a small `deepnet.data` package alongside the existing model code. Use frozen dataclasses and versioned JSON manifests to keep the core schema dependency-light and portable.
