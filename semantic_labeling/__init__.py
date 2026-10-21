@@ -1,1 +1,4 @@
-"""Shared data and evaluation utilities for the ISPRS labeling experiments."""
+"""Legacy model and evaluation helpers retained for historical experiments.
+
+New data access, preprocessing, and evaluation belong in ``deepnet.data``.
+"""

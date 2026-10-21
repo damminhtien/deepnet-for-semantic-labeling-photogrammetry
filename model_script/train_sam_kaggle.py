@@ -1,4 +1,9 @@
-"""Fine-tune SAM ViT-B with attention LoRA for six-class Potsdam labeling."""
+"""Historical SAM LoRA trainer retained for audit of the earlier experiment.
+
+This script consumes the old model-specific bundle and patch dataset; it is not an
+entry point for the contract-driven data pipeline. New training code should
+construct data through ``deepnet.data`` and record its bundle/run manifests.
+"""
 
 import argparse
 import hashlib

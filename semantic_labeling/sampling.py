@@ -1,4 +1,7 @@
-"""Patch and sliding-window coordinate helpers."""
+"""Historical patch coordinates used by pre-pipeline experiments.
+
+New patch and grid strategies belong in ``deepnet.data.sampling``.
+"""
 
 import random
 from itertools import islice
@@ -7,7 +10,9 @@ from itertools import islice
 def get_random_pos(img, window_shape, rng=None):
     """Return a valid ``(top, bottom, left, right)`` crop for an array."""
     if len(img.shape) < 2:
-        raise ValueError(f"Expected an image with at least two dimensions, got {img.shape}")
+        raise ValueError(
+            f"Expected an image with at least two dimensions, got {img.shape}"
+        )
 
     height, width = img.shape[-2:]
     window_height, window_width = window_shape
@@ -46,7 +51,9 @@ def _window_starts(length, window_size, step):
 def sliding_window(top, step=10, window_size=(20, 20)):
     """Yield each covering window once as ``(top, left, height, width)``."""
     if len(top.shape) < 2:
-        raise ValueError(f"Expected an image with at least two dimensions, got {top.shape}")
+        raise ValueError(
+            f"Expected an image with at least two dimensions, got {top.shape}"
+        )
 
     window_height, window_width = window_size
     height, width = top.shape[:2]

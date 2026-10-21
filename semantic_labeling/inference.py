@@ -1,4 +1,8 @@
-"""Shared tiled inference for the Potsdam evaluation notebooks."""
+"""Historical tiled inference retained with the pre-pipeline notebooks.
+
+New full-scene evaluation belongs in ``deepnet.data.evaluation`` and records the
+data contract hashes used to create each score.
+"""
 
 import math
 

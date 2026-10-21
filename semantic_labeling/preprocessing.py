@@ -1,4 +1,8 @@
-"""Input assembly and scaling shared by training and inference."""
+"""Historical input assembly used by pre-pipeline experiments.
+
+New model views are declared with ``ModelInputSpec`` and transformed by
+``deepnet.data.preprocessing``.
+"""
 
 import numpy as np
 

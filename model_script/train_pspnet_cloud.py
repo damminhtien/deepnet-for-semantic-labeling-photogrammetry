@@ -1,4 +1,9 @@
-"""Resume the Potsdam PSPNet experiment on a CUDA runtime."""
+"""Historical PSPNet cloud trainer retained for audit of the earlier experiment.
+
+It consumes the old model-specific bundle and loader and is not an entry point for
+the contract-driven data pipeline. New training code should construct data through
+``deepnet.data`` and record its bundle/run manifests.
+"""
 
 import argparse
 import hashlib

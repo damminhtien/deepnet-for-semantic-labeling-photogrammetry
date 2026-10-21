@@ -1,4 +1,8 @@
-"""Shared random-patch dataset for the Potsdam experiment notebooks."""
+"""Historical Potsdam patch loader used by pre-pipeline experiments.
+
+New data access belongs in ``deepnet.data.dataset`` and uses a scene catalog,
+versioned split, preprocessing contract, and model-input spec.
+"""
 
 import random
 
