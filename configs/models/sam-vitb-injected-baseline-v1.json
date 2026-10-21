@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "model_id": "sam-vitb-injected-baseline",
+  "version": 1,
+  "backbone": {
+    "backend": "injected",
+    "model_id": "segment-anything-vit-b",
+    "patch_size": 16,
+    "feature_blocks": [3, 6, 9, 12],
+    "feature_channels": 768,
+    "lora": {
+      "rank": 4,
+      "alpha": 8,
+      "dropout": 0.0,
+      "target_modules": ["qkv", "proj"]
+    }
+  },
+  "input_adapter": {
+    "identity_channel_order": ["red", "green", "blue"],
+    "projection_init": "identity",
+    "backbone_mean": [123.675, 116.28, 103.53],
+    "backbone_std": [58.395, 57.12, 57.375],
+    "spatial_channels": 64
+  },
+  "decoder_width": 256,
+  "num_classes": 6,
+  "ignore_index": 6,
+  "label_ontology": "isprs-six-class-v1",
+  "license_id": "Verify the license for the selected SAM weights",
+  "license_url": "https://github.com/facebookresearch/segment-anything/blob/main/LICENSE"
+}

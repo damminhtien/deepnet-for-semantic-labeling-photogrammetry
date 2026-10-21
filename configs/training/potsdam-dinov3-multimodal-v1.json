@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "run_id": "potsdam-dinov3-multimodal-v1",
+  "status": "configured-not-trained",
+  "dataset_id": "isprs-potsdam",
+  "split_id": "potsdam-legacy-v1",
+  "preprocessing_id": "isprs-canonical-v1",
+  "model_input_id": "isprs-5ch-elevation-zscore-v1",
+  "domain_id": "isprs-potsdam-multimodal-v1",
+  "augmentation_id": "isprs-potsdam-v1",
+  "model_id": "dinov3-vitb16-multimodal",
+  "seed": 42,
+  "crop_size": [512, 512],
+  "optimizer": {
+    "name": "AdamW",
+    "weight_decay": 0.01,
+    "learning_rates": {
+      "lora": 0.0001,
+      "input_adapter_and_decoder": 0.0003
+    }
+  },
+  "scheduler": {
+    "name": "cosine",
+    "warmup_fraction": 0.05
+  },
+  "loss": {
+    "cross_entropy_weight": 0.7,
+    "soft_dice_weight": 0.3,
+    "ignore_index": 6
+  },
+  "sampling": {
+    "uniform_fraction": 0.7,
+    "class_or_boundary_aware_fraction": 0.3
+  },
+  "stopping": {
+    "max_epochs": 30,
+    "steps_per_epoch": 256,
+    "early_stopping_patience": 8,
+    "selection_metric": "validation_miou",
+    "test_used_for_selection": false
+  },
+  "data_preflight": {
+    "required_assets": ["irrg", "dsm", "ndsm"],
+    "ndsm_alignment_required": true,
+    "note": "Training must not start until nDSM decoding, spatial registration, and train-fitted elevation statistics are verified."
+  }
+}

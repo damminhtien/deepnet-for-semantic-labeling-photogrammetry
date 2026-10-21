@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "model_id": "dinov2-vitb14-multimodal",
+  "version": 1,
+  "backbone": {
+    "backend": "huggingface",
+    "model_id": "facebook/dinov2-base",
+    "patch_size": 14,
+    "feature_blocks": [3, 6, 9, 12],
+    "feature_channels": 768,
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target_modules": ["qkv", "proj"]
+    }
+  },
+  "input_adapter": {
+    "identity_channel_order": ["red", "green", "blue"],
+    "projection_init": "kaiming_uniform",
+    "backbone_mean": [0.485, 0.456, 0.406],
+    "backbone_std": [0.229, 0.224, 0.225],
+    "spatial_channels": 64
+  },
+  "decoder_width": 256,
+  "num_classes": 6,
+  "ignore_index": 6,
+  "label_ontology": "isprs-six-class-v1",
+  "license_id": "Apache-2.0",
+  "license_url": "https://github.com/facebookresearch/dinov2/blob/main/LICENSE"
+}
