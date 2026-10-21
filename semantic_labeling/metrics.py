@@ -1,4 +1,7 @@
-"""Pixel metrics with explicit handling for ignored boundary labels."""
+"""Historical pixel metrics used by pre-pipeline experiments.
+
+New scene-level evaluation and provenance belong in ``deepnet.data.evaluation``.
+"""
 
 import numpy as np
 from sklearn.metrics import confusion_matrix
@@ -59,7 +62,7 @@ def metrics(predictions, ground_truth, label_values=LABELS):
         where=denominators != 0,
     )
     print("F1 score:")
-    for label, f1_score in zip(label_values, f1_scores):
+    for label, f1_score in zip(label_values, f1_scores, strict=False):
         print(f"{label}: {f1_score}")
     print("---")
 
