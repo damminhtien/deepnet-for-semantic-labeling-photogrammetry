@@ -1,0 +1,138 @@
+stages:
+  catalog_potsdam:
+    cmd: >-
+      deepnet-data build-catalog --dataset-id isprs-potsdam
+      --data-root data/raw/inputs
+      --output data/prepared/potsdam/catalog.json --hash-assets
+    deps:
+      - configs/datasets/isprs-potsdam.json
+      - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+      - data/raw/inputs/potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants
+      - data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+      - deepnet/data
+    outs:
+      - data/prepared/potsdam/catalog.json
+
+  validate_potsdam:
+    cmd: >-
+      deepnet-data validate-catalog --catalog data/prepared/potsdam/catalog.json
+      --split configs/splits/potsdam-dinov3-v1.json --require-hashes
+      --view-assets irrg-view=irrg --include-split train
+      --include-split validation
+      > data/prepared/potsdam/catalog-validation.json
+    deps:
+      - configs/splits/potsdam-dinov3-v1.json
+      - data/prepared/potsdam/catalog.json
+      - deepnet/data
+    outs:
+      - data/prepared/potsdam/catalog-validation.json
+
+  quality_potsdam:
+    cmd: >-
+      deepnet-data quality-report --catalog data/prepared/potsdam/catalog.json
+      --split configs/splits/potsdam-dinov3-v1.json
+      --preprocessing-id isprs-canonical-v2
+      --data-root data/raw/inputs --tile-size 1024
+      --view-assets irrg-view=irrg --include-split train
+      --include-split validation
+      --output data/prepared/potsdam/quality.json
+    deps:
+      - configs/preprocessing/isprs-canonical-v2.json
+      - configs/splits/potsdam-dinov3-v1.json
+      - data/prepared/potsdam/catalog-validation.json
+      - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+      - data/raw/inputs/potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants
+      - data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+      - deepnet/data
+    outs:
+      - data/prepared/potsdam/quality.json
+
+  bundle_potsdam:
+    cmd: >-
+      deepnet-data export-bundle --catalog data/prepared/potsdam/catalog.json
+      --split configs/splits/potsdam-dinov3-v1.json
+      --preprocessing-id isprs-canonical-v2
+      --model-input-id isprs-irrg-unit-v1 --data-root data/raw/inputs
+      --include-split train --include-split validation
+      --output data/prepared/potsdam/train-validation-bundle
+    deps:
+      - configs/model-inputs/isprs-irrg-unit-v1.json
+      - configs/preprocessing/isprs-canonical-v2.json
+      - configs/splits/potsdam-dinov3-v1.json
+      - data/prepared/potsdam/catalog.json
+      - data/prepared/potsdam/quality.json
+      - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+      - data/raw/inputs/potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants
+      - data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+      - deepnet/data
+    outs:
+      - data/prepared/potsdam/train-validation-bundle
+
+  catalog_vaihingen:
+    cmd: >-
+      deepnet-data build-catalog --dataset-id isprs-vaihingen
+      --data-root data/raw/inputs
+      --output data/prepared/vaihingen/catalog.json --hash-assets
+    deps:
+      - configs/datasets/isprs-vaihingen.json
+      - data/raw/inputs/vaihingen-isprs-official-20261019/images
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_participant
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+      - deepnet/data
+    outs:
+      - data/prepared/vaihingen/catalog.json
+
+  validate_vaihingen:
+    cmd: >-
+      deepnet-data validate-catalog --catalog data/prepared/vaihingen/catalog.json
+      --split configs/splits/vaihingen-dinov3-v1.json --require-hashes
+      --view-assets irrg-view=irrg --include-split train
+      --include-split validation
+      > data/prepared/vaihingen/catalog-validation.json
+    deps:
+      - configs/splits/vaihingen-dinov3-v1.json
+      - data/prepared/vaihingen/catalog.json
+      - deepnet/data
+    outs:
+      - data/prepared/vaihingen/catalog-validation.json
+
+  quality_vaihingen:
+    cmd: >-
+      deepnet-data quality-report --catalog data/prepared/vaihingen/catalog.json
+      --split configs/splits/vaihingen-dinov3-v1.json
+      --preprocessing-id isprs-canonical-v2
+      --data-root data/raw/inputs --tile-size 1024
+      --view-assets irrg-view=irrg --include-split train
+      --include-split validation
+      --output data/prepared/vaihingen/quality.json
+    deps:
+      - configs/preprocessing/isprs-canonical-v2.json
+      - configs/splits/vaihingen-dinov3-v1.json
+      - data/prepared/vaihingen/catalog-validation.json
+      - data/raw/inputs/vaihingen-isprs-official-20261019/images
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_participant
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+      - deepnet/data
+    outs:
+      - data/prepared/vaihingen/quality.json
+
+  bundle_vaihingen:
+    cmd: >-
+      deepnet-data export-bundle --catalog data/prepared/vaihingen/catalog.json
+      --split configs/splits/vaihingen-dinov3-v1.json
+      --preprocessing-id isprs-canonical-v2
+      --model-input-id isprs-irrg-unit-v1 --data-root data/raw/inputs
+      --include-split train --include-split validation
+      --output data/prepared/vaihingen/train-validation-bundle
+    deps:
+      - configs/model-inputs/isprs-irrg-unit-v1.json
+      - configs/preprocessing/isprs-canonical-v2.json
+      - configs/splits/vaihingen-dinov3-v1.json
+      - data/prepared/vaihingen/catalog.json
+      - data/prepared/vaihingen/quality.json
+      - data/raw/inputs/vaihingen-isprs-official-20261019/images
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_participant
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+      - deepnet/data
+    outs:
+      - data/prepared/vaihingen/train-validation-bundle

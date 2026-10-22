@@ -1,0 +1,15 @@
+md5: 204e8c78255ab1e40926b54c77039661
+frozen: true
+deps:
+- md5: 12774fccf314503ebcd2105c5e8a12c7.dir
+  size: 4139032978
+  nfiles: 76
+  hash: md5
+  path:
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+outs:
+- md5: 12774fccf314503ebcd2105c5e8a12c7.dir
+  size: 4139032978
+  nfiles: 76
+  hash: md5
+  path: 3_Ortho_IRRG

@@ -1,0 +1,15 @@
+md5: 0fd20aede51d41508aa7db97c615fea4
+frozen: true
+deps:
+- md5: ef472f9ce891f8f2ca6cc55d5298d761.dir
+  size: 181842068
+  nfiles: 12
+  hash: md5
+  path:
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/vaihingen-train-labels
+outs:
+- md5: ef472f9ce891f8f2ca6cc55d5298d761.dir
+  size: 181842068
+  nfiles: 12
+  hash: md5
+  path: labels_participant

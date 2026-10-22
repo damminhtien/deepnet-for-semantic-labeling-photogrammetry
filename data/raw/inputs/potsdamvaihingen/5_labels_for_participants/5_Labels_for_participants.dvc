@@ -1,0 +1,15 @@
+md5: b0599ecbc304ce933c5e33bc70e0fb95
+frozen: true
+deps:
+- md5: cff05dadff2fb795475c89096f4a4abc.dir
+  size: 1944644020
+  nfiles: 18
+  hash: md5
+  path:
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/potsdam-train-labels
+outs:
+- md5: cff05dadff2fb795475c89096f4a4abc.dir
+  size: 1944644020
+  nfiles: 18
+  hash: md5
+  path: 5_Labels_for_participants

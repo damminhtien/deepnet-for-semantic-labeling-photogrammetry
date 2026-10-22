@@ -1,0 +1,15 @@
+md5: da4ca21c9e8617f087ffc4edf9da9bbd
+frozen: true
+deps:
+- md5: 5a249e31abaf738582f3529dfa1fcb6e.dir
+  size: 2160966200
+  nfiles: 20
+  hash: md5
+  path:
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/potsdam-validation-labels
+outs:
+- md5: 5a249e31abaf738582f3529dfa1fcb6e.dir
+  size: 2160966200
+  nfiles: 20
+  hash: md5
+  path: 5_labels_all_noboundary

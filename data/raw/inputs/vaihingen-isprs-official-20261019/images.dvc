@@ -1,0 +1,15 @@
+md5: ef6fd0c0a0bbed24f78afd0f047b40dc
+frozen: true
+deps:
+- md5: 1b217841aeddbf3866c2375df90a4530.dir
+  size: 508410796
+  nfiles: 33
+  hash: md5
+  path:
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/inputs/vaihingen-isprs-official-20261019/images
+outs:
+- md5: 1b217841aeddbf3866c2375df90a4530.dir
+  size: 508410796
+  nfiles: 33
+  hash: md5
+  path: images

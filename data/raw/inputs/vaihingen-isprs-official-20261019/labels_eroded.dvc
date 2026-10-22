@@ -1,0 +1,15 @@
+md5: f893e48b75c03c8eeddfced90f292d00
+frozen: true
+deps:
+- md5: 21f86d40e7a3ba898c57f4baae577cff.dir
+  size: 58683616
+  nfiles: 4
+  hash: md5
+  path:
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/vaihingen-validation-labels
+outs:
+- md5: 21f86d40e7a3ba898c57f4baae577cff.dir
+  size: 58683616
+  nfiles: 4
+  hash: md5
+  path: labels_eroded

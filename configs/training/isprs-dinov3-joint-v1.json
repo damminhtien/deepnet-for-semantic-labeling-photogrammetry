@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "run_id": "isprs-dinov3-joint-v1",
+  "status": "configured-not-trained",
+  "model_id": "dinov3-vitb16-multimodal",
+  "domain_id": "isprs-irrg-aerial-v1",
+  "model_input_id": "isprs-irrg-unit-v1",
+  "preprocessing_id": "isprs-canonical-v2",
+  "augmentation_id": "isprs-irrg-aerial-v2",
+  "seed": 42,
+  "datasets": [
+    {
+      "dataset_id": "isprs-potsdam",
+      "split_id": "potsdam-dinov3",
+      "split_version": 1,
+      "catalog_path": "data/prepared/potsdam/catalog.json",
+      "bundle_path": "data/prepared/potsdam/train-validation-bundle",
+      "train_window_size": [
+        512,
+        512
+      ],
+      "validation_window_size": [
+        512,
+        512
+      ],
+      "sampling_weight": 0.5
+    },
+    {
+      "dataset_id": "isprs-vaihingen",
+      "split_id": "vaihingen-dinov3",
+      "split_version": 1,
+      "catalog_path": "data/prepared/vaihingen/catalog.json",
+      "bundle_path": "data/prepared/vaihingen/train-validation-bundle",
+      "train_window_size": [
+        288,
+        288
+      ],
+      "validation_window_size": [
+        288,
+        288
+      ],
+      "sampling_weight": 0.5
+    }
+  ],
+  "sampling": {
+    "strategy": "balanced_domain_cycle",
+    "class_aware_fraction": 0.3,
+    "class_frequency_power": -0.5,
+    "class_weight_min": 0.5,
+    "class_weight_max": 2.0,
+    "fit_scene_scope": "train_only",
+    "validation_policy": "deterministic_full_grid",
+    "test_policy": "excluded_until_checkpoint_selection"
+  },
+  "optimizer": {
+    "name": "AdamW",
+    "weight_decay": 0.01,
+    "learning_rates": {
+      "lora": 0.0001,
+      "input_adapter_and_decoder": 0.0003
+    }
+  },
+  "scheduler": {
+    "name": "cosine",
+    "warmup_fraction": 0.05
+  },
+  "loss": {
+    "cross_entropy_weight": 0.7,
+    "soft_dice_weight": 0.3,
+    "ignore_index": 6
+  },
+  "execution": {
+    "micro_batch_size": 1,
+    "gradient_accumulation_steps": 4,
+    "mixed_precision": "float16",
+    "gradient_checkpointing": true,
+    "optimizer_steps_per_epoch": 64,
+    "max_epochs": 20,
+    "validation_interval_epochs": 1,
+    "early_stopping_patience": 6,
+    "selection_metric": "mean_dataset_validation_miou",
+    "selection_aggregation": "unweighted_mean",
+    "checkpoint_interval_optimizer_steps": 64,
+    "resume_latest_checkpoint": true,
+    "maximum_run_hours": 10.0
+  },
+  "output": {
+    "relative_root": "isprs-dinov3-joint-v1",
+    "save_best_and_latest": true,
+    "save_optimizer_and_scheduler": true,
+    "save_run_manifest": true,
+    "save_validation_confusion_matrices": true,
+    "include_test_metrics_during_selection": false
+  },
+  "data_preflight": {
+    "required_datasets": [
+      "isprs-potsdam",
+      "isprs-vaihingen"
+    ],
+    "require_dvc_materialized_inputs": true,
+    "require_verified_bundle_hashes": true,
+    "include_official_test_labels_in_training_bundle": false,
+    "note": "Potsdam uses 18 participant-labeled training scenes and 20 eroded-reference validation scenes, including the 14 scenes used as heldout in a previous, independent experiment. This DINOv3 run has no independent Potsdam test. Vaihingen official heldout labels stay outside training and selection bundles and are scored only after checkpoint selection.",
+    "required_view_assets": [
+      "irrg"
+    ],
+    "validate_label_assets_from_split_manifest": true
+  },
+  "hub_preflight": {
+    "model_id": "facebook/dinov3-vitb16-pretrain-lvd1689m",
+    "approval_required": true,
+    "license_review_required": true,
+    "kaggle_secret_name": "HF_TOKEN",
+    "token_must_not_be_committed": true
+  }
+}
