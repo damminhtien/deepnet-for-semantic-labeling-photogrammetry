@@ -1,3 +1,7 @@
 # Add patterns of files dvc should ignore, which could improve
 # the performance. Learn more at
 # https://dvc.org/doc/user-guide/dvcignore
+
+# Python bytecode is runtime-specific and must not affect source dependency hashes.
+__pycache__/
+*.py[cod]

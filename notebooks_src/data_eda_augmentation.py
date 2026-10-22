@@ -107,16 +107,17 @@ ARTIFACT_ROOT.mkdir(parents=True, exist_ok=False)
 # ## Load versioned catalogs and split contracts
 #
 # Catalog hashes and DVC quality reports provide the data provenance for this
-# notebook. Potsdam's 20-scene validation role includes the 14 scenes held out in a
-# separate earlier experiment. The 17 official Vaihingen scenes remain closed until
-# the DINOv3 config and selected checkpoint are frozen. A versioned evaluation
+# notebook. Potsdam follows the benchmark-aligned 18/6/14 split. Its 14
+# challenge-heldout scenes are excluded from this analysis and stay closed until
+# selection. The 17 official Vaihingen scenes remain closed until the DINOv3 config
+# and selected checkpoint are frozen. A versioned evaluation
 # protocol checks both split hashes before analysis begins.
 
 # %%
 DATASET_CONFIGS = {
     "Potsdam": {
         "dataset_id": "isprs-potsdam",
-        "split_file": "potsdam-dinov3-v1.json",
+        "split_file": "potsdam-dinov3-v2.json",
         "crop_size": 512,
     },
     "Vaihingen": {
@@ -125,9 +126,9 @@ DATASET_CONFIGS = {
         "crop_size": 288,
     },
 }
-EVALUATION_PROTOCOL_PATH = CONFIG_ROOT / "evaluations" / "isprs-dinov3-v1.json"
+EVALUATION_PROTOCOL_PATH = CONFIG_ROOT / "evaluations" / "isprs-dinov3-v2.json"
 EVALUATION_PROTOCOL = json.loads(EVALUATION_PROTOCOL_PATH.read_text(encoding="utf-8"))
-TRAINING_CONFIG_PATH = CONFIG_ROOT / "training" / "isprs-dinov3-joint-v1.json"
+TRAINING_CONFIG_PATH = CONFIG_ROOT / "training" / "isprs-dinov3-joint-v2.json"
 TRAINING_CONFIG = json.loads(TRAINING_CONFIG_PATH.read_text(encoding="utf-8"))
 TRAINING_CONFIG_SHA256 = hashlib.sha256(TRAINING_CONFIG_PATH.read_bytes()).hexdigest()
 

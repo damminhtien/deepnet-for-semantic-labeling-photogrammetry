@@ -59,6 +59,7 @@ def confusion_matrix(
 
 
 def summarize_confusion(matrix: np.ndarray) -> dict[str, Any]:
+    """Compute class metrics from a truth-row, prediction-column matrix."""
     matrix = np.asarray(matrix, dtype=np.int64)
     if matrix.ndim != 2 or matrix.shape[0] != matrix.shape[1]:
         raise ValueError("Confusion matrix must be square")
@@ -72,16 +73,40 @@ def summarize_confusion(matrix: np.ndarray) -> dict[str, Any]:
         out=np.full(matrix.shape[0], np.nan, dtype=np.float64),
         where=union != 0,
     )
+    precision = np.divide(
+        true_positive,
+        predicted,
+        out=np.full(matrix.shape[0], np.nan, dtype=np.float64),
+        where=predicted != 0,
+    )
+    recall = np.divide(
+        true_positive,
+        ground_truth,
+        out=np.full(matrix.shape[0], np.nan, dtype=np.float64),
+        where=ground_truth != 0,
+    )
+    f1 = np.divide(
+        2 * precision * recall,
+        precision + recall,
+        out=np.full(matrix.shape[0], np.nan, dtype=np.float64),
+        where=np.isfinite(precision + recall) & ((precision + recall) != 0),
+    )
     total = int(matrix.sum())
     return {
         "overall_accuracy": float(true_positive.sum() / total) if total else 0.0,
         "mean_iou": float(np.nanmean(iou)) if np.any(np.isfinite(iou)) else 0.0,
-        "per_class_iou": [
-            None if not np.isfinite(value) else float(value) for value in iou
-        ],
+        "per_class_iou": _optional_metric_values(iou),
+        "per_class_precision": _optional_metric_values(precision),
+        "per_class_recall": _optional_metric_values(recall),
+        "per_class_f1": _optional_metric_values(f1),
         "pixels_scored": total,
         "confusion_matrix": matrix.tolist(),
     }
+
+
+def _optional_metric_values(values: np.ndarray) -> list[float | None]:
+    """Convert undefined class metrics to JSON-safe null values."""
+    return [None if not np.isfinite(value) else float(value) for value in values]
 
 
 def _weight_map(height: int, width: int) -> np.ndarray:

@@ -34,7 +34,11 @@ from deepnet.data.dataset import (
     build_class_pixel_index,
     collate_samples,
 )
-from deepnet.data.evaluation import confusion_matrix, evaluate_scenes
+from deepnet.data.evaluation import (
+    confusion_matrix,
+    evaluate_scenes,
+    summarize_confusion,
+)
 from deepnet.data.lineage import build_run_manifest
 from deepnet.data.preprocessing import (
     decode_rgb_labels,
@@ -198,25 +202,26 @@ def test_potsdam_legacy_split_is_frozen_scene_disjoint():
     assert "not a region-held-out split" in split.spatial_scope
 
 
-def test_potsdam_dinov3_split_uses_previous_heldout_scenes_for_validation():
+def test_potsdam_dinov3_v2_preserves_the_benchmark_test_tiles():
     config_root = Path(__file__).resolve().parents[2] / "configs" / "splits"
     legacy = load_split_manifest(config_root / "potsdam-legacy-v1.json")
-    split = load_split_manifest(config_root / "potsdam-dinov3-v1.json")
+    split = load_split_manifest(config_root / "potsdam-dinov3-v2.json")
 
-    assert len(split.train_scene_ids) == 18
-    assert len(split.validation_scene_ids) == 20
-    assert split.test_scene_ids == ()
+    assert (
+        len(split.train_scene_ids),
+        len(split.validation_scene_ids),
+        len(split.test_scene_ids),
+    ) == (18, 6, 14)
     assert set(split.train_scene_ids) == set(legacy.train_scene_ids)
-    assert set(split.validation_scene_ids) == set(
-        legacy.validation_scene_ids + legacy.test_scene_ids
-    )
+    assert set(split.validation_scene_ids) == set(legacy.validation_scene_ids)
+    assert set(split.test_scene_ids) == set(legacy.test_scene_ids)
     assert dict(split.label_assets) == {
         "train": "label_participant",
         "validation": "label_eroded",
+        "test": "label_eroded",
     }
-    assert active_split_names(split) == ("train", "validation")
-    with pytest.raises(ValueError, match="roles have no scenes"):
-        active_split_names(split, ("test",))
+    assert active_split_names(split) == ("train", "validation", "test")
+    assert active_split_names(split, ("test",)) == ("test",)
 
 
 def test_catalog_resolves_initial_isprs_datasets():
@@ -234,6 +239,10 @@ def test_confusion_matrix_accepts_only_declared_classes_and_ignore():
         ignore_label=6,
     )
     np.testing.assert_array_equal(matrix, [[0, 1], [0, 1]])
+    summary = summarize_confusion(np.array([[5, 1], [2, 2]]))
+    assert summary["per_class_precision"] == pytest.approx([5 / 7, 2 / 3])
+    assert summary["per_class_recall"] == pytest.approx([5 / 6, 1 / 2])
+    assert summary["per_class_f1"] == pytest.approx([10 / 13, 4 / 7])
     with pytest.raises(ValueError, match="undeclared class IDs"):
         confusion_matrix(
             np.array([[7]]),

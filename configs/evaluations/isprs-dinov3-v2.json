@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "protocol_id": "isprs-dinov3",
+  "version": 2,
+  "status": "locked",
+  "training_config": {
+    "path": "configs/training/isprs-dinov3-joint-v2.json",
+    "sha256": "ce68235289a6863472318fcd82fe5ad9acf845bbb251f250a3ed5f4183d7a917"
+  },
+  "split_manifests": {
+    "isprs-potsdam": {
+      "path": "configs/splits/potsdam-dinov3-v2.json",
+      "split_id": "potsdam-dinov3",
+      "version": 2,
+      "content_hash": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+    },
+    "isprs-vaihingen": {
+      "path": "configs/splits/vaihingen-dinov3-v1.json",
+      "split_id": "vaihingen-dinov3",
+      "version": 1,
+      "content_hash": "4c016ced70c4056c360a73df0268882b40361eaf6202341fcd5671386f94478a"
+    }
+  },
+  "roles": {
+    "train_labels": "label_participant",
+    "validation_labels": "label_eroded",
+    "post_selection_test_labels": "label_eroded",
+    "test_labels": "label_eroded"
+  },
+  "model_selection": {
+    "role": "validation",
+    "metric": "mean_dataset_validation_miou",
+    "aggregation": "unweighted_mean",
+    "datasets": [
+      "isprs-potsdam",
+      "isprs-vaihingen"
+    ],
+    "dataset_metrics_are_reported_separately": true,
+    "scene_aggregation": "sum_confusion_matrices_within_each_dataset",
+    "inference": "full_scene_tiled_overlap_weighted"
+  },
+  "metrics": {
+    "class_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "ignore_label": 6,
+    "primary": "mean_iou",
+    "report": [
+      "mean_iou",
+      "per_class_iou",
+      "overall_accuracy",
+      "pixels_scored",
+      "confusion_matrix"
+    ],
+    "ignore_and_invalid_pixels_are_excluded": true,
+    "cross_dataset_pixel_pooling": false
+  },
+  "preprocessing": {
+    "fitted_statistics_roles": [
+      "train"
+    ],
+    "validation_augmentation": "disabled",
+    "test_augmentation": "disabled"
+  },
+  "spatial_scope": {
+    "split_unit": "scene",
+    "region_disjoint": false,
+    "interpretation": "Scene-held-out evaluation; neighboring tiles may occur in different roles, so do not claim region-independent generalization."
+  },
+  "historical_context": "The 14 Potsdam challenge-heldout scenes were evaluated in separate historical experiments. This protocol keeps them out of DINOv3 training and model selection and evaluates them once after this run is frozen; report the score as benchmark-aligned held-out evaluation, not as a never-before-used program-level test.",
+  "post_selection_evaluations": [
+    {
+      "dataset_id": "isprs-potsdam",
+      "role": "test",
+      "purpose": "benchmark-aligned evaluation on the 14 Potsdam challenge-heldout tiles",
+      "scene_ids_source": "potsdam-dinov3-v2.json:test_scene_ids",
+      "bundle_path": "data/prepared/potsdam/post-selection-test-bundle",
+      "evaluate_only_after": [
+        "training configuration and checkpoint selection are frozen",
+        "run manifest records the selected checkpoint and configuration hash"
+      ],
+      "evaluation_runs_after_selection": 1,
+      "include_test_labels_in_training_or_selection_bundle": false,
+      "reference_asset": "label_eroded",
+      "benchmark_table_metrics": {
+        "reference": "eroded/no-boundary",
+        "boundary_erosion_radius_pixels": 3,
+        "per_class_f1_ids": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "overall_accuracy": true,
+        "aggregate": "sum per-tile confusion-matrix counts"
+      },
+      "additional_report_metrics": [
+        "per-class precision and recall for all six classes",
+        "per-class F1 and IoU for all six classes",
+        "mean IoU",
+        "per-tile and aggregate confusion matrices"
+      ]
+    },
+    {
+      "dataset_id": "isprs-vaihingen",
+      "role": "test",
+      "purpose": "post-selection cross-dataset transfer evaluation for this DINOv3 run",
+      "scene_ids_source": "vaihingen-dinov3-v1.json:test_scene_ids",
+      "bundle_path": "data/prepared/vaihingen/post-selection-test-bundle",
+      "evaluate_only_after": [
+        "training configuration and checkpoint selection are frozen",
+        "run manifest records the selected checkpoint and configuration hash"
+      ],
+      "evaluation_runs_after_selection": 1,
+      "include_test_labels_in_training_or_selection_bundle": false
+    }
+  ]
+}

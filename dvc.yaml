@@ -16,12 +16,12 @@ stages:
   validate_potsdam:
     cmd: >-
       deepnet-data validate-catalog --catalog data/prepared/potsdam/catalog.json
-      --split configs/splits/potsdam-dinov3-v1.json --require-hashes
+      --split configs/splits/potsdam-dinov3-v2.json --require-hashes
       --view-assets irrg-view=irrg --include-split train
       --include-split validation
       > data/prepared/potsdam/catalog-validation.json
     deps:
-      - configs/splits/potsdam-dinov3-v1.json
+      - configs/splits/potsdam-dinov3-v2.json
       - data/prepared/potsdam/catalog.json
       - deepnet/data
     outs:
@@ -30,7 +30,7 @@ stages:
   quality_potsdam:
     cmd: >-
       deepnet-data quality-report --catalog data/prepared/potsdam/catalog.json
-      --split configs/splits/potsdam-dinov3-v1.json
+      --split configs/splits/potsdam-dinov3-v2.json
       --preprocessing-id isprs-canonical-v2
       --data-root data/raw/inputs --tile-size 1024
       --view-assets irrg-view=irrg --include-split train
@@ -38,7 +38,7 @@ stages:
       --output data/prepared/potsdam/quality.json
     deps:
       - configs/preprocessing/isprs-canonical-v2.json
-      - configs/splits/potsdam-dinov3-v1.json
+      - configs/splits/potsdam-dinov3-v2.json
       - data/prepared/potsdam/catalog-validation.json
       - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
       - data/raw/inputs/potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants
@@ -50,7 +50,7 @@ stages:
   bundle_potsdam:
     cmd: >-
       deepnet-data export-bundle --catalog data/prepared/potsdam/catalog.json
-      --split configs/splits/potsdam-dinov3-v1.json
+      --split configs/splits/potsdam-dinov3-v2.json
       --preprocessing-id isprs-canonical-v2
       --model-input-id isprs-irrg-unit-v1 --data-root data/raw/inputs
       --include-split train --include-split validation
@@ -58,7 +58,7 @@ stages:
     deps:
       - configs/model-inputs/isprs-irrg-unit-v1.json
       - configs/preprocessing/isprs-canonical-v2.json
-      - configs/splits/potsdam-dinov3-v1.json
+      - configs/splits/potsdam-dinov3-v2.json
       - data/prepared/potsdam/catalog.json
       - data/prepared/potsdam/quality.json
       - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG

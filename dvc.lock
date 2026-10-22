@@ -26,9 +26,9 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/potsdam/catalog.json
       hash: md5
@@ -37,32 +37,32 @@ stages:
   validate_potsdam:
     cmd: deepnet-data validate-catalog --catalog
       data/prepared/potsdam/catalog.json --split
-      configs/splits/potsdam-dinov3-v1.json --require-hashes --view-assets
+      configs/splits/potsdam-dinov3-v2.json --require-hashes --view-assets
       irrg-view=irrg --include-split train --include-split validation >
       data/prepared/potsdam/catalog-validation.json
     deps:
-    - path: configs/splits/potsdam-dinov3-v1.json
+    - path: configs/splits/potsdam-dinov3-v2.json
       hash: md5
-      md5: 015c49a51b373bc507fc20a934174c58
-      size: 1882
+      md5: 7e36ecd1dc375e41b42c96105a75557f
+      size: 2052
     - path: data/prepared/potsdam/catalog.json
       hash: md5
       md5: 1f72879562f4ff239c57f97b89f75985
       size: 89013
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/potsdam/catalog-validation.json
       hash: md5
-      md5: e93f44778c7d4b9c156fb6f6a278bb27
+      md5: 8915b87d9b26c854548256135a3196b9
       size: 249
   quality_potsdam:
     cmd: deepnet-data quality-report --catalog
       data/prepared/potsdam/catalog.json --split
-      configs/splits/potsdam-dinov3-v1.json --preprocessing-id
+      configs/splits/potsdam-dinov3-v2.json --preprocessing-id
       isprs-canonical-v2 --data-root data/raw/inputs --tile-size 1024
       --view-assets irrg-view=irrg --include-split train --include-split
       validation --output data/prepared/potsdam/quality.json
@@ -71,13 +71,13 @@ stages:
       hash: md5
       md5: d22bab448f7b7d595e960e52d94c2122
       size: 554
-    - path: configs/splits/potsdam-dinov3-v1.json
+    - path: configs/splits/potsdam-dinov3-v2.json
       hash: md5
-      md5: 015c49a51b373bc507fc20a934174c58
-      size: 1882
+      md5: 7e36ecd1dc375e41b42c96105a75557f
+      size: 2052
     - path: data/prepared/potsdam/catalog-validation.json
       hash: md5
-      md5: e93f44778c7d4b9c156fb6f6a278bb27
+      md5: 8915b87d9b26c854548256135a3196b9
       size: 249
     - path: data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
       hash: md5
@@ -97,17 +97,17 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/potsdam/quality.json
       hash: md5
-      md5: 403e2b8ca8a6f41944a3ce40eab7fbd4
-      size: 52630
+      md5: 943c1223f4f909001a8f9b3fe385fc11
+      size: 33844
   bundle_potsdam:
     cmd: deepnet-data export-bundle --catalog data/prepared/potsdam/catalog.json
-      --split configs/splits/potsdam-dinov3-v1.json --preprocessing-id
+      --split configs/splits/potsdam-dinov3-v2.json --preprocessing-id
       isprs-canonical-v2 --model-input-id isprs-irrg-unit-v1 --data-root
       data/raw/inputs --include-split train --include-split validation --output
       data/prepared/potsdam/train-validation-bundle
@@ -120,18 +120,18 @@ stages:
       hash: md5
       md5: d22bab448f7b7d595e960e52d94c2122
       size: 554
-    - path: configs/splits/potsdam-dinov3-v1.json
+    - path: configs/splits/potsdam-dinov3-v2.json
       hash: md5
-      md5: 015c49a51b373bc507fc20a934174c58
-      size: 1882
+      md5: 7e36ecd1dc375e41b42c96105a75557f
+      size: 2052
     - path: data/prepared/potsdam/catalog.json
       hash: md5
       md5: 1f72879562f4ff239c57f97b89f75985
       size: 89013
     - path: data/prepared/potsdam/quality.json
       hash: md5
-      md5: 403e2b8ca8a6f41944a3ce40eab7fbd4
-      size: 52630
+      md5: 943c1223f4f909001a8f9b3fe385fc11
+      size: 33844
     - path: data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
       hash: md5
       md5: 5a249e31abaf738582f3529dfa1fcb6e.dir
@@ -150,15 +150,15 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/potsdam/train-validation-bundle
       hash: md5
-      md5: 5614c3cd7593b4ff00b5e836b3ee13a9.dir
-      size: 8244749048
-      nfiles: 81
+      md5: b86bb20e199fe9ebe1f95541ebd67943.dir
+      size: 5207151275
+      nfiles: 53
   catalog_vaihingen:
     cmd: deepnet-data build-catalog --dataset-id isprs-vaihingen --data-root
       data/raw/inputs --output data/prepared/vaihingen/catalog.json
@@ -185,9 +185,9 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/vaihingen/catalog.json
       hash: md5
@@ -210,9 +210,9 @@ stages:
       size: 54492
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/vaihingen/catalog-validation.json
       hash: md5
@@ -255,9 +255,9 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/vaihingen/quality.json
       hash: md5
@@ -308,12 +308,12 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: 0adf1c089a0d4bea22c752a7a7e9d736.dir
-      size: 665261
-      nfiles: 41
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
     outs:
     - path: data/prepared/vaihingen/train-validation-bundle
       hash: md5
-      md5: 05294e0f02e477ff8baf4aba22a95f02.dir
+      md5: 21b38179043ff29e3f085a3c1d4f3f03.dir
       size: 476547085
       nfiles: 37
