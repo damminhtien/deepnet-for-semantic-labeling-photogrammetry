@@ -25,7 +25,12 @@ def decode_rgb_labels(
     *,
     valid_mask: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Map the declared RGB palette to class IDs; reject unrecognized valid colors."""
+    """Map the declared RGB palette to IDs, rejecting unsupported valid colors.
+
+    Optional tolerance uses Euclidean distance in RGB space to accommodate a
+    verified source color transform. Equal-distance matches and colors outside the
+    configured tolerance remain errors rather than being guessed.
+    """
     image = np.asarray(image)
     if image.ndim != 3 or image.shape[-1] != 3:
         raise ValueError(f"Expected an RGB label array, got shape {image.shape}")
@@ -44,8 +49,53 @@ def decode_rgb_labels(
         recognized |= match
     unknown = valid & ~recognized
     if np.any(unknown):
-        colors = np.unique(image[unknown].reshape(-1, 3), axis=0)[:10].tolist()
-        raise ValueError(f"Label raster contains undeclared RGB colors: {colors}")
+        palette = np.asarray(
+            [entry[:3] for entry in spec.label_palette], dtype=np.int32
+        )
+        class_ids = np.asarray(
+            [entry[3] for entry in spec.label_palette], dtype=np.uint8
+        )
+        pixel_indices = np.flatnonzero(unknown)
+        pixels = image.reshape(-1, 3)[pixel_indices].astype(np.int32, copy=False)
+        nearest_squared = np.full(len(pixels), np.iinfo(np.int32).max, dtype=np.int32)
+        second_squared = nearest_squared.copy()
+        nearest_indices = np.zeros(len(pixels), dtype=np.intp)
+
+        for palette_index, color in enumerate(palette):
+            delta = pixels - color
+            squared = np.sum(delta * delta, axis=1)
+            closer = squared < nearest_squared
+            second_squared = np.where(
+                closer, nearest_squared, np.minimum(second_squared, squared)
+            )
+            nearest_squared = np.minimum(nearest_squared, squared)
+            nearest_indices[closer] = palette_index
+
+        tolerance_squared = spec.label_color_tolerance**2
+        resolved = (nearest_squared <= tolerance_squared) & (
+            nearest_squared < second_squared
+        )
+        result.reshape(-1)[pixel_indices[resolved]] = class_ids[
+            nearest_indices[resolved]
+        ]
+        unresolved = ~resolved
+        if np.any(unresolved):
+            colors = pixels[unresolved]
+            color_keys = (colors[:, 0] << 16) | (colors[:, 1] << 8) | colors[:, 2]
+            samples = [
+                [int(key >> 16), int((key >> 8) & 255), int(key & 255)]
+                for key in np.unique(color_keys)[:10]
+            ]
+            max_distance = float(np.sqrt(nearest_squared[unresolved].max()))
+            ambiguous_count = int(
+                np.count_nonzero((nearest_squared == second_squared) & unresolved)
+            )
+            raise ValueError(
+                "Label raster contains unresolved RGB colors: "
+                f"{samples}; maximum nearest-palette distance={max_distance:.2f}, "
+                f"tolerance={spec.label_color_tolerance:g}, "
+                f"ambiguous_pixels={ambiguous_count}"
+            )
     return result
 
 

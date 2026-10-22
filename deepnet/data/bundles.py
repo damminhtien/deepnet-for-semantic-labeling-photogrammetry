@@ -17,6 +17,7 @@ from .contracts import (
     RasterAsset,
     SceneRecord,
     SplitManifest,
+    active_split_names,
     canonical_hash,
 )
 from .raster import sha256_file
@@ -73,6 +74,7 @@ def export_model_bundle(
     output_dir: Path,
     *,
     source_revision: str | None = None,
+    include_splits: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     """Copy only the view's assets and split-specific labels into an atomic bundle.
 
@@ -90,6 +92,7 @@ def export_model_bundle(
     if set(split.scene_ids) - by_id.keys():
         raise ValueError("Split manifest references scenes missing from the catalog")
     preprocessing.validate_fit_scope(split)
+    included_splits = active_split_names(split, include_splits)
 
     channel_assets = {asset_name for _, asset_name, _ in model_input.channel_sources}
     output_dir = Path(output_dir).expanduser().resolve()
@@ -109,7 +112,7 @@ def export_model_bundle(
     try:
         selected_records = []
         copied_paths: set[str] = set()
-        for split_name in ("train", "validation", "test"):
+        for split_name in included_splits:
             label_asset_name = split.label_asset_for(split_name)
             for scene_id in split.scenes_for(split_name):
                 scene = by_id[scene_id]
@@ -176,10 +179,12 @@ def export_model_bundle(
             key=lambda path: path.relative_to(staging_dir).as_posix(),
         )
         files = [_file_record(staging_dir, path) for path in file_paths]
-        split_counts = {
-            name: len(split.scenes_for(name))
-            for name in ("train", "validation", "test")
-        }
+        split_counts = {name: len(split.scenes_for(name)) for name in included_splits}
+        included_scene_ids = [
+            scene_id
+            for split_name in included_splits
+            for scene_id in split.scenes_for(split_name)
+        ]
         manifest = {
             "schema_version": 1,
             "dataset_id": split.dataset_id,
@@ -195,7 +200,13 @@ def export_model_bundle(
             "catalog_hash": catalog["catalog_content_hash"],
             "source_revision": source_revision or _source_revision(),
             "scene_ids": list(split.scene_ids),
-            "scene_counts": split_counts,
+            "scene_counts": {
+                name: len(split.scenes_for(name))
+                for name in ("train", "validation", "test")
+            },
+            "included_splits": list(included_splits),
+            "included_scene_ids": included_scene_ids,
+            "included_scene_counts": split_counts,
             "files": files,
             "file_count": len(files),
             "total_bytes": sum(record["bytes"] for record in files),
@@ -249,6 +260,13 @@ class BundleData:
     def scene_access(self, split_name: str, *, verify_metadata: bool = True) -> Any:
         from .dataset import SceneAccess
 
+        included_splits = self.manifest.get(
+            "included_splits", ["train", "validation", "test"]
+        )
+        if split_name not in included_splits:
+            raise ValueError(
+                f"Split {split_name!r} is not included in this data bundle"
+            )
         return SceneAccess(
             self.scenes,
             self.root,
@@ -281,6 +299,9 @@ def load_bundle(bundle_root: Path, *, verify: bool = True) -> BundleData:
         json.loads(_safe_file(root, "model_input.json").read_text(encoding="utf-8"))
     )
     scenes = tuple(SceneRecord.from_dict(value) for value in catalog["scenes"])
+    included_scene_ids = manifest.get("included_scene_ids", manifest["scene_ids"])
+    if set(included_scene_ids) != {scene.scene_id for scene in scenes}:
+        raise RuntimeError("Bundle catalog does not match its included scene IDs")
     calculated_catalog_hash = canonical_hash([scene.to_dict() for scene in scenes])
     if calculated_catalog_hash != catalog.get("catalog_content_hash"):
         raise RuntimeError(

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 from contextlib import nullcontext
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -24,6 +25,7 @@ from deepnet.data.contracts import (
     SceneRecord,
     SplitManifest,
     WindowSpec,
+    active_split_names,
     canonical_hash,
 )
 from deepnet.data.dataset import (
@@ -196,6 +198,27 @@ def test_potsdam_legacy_split_is_frozen_scene_disjoint():
     assert "not a region-held-out split" in split.spatial_scope
 
 
+def test_potsdam_dinov3_split_uses_previous_heldout_scenes_for_validation():
+    config_root = Path(__file__).resolve().parents[2] / "configs" / "splits"
+    legacy = load_split_manifest(config_root / "potsdam-legacy-v1.json")
+    split = load_split_manifest(config_root / "potsdam-dinov3-v1.json")
+
+    assert len(split.train_scene_ids) == 18
+    assert len(split.validation_scene_ids) == 20
+    assert split.test_scene_ids == ()
+    assert set(split.train_scene_ids) == set(legacy.train_scene_ids)
+    assert set(split.validation_scene_ids) == set(
+        legacy.validation_scene_ids + legacy.test_scene_ids
+    )
+    assert dict(split.label_assets) == {
+        "train": "label_participant",
+        "validation": "label_eroded",
+    }
+    assert active_split_names(split) == ("train", "validation")
+    with pytest.raises(ValueError, match="roles have no scenes"):
+        active_split_names(split, ("test",))
+
+
 def test_catalog_resolves_initial_isprs_datasets():
     catalog = DatasetCatalog.load()
 
@@ -325,8 +348,51 @@ def test_label_decoder_rejects_unknown_valid_colors_and_preserves_ignore(
     valid = np.array([[True, False], [True, True]])
     decoded = decode_rgb_labels(image, preprocessing, valid_mask=valid)
     np.testing.assert_array_equal(decoded, [[0, 6], [1, 6]])
-    with pytest.raises(ValueError, match="undeclared RGB colors"):
+    with pytest.raises(ValueError, match="unresolved RGB colors"):
         decode_rgb_labels(image, preprocessing)
+
+
+def test_label_decoder_uses_explicit_rgb_tolerance_and_rejects_outliers(
+    pipeline_fixture,
+):
+    _, _, _, preprocessing, _ = pipeline_fixture
+    tolerant = replace(
+        preprocessing,
+        label_color_tolerance=80.0,
+        label_palette=(
+            (255, 255, 255, 0),
+            (0, 0, 255, 1),
+            (0, 255, 255, 2),
+            (0, 255, 0, 3),
+            (255, 255, 0, 4),
+            (255, 0, 0, 5),
+            (0, 0, 0, 6),
+        ),
+    )
+    image = np.array(
+        [[[220, 225, 225], [8, 220, 219]], [[10, 12, 224], [100, 100, 100]]],
+        dtype=np.uint8,
+    )
+    valid = np.array([[True, True], [True, False]])
+
+    decoded = decode_rgb_labels(image, tolerant, valid_mask=valid)
+
+    np.testing.assert_array_equal(decoded, [[0, 2], [1, 6]])
+    with pytest.raises(ValueError, match="maximum nearest-palette distance"):
+        decode_rgb_labels(image, tolerant)
+
+
+def test_label_decoder_rejects_equal_distance_palette_matches(pipeline_fixture):
+    _, _, _, preprocessing, _ = pipeline_fixture
+    ambiguous = replace(
+        preprocessing,
+        label_color_tolerance=255.0,
+        label_palette=((255, 0, 0, 0), (0, 0, 255, 1)),
+    )
+    image = np.array([[[127, 0, 127]]], dtype=np.uint8)
+
+    with pytest.raises(ValueError, match="ambiguous_pixels=1"):
+        decode_rgb_labels(image, ambiguous)
 
 
 def test_fitted_statistics_use_train_scenes_only(pipeline_fixture):
@@ -577,6 +643,21 @@ def test_shared_dataset_and_bundle_round_trip_are_reproducible(
     bundled_sample = bundled_access.read_sample("validation-a", WindowSpec(0, 0, 4, 4))
     assert bundled_sample.image.shape == (1, 4, 4)
     bundled_access.close()
+    training_bundle_dir = tmp_path / "training-bundle"
+    training_manifest = export_model_bundle(
+        scenes,
+        data_root,
+        split,
+        preprocessing,
+        model_input,
+        training_bundle_dir,
+        include_splits=("validation", "train"),
+    )
+    assert training_manifest["included_splits"] == ["train", "validation"]
+    assert training_manifest["included_scene_counts"] == {"train": 1, "validation": 1}
+    training_bundle = load_bundle(training_bundle_dir)
+    with pytest.raises(ValueError, match="not included in this data bundle"):
+        training_bundle.scene_access("test")
     assert source_bytes == {
         path.name: path.read_bytes() for path in data_root.iterdir() if path.is_file()
     }

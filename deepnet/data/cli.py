@@ -18,6 +18,7 @@ from .catalog import (
     validate_scene_catalog,
     write_scene_catalog,
 )
+from .contracts import active_split_names, selected_split_names
 from .preprocessing import fit_model_statistics
 from .quality import validate_data_quality
 
@@ -64,6 +65,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=[],
         metavar="NAME=ASSET,ASSET",
     )
+    validate.add_argument(
+        "--include-split",
+        action="append",
+        choices=("train", "validation", "test"),
+        help="validate only selected split roles; may be repeated",
+    )
 
     quality = subparsers.add_parser(
         "quality-report", help="scan labels and alignment by windows"
@@ -80,6 +87,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         required=True,
         metavar="NAME=ASSET,ASSET",
+    )
+    quality.add_argument(
+        "--include-split",
+        action="append",
+        choices=("train", "validation", "test"),
+        help="scan only selected split roles; may be repeated",
     )
 
     statistics = subparsers.add_parser(
@@ -105,6 +118,12 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--model-input-id", required=True)
     export.add_argument("--data-root", type=Path, required=True)
     export.add_argument("--output", type=Path, required=True)
+    export.add_argument(
+        "--include-split",
+        action="append",
+        choices=("train", "validation", "test"),
+        help="export only selected split roles; may be repeated",
+    )
 
     verify = subparsers.add_parser(
         "verify-bundle", help="verify a portable bundle's hashes"
@@ -174,6 +193,9 @@ def main(argv: list[str] | None = None) -> int:
             preprocessing,
             model_input,
             args.output,
+            include_splits=(
+                tuple(args.include_split) if args.include_split is not None else None
+            ),
         )
         print(
             json.dumps(
@@ -240,19 +262,32 @@ def main(argv: list[str] | None = None) -> int:
             split=split,
             require_hashes=args.require_hashes,
         )
+        if split is None and args.include_split is not None:
+            raise ValueError("--include-split requires --split")
+        requested_splits = (
+            tuple(args.include_split) if args.include_split is not None else None
+        )
+        included_splits = (
+            active_split_names(split, requested_splits)
+            if split is not None
+            else selected_split_names(requested_splits)
+        )
+        scene_roles = (
+            {
+                scene_id: split_name
+                for split_name in included_splits
+                for scene_id in split.scenes_for(split_name)
+            }
+            if split is not None
+            else {}
+        )
         alignment_results = {}
         for name, asset_names in asset_groups.items():
             for scene in scenes:
-                if split is not None and scene.scene_id not in split.scene_ids:
+                if split is not None and scene.scene_id not in scene_roles:
                     continue
                 label_asset = (
-                    split.label_asset_for(
-                        next(
-                            split_name
-                            for split_name in ("train", "validation", "test")
-                            if scene.scene_id in split.scenes_for(split_name)
-                        )
-                    )
+                    split.label_asset_for(scene_roles[scene.scene_id])
                     if split is not None
                     else None
                 )
@@ -285,6 +320,9 @@ def main(argv: list[str] | None = None) -> int:
         preprocessing,
         _asset_groups(args.view_assets),
         tile_size=args.tile_size,
+        include_splits=(
+            tuple(args.include_split) if args.include_split is not None else None
+        ),
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

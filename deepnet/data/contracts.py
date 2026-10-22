@@ -10,6 +10,25 @@ from dataclasses import asdict, dataclass
 from pathlib import PurePosixPath
 from typing import Any
 
+SPLIT_NAMES = ("train", "validation", "test")
+
+
+def selected_split_names(
+    include_splits: tuple[str, ...] | None = None,
+) -> tuple[str, ...]:
+    """Return requested split roles in their canonical order."""
+    if include_splits is None:
+        return SPLIT_NAMES
+    requested = set(include_splits)
+    if not requested:
+        raise ValueError("At least one split role must be selected")
+    if len(requested) != len(include_splits):
+        raise ValueError("Split roles must not be repeated")
+    unknown = requested - set(SPLIT_NAMES)
+    if unknown:
+        raise ValueError(f"Unknown split roles: {sorted(unknown)}")
+    return tuple(name for name in SPLIT_NAMES if name in requested)
+
 
 class AlignmentError(ValueError):
     """Raised when assets cannot be proven to share a spatial grid."""
@@ -313,7 +332,7 @@ class SplitManifest:
             "test": self.test_scene_ids,
         }
         for name, scene_ids in splits.items():
-            if not scene_ids:
+            if name != "test" and not scene_ids:
                 raise ValueError(f"Split {name!r} must not be empty")
             if any(not scene_id.strip() for scene_id in scene_ids):
                 raise ValueError(f"Split {name!r} contains an empty scene ID")
@@ -353,11 +372,12 @@ class SplitManifest:
                         f"{previous} and {split_name}"
                     )
         labels = dict(self.label_assets)
-        if set(labels) != set(splits) or any(
+        active_splits = {name for name, scene_ids in splits.items() if scene_ids}
+        if set(labels) != active_splits or any(
             not value.strip() for value in labels.values()
         ):
             raise ValueError(
-                "Each split must declare exactly one non-empty label asset role"
+                "Every non-empty split must declare one non-empty label asset role"
             )
         if not self.spatial_scope.strip():
             raise ValueError(
@@ -380,10 +400,14 @@ class SplitManifest:
             raise ValueError(f"Unknown split: {split_name}") from error
 
     def label_asset_for(self, split_name: str) -> str:
+        if split_name not in SPLIT_NAMES:
+            raise ValueError(f"Unknown split: {split_name}")
         try:
             return dict(self.label_assets)[split_name]
         except KeyError as error:
-            raise ValueError(f"Unknown split: {split_name}") from error
+            raise ValueError(
+                f"Split {split_name!r} has no assigned scenes or label asset"
+            ) from error
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -419,6 +443,21 @@ class SplitManifest:
         )
 
 
+def active_split_names(
+    split: SplitManifest,
+    include_splits: tuple[str, ...] | None = None,
+) -> tuple[str, ...]:
+    """Return selected roles that contain scenes, rejecting explicit empty roles."""
+    selected = selected_split_names(include_splits)
+    active = tuple(name for name in selected if split.scenes_for(name))
+    if include_splits is not None and len(active) != len(selected):
+        empty = [name for name in selected if not split.scenes_for(name)]
+        raise ValueError(f"Selected split roles have no scenes: {empty}")
+    if not active:
+        raise ValueError("The split manifest contains no selected scene roles")
+    return active
+
+
 @dataclass(frozen=True, slots=True)
 class PreprocessingSpec:
     """Versioned deterministic operations and train-fitted statistics."""
@@ -431,6 +470,7 @@ class PreprocessingSpec:
     categorical_resampling: str
     nodata_policy: str
     label_palette: tuple[tuple[int, int, int, int], ...] = ()
+    label_color_tolerance: float = 0.0
     ignore_label: int = 6
     fitted_statistics: tuple[tuple[str, float, float], ...] = ()
     fit_scene_ids: tuple[str, ...] = ()
@@ -451,6 +491,10 @@ class PreprocessingSpec:
             raise ValueError("Preprocessing spec identifiers and policies are required")
         if self.version <= 0:
             raise ValueError("Preprocessing version must be positive")
+        if not math.isfinite(self.label_color_tolerance) or (
+            self.label_color_tolerance < 0
+        ):
+            raise ValueError("label_color_tolerance must be finite and non-negative")
         if self.ignore_label < 0:
             raise ValueError("ignore_label must be non-negative")
         colors = [(red, green, blue) for red, green, blue, _ in self.label_palette]
@@ -504,6 +548,7 @@ class PreprocessingSpec:
             "categorical_resampling": self.categorical_resampling,
             "nodata_policy": self.nodata_policy,
             "label_palette": [list(item) for item in self.label_palette],
+            "label_color_tolerance": self.label_color_tolerance,
             "ignore_label": self.ignore_label,
             "fitted_statistics": {
                 channel: {"mean": mean, "std": std}
@@ -528,6 +573,7 @@ class PreprocessingSpec:
                 tuple(int(channel) for channel in row)
                 for row in value.get("label_palette", ())
             ),
+            label_color_tolerance=float(value.get("label_color_tolerance", 0.0)),
             ignore_label=int(value.get("ignore_label", 6)),
             fitted_statistics=tuple(
                 sorted(

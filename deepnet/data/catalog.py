@@ -202,7 +202,8 @@ def load_scene_catalog(
     return records
 
 
-def _scene_format_values(scene_id: str) -> dict[str, Any]:
+def scene_format_values(scene_id: str) -> dict[str, Any]:
+    """Return descriptor template values for a canonical scene identifier."""
     parts = scene_id.split("_")
     if len(parts) == 1:
         return {"scene_id": scene_id, "area": int(parts[0])}
@@ -260,7 +261,7 @@ def build_scene_catalog(
     records: list[SceneRecord] = []
     missing: dict[str, list[str]] = {}
     for scene_id, reference_path in discovered.items():
-        values = _scene_format_values(scene_id)
+        values = scene_format_values(scene_id)
         reference_config = asset_configs[descriptor.reference_asset]
         reference_uri = reference_config["path"].format(**values)
         if _safe_source_path(data_root, reference_uri) != reference_path.resolve():

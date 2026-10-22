@@ -9,7 +9,12 @@ from typing import Any
 
 import numpy as np
 
-from .contracts import PreprocessingSpec, SceneRecord, SplitManifest
+from .contracts import (
+    PreprocessingSpec,
+    SceneRecord,
+    SplitManifest,
+    active_split_names,
+)
 from .preprocessing import decode_rgb_labels
 from .raster import RasterioSceneReader
 from .sampling import grid_windows
@@ -23,6 +28,7 @@ def validate_data_quality(
     required_assets_by_view: Mapping[str, tuple[str, ...]],
     *,
     tile_size: int = 1024,
+    include_splits: tuple[str, ...] | None = None,
 ) -> dict[str, Any]:
     """Check asset alignment, TIFF metadata, label palette, and per-split coverage."""
     if tile_size <= 0:
@@ -35,6 +41,7 @@ def validate_data_quality(
     missing = set(split.scene_ids) - by_id.keys()
     if missing:
         raise ValueError(f"Split references unknown scenes: {sorted(missing)}")
+    included_splits = active_split_names(split, include_splits)
 
     report: dict[str, Any] = {
         "schema_version": 1,
@@ -42,14 +49,18 @@ def validate_data_quality(
         "split_id": split.split_id,
         "split_version": split.version,
         "split_hash": split.content_hash,
+        "preprocessing_id": preprocessing.preprocessing_id,
+        "preprocessing_version": preprocessing.version,
+        "preprocessing_hash": preprocessing.content_hash,
         "tile_size": tile_size,
+        "included_splits": list(included_splits),
         "view_asset_requirements": {
             name: list(asset_names)
             for name, asset_names in required_assets_by_view.items()
         },
         "splits": {},
     }
-    for split_name in ("train", "validation", "test"):
+    for split_name in included_splits:
         class_counts: Counter[int] = Counter()
         valid_pixels = 0
         total_pixels = 0

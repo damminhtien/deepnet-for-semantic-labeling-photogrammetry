@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Callable, Mapping
 from typing import Any
 
@@ -40,6 +41,24 @@ def _build_transforms(
             ) from error
         transforms.append(factory(albumentations, spec))
     return transforms
+
+
+def _seed_transform_tree(transform: Any, seed: int, path: str) -> None:
+    """Give each transform a stable, independent random stream for one sample."""
+    material = f"{seed}:{path}:{type(transform).__qualname__}".encode()
+    child_seed = int.from_bytes(
+        hashlib.blake2s(material, digest_size=4).digest(), "big"
+    )
+    transform.set_random_seed(child_seed)
+    for index, child in enumerate(getattr(transform, "transforms", ())):
+        _seed_transform_tree(child, seed, f"{path}/{index}")
+
+
+def _seed_compose(compose: Any, seed: int, namespace: str) -> None:
+    """Seed a Compose and its children without coupling probability gates."""
+    compose.set_random_seed(seed)
+    for index, transform in enumerate(compose.transforms):
+        _seed_transform_tree(transform, seed, f"{namespace}/{index}")
 
 
 def _square_symmetry(albumentations: Any, spec: TransformSpec) -> Any:
@@ -84,6 +103,21 @@ def _random_brightness_contrast(albumentations: Any, spec: TransformSpec) -> Any
     )
 
 
+def _random_gamma(albumentations: Any, spec: TransformSpec) -> Any:
+    """Apply a configured gamma adjustment to normalized optical channels."""
+    return albumentations.RandomGamma(p=spec.probability, **spec.parameter_map())
+
+
+def _gaussian_noise(albumentations: Any, spec: TransformSpec) -> Any:
+    """Add configured low-variance sensor noise to optical channels."""
+    return albumentations.GaussNoise(p=spec.probability, **spec.parameter_map())
+
+
+def _gaussian_blur(albumentations: Any, spec: TransformSpec) -> Any:
+    """Apply a mild configured blur to model the source imaging process."""
+    return albumentations.GaussianBlur(p=spec.probability, **spec.parameter_map())
+
+
 def _horizontal_flip(albumentations: Any, spec: TransformSpec) -> Any:
     return albumentations.HorizontalFlip(p=spec.probability, **spec.parameter_map())
 
@@ -91,6 +125,9 @@ def _horizontal_flip(albumentations: Any, spec: TransformSpec) -> Any:
 register_transform("square_symmetry", _square_symmetry)
 register_transform("affine", _affine)
 register_transform("random_brightness_contrast", _random_brightness_contrast)
+register_transform("random_gamma", _random_gamma)
+register_transform("gaussian_noise", _gaussian_noise)
+register_transform("gaussian_blur", _gaussian_blur)
 register_transform("horizontal_flip", _horizontal_flip)
 
 
@@ -204,7 +241,7 @@ class AlbumentationsAugmenter:
         optical = np.stack([arrays[name] for name in self.optical_channels], axis=-1)
         if self.geometry is not None:
             seed_value = int(seed) & 0xFFFFFFFF
-            self.geometry.set_random_seed(seed_value)
+            _seed_compose(self.geometry, seed_value, "geometry")
             geometry_input: dict[str, Any] = {
                 "image": optical,
                 "mask": labels,
@@ -215,7 +252,10 @@ class AlbumentationsAugmenter:
             transformed = self.geometry(**geometry_input)
             optical = transformed["image"]
             labels = transformed["mask"]
-            valid = transformed["valid"].astype(bool, copy=False)
+            transformed_valid = transformed["valid"]
+            valid = (transformed_valid != self.ignore_label) & transformed_valid.astype(
+                bool, copy=False
+            )
             for index, name in enumerate(self.auxiliary_channels):
                 arrays[name] = transformed[f"aux_{index}"]
 
@@ -223,7 +263,8 @@ class AlbumentationsAugmenter:
             low, high = self.optical_value_range
             optical = np.asarray(optical, dtype=np.float32)
             optical = np.clip((optical - low) / (high - low), 0.0, 1.0)
-            self.optical.set_random_seed((int(seed) ^ 0x9E3779B9) & 0xFFFFFFFF)
+            optical_seed = (int(seed) ^ 0x9E3779B9) & 0xFFFFFFFF
+            _seed_compose(self.optical, optical_seed, "optical")
             optical = self.optical(image=optical)["image"]
             optical = np.clip(optical, 0.0, 1.0) * (high - low) + low
 

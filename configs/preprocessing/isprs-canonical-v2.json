@@ -1,0 +1,20 @@
+{
+  "preprocessing_id": "isprs-canonical",
+  "version": 2,
+  "label_ontology": "isprs-six-class-v1",
+  "alignment_policy": "require-matching-georeferencing-or-explicit-source-pair-evidence",
+  "continuous_resampling": "bilinear",
+  "categorical_resampling": "nearest",
+  "nodata_policy": "separate-valid-mask-and-label-ignore",
+  "label_color_tolerance": 80.0,
+  "ignore_label": 6,
+  "label_palette": [
+    [255, 255, 255, 0],
+    [0, 0, 255, 1],
+    [0, 255, 255, 2],
+    [0, 255, 0, 3],
+    [255, 255, 0, 4],
+    [255, 0, 0, 5],
+    [0, 0, 0, 6]
+  ]
+}

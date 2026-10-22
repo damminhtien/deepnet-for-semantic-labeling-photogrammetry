@@ -1,0 +1,58 @@
+{
+  "augmentation_id": "isprs-irrg-aerial-v2",
+  "version": 2,
+  "domain_id": "isprs-irrg-aerial-v1",
+  "geometry": [
+    {
+      "name": "square_symmetry",
+      "probability": 1.0
+    },
+    {
+      "name": "affine",
+      "probability": 0.35,
+      "parameters": {
+        "scale": [0.9, 1.1],
+        "rotate": [-12.0, 12.0],
+        "translate_percent": [-0.04, 0.04],
+        "interpolation": "linear",
+        "mask_interpolation": "nearest",
+        "border_mode": "constant",
+        "fill": 0,
+        "fill_mask": 6
+      }
+    }
+  ],
+  "optical": [
+    {
+      "name": "random_brightness_contrast",
+      "probability": 0.35,
+      "parameters": {
+        "brightness_limit": [-0.08, 0.08],
+        "contrast_limit": [-0.1, 0.1]
+      }
+    },
+    {
+      "name": "random_gamma",
+      "probability": 0.2,
+      "parameters": {
+        "gamma_limit": [90.0, 110.0]
+      }
+    },
+    {
+      "name": "gaussian_noise",
+      "probability": 0.15,
+      "parameters": {
+        "std_range": [0.005, 0.025],
+        "mean_range": [-0.005, 0.005],
+        "per_channel": true
+      }
+    },
+    {
+      "name": "gaussian_blur",
+      "probability": 0.1,
+      "parameters": {
+        "blur_limit": [3, 5]
+      }
+    }
+  ]
+}

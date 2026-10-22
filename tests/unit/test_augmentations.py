@@ -137,6 +137,145 @@ def test_radiometry_changes_only_optical_bands_and_is_seeded():
     np.testing.assert_array_equal(first[2], valid)
 
 
+def test_optical_probability_gates_are_independent_and_reproducible():
+    pytest.importorskip("albumentations")
+    domain = DomainSpec(
+        "synthetic-independent-radiometry",
+        1,
+        "synthetic",
+        (
+            BandSpec("nir", "optical", value_range=(0.0, 1.0)),
+            BandSpec("red", "optical", value_range=(0.0, 1.0)),
+            BandSpec("green", "optical", value_range=(0.0, 1.0)),
+        ),
+    )
+    policy = AugmentationSpec(
+        "synthetic-independent-radiometry",
+        1,
+        domain.domain_id,
+        optical=(
+            TransformSpec(
+                "random_brightness_contrast",
+                probability=0.5,
+                parameters=(
+                    ("brightness_limit", (0.2, 0.2)),
+                    ("contrast_limit", (0.0, 0.0)),
+                ),
+            ),
+            TransformSpec(
+                "random_gamma",
+                probability=0.5,
+                parameters=(("gamma_limit", (80.0, 80.0)),),
+            ),
+        ),
+    )
+    augmenter = AlbumentationsAugmenter(
+        domain,
+        _view(("nir", "red", "green")),
+        policy,
+        ignore_label=6,
+    )
+    image = np.full((16, 16), 0.5, dtype=np.float32)
+    channels = {name: image.copy() for name in ("nir", "red", "green")}
+    labels = np.zeros(image.shape, dtype=np.uint8)
+    valid = np.ones(image.shape, dtype=bool)
+
+    outcomes = {
+        round(float(augmenter(channels, labels, valid, seed=seed)[0]["nir"].mean()), 3)
+        for seed in range(128)
+    }
+    replay = augmenter(channels, labels, valid, seed=27)
+    repeated = augmenter(channels, labels, valid, seed=27)
+
+    assert len(outcomes) == 4
+    np.testing.assert_array_equal(replay[0]["nir"], repeated[0]["nir"])
+
+
+def test_affine_padding_is_invalid_and_label_interpolation_is_nearest():
+    pytest.importorskip("albumentations")
+    domain = DomainSpec(
+        "synthetic-irrg",
+        1,
+        "synthetic aerial imagery",
+        (
+            BandSpec("ir", "optical", value_range=(0.0, 255.0)),
+            BandSpec("red", "optical", value_range=(0.0, 255.0)),
+            BandSpec("green", "optical", value_range=(0.0, 255.0)),
+        ),
+    )
+    policy = AugmentationSpec(
+        "synthetic-affine-padding",
+        1,
+        domain.domain_id,
+        geometry=(
+            TransformSpec(
+                "affine",
+                probability=1.0,
+                parameters=(
+                    ("scale", (1.0, 1.0)),
+                    ("rotate", (0.0, 0.0)),
+                    ("translate_percent", (0.25, 0.25)),
+                    ("interpolation", "nearest"),
+                    ("mask_interpolation", "nearest"),
+                    ("border_mode", "constant"),
+                    ("fill", 0),
+                    ("fill_mask", 6),
+                ),
+            ),
+        ),
+    )
+    augmenter = AlbumentationsAugmenter(
+        domain,
+        _view(("ir", "red", "green")),
+        policy,
+        ignore_label=6,
+    )
+    labels = (np.indices((16, 16))[0] % 6).astype(np.uint8)
+    channels = {
+        "ir": labels.astype(np.float32),
+        "red": labels.astype(np.float32) + 1,
+        "green": labels.astype(np.float32) + 2,
+    }
+    valid = np.ones(labels.shape, dtype=bool)
+
+    first = augmenter(channels, labels, valid, seed=72)
+    repeated = augmenter(channels, labels, valid, seed=72)
+
+    assert np.any(~first[2])
+    assert np.all(first[1][~first[2]] == 6)
+    assert np.all(first[1][first[2]] < 6)
+    np.testing.assert_array_equal(first[0]["ir"][first[2]], first[1][first[2]])
+    np.testing.assert_array_equal(first[0]["red"][first[2]], first[1][first[2]] + 1)
+    np.testing.assert_array_equal(first[0]["green"][first[2]], first[1][first[2]] + 2)
+    np.testing.assert_array_equal(first[1], repeated[1])
+    np.testing.assert_array_equal(first[2], repeated[2])
+    for name in channels:
+        np.testing.assert_array_equal(first[0][name], repeated[0][name])
+
+
+def test_irrg_aerial_policy_json_builds_with_pinned_augmentation_api():
+    pytest.importorskip("albumentations")
+    domain = load_domain_spec("isprs-irrg-aerial-v1")
+    model_input = _view(("ir", "red", "green"))
+    spec = load_augmentation_spec("isprs-irrg-aerial-v2")
+    augmenter = AlbumentationsAugmenter(
+        domain,
+        model_input,
+        spec,
+        ignore_label=6,
+    )
+    image = np.full((32, 32), 127.0, dtype=np.float32)
+    channels = {name: image.copy() for name in model_input.channels}
+    labels = np.zeros(image.shape, dtype=np.uint8)
+    valid = np.ones(image.shape, dtype=bool)
+
+    transformed = augmenter(channels, labels, valid, seed=19)
+
+    assert transformed[0]["ir"].shape == image.shape
+    assert transformed[1].shape == image.shape
+    assert transformed[2].shape == image.shape
+
+
 def test_potsdam_policy_json_builds_with_optional_augmentation_dependency():
     pytest.importorskip("albumentations")
     domain = load_domain_spec("isprs-potsdam-multimodal-v1")

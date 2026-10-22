@@ -1,0 +1,26 @@
+{
+  "domain_id": "isprs-irrg-aerial-v1",
+  "version": 1,
+  "sensor": "ISPRS aerial infrared, red, and green orthophotography",
+  "gsd_m": null,
+  "bands": [
+    {
+      "name": "ir",
+      "role": "optical",
+      "representation": "source digital number",
+      "value_range": [0, 255]
+    },
+    {
+      "name": "red",
+      "role": "optical",
+      "representation": "source digital number",
+      "value_range": [0, 255]
+    },
+    {
+      "name": "green",
+      "role": "optical",
+      "representation": "source digital number",
+      "value_range": [0, 255]
+    }
+  ]
+}
