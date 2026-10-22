@@ -1,15 +1,15 @@
-md5: f893e48b75c03c8eeddfced90f292d00
+md5: 3b51b595df82c101a5f1309c161770dc
 frozen: true
 deps:
-- md5: 21f86d40e7a3ba898c57f4baae577cff.dir
-  size: 58683616
-  nfiles: 4
+- md5: 2f1130619a9d728f317fe112ab354700.dir
+  size: 329638420
+  nfiles: 21
   hash: md5
   path:
-    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/vaihingen-validation-labels
+    /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/vaihingen-eroded-evaluation-labels
 outs:
-- md5: 21f86d40e7a3ba898c57f4baae577cff.dir
-  size: 58683616
-  nfiles: 4
+- md5: 2f1130619a9d728f317fe112ab354700.dir
+  size: 329638420
+  nfiles: 21
   hash: md5
   path: labels_eroded
