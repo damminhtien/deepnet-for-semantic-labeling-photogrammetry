@@ -111,21 +111,27 @@ bytes or machine credentials are staged in Git.
 
 ### M11: Dataset splits, DINOv3 views, and robust augmentation
 
-Status: split/evaluation lock and full-scene EDA complete (2026-10-22). The 19-cell
-Jupyter notebook ran all 10 code cells after a project `.venv` kernel restart; its
-Jupytext source also completed as a fresh process. Both runs used the materialized
-DVC snapshot at lock SHA `17994ddb59a804bc`. Every IRRG pixel in 38 Potsdam and 16
-Vaihingen train/validation scenes was scanned. All 38 Potsdam DSM/nDSM scene pairs
-were inspected and hashed; 37 DSM grids match IRRG metadata, scene `3_13` is one
-column short, and nDSM registration remains unverified for every scene. The audit
-did not read Vaihingen test pixels or labels. It also replayed the v2 synchronized
-augmentation policy over three seeds per training scene. Results and provenance
-are under `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/eda/`
-outside Git.
+Status: the DINOv3 split and evaluation protocol v2 are locked (2026-10-22); the
+full-scene EDA snapshot below is historical DINOv3 v1 evidence. The 19-cell Jupyter
+notebook ran all 10 code cells after a project `.venv` kernel restart; its Jupytext
+source also completed as a fresh process. Both runs used the materialized DVC
+snapshot at lock SHA `17994ddb59a804bc`. Every IRRG pixel in 38 Potsdam scenes
+(18 train and 20 v1 validation, including the 14 challenge-test tiles) and 16
+Vaihingen v1 train/validation scenes was scanned. All 38 Potsdam DSM/nDSM scene
+pairs were inspected and hashed; 37 DSM grids match IRRG metadata, scene `3_13` is
+one column short, and nDSM registration remains unverified for every scene. The
+audit did not read Vaihingen test pixels or labels. It also replayed the v2
+synchronized augmentation policy over three seeds per training scene. Results and
+provenance are under
+`/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/eda/` outside Git.
 
-- Use 18 participant-labeled Potsdam scenes for training and 20 eroded-reference
-  scenes for validation, including the 14 scenes held out in a separate prior run.
-  This DINOv3 split has no independent Potsdam test set.
+- Keep the benchmark-aligned Potsdam v2 split: 18 train, 6 internal validation,
+  and 14 challenge-heldout test scenes. The 18/6 division is project-defined within
+  ISPRS's 24 labeled tiles; hold test labels out of training and selection bundles.
+- Keep test-only DVC exports in `pipelines/evaluation/dvc.yaml`, outside the default
+  train/validation graph. The single-run Kaggle caller must evaluate each test role
+  once after freezing the selected checkpoint, and save per-tile/aggregate
+  confusion matrices plus the ISPRS table-style class F1 and overall accuracy.
 - Use 12 participant-labeled Vaihingen scenes for training, 4 eroded-reference
   scenes for validation, and keep 17 official references for post-selection
   evaluation. Keep unverified Potsdam nDSM out of the unified run.
@@ -136,9 +142,11 @@ outside Git.
 Validation: split and training-config hashes are checked against the locked
 evaluation protocol; data-quality reports cover all active train/validation scenes;
 full-scene IRRG histograms are exact per scene; the elevation audit records grid,
-coverage, and encoding limits. The project `.venv` kernel was verified, restarted,
-and used to run all notebook code cells in order; the Jupytext source also completed
-in a fresh process. Vaihingen test assets remain unopened. No training was run.
+coverage, and encoding limits. The DINOv3 v2 Potsdam test split is excluded from the
+train/validation bundle and selection. Its local labels were used in historical v1
+EDA/experiments; v2 scores them only after checkpoint freeze. A complete
+training/evaluation caller is still required. No training or v2 test evaluation was
+run.
 
 ### M12: One unified Kaggle run plan and README
 
@@ -149,8 +157,8 @@ weight, bundle, and durable-output preflights pass.
 
 - Configure one multi-domain DINOv3 run with balanced dataset sampling, separate
   validation metrics, deterministic manifests, and resumable checkpoints. Potsdam
-  selection uses its 20-scene validation set; Vaihingen's 17 official scenes remain
-  outside selection.
+  selection uses its 6-scene internal validation set; its 14 challenge-heldout
+  scenes and Vaihingen's 17 official test scenes remain outside selection.
 - Document local Mac preparation, DVC materialization, Kaggle packaging/secrets, and
   the single-run policy in the README and data-pipeline guide.
 - Download weights only after Hugging Face grants access; do not start Kaggle before

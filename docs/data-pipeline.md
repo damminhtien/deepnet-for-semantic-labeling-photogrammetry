@@ -145,7 +145,7 @@ Set `DEEPNET_DATA_ROOT` to `data/raw/inputs` and `DEEPNET_ARTIFACT_ROOT` to a
 directory outside the repository before running. The analysis marks reference-grid
 checks separately from metadata: matching width/height by itself is never treated as
 proof of alignment.
-Potsdam uses eroded labels for all 20 validation scenes; Vaihingen uses eroded labels
+Potsdam uses eroded labels for its 6 validation scenes; Vaihingen uses eroded labels
 for its 4 validation scenes. Training reads participant labels. The 17 Vaihingen
 post-selection scenes are not scanned for label scores during model selection.
 
@@ -158,51 +158,96 @@ of 69.88. Tied colors or colors farther than the configured tolerance still fail
 The official six-class palette and ignored black boundaries are documented by
 [ISPRS](https://isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx).
 
-### DINOv3 split and evaluation lock
+### DINOv3 v2 split and evaluation protocol
 
-The joint DINOv3 run uses the versioned [evaluation protocol](../configs/evaluations/isprs-dinov3-v1.json)
-and its two [Potsdam](../configs/splits/potsdam-dinov3-v1.json) and
-[Vaihingen](../configs/splits/vaihingen-dinov3-v1.json) split manifests. The protocol
-binds each manifest by ID, version, and canonical content hash. It also binds the
-training plan to SHA-256
-`b5e170e4f1192b587a6d97f8db798c5fcbc0bc6d07edadd4c4a006f394df7124`; the EDA
-notebook refuses to run if that plan changes without updating the protocol.
+The current joint run follows the outer split used by the [ISPRS 2D Semantic
+Labeling contest](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx): 24 Potsdam tiles have references for training or internal evaluation, while 14 challenge tiles are held out for test. The [ISPRS 2015 report](https://isprs.org/society/si/SI-2015/ISPRS-SI2015-Gerke_report_WGIII4_2015.pdf) confirms that references are released for 24 of 38 tiles and the remaining 14 are submitted for organizer evaluation. ISPRS does not define a mandatory train/validation split within those 24 labeled tiles. A later [ISPRS Annals study](https://isprs-annals.copernicus.org/articles/V-2-2022/275/2022/isprs-annals-V-2-2022-275-2022.pdf) used 18 randomly selected training tiles, 6 validation tiles, and the same 14-tile test set. This project uses those counts with its fixed versioned scene IDs; the internal 18/6 assignment is project-defined, not an official contest split.
+
+The current [evaluation protocol](../configs/evaluations/isprs-dinov3-v2.json) binds
+its training plan and split manifests by SHA-256. The active Potsdam manifest is
+[`potsdam-dinov3-v2.json`](../configs/splits/potsdam-dinov3-v2.json); Vaihingen
+continues to use [`vaihingen-dinov3-v1.json`](../configs/splits/vaihingen-dinov3-v1.json).
+The previous DINOv3 v1 manifest and protocol remain unchanged as historical
+configuration; training has not started under either version.
 
 Exact scene membership is:
 
 - **Potsdam train (18):** `2_10`, `2_11`, `2_12`, `3_10`, `3_11`, `5_10`, `5_12`,
   `6_10`, `6_11`, `6_7`, `6_8`, `6_9`, `7_10`, `7_11`, `7_12`, `7_7`, `7_8`, `7_9`.
-- **Potsdam validation (20):** `2_13`, `2_14`, `3_12`, `3_13`, `3_14`, `4_10`,
-  `4_11`, `4_12`, `4_13`, `4_14`, `4_15`, `5_11`, `5_13`, `5_14`, `5_15`,
-  `6_12`, `6_13`, `6_14`, `6_15`, `7_13`. Potsdam has no test scenes in this run.
+- **Potsdam internal validation (6):** `3_12`, `4_10`, `4_11`, `4_12`, `5_11`, `6_12`.
+- **Potsdam challenge test (14):** `2_13`, `2_14`, `3_13`, `3_14`, `4_13`, `4_14`,
+  `4_15`, `5_13`, `5_14`, `5_15`, `6_13`, `6_14`, `6_15`, `7_13`.
 - **Vaihingen train (12):** `3`, `5`, `13`, `15`, `17`, `21`, `23`, `26`, `30`,
   `32`, `34`, `37`.
 - **Vaihingen validation (4):** `1`, `7`, `11`, `28`.
 - **Vaihingen post-selection test (17):** `2`, `4`, `6`, `8`, `10`, `12`, `14`,
   `16`, `20`, `22`, `24`, `27`, `29`, `31`, `33`, `35`, `38`.
 
-Checkpoint selection uses the unweighted mean of the Potsdam and Vaihingen
-validation mIoU values. Report each dataset's metrics and confusion matrix
-separately; sum confusion matrices only within a dataset, and never pool pixels
-across datasets. Validation uses full-scene deterministic grids with overlap-weighted
-logit aggregation. Ignore ID 6 and invalid pixels are excluded. Fitted statistics
-use training scenes only, and validation/test augmentation is disabled.
+Checkpoint selection uses only the unweighted mean of Potsdam and Vaihingen
+validation mIoU. The 14 Potsdam test tiles and 17 Vaihingen post-selection tiles are
+evaluated once after the training configuration and selected checkpoint are frozen
+and recorded in the run manifest. The default DVC graph exports only train and
+validation roles; test labels are excluded from training and checkpoint-selection
+bundles.
 
-The 17 Vaihingen test scenes remain unopened during training and model selection.
-Run their eroded-label evaluation once after the final training configuration and
-selected checkpoint are frozen and recorded in the run manifest. This measures
-post-selection cross-dataset transfer for this run; related scenes appeared in
-other research, so describe the result accordingly. The split is scene-disjoint, not
-region-disjoint, and neighboring tiles may share geographic context. Do not claim
-region-independent generalization from this protocol. The current joint DINOv3 plan
-uses the three IRRG bands. The separate
-[`potsdam-dinov3-multimodal-v1` plan](../configs/training/potsdam-dinov3-multimodal-v1.json)
-uses the older `potsdam-legacy-v1` split and is not covered by this joint-run
-protocol; it remains gated on the DSM/nDSM audit below.
+The isolated [`evaluation DVC pipeline`](../pipelines/evaluation/dvc.yaml) validates
+each test split against its catalog and exports a test-only bundle to the configured
+path. Run a target explicitly; `uv run dvc repro` does not include this pipeline:
 
-### Frozen EDA snapshot
+```bash
+uv run dvc repro pipelines/evaluation/dvc.yaml:bundle_potsdam_test
+uv run dvc repro pipelines/evaluation/dvc.yaml:bundle_vaihingen_test
+```
 
-The current analysis was generated against DVC lock SHA-256
+Potsdam's 14 eroded-reference labels are already in its DVC-managed source. The
+current Vaihingen DVC snapshot contains only the four validation labels. Before
+targeting its test bundle, stage the 17 post-selection references, combine them with
+the four validation references into an external directory, refresh the `labels_eroded`
+import with `dvc import-url --force`, and rebuild `catalog_vaihingen`. See the
+[data preparation instructions](../README.md#version-and-prepare-data-with-dvc) for
+the exact commands. Package the test bundles as separate Kaggle inputs for the one
+full run. The model-selection loader must not consume them; the evaluation caller
+scores them only after the validation-selected checkpoint has been frozen.
+
+For Potsdam, the local test references are the eroded/no-boundary labels. The
+[ISPRS Potsdam results table](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/results/label_challenge_2D_potsdam_result_ifr.html)
+reports five per-class F1 scores (excluding clutter/background) and overall
+accuracy from the no-boundary reference. The final report will reproduce those
+metrics, retain per-tile confusion matrices, and sum their counts for the aggregate
+confusion matrix. It will also report all-six-class F1/IoU, precision/recall, and
+mean IoU as additional project metrics. The official site describes a second
+full-reference evaluation too; the active local catalog currently has no full
+reference for these tiles, so we will not claim that metric without obtaining and
+verifying those labels.
+The local no-boundary rasters are scene-matched and hashed, but their equivalence to
+the organizers' hidden scoring files has not been independently verified; report
+these as local benchmark-aligned metrics rather than an official contest score.
+
+The shared `evaluate_scenes` function in
+[`deepnet/data/evaluation.py`](../deepnet/data/evaluation.py) performs deterministic
+full-scene tiled inference, overlap-weighted logit merging, and per-scene plus
+aggregate confusion-matrix scoring. The future training caller must invoke it with
+the manifest's test IDs only after checkpoint selection is frozen; the current plan
+configures this protocol but does not yet provide a complete model-loading
+training/evaluation runner. No test evaluation has been performed for this DINOv3
+plan.
+
+The 14 test scenes were evaluated in separate historical experiments. This v2 keeps
+them out of DINOv3 training and model selection, but the result should be described
+as benchmark-aligned held-out evaluation, not as a never-before-used program-level
+test. All split roles are scene-level, not region-disjoint; neighboring tiles may
+share geographic context.
+
+### Historical EDA snapshot from DINOv3 v1
+
+This snapshot was produced under the previous 18/20 Potsdam split, where the 14
+challenge-test scenes were assigned to validation. Keep its artifacts for history,
+but do not use the 20-scene validation statistics below as v2 validation evidence.
+The v2 notebook source now follows the 18/6/14 split; regenerate this snapshot before
+using validation distributions to tune the v2 run. The rare-class augmentation
+replay itself used train scenes only, and the train membership is unchanged.
+
+The previous analysis was generated against DVC lock SHA-256
 `17994ddb59a804bc847d3429cdd17dce1b0435db1c054e207e15565f28217b9c`. Label
 proportions below come from complete train/validation scene scans. Each class share
 is normalized over the six semantic classes; the ignore share uses all labeled
@@ -220,14 +265,17 @@ more concentrated: it appears in 4/12 training scenes and 1/4 validation scenes.
 This supports the configured 30% class-aware component for training windows; it
 does not justify changing the natural validation distribution.
 
-The 2026-10-22 optical profile scans every train and validation IRRG pixel in native
-raster blocks. It covers all 38 Potsdam scenes (18 train, 20 validation) and the 16
-Vaihingen scenes in this split (12 train, 4 validation); no Vaihingen test raster or
-label was read. Histograms and quantiles are exact for uint8 values. Every scanned
-IRRG pixel passed its raster mask and finite-value checks.
+The 2026-10-22 optical profile was generated under DINOv3 v1. It scanned 38 Potsdam
+scenes (18 train and 20 validation, including the 14 challenge-test tiles) and 16
+Vaihingen train/validation scenes in native raster blocks. It is historical evidence,
+not a v2 validation summary. The v2 notebook source now uses only the 18/6 Potsdam
+train/validation split; regenerate its EDA outputs before using those distributions
+for v2 decisions. Histograms and quantiles in the historical scan are exact for
+uint8 values, and every scanned IRRG pixel passed its raster mask and finite-value
+checks.
 
-The table reports pooled band means and medians plus the range of per-scene medians
-in source band order IR, red, green. The per-scene CSV retains exact minima,
+The historical v1 table reports pooled band means and medians plus the range of
+per-scene medians in source band order IR, red, green. Its per-scene CSV retains exact minima,
 percentiles, standard deviations, valid-pixel counts, and full 256-bin histograms.
 
 | Dataset / role | Scenes / pixels per band | Mean IR / red / green | Pooled median IR / red / green | Per-scene median range IR / red / green |

@@ -44,21 +44,28 @@ The catalog descriptors cover ISPRS Potsdam and Vaihingen. Source imagery and la
 are versioned with DVC; raster bytes and credentials are not stored in Git. The DVC
 cache and local remote stay outside the repository. Do not edit raw assets in place.
 
-The DINOv3 preparation uses 18 Potsdam training scenes and 20 validation scenes. The
-20 validation scenes include the 6 scenes previously used for validation and the 14
-scenes held out in an earlier, independent experiment. Their previous use does not
-prevent this DINOv3 run from using them for model selection; after selection they are
-not a Potsdam test set for this run. Validation uses eroded references on both
-datasets. Vaihingen uses 12 training, 4 validation, and 17 post-selection scenes.
-Official Vaihingen heldout labels are excluded from DVC training inputs and exported
+The DINOv3 v2 split follows the Potsdam contest's outer partition: 24 labeled tiles
+are divided into 18 training and 6 internal validation scenes, while the 14
+challenge-heldout tiles remain test. The [ISPRS report](https://isprs.org/society/si/SI-2015/ISPRS-SI2015-Gerke_report_WGIII4_2015.pdf)
+states that references are released for 24 of 38 tiles and the remaining 14 are
+evaluated by the organizers. ISPRS does not prescribe a train/validation subset
+within the 24 labeled tiles; the 18/6 assignment is fixed for this project.
+Checkpoint selection uses only validation. Potsdam test labels stay out of training
+and model selection, then are evaluated once after the checkpoint and configuration
+are frozen. Vaihingen uses 12 training, 4 validation, and 17 post-selection scenes.
+Its official heldout labels also stay out of DVC training inputs and exported
 bundles. The catalog records Vaihingen rasters as pixel-local where the source files
 contain no georeferencing metadata.
 
 The source inventory has 33 Vaihingen images and 17 scenes without participant
 labels. Those 17 images remain available for post-selection evaluation against the
 official reference labels; no labels are inferred or filled. Potsdam has 38 images,
-24 participant labels, and 38 eroded reference labels; the versioned DVC inputs stage
-only the 18 participant training labels and 20 eroded validation labels used here.
+24 participant labels, and 20 eroded-reference labels in the current DVC source
+(6 validation and 14 challenge-test). The active DVC train/validation
+bundle contains only 18 participant training labels and 6 validation labels; the 14
+test labels are excluded from it. The default DVC pipeline never exports test roles.
+The isolated [`pipelines/evaluation/dvc.yaml`](pipelines/evaluation/dvc.yaml) pipeline
+creates test-only bundles separately; training and validation do not depend on them.
 
 The current joint DINOv3 plan uses three IRRG channels. Five-channel views also need
 DSM and nDSM, but the data audit found only 37/38 DSM rasters with an exact
@@ -66,7 +73,7 @@ metadata-grid match; Potsdam scene `3_13` is one column short. The 37 matching-s
 nDSM JPEGs have no CRS/affine or co-registration evidence, and the remaining nDSM is
 also one column short. None of the 76 DSM/nDSM files is in the current DVC snapshot.
 Those elevation views remain blocked until source data, grid coverage, registration,
-and value encoding are verified. See the [split protocol and EDA findings](docs/data-pipeline.md#dinov3-split-and-evaluation-lock).
+and value encoding are verified. See the [split protocol and EDA findings](docs/data-pipeline.md#dinov3-v2-split-and-evaluation-protocol).
 
 ## Data EDA and augmentation
 
@@ -79,8 +86,8 @@ metadata and value audits, and a seeded augmentation audit. The report records
 label imbalance and ignore coverage for both datasets; validation stays natural and
 unaugmented. The current aerial IRRG policy is versioned as
 `isprs-irrg-aerial-v2`, with synchronized geometry, ignored affine borders, and
-independently seeded optical-only transforms. See the [EDA findings and audit
-method](docs/data-pipeline.md#frozen-eda-snapshot) and the
+independently seeded optical-only transforms. See the [historical EDA findings and audit
+method](docs/data-pipeline.md#historical-eda-snapshot-from-dinov3-v1) and the
 [augmentation design](docs/data-pipeline.md#augmentation-policy-and-audit).
 
 The expanded train-only audit scans 12,121 overlapping candidate windows across
@@ -91,11 +98,13 @@ inside affine padding even though its labels and validity mask are correct. Keep
 current policy out of a full training run until padding values are restored after
 radiometry and the rare-car crop behavior is reviewed. The versioned augmentation
 config is unchanged. Audit tables, provenance, and visual examples are written
-outside Git under the configured EDA data root.
+outside Git under the configured EDA data root. Stored EDA artifacts are historical
+v1 results; regenerate outputs with the active v2 split before using them for model
+selection or data-driven tuning.
 
 ## DINOv3 training plan
 
-`configs/training/isprs-dinov3-joint-v1.json` describes one balanced IRRG run across
+`configs/training/isprs-dinov3-joint-v2.json` describes one balanced IRRG run across
 both datasets. It uses 512-pixel Potsdam crops and 288-pixel Vaihingen crops, a 50/50
 dataset cycle, train-only class-aware sampling, synchronized geometry, optical-only
 radiometry, and separate deterministic validation grids. Checkpoint selection uses
@@ -104,19 +113,22 @@ uses one-sample mixed-precision microbatches with four-step gradient accumulatio
 periodic resumable checkpoints.
 
 Its locked evaluation protocol and exact split manifests are
-[`isprs-dinov3-v1.json`](configs/evaluations/isprs-dinov3-v1.json),
-[`potsdam-dinov3-v1.json`](configs/splits/potsdam-dinov3-v1.json), and
-[`vaihingen-dinov3-v1.json`](configs/splits/vaihingen-dinov3-v1.json). Potsdam has
-no test split; the 17 Vaihingen test scenes stay closed until configuration and
-checkpoint selection are frozen, then are evaluated once. The protocol explicitly
-keeps test labels out of training and selection bundles.
+[`isprs-dinov3-v2.json`](configs/evaluations/isprs-dinov3-v2.json),
+[`potsdam-dinov3-v2.json`](configs/splits/potsdam-dinov3-v2.json), and
+[`vaihingen-dinov3-v1.json`](configs/splits/vaihingen-dinov3-v1.json). The 14 Potsdam and 17 Vaihingen test scenes stay out of checkpoint selection and are
+scored once after the configuration and selected checkpoint are frozen. The protocol explicitly
+keeps test labels out of training and selection bundles. Include test-only DVC
+bundles as separate inputs to the single Kaggle run; the evaluator must not read
+them until it freezes the selected checkpoint.
 
 The JSON is a versioned plan; it does not start training. No pretrained weights or
 Kaggle GPU run have been downloaded or launched. Once the gated DINOv3 access is
 approved, complete the generic training caller and local data/weight preflights, then
 run one full Kaggle job. Do not spend a GPU session on a pilot. Keep test labels out
-of its attached bundles and evaluate them only after the validation-selected
-checkpoint is fixed.
+of its training/validation bundles and evaluate them only after the validation-
+selected checkpoint is fixed. The repository has the shared full-scene evaluation
+API but no complete model-loading training/evaluation runner yet; implement that
+caller before starting the full run.
 
 ## Install locally
 
@@ -162,12 +174,12 @@ mkdir -p \
 
 uv run python scripts/stage_split_label_subset.py \
   --dataset-id isprs-potsdam --asset-name label_participant \
-  --split configs/splits/potsdam-dinov3-v1.json --split-role train \
+  --split configs/splits/potsdam-dinov3-v2.json --split-role train \
   --data-root "$SOURCE_ROOT" \
   --output-dir "$DVC_DATA_ROOT/staging/potsdam-train-labels"
 uv run python scripts/stage_split_label_subset.py \
   --dataset-id isprs-potsdam --asset-name label_eroded \
-  --split configs/splits/potsdam-dinov3-v1.json --split-role validation \
+  --split configs/splits/potsdam-dinov3-v2.json --split-role validation \
   --data-root "$SOURCE_ROOT" \
   --output-dir "$DVC_DATA_ROOT/staging/potsdam-validation-labels"
 uv run python scripts/stage_split_label_subset.py \
@@ -202,9 +214,11 @@ uv run dvc push -r storage
 
 The staging helper copies only manifest-selected labels and prints their hashes; it
 never edits the source dataset. DVC therefore sees exactly 18 Potsdam train labels,
-20 Potsdam validation labels, 12 Vaihingen train labels, and 4 Vaihingen validation
-labels. The 17 Vaihingen post-selection labels stay out of this snapshot. `dvc.yaml`
-rebuilds SHA-256 catalogs,
+6 Potsdam validation labels, 12 Vaihingen train labels, and 4 Vaihingen validation
+labels in the default training/validation bundles. The 14 Potsdam challenge-test
+references are present in its versioned source assets, but remain out of that bundle.
+Vaihingen's 17 post-selection references remain outside the default DVC snapshot.
+`dvc.yaml` rebuilds SHA-256 catalogs,
 validates alignment and label quality for the active train/validation scenes, and
 exports bundles with only their split-specific labels. `import-url` freezes the
 selected source files into the DVC cache; the absolute local source path in each
@@ -212,6 +226,32 @@ selected source files into the DVC cache; the absolute local source path in each
 own cache and a remote containing the pushed objects, then run `dvc pull -r storage`
 before `dvc repro`. The committed DVC config uses hardlinks with copy fallback so
 resolved raster paths remain inside the data root.
+
+For a full run, materialize the held-out scenes as separate bundles through
+`pipelines/evaluation/dvc.yaml`. The Potsdam stage uses the already versioned
+eroded references. Before running the Vaihingen stage, stage its 17 test references
+and refresh the eroded-label import with the existing four validation references:
+
+```bash
+uv run python scripts/stage_split_label_subset.py \
+  --dataset-id isprs-vaihingen --asset-name label_eroded \
+  --split configs/splits/vaihingen-dinov3-v1.json --split-role test \
+  --data-root "$SOURCE_ROOT" \
+  --output-dir "$DVC_DATA_ROOT/staging/vaihingen-test-labels"
+mkdir -p "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels"
+cp -R "$DVC_DATA_ROOT/staging/vaihingen-validation-labels/." \
+  "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels/"
+cp -R "$DVC_DATA_ROOT/staging/vaihingen-test-labels/." \
+  "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels/"
+uv run dvc import-url --force \
+  "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels" \
+  data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+uv run dvc repro catalog_vaihingen
+```
+
+Then target the desired evaluation bundle stage. Keep both test bundles separate
+from the training/validation bundles; the single-run Kaggle evaluator must not
+score them until checkpoint selection is frozen.
 
 For the one full Kaggle run, package the two verified DVC bundles and the pure-Python
 wheel into one private Kaggle Dataset version. Prepare those inputs without starting
@@ -383,8 +423,8 @@ weights unless the caller explicitly invokes `from_pretrained`.
 
 The legacy five-channel Potsdam settings remain in
 `configs/training/potsdam-dinov3-multimodal-v1.json`. The new joint IRRG plan is
-`configs/training/isprs-dinov3-joint-v1.json`; it follows the updated 18/20 Potsdam
-split and the separate 12/4/17 Vaihingen split. No training has been run. The
+`configs/training/isprs-dinov3-joint-v2.json`; it follows the benchmark-aligned
+18/6/14 Potsdam split and the separate 12/4/17 Vaihingen split. No training has been run. The
 five-channel nDSM view still requires verified decoding and coregistration evidence.
 
 To construct the optional augmenter and model after installing the relevant extras:

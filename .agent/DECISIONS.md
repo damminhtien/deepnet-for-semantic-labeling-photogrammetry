@@ -54,3 +54,13 @@ The user explicitly authorized pushing all commits on local `master`, including 
 ## 2026-10-20: Persist cloud reruns outside ephemeral runtimes
 
 Write Colab run artifacts into a unique subfolder of the existing project Drive folder while training proceeds; keep the latest resumable checkpoint and hash-verified logs/manifests there and copy them to local project Data. Kaggle SAM remains a separate job and consumes the fixed Potsdam dataset plus a small private source-code dataset so its imports are present in `/kaggle/input` without re-uploading the multi-gigabyte image dataset. Keep Kaggle outputs local only; do not upload them to Drive.
+
+## 2026-10-22: Align the active Potsdam evaluation with the ISPRS split
+
+Use the 24 Potsdam scenes with released references as the train/internal-validation pool and preserve the 14 challenge-heldout tiles as test. ISPRS does not prescribe the internal validation membership; this project keeps its fixed 18/6 assignment within the 24 labeled scenes. Keep test references out of train/validation bundles and checkpoint selection, then evaluate once after the selected checkpoint is frozen. Report the no-boundary table metrics (F1 for classes 0–4 and overall accuracy), per-tile and accumulated confusion matrices, and supplemental all-class metrics. Keep protocol v1 unchanged and make v2 the active plan. Describe local results as benchmark-aligned; the locally available eroded references have not been independently proven identical to the organizers' hidden files.
+
+Keep the normal `dvc.yaml` graph restricted to train/validation. Use the opt-in
+`pipelines/evaluation/dvc.yaml` for separate test-only bundles so the test loader can
+be isolated during model selection. The complete model-loading training/evaluation
+caller is not implemented; the full run must not start until it can score each test
+set once and save the locked metrics and confusion matrices.
