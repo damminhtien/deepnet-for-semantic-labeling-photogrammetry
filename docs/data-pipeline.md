@@ -113,8 +113,9 @@ Set `DEEPNET_DATA_ROOT` to the materialized input directory. The analysis reads 
 versioned catalogs and full-scene quality reports without modifying source rasters,
 then evaluates only the train and validation roles in the selected split. It reports
 per-scene asset coverage and raster metadata, explicit alignment evidence, full-scene
-label counts, deterministic IRRG histograms, and aligned before/after augmentation
-examples. It saves tables and figures under `DEEPNET_ARTIFACT_ROOT`, outside Git.
+label counts and IRRG histograms, auxiliary elevation checks, and aligned
+before/after augmentation examples. It saves tables and figures under
+`DEEPNET_ARTIFACT_ROOT`, outside Git.
 
 Open the runnable
 [`notebooks/data_eda_augmentation.ipynb`](../notebooks/data_eda_augmentation.ipynb)
@@ -157,6 +158,48 @@ of 69.88. Tied colors or colors farther than the configured tolerance still fail
 The official six-class palette and ignored black boundaries are documented by
 [ISPRS](https://isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx).
 
+### DINOv3 split and evaluation lock
+
+The joint DINOv3 run uses the versioned [evaluation protocol](../configs/evaluations/isprs-dinov3-v1.json)
+and its two [Potsdam](../configs/splits/potsdam-dinov3-v1.json) and
+[Vaihingen](../configs/splits/vaihingen-dinov3-v1.json) split manifests. The protocol
+binds each manifest by ID, version, and canonical content hash. It also binds the
+training plan to SHA-256
+`b5e170e4f1192b587a6d97f8db798c5fcbc0bc6d07edadd4c4a006f394df7124`; the EDA
+notebook refuses to run if that plan changes without updating the protocol.
+
+Exact scene membership is:
+
+- **Potsdam train (18):** `2_10`, `2_11`, `2_12`, `3_10`, `3_11`, `5_10`, `5_12`,
+  `6_10`, `6_11`, `6_7`, `6_8`, `6_9`, `7_10`, `7_11`, `7_12`, `7_7`, `7_8`, `7_9`.
+- **Potsdam validation (20):** `2_13`, `2_14`, `3_12`, `3_13`, `3_14`, `4_10`,
+  `4_11`, `4_12`, `4_13`, `4_14`, `4_15`, `5_11`, `5_13`, `5_14`, `5_15`,
+  `6_12`, `6_13`, `6_14`, `6_15`, `7_13`. Potsdam has no test scenes in this run.
+- **Vaihingen train (12):** `3`, `5`, `13`, `15`, `17`, `21`, `23`, `26`, `30`,
+  `32`, `34`, `37`.
+- **Vaihingen validation (4):** `1`, `7`, `11`, `28`.
+- **Vaihingen post-selection test (17):** `2`, `4`, `6`, `8`, `10`, `12`, `14`,
+  `16`, `20`, `22`, `24`, `27`, `29`, `31`, `33`, `35`, `38`.
+
+Checkpoint selection uses the unweighted mean of the Potsdam and Vaihingen
+validation mIoU values. Report each dataset's metrics and confusion matrix
+separately; sum confusion matrices only within a dataset, and never pool pixels
+across datasets. Validation uses full-scene deterministic grids with overlap-weighted
+logit aggregation. Ignore ID 6 and invalid pixels are excluded. Fitted statistics
+use training scenes only, and validation/test augmentation is disabled.
+
+The 17 Vaihingen test scenes remain unopened during training and model selection.
+Run their eroded-label evaluation once after the final training configuration and
+selected checkpoint are frozen and recorded in the run manifest. This measures
+post-selection cross-dataset transfer for this run; related scenes appeared in
+other research, so describe the result accordingly. The split is scene-disjoint, not
+region-disjoint, and neighboring tiles may share geographic context. Do not claim
+region-independent generalization from this protocol. The current joint DINOv3 plan
+uses the three IRRG bands. The separate
+[`potsdam-dinov3-multimodal-v1` plan](../configs/training/potsdam-dinov3-multimodal-v1.json)
+uses the older `potsdam-legacy-v1` split and is not covered by this joint-run
+protocol; it remains gated on the DSM/nDSM audit below.
+
 ### Frozen EDA snapshot
 
 The current analysis was generated against DVC lock SHA-256
@@ -177,23 +220,66 @@ more concentrated: it appears in 4/12 training scenes and 1/4 validation scenes.
 This supports the configured 30% class-aware component for training windows; it
 does not justify changing the natural validation distribution.
 
-The optical profile uses two deterministic 256 x 256 windows from every active scene
-in each role. It is a scene-stratified sample, not a full-raster histogram. Values
-below are sampled p05 / median / p95 digital numbers, in source band order IR, red,
-green.
+The 2026-10-22 optical profile scans every train and validation IRRG pixel in native
+raster blocks. It covers all 38 Potsdam scenes (18 train, 20 validation) and the 16
+Vaihingen scenes in this split (12 train, 4 validation); no Vaihingen test raster or
+label was read. Histograms and quantiles are exact for uint8 values. Every scanned
+IRRG pixel passed its raster mask and finite-value checks.
 
-| Dataset / role | IR | Red | Green |
-| --- | --- | --- | --- |
-| Potsdam train | 47 / 96 / 163 | 49 / 83 / 150 | 42 / 75 / 150 |
-| Potsdam validation | 44 / 97 / 169 | 46 / 87 / 169 | 40 / 78 / 165 |
-| Vaihingen train | 41 / 122 / 208 | 37 / 72 / 149 | 36 / 76 / 139 |
-| Vaihingen validation | 41 / 106 / 211 | 42 / 71 / 162 | 39 / 73 / 142 |
+The table reports pooled band means and medians plus the range of per-scene medians
+in source band order IR, red, green. The per-scene CSV retains exact minima,
+percentiles, standard deviations, valid-pixel counts, and full 256-bin histograms.
+
+| Dataset / role | Scenes / pixels per band | Mean IR / red / green | Pooled median IR / red / green | Per-scene median range IR / red / green |
+| --- | ---: | --- | --- | --- |
+| Potsdam train | 18 / 648,000,000 | 98.71 / 92.57 / 85.55 | 95 / 85 / 77 | 79–119 / 78–91 / 71–86 |
+| Potsdam validation | 20 / 720,000,000 | 96.68 / 92.52 / 86.25 | 92 / 86 / 79 | 80–105 / 78–94 / 71–88 |
+| Vaihingen train | 12 / 58,554,459 | 121.39 / 82.01 / 80.86 | 121 / 72 / 76 | 98–150 / 58–101 / 61–97 |
+| Vaihingen validation | 4 / 19,533,347 | 114.82 / 79.61 / 78.70 | 112 / 71 / 74 | 101–118 / 64–73 / 70–76 |
+
+Vaihingen's IR channel is brighter and more variable than Potsdam's in this split;
+Vaihingen's red channel is lower. The per-scene ranges also show substantial
+within-dataset variation, especially in Vaihingen training scenes. Keep these
+differences visible in view-specific normalization and diagnostics; do not derive
+training statistics from validation pixels. The full outputs include
+`irrg-band-statistics.csv`, `irrg-per-scene-band-statistics.csv`, and
+`irrg-full-histograms.csv` under the external EDA artifact directory.
 
 The alignment report passed all 54 active image/label scene pairs. Potsdam IRRG has
 CRS/affine metadata while its label TIFFs are pixel-local and use source-attested
 same-scene pairing. Vaihingen inputs and labels are pixel-local and use explicit
 ISPRS image/label pair evidence. Matching dimensions alone are never the acceptance
 criterion.
+
+### Potsdam DSM/nDSM alignment and value audit
+
+The notebook audited all 38 Potsdam train/validation DSM and configured lastools
+nDSM files from `DEEPNET_AUX_DATA_ROOT`; it hashed each file and scanned its values
+by native blocks. These 76 elevation files are not in the DVC input snapshot (0/76
+found under `data/raw/inputs`), so their hashes and audit outputs are provenance
+records, not DVC-managed source versions.
+
+| Asset | Result against the matching IRRG reference grid | Scene match vs pixel-grid evidence |
+| --- | --- | --- |
+| DSM GeoTIFF | 37/38 have matching EPSG:32633 CRS, affine transform, width, and height (6000 x 6000). | Scene `3_13` has the same CRS and affine origin/resolution but is only 5999 x 6000; one 6000-pixel column is missing. It is not a complete grid match. |
+| nDSM JPEG | 37/38 have the same 6000 x 6000 dimensions; `3_13` is 5999 x 6000. | All files lack CRS/affine metadata and the catalog has no co-registration evidence. Matching the scene name and shape does not prove pixel alignment. |
+
+The DSM TIFFs have no embedded vertical-unit metadata; the dataset config describes
+them as metres, but the source unit and vertical datum still need authoritative
+confirmation. Full scans found DSM values from -35.75 in train scene `7_10` to
+106.171 in validation scene `7_13`. These extrema need source review before choosing
+elevation clipping or normalization. DSM per-scene mean/min/max and standard
+deviation use all valid pixels; its p01–p99 values use a deterministic,
+block-stratified sample of about 100,000 pixels per scene. The nDSM JPEG stores
+uint8 digital numbers from 0 to 255; its histograms and quantiles are exact encoded
+value summaries, not metric heights.
+
+Do not train the five-channel view from these files yet. First add immutable DSM and
+nDSM sources to DVC with checksums and source provenance; restore the full `3_13`
+rasters or explicitly record a supported common-coverage mask; obtain authoritative
+nDSM decoding and co-registration evidence; then validate all grids and fit elevation
+statistics on training scenes only. The joint DINOv3 configuration currently uses
+IRRG only, so it does not consume the unverified elevation channels.
 
 ### Augmentation policy and audit
 

@@ -2,12 +2,15 @@
 # # ISPRS data EDA and augmentation review
 #
 # This reproducible, cell-oriented analysis reads the DVC-prepared catalogs and
-# train/validation quality reports. It never modifies source rasters, fits
-# normalization on validation data, or scores the Vaihingen post-selection scenes.
+# train/validation quality reports. It scans full-scene IRRG in raster blocks and
+# optionally audits Potsdam DSM/nDSM files from a configured auxiliary root. It
+# never modifies source rasters, fits normalization on validation data, or reads
+# the Vaihingen post-selection scenes.
 #
 # Before running, prepare the DVC inputs and run `dvc repro`. Set
-# `DEEPNET_DATA_ROOT` to the materialized `data/raw/inputs` directory and
-# `DEEPNET_ARTIFACT_ROOT` to an output directory outside the repository.
+# `DEEPNET_DATA_ROOT` to the materialized DVC input directory. Set
+# `DEEPNET_AUX_DATA_ROOT` to the directory containing the Potsdam DSM/nDSM source
+# folders when those assets are available. Set `DEEPNET_ARTIFACT_ROOT` outside Git.
 
 # %%
 from __future__ import annotations
@@ -18,7 +21,6 @@ import os
 import platform
 import subprocess
 import sys
-from collections import defaultdict
 from dataclasses import replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -31,7 +33,6 @@ import pandas as pd
 import rasterio
 from IPython.display import display
 from matplotlib.colors import ListedColormap
-from rasterio.windows import Window as RasterWindow
 
 from deepnet.data.augmentations import AlbumentationsAugmenter
 from deepnet.data.catalog import (
@@ -42,9 +43,9 @@ from deepnet.data.catalog import (
     load_scene_catalog,
     load_split_manifest,
 )
-from deepnet.data.contracts import SceneRecord, WindowSpec, canonical_hash
+from deepnet.data.contracts import GridSpec, SceneRecord, WindowSpec, canonical_hash
 from deepnet.data.preprocessing import decode_rgb_labels
-from deepnet.data.raster import RasterioSceneReader
+from deepnet.data.raster import RasterioSceneReader, sha256_file
 
 
 def _find_repository_root() -> Path:
@@ -66,6 +67,9 @@ DATA_ROOT = (
     Path(os.environ.get("DEEPNET_DATA_ROOT", REPOSITORY_ROOT / "data/raw/inputs"))
     .expanduser()
     .resolve()
+)
+AUX_DATA_ROOT = (
+    Path(os.environ.get("DEEPNET_AUX_DATA_ROOT", DATA_ROOT)).expanduser().resolve()
 )
 PREPARED_ROOT = REPOSITORY_ROOT / "data/prepared"
 ARTIFACT_ROOT = (
@@ -98,8 +102,9 @@ ARTIFACT_ROOT.mkdir(parents=True, exist_ok=False)
 #
 # Catalog hashes and DVC quality reports provide the data provenance for this
 # notebook. Potsdam's 20-scene validation role includes the 14 scenes held out in a
-# separate earlier experiment. Vaihingen's official 17-scene cohort stays outside
-# this DINOv3 run's model selection.
+# separate earlier experiment. The 17 official Vaihingen scenes remain closed until
+# the DINOv3 config and selected checkpoint are frozen. A versioned evaluation
+# protocol checks both split hashes before analysis begins.
 
 # %%
 DATASET_CONFIGS = {
@@ -114,6 +119,11 @@ DATASET_CONFIGS = {
         "crop_size": 288,
     },
 }
+EVALUATION_PROTOCOL_PATH = CONFIG_ROOT / "evaluations" / "isprs-dinov3-v1.json"
+EVALUATION_PROTOCOL = json.loads(EVALUATION_PROTOCOL_PATH.read_text(encoding="utf-8"))
+TRAINING_CONFIG_PATH = CONFIG_ROOT / "training" / "isprs-dinov3-joint-v1.json"
+TRAINING_CONFIG = json.loads(TRAINING_CONFIG_PATH.read_text(encoding="utf-8"))
+TRAINING_CONFIG_SHA256 = hashlib.sha256(TRAINING_CONFIG_PATH.read_bytes()).hexdigest()
 
 PREPROCESSING = load_preprocessing_spec(
     "isprs-canonical-v2", CONFIG_ROOT / "preprocessing"
@@ -129,6 +139,28 @@ AUGMENTER = AlbumentationsAugmenter(
     AUGMENTATION,
     ignore_label=PREPROCESSING.ignore_label,
 )
+if EVALUATION_PROTOCOL["status"] != "locked":
+    raise RuntimeError("DINOv3 evaluation protocol must be locked before EDA")
+if EVALUATION_PROTOCOL["training_config"]["sha256"] != TRAINING_CONFIG_SHA256:
+    raise RuntimeError("Training config differs from the configuration locked for EDA")
+if TRAINING_CONFIG["evaluation_protocol_id"] != (
+    f"{EVALUATION_PROTOCOL['protocol_id']}-v{EVALUATION_PROTOCOL['version']}"
+):
+    raise RuntimeError("Training config references a different evaluation protocol")
+if (
+    TRAINING_CONFIG["execution"]["selection_metric"]
+    != (EVALUATION_PROTOCOL["model_selection"]["metric"])
+):
+    raise RuntimeError("Training selection metric differs from the locked protocol")
+if (
+    TRAINING_CONFIG["execution"]["selection_aggregation"]
+    != (EVALUATION_PROTOCOL["model_selection"]["aggregation"])
+):
+    raise RuntimeError(
+        "Training selection aggregation differs from the locked protocol"
+    )
+if PREPROCESSING.ignore_label != EVALUATION_PROTOCOL["metrics"]["ignore_label"]:
+    raise RuntimeError("The evaluation ignore label differs from preprocessing")
 GEOMETRY_ONLY_AUGMENTER = AlbumentationsAugmenter(
     DOMAIN,
     MODEL_INPUT,
@@ -157,6 +189,20 @@ for display_name, settings in DATASET_CONFIGS.items():
     scenes = load_scene_catalog(catalog_path, expected_dataset_id=dataset_id)
     split = load_split_manifest(split_path)
     quality = json.loads(quality_path.read_text(encoding="utf-8"))
+    protocol_split = EVALUATION_PROTOCOL["split_manifests"][dataset_id]
+
+    if split.split_id != protocol_split["split_id"]:
+        raise RuntimeError(
+            f"Evaluation protocol uses a different split for {dataset_id}"
+        )
+    if split.version != protocol_split["version"]:
+        raise RuntimeError(
+            f"Evaluation protocol uses a different split version for {dataset_id}"
+        )
+    if split.content_hash != protocol_split["content_hash"]:
+        raise RuntimeError(
+            f"Split hash differs from the locked protocol for {dataset_id}"
+        )
 
     if catalog.get("hash_status") != "complete":
         raise RuntimeError(f"Catalog hashes are incomplete for {dataset_id}")
@@ -211,6 +257,11 @@ display(
         ]
     )
 )
+
+if set(EVALUATION_PROTOCOL["model_selection"]["datasets"]) != {
+    settings["dataset_id"] for settings in DATASET_CONFIGS.values()
+}:
+    raise RuntimeError("Evaluation protocol and training datasets do not match")
 display(
     pd.DataFrame(
         [
@@ -233,15 +284,19 @@ display(
 #
 # Review band order, shapes, data types, NoData metadata, CRS/affine availability,
 # checksums, and source-backed alignment records. The report distinguishes a
-# pixel-local pairing from geographic registration. The first DINOv3 view uses IRRG
-# only; the unverified Potsdam nDSM is intentionally not a model input.
+# pixel-local pairing from geographic registration. The configured DINOv3 view uses
+# IRRG only; the optional Potsdam DSM/nDSM audit below does not add those assets to
+# the model input.
 
 # %%
 asset_rows = []
 scene_lookup: dict[str, dict[str, SceneRecord]] = {}
 for display_name, scenes in SCENES.items():
     scene_lookup[display_name] = {scene.scene_id: scene for scene in scenes}
-    for scene in scenes:
+    split = SPLITS[display_name]
+    analysis_scene_ids = set(split.train_scene_ids) | set(split.validation_scene_ids)
+    for scene_id in sorted(analysis_scene_ids):
+        scene = scene_lookup[display_name][str(scene_id)]
         for asset_name, asset in scene.assets:
             asset_path = DATA_ROOT / asset.uri
             asset_rows.append(
@@ -464,159 +519,648 @@ fig.savefig(ARTIFACT_ROOT / "per-scene-class-balance.png", dpi=160)
 plt.show()
 
 # %% [markdown]
-# ## IRRG value distributions from deterministic training and validation windows
+# ## Full-scene IRRG value distributions
 #
-# This profile uses a fixed seed and two windows from every active scene in each
-# role. It is a scene-stratified sample, not a full-raster histogram. Any fitted
-# normalization statistics must still be calculated from training scenes alone by
-# `fit-statistics`; validation pixels are never used to fit normalization. Optical
-# source values must conform to the declared 8-bit range before any model-view
-# scaling or training augmentation.
+# Every pixel in every train and validation IRRG raster is scanned using native
+# raster blocks. Histograms and quantiles are exact for the declared uint8 bands.
+# The 17 Vaihingen post-selection scenes are excluded. These diagnostics compare
+# distributions; fitted normalization statistics still come from train only.
+
 
 # %%
-SAMPLE_SIZE = 256
-WINDOWS_PER_SCENE = 2
-rng = np.random.default_rng(RANDOM_SEED)
-sampled_values: dict[tuple[str, str, str], list[np.ndarray]] = defaultdict(list)
-sampled_scene_values: dict[tuple[str, str, str, str], list[np.ndarray]] = defaultdict(
-    list
-)
-window_rows = []
+def _histogram_summary(
+    histogram: np.ndarray,
+    *,
+    total_pixels: int,
+) -> dict[str, float | int]:
+    """Summarize a complete uint8 histogram using its empirical distribution."""
+    counts = np.asarray(histogram, dtype=np.int64)
+    valid_pixels = int(counts.sum())
+    if valid_pixels == 0:
+        return {
+            "valid_pixels": 0,
+            "invalid_fraction": 1.0,
+            "min": float("nan"),
+            "p01": float("nan"),
+            "p05": float("nan"),
+            "p50": float("nan"),
+            "p95": float("nan"),
+            "p99": float("nan"),
+            "max": float("nan"),
+            "mean": float("nan"),
+            "std": float("nan"),
+            "zero_fraction": float("nan"),
+            "max_value_fraction": float("nan"),
+        }
 
+    digital_numbers = np.arange(counts.size, dtype=np.float64)
+    cumulative = np.cumsum(counts, dtype=np.int64)
+
+    def quantile(value: float) -> int:
+        rank = max(1, int(np.ceil(value * valid_pixels)))
+        return int(np.searchsorted(cumulative, rank, side="left"))
+
+    mean = float(np.dot(digital_numbers, counts) / valid_pixels)
+    variance = float(np.dot(np.square(digital_numbers - mean), counts) / valid_pixels)
+    nonzero_bins = np.flatnonzero(counts)
+    return {
+        "valid_pixels": valid_pixels,
+        "invalid_fraction": float(1 - valid_pixels / max(total_pixels, 1)),
+        "min": int(nonzero_bins[0]),
+        "p01": quantile(0.01),
+        "p05": quantile(0.05),
+        "p50": quantile(0.50),
+        "p95": quantile(0.95),
+        "p99": quantile(0.99),
+        "max": int(nonzero_bins[-1]),
+        "mean": mean,
+        "std": float(np.sqrt(max(variance, 0.0))),
+        "zero_fraction": float(counts[0] / valid_pixels),
+        "max_value_fraction": float(counts[-1] / valid_pixels),
+    }
+
+
+irrg_scene_histograms: dict[tuple[str, str, str], np.ndarray] = {}
+irrg_scene_rows = []
 for display_name in DATASET_CONFIGS:
     split = SPLITS[display_name]
-    scenes_by_id = scene_lookup[display_name]
     for role in ("train", "validation"):
-        scene_ids = sorted(split.scenes_for(role))
-        for scene_id in scene_ids:
-            scene = scenes_by_id[str(scene_id)]
+        for scene_id in sorted(split.scenes_for(role)):
+            scene = scene_lookup[display_name][str(scene_id)]
             asset = scene.asset_map()["irrg"]
             path = DATA_ROOT / asset.uri
             with rasterio.open(path) as source:
-                if source.width < SAMPLE_SIZE or source.height < SAMPLE_SIZE:
-                    raise ValueError(f"IRRG scene is too small to sample: {scene_id}")
-                for _ in range(WINDOWS_PER_SCENE):
-                    row = int(rng.integers(0, source.height - SAMPLE_SIZE + 1))
-                    col = int(rng.integers(0, source.width - SAMPLE_SIZE + 1))
-                    raster_window = RasterWindow(col, row, SAMPLE_SIZE, SAMPLE_SIZE)
-                    pixels = source.read(window=raster_window, masked=True)
-                    mask = source.read_masks(window=raster_window).all(axis=0) > 0
-                    finite = np.isfinite(pixels.data).all(axis=0)
-                    valid = mask & finite
-                    if np.any(pixels.data[:, valid] < 0) or np.any(
-                        pixels.data[:, valid] > 255
-                    ):
-                        raise ValueError(
-                            f"IRRG values fall outside [0, 255] in scene {scene_id}"
-                        )
-                    for band_index, band_name in enumerate(asset.bands):
-                        values = pixels.data[band_index][valid]
-                        if values.size:
-                            sampled_values[(display_name, role, band_name)].append(
-                                values
+                if any(dtype != "uint8" for dtype in source.dtypes):
+                    raise ValueError(
+                        f"IRRG must be uint8 for exact histograms: {scene.scene_id}"
+                    )
+                if source.count != len(asset.bands):
+                    raise ValueError(
+                        f"IRRG band count differs from catalog: {scene.scene_id}"
+                    )
+
+                histograms = np.zeros((source.count, 256), dtype=np.int64)
+                for _, raster_window in source.block_windows(1):
+                    pixels = source.read(window=raster_window)
+                    masks = source.read_masks(window=raster_window) > 0
+                    for band_index in range(source.count):
+                        values = pixels[band_index]
+                        valid = masks[band_index] & np.isfinite(values)
+                        valid_values = values[valid]
+                        if valid_values.size and (
+                            valid_values.min() < 0 or valid_values.max() > 255
+                        ):
+                            raise ValueError(
+                                f"IRRG values fall outside [0, 255] in {scene.scene_id}"
                             )
-                            sampled_scene_values[
-                                (display_name, role, str(scene_id), band_name)
-                            ].append(values)
-                    window_rows.append(
+                        histograms[band_index] += np.bincount(
+                            valid_values.astype(np.uint8), minlength=256
+                        )
+
+                total_pixels = source.width * source.height
+                for band_index, band_name in enumerate(asset.bands):
+                    histogram = histograms[band_index]
+                    irrg_scene_histograms[
+                        (display_name, role, str(scene_id), band_name)
+                    ] = histogram
+                    irrg_scene_rows.append(
                         {
                             "dataset": display_name,
                             "role": role,
                             "scene_id": str(scene_id),
-                            "row": row,
-                            "col": col,
-                            "size": SAMPLE_SIZE,
-                            "valid_fraction": float(valid.mean()),
+                            "band": band_name,
+                            "total_pixels": total_pixels,
+                            **_histogram_summary(histogram, total_pixels=total_pixels),
                         }
                     )
 
+scene_band_statistics = pd.DataFrame(irrg_scene_rows)
 band_rows = []
-for (display_name, role, band_name), arrays in sorted(sampled_values.items()):
-    values = np.concatenate(arrays)
-    quantiles = np.quantile(values, [0.01, 0.05, 0.5, 0.95, 0.99])
-    band_rows.append(
-        {
-            "dataset": display_name,
-            "role": role,
-            "band": band_name,
-            "scenes_sampled": len(
+irrg_histogram_rows = []
+for display_name in DATASET_CONFIGS:
+    split = SPLITS[display_name]
+    for role in ("train", "validation"):
+        scene_ids = sorted(split.scenes_for(role))
+        for band_name in ("ir", "red", "green"):
+            scene_histograms = [
+                irrg_scene_histograms[(display_name, role, str(scene_id), band_name)]
+                for scene_id in scene_ids
+            ]
+            pooled_histogram = np.sum(scene_histograms, axis=0, dtype=np.int64)
+            band_rows.append(
                 {
-                    scene_id
-                    for dataset, sample_role, scene_id, sampled_band in (
-                        sampled_scene_values
-                    )
-                    if (dataset, sample_role, sampled_band)
-                    == (display_name, role, band_name)
+                    "dataset": display_name,
+                    "role": role,
+                    "band": band_name,
+                    "scenes_scanned": len(scene_ids),
+                    "total_pixels": int(
+                        scene_band_statistics.loc[
+                            (scene_band_statistics["dataset"] == display_name)
+                            & (scene_band_statistics["role"] == role)
+                            & (scene_band_statistics["band"] == band_name),
+                            "total_pixels",
+                        ].sum()
+                    ),
+                    **_histogram_summary(
+                        pooled_histogram,
+                        total_pixels=int(
+                            scene_band_statistics.loc[
+                                (scene_band_statistics["dataset"] == display_name)
+                                & (scene_band_statistics["role"] == role)
+                                & (scene_band_statistics["band"] == band_name),
+                                "total_pixels",
+                            ].sum()
+                        ),
+                    ),
                 }
-            ),
-            "windows_sampled": len(arrays),
-            "samples": int(values.size),
-            "min": float(values.min()),
-            "p01": float(quantiles[0]),
-            "p05": float(quantiles[1]),
-            "p50": float(quantiles[2]),
-            "p95": float(quantiles[3]),
-            "p99": float(quantiles[4]),
-            "max": float(values.max()),
-            "mean": float(values.mean()),
-            "std": float(values.std()),
-            "zero_fraction": float(np.mean(values == 0)),
-            "max_value_fraction": float(np.mean(values == np.iinfo(values.dtype).max))
-            if np.issubdtype(values.dtype, np.integer)
-            else float("nan"),
-        }
-    )
-band_statistics = pd.DataFrame(band_rows)
-display(band_statistics)
+            )
+            for scene_id, histogram in zip(scene_ids, scene_histograms, strict=True):
+                irrg_histogram_rows.extend(
+                    {
+                        "dataset": display_name,
+                        "role": role,
+                        "scene_id": str(scene_id),
+                        "band": band_name,
+                        "digital_number": digital_number,
+                        "pixel_count": int(count),
+                    }
+                    for digital_number, count in enumerate(histogram)
+                )
 
-scene_band_rows = []
-for (display_name, role, scene_id, band_name), arrays in sorted(
-    sampled_scene_values.items()
-):
-    values = np.concatenate(arrays)
-    quantiles = np.quantile(values, [0.05, 0.5, 0.95])
-    scene_band_rows.append(
-        {
-            "dataset": display_name,
-            "role": role,
-            "scene_id": scene_id,
-            "band": band_name,
-            "samples": int(values.size),
-            "p05": float(quantiles[0]),
-            "p50": float(quantiles[1]),
-            "p95": float(quantiles[2]),
-            "mean": float(values.mean()),
-            "std": float(values.std()),
-            "zero_fraction": float(np.mean(values == 0)),
-        }
+band_statistics = pd.DataFrame(band_rows)
+irrg_full_histograms = pd.DataFrame(irrg_histogram_rows)
+display(band_statistics)
+display(
+    scene_band_statistics.sort_values(
+        ["dataset", "role", "band", "p50"], ascending=[True, True, True, False]
     )
-scene_band_statistics = pd.DataFrame(scene_band_rows)
-display(scene_band_statistics.head(12))
+    .groupby(["dataset", "role", "band"], as_index=False)
+    .head(1)
+)
 
 fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex=True, constrained_layout=True)
 for row_index, display_name in enumerate(DATASET_CONFIGS):
     for column_index, band_name in enumerate(("ir", "red", "green")):
         axis = axes[row_index, column_index]
         for role, color in (("train", "#4472C4"), ("validation", "#ED7D31")):
-            arrays = sampled_values.get((display_name, role, band_name), [])
-            if arrays:
-                values = np.concatenate(arrays)
-                axis.hist(
-                    values,
-                    bins=np.arange(-0.5, 256.5, 1),
-                    density=True,
-                    histtype="step",
-                    linewidth=1.2,
-                    label=role,
-                    color=color,
-                )
-        axis.set_title(f"{display_name} · {band_name}")
+            split = SPLITS[display_name]
+            histogram = np.sum(
+                [
+                    irrg_scene_histograms[
+                        (display_name, role, str(scene_id), band_name)
+                    ]
+                    for scene_id in sorted(split.scenes_for(role))
+                ],
+                axis=0,
+                dtype=np.int64,
+            )
+            axis.plot(
+                np.arange(histogram.size),
+                histogram / max(int(histogram.sum()), 1),
+                label=role,
+                color=color,
+            )
+        axis.set_title(f"{display_name} · {band_name} · all pixels")
         axis.set_xlabel("source digital number")
-        axis.set_ylabel("density")
+        axis.set_ylabel("pixel fraction")
         axis.grid(alpha=0.2)
         axis.legend()
 fig.savefig(ARTIFACT_ROOT / "irrg-training-validation-histograms.png", dpi=160)
 plt.show()
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 8), constrained_layout=True)
+for row_index, display_name in enumerate(DATASET_CONFIGS):
+    for column_index, band_name in enumerate(("ir", "red", "green")):
+        axis = axes[row_index, column_index]
+        subset = scene_band_statistics[
+            (scene_band_statistics["dataset"] == display_name)
+            & (scene_band_statistics["band"] == band_name)
+        ]
+        for role, marker, color in (
+            ("train", "o", "#4472C4"),
+            ("validation", "s", "#ED7D31"),
+        ):
+            role_rows = subset[subset["role"] == role].reset_index(drop=True)
+            positions = np.arange(len(role_rows)) + (0 if role == "train" else 0.15)
+            axis.errorbar(
+                positions,
+                role_rows["p50"],
+                yerr=np.vstack(
+                    [
+                        role_rows["p50"] - role_rows["p05"],
+                        role_rows["p95"] - role_rows["p50"],
+                    ]
+                ),
+                fmt=marker,
+                markersize=3,
+                capsize=1,
+                color=color,
+                label=role,
+            )
+        axis.set_title(f"{display_name} · {band_name} · scene percentiles")
+        axis.set_ylabel("digital number (p05–p95; center=p50)")
+        axis.grid(axis="y", alpha=0.2)
+        axis.legend()
+fig.savefig(ARTIFACT_ROOT / "irrg-per-scene-percentiles.png", dpi=160)
+plt.show()
+
+# %% [markdown]
+# ## Potsdam DSM and nDSM source audit
+#
+# These optional assets are read from `DEEPNET_AUX_DATA_ROOT`. The current DVC
+# snapshot does not contain them, so each source file is SHA-256 recorded in the
+# output manifest. Only train and validation scenes are scanned. DSM alignment is
+# accepted only when CRS and affine metadata match the IRRG reference grid. Equal
+# nDSM/JPEG dimensions do not establish registration; nDSM remains excluded from
+# the model input until independent coregistration evidence is supplied.
+
+# %%
+POTSDAM_SOURCE_CONFIG = json.loads(
+    (CONFIG_ROOT / "datasets" / "isprs-potsdam.json").read_text(encoding="utf-8")
+)
+POTSDAM_MULTIMODAL_CONFIG = json.loads(
+    (CONFIG_ROOT / "domains" / "isprs-potsdam-multimodal-v1.json").read_text(
+        encoding="utf-8"
+    )
+)
+AUXILIARY_BANDS = {band["name"]: band for band in POTSDAM_MULTIMODAL_CONFIG["bands"]}
+AUXILIARY_ASSETS = ("dsm", "ndsm")
+auxiliary_metadata_rows = []
+auxiliary_alignment_rows = []
+auxiliary_statistics_rows = []
+auxiliary_histogram_rows = []
+
+
+def _auxiliary_path(asset_name: str, scene_id: str) -> tuple[str, Path]:
+    """Resolve a configured Potsdam auxiliary asset for one scene ID."""
+    row, column = (int(value) for value in scene_id.split("_", maxsplit=1))
+    relative_uri = POTSDAM_SOURCE_CONFIG["assets"][asset_name]["path"].format(
+        scene_id=scene_id,
+        row=row,
+        column=column,
+        area=scene_id,
+    )
+    return relative_uri, AUX_DATA_ROOT / relative_uri
+
+
+def _grid_from_raster(source: Any, scene: SceneRecord, asset_name: str) -> GridSpec:
+    """Describe raster metadata without treating an identity transform as evidence."""
+    crs = source.crs.to_string() if source.crs else None
+    affine_values = tuple(float(value) for value in tuple(source.transform)[:6])
+    identity = (1.0, 0.0, 0.0, 0.0, 1.0, 0.0)
+    affine = (
+        affine_values
+        if crs is not None
+        or not np.allclose(affine_values, identity, rtol=0.0, atol=1e-15)
+        else None
+    )
+    grid_id = (
+        scene.reference_grid.grid_id
+        if crs is not None
+        else f"{asset_name}:{scene.scene_id}:unregistered"
+    )
+    return GridSpec(
+        grid_id=grid_id,
+        width=source.width,
+        height=source.height,
+        crs=crs,
+        affine=affine,
+    )
+
+
+def _merge_moments(
+    count: int,
+    mean: float,
+    sum_squared_deviations: float,
+    values: np.ndarray,
+) -> tuple[int, float, float]:
+    """Merge one finite raster block into stable population moments."""
+    block = np.asarray(values, dtype=np.float64)
+    block_count = int(block.size)
+    if block_count == 0:
+        return count, mean, sum_squared_deviations
+    block_mean = float(block.mean())
+    block_m2 = float(np.square(block - block_mean).sum())
+    combined_count = count + block_count
+    delta = block_mean - mean
+    combined_mean = mean + delta * block_count / combined_count
+    combined_m2 = (
+        sum_squared_deviations
+        + block_m2
+        + delta * delta * count * block_count / combined_count
+    )
+    return combined_count, combined_mean, combined_m2
+
+
+def _scan_auxiliary_raster(
+    path: Path,
+    *,
+    asset_name: str,
+    scene: SceneRecord,
+    role: str,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], np.ndarray | None]:
+    """Scan one DSM/nDSM in native blocks and return metadata and full-scene stats."""
+    configured_asset = POTSDAM_SOURCE_CONFIG["assets"][asset_name]
+    band_config = AUXILIARY_BANDS[asset_name]
+    file_hash = sha256_file(path)
+
+    with rasterio.open(path) as source:
+        raster_grid = _grid_from_raster(source, scene, asset_name)
+        reference_grid = scene.reference_grid
+        same_shape = (source.width, source.height) == (
+            reference_grid.width,
+            reference_grid.height,
+        )
+        if raster_grid.same_grid(reference_grid):
+            alignment_status = "verified_metadata_grid_match"
+        elif raster_grid.georeferenced and reference_grid.georeferenced:
+            alignment_status = "georeferenced_grid_mismatch"
+        elif same_shape and configured_asset.get("alignment_evidence"):
+            alignment_status = "source_attested_pixel_local"
+        elif same_shape:
+            alignment_status = "same_shape_only_unverified"
+        else:
+            alignment_status = "unverified_shape_mismatch"
+
+        metadata = {
+            "dataset": "Potsdam",
+            "role": role,
+            "scene_id": scene.scene_id,
+            "asset": asset_name,
+            "relative_uri": str(path.relative_to(AUX_DATA_ROOT)),
+            "driver": source.driver,
+            "width": source.width,
+            "height": source.height,
+            "band_count": source.count,
+            "dtypes": ",".join(source.dtypes),
+            "configured_representation": band_config.get("representation"),
+            "configured_unit": band_config.get("unit"),
+            "file_units": ",".join(unit or "" for unit in source.units),
+            "scales": ",".join(str(value) for value in source.scales),
+            "offsets": ",".join(str(value) for value in source.offsets),
+            "nodata": source.nodata,
+            "crs": raster_grid.crs,
+            "affine": raster_grid.affine,
+            "reference_crs": reference_grid.crs,
+            "reference_affine": reference_grid.affine,
+            "same_shape_as_irrg": same_shape,
+            "dvc_input_snapshot_contains_file": (
+                DATA_ROOT / path.relative_to(AUX_DATA_ROOT)
+            ).is_file(),
+            "file_size_bytes": path.stat().st_size,
+            "sha256": file_hash,
+        }
+        alignment = {
+            "dataset": "Potsdam",
+            "role": role,
+            "scene_id": scene.scene_id,
+            "asset": asset_name,
+            "status": alignment_status,
+            "same_shape_as_irrg": same_shape,
+            "asset_georeferenced": raster_grid.georeferenced,
+            "reference_georeferenced": reference_grid.georeferenced,
+            "alignment_evidence": configured_asset.get("alignment_evidence"),
+        }
+        if source.count != 1:
+            metadata["scan_status"] = "skipped_unexpected_band_count"
+            return metadata, alignment, {}, None
+
+        integer_histogram = (
+            np.zeros(256, dtype=np.int64) if source.dtypes[0] == "uint8" else None
+        )
+        sample_rng = np.random.default_rng(
+            int.from_bytes(
+                hashlib.sha256(
+                    f"{RANDOM_SEED}:{scene.scene_id}:{asset_name}".encode()
+                ).digest()[:8],
+                byteorder="big",
+            )
+        )
+        sample_values = []
+        valid_count = 0
+        invalid_count = 0
+        zero_count = 0
+        minimum = float("inf")
+        maximum = float("-inf")
+        mean = 0.0
+        sum_squared_deviations = 0.0
+        total_pixels = source.width * source.height
+        quantile_sample_limit = 100_000
+
+        for _, raster_window in source.block_windows(1):
+            block = source.read(1, window=raster_window)
+            block_valid = (
+                source.read_masks(1, window=raster_window) > 0
+            ) & np.isfinite(block)
+            values = block[block_valid]
+            invalid_count += int(block.size - values.size)
+            if values.size == 0:
+                continue
+            minimum = min(minimum, float(values.min()))
+            maximum = max(maximum, float(values.max()))
+            zero_count += int(np.count_nonzero(values == 0))
+            valid_count, mean, sum_squared_deviations = _merge_moments(
+                valid_count,
+                mean,
+                sum_squared_deviations,
+                values,
+            )
+            if integer_histogram is not None:
+                integer_histogram += np.bincount(values.astype(np.uint8), minlength=256)
+            else:
+                block_fraction = block.size / total_pixels
+                sample_count = min(
+                    values.size,
+                    max(1, int(round(quantile_sample_limit * block_fraction))),
+                )
+                if sample_count < values.size:
+                    sample_indices = sample_rng.choice(
+                        values.size, size=sample_count, replace=False
+                    )
+                    sample_values.append(values[sample_indices])
+                else:
+                    sample_values.append(values)
+
+        if valid_count == 0:
+            summary = {"scan_status": "no_valid_pixels"}
+            histogram_rows = None
+        elif integer_histogram is not None:
+            summary = {
+                "scan_status": "complete",
+                "quantile_method": "exact_empirical_uint8_histogram",
+                "total_pixels": total_pixels,
+                "valid_pixels": valid_count,
+                "invalid_fraction": invalid_count / max(total_pixels, 1),
+                **_histogram_summary(integer_histogram, total_pixels=total_pixels),
+            }
+            histogram_rows = integer_histogram
+        else:
+            quantile_values = np.concatenate(sample_values)
+            quantiles = np.quantile(quantile_values, [0.01, 0.05, 0.5, 0.95, 0.99])
+            summary = {
+                "scan_status": "complete",
+                "quantile_method": "deterministic_block_stratified_sample",
+                "quantile_sample_count": int(quantile_values.size),
+                "total_pixels": total_pixels,
+                "valid_pixels": valid_count,
+                "invalid_fraction": invalid_count / max(total_pixels, 1),
+                "min": minimum,
+                "p01": float(quantiles[0]),
+                "p05": float(quantiles[1]),
+                "p50": float(quantiles[2]),
+                "p95": float(quantiles[3]),
+                "p99": float(quantiles[4]),
+                "max": maximum,
+                "mean": mean,
+                "std": float(np.sqrt(sum_squared_deviations / valid_count)),
+                "zero_fraction": zero_count / valid_count,
+                "max_value_fraction": float("nan"),
+            }
+            histogram_rows = None
+
+        metadata["scan_status"] = summary.get("scan_status")
+        return metadata, alignment, summary, histogram_rows
+
+
+potsdam_split = SPLITS["Potsdam"]
+for role in ("train", "validation"):
+    for scene_id in sorted(potsdam_split.scenes_for(role)):
+        scene = scene_lookup["Potsdam"][str(scene_id)]
+        for asset_name in AUXILIARY_ASSETS:
+            relative_uri, asset_path = _auxiliary_path(asset_name, str(scene_id))
+            if not asset_path.is_file():
+                auxiliary_metadata_rows.append(
+                    {
+                        "dataset": "Potsdam",
+                        "role": role,
+                        "scene_id": str(scene_id),
+                        "asset": asset_name,
+                        "relative_uri": relative_uri,
+                        "scan_status": "file_missing",
+                        "dvc_input_snapshot_contains_file": False,
+                    }
+                )
+                auxiliary_alignment_rows.append(
+                    {
+                        "dataset": "Potsdam",
+                        "role": role,
+                        "scene_id": str(scene_id),
+                        "asset": asset_name,
+                        "status": "file_missing",
+                    }
+                )
+                continue
+
+            metadata, alignment_record, summary, histogram = _scan_auxiliary_raster(
+                asset_path,
+                asset_name=asset_name,
+                scene=scene,
+                role=role,
+            )
+            auxiliary_metadata_rows.append(metadata)
+            auxiliary_alignment_rows.append(alignment_record)
+            if summary:
+                auxiliary_statistics_rows.append(
+                    {
+                        "dataset": "Potsdam",
+                        "role": role,
+                        "scene_id": str(scene_id),
+                        "asset": asset_name,
+                        **summary,
+                    }
+                )
+            if histogram is not None:
+                auxiliary_histogram_rows.extend(
+                    {
+                        "dataset": "Potsdam",
+                        "role": role,
+                        "scene_id": str(scene_id),
+                        "asset": asset_name,
+                        "digital_number": digital_number,
+                        "pixel_count": int(count),
+                    }
+                    for digital_number, count in enumerate(histogram)
+                )
+
+auxiliary_metadata = pd.DataFrame(auxiliary_metadata_rows)
+auxiliary_alignment = pd.DataFrame(auxiliary_alignment_rows)
+auxiliary_statistics = pd.DataFrame(auxiliary_statistics_rows)
+auxiliary_histograms = pd.DataFrame(auxiliary_histogram_rows)
+if not auxiliary_alignment.empty:
+    display(
+        auxiliary_alignment.groupby(["asset", "status"], dropna=False)
+        .size()
+        .rename("scene_count")
+        .reset_index()
+    )
+if not auxiliary_statistics.empty:
+    display(
+        auxiliary_statistics.groupby(["asset", "role"], as_index=False).agg(
+            scenes=("scene_id", "nunique"),
+            valid_pixels=("valid_pixels", "sum"),
+            value_min=("min", "min"),
+            value_p05=("p05", "min"),
+            value_p50=("p50", "median"),
+            value_p95=("p95", "max"),
+            value_max=("max", "max"),
+            mean_of_scene_means=("mean", "mean"),
+        )
+    )
+else:
+    display("No configured Potsdam DSM/nDSM files were found under the auxiliary root.")
+
+if not auxiliary_statistics.empty:
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5), constrained_layout=True)
+    dsm_rows = auxiliary_statistics[auxiliary_statistics["asset"] == "dsm"]
+    for role, marker, color in (
+        ("train", "o", "#4472C4"),
+        ("validation", "s", "#ED7D31"),
+    ):
+        role_rows = dsm_rows[dsm_rows["role"] == role].reset_index(drop=True)
+        positions = np.arange(len(role_rows))
+        axes[0].errorbar(
+            positions,
+            role_rows["p50"],
+            yerr=np.vstack(
+                [
+                    role_rows["p50"] - role_rows["p05"],
+                    role_rows["p95"] - role_rows["p50"],
+                ]
+            ),
+            fmt=marker,
+            markersize=3,
+            capsize=1,
+            color=color,
+            label=role,
+        )
+    axes[0].set_title("Potsdam DSM · per-scene p05–p95")
+    axes[0].set_ylabel("source value (configured as metres)")
+    axes[0].grid(axis="y", alpha=0.2)
+    axes[0].legend()
+
+    for role, color in (("train", "#4472C4"), ("validation", "#ED7D31")):
+        role_histogram = (
+            auxiliary_histograms[
+                (auxiliary_histograms["asset"] == "ndsm")
+                & (auxiliary_histograms["role"] == role)
+            ]
+            .groupby("digital_number")["pixel_count"]
+            .sum()
+        )
+        if not role_histogram.empty:
+            axes[1].plot(
+                role_histogram.index,
+                role_histogram / role_histogram.sum(),
+                label=role,
+                color=color,
+            )
+    axes[1].set_title("Potsdam nDSM JPEG · encoded DN distribution")
+    axes[1].set_xlabel("encoded digital number")
+    axes[1].set_ylabel("pixel fraction")
+    axes[1].grid(alpha=0.2)
+    axes[1].legend()
+    fig.savefig(ARTIFACT_ROOT / "potsdam-elevation-value-profiles.png", dpi=160)
+    plt.show()
 
 # %% [markdown]
 # ## Synchronized augmentation examples and checks
@@ -1129,9 +1673,9 @@ plt.show()
 # %% [markdown]
 # ## Save tables, figures, and provenance
 #
-# These artifacts are outside the Git checkout. The provenance records DVC lock,
-# catalog, split, quality-report, analysis-source, and augmentation hashes, plus the
-# exact runtime versions and sampling coordinates used for the audit.
+# These artifacts are outside the Git checkout. Provenance records DVC, catalog,
+# split, protocol, quality-report, analysis-source, and auxiliary-file hashes, plus
+# runtime versions and full-scene scan policies.
 
 # %%
 asset_metadata.to_csv(ARTIFACT_ROOT / "asset-metadata.csv", index=False)
@@ -1143,8 +1687,16 @@ band_statistics.to_csv(ARTIFACT_ROOT / "irrg-band-statistics.csv", index=False)
 scene_band_statistics.to_csv(
     ARTIFACT_ROOT / "irrg-per-scene-band-statistics.csv", index=False
 )
-pd.DataFrame(window_rows).to_csv(
-    ARTIFACT_ROOT / "sampled-window-manifest.csv", index=False
+irrg_full_histograms.to_csv(ARTIFACT_ROOT / "irrg-full-histograms.csv", index=False)
+auxiliary_metadata.to_csv(ARTIFACT_ROOT / "auxiliary-asset-metadata.csv", index=False)
+auxiliary_alignment.to_csv(
+    ARTIFACT_ROOT / "auxiliary-alignment-checks.csv", index=False
+)
+auxiliary_statistics.to_csv(
+    ARTIFACT_ROOT / "auxiliary-per-scene-statistics.csv", index=False
+)
+auxiliary_histograms.to_csv(
+    ARTIFACT_ROOT / "auxiliary-uint8-histograms.csv", index=False
 )
 augmentation_audit.to_csv(ARTIFACT_ROOT / "augmentation-audit.csv", index=False)
 augmentation_effect_summary.to_csv(
@@ -1173,21 +1725,47 @@ except (OSError, subprocess.CalledProcessError):
 
 dvc_lock_path = REPOSITORY_ROOT / "dvc.lock"
 provenance = {
-    "schema_version": 2,
+    "schema_version": 3,
     "created_at_utc": datetime.now(UTC).isoformat(),
     "git_revision": git_revision,
     "analysis_source_sha256": _sha256(Path(__file__).resolve())
     if "__file__" in globals()
     else _sha256(REPOSITORY_ROOT / "notebooks_src/data_eda_augmentation.py"),
     "dvc_lock_sha256": _sha256(dvc_lock_path) if dvc_lock_path.is_file() else None,
+    "evaluation_protocol": {
+        "protocol_id": EVALUATION_PROTOCOL["protocol_id"],
+        "version": EVALUATION_PROTOCOL["version"],
+        "status": EVALUATION_PROTOCOL["status"],
+        "file_sha256": _sha256(EVALUATION_PROTOCOL_PATH),
+    },
+    "training_config": {
+        "path": str(TRAINING_CONFIG_PATH.relative_to(REPOSITORY_ROOT)),
+        "file_sha256": TRAINING_CONFIG_SHA256,
+    },
     "analysis_design": {
         "label_counts": "full-scene counts from DVC quality reports",
         "irrg_profile": {
-            "windows_per_scene": WINDOWS_PER_SCENE,
-            "window_size": SAMPLE_SIZE,
+            "coverage": "all pixels, read in native raster blocks",
             "roles": ["train", "validation"],
-            "scenes_sampled_per_role": "all active split scenes",
-            "seed": RANDOM_SEED,
+            "quantiles": "exact inverse empirical CDF from uint8 histograms",
+            "test_scenes_read": False,
+        },
+        "auxiliary_asset_audit": {
+            "dataset": "Potsdam",
+            "assets": list(AUXILIARY_ASSETS),
+            "roles": ["train", "validation"],
+            "coverage": "all available pixels, read in native raster blocks",
+            "float_quantiles": "deterministic block-stratified sample",
+            "uint8_quantiles": "exact inverse empirical CDF from histograms",
+            "source_root_environment_variable": "DEEPNET_AUX_DATA_ROOT",
+            "test_scenes_read": False,
+            "files_present_in_dvc_input_snapshot": int(
+                auxiliary_metadata.get(
+                    "dvc_input_snapshot_contains_file", pd.Series(dtype=bool)
+                )
+                .fillna(False)
+                .sum()
+            ),
         },
         "augmentation_audit": {
             "roles": ["train"],

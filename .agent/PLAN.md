@@ -111,15 +111,17 @@ bytes or machine credentials are staged in Git.
 
 ### M11: Dataset splits, DINOv3 views, and robust augmentation
 
-Status: implementation and local EDA complete (2026-10-22). The reproducible
-Jupytext source ran as a fresh project process and as a 17-cell Jupyter notebook
-against DVC lock `17994ddb59a804bc`. After restarting the project `.venv` kernel, all
-nine code cells executed in order. The analysis scanned full-scene labels and active
-train/validation scenes, sampled IRRG windows across every scene, and audited
-synchronized geometry and optical transforms over three seeds per training scene.
-Albumentations child transforms now receive independent deterministic seeds; the
-aerial policy is v2. Tables and figures are under the external Data EDA directory,
-with source, DVC, split, and augmentation hashes in the provenance manifest.
+Status: split/evaluation lock and full-scene EDA complete (2026-10-22). The 19-cell
+Jupyter notebook ran all 10 code cells after a project `.venv` kernel restart; its
+Jupytext source also completed as a fresh process. Both runs used the materialized
+DVC snapshot at lock SHA `17994ddb59a804bc`. Every IRRG pixel in 38 Potsdam and 16
+Vaihingen train/validation scenes was scanned. All 38 Potsdam DSM/nDSM scene pairs
+were inspected and hashed; 37 DSM grids match IRRG metadata, scene `3_13` is one
+column short, and nDSM registration remains unverified for every scene. The audit
+did not read Vaihingen test pixels or labels. It also replayed the v2 synchronized
+augmentation policy over three seeds per training scene. Results and provenance
+are under `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/eda/`
+outside Git.
 
 - Use 18 participant-labeled Potsdam scenes for training and 20 eroded-reference
   scenes for validation, including the 14 scenes held out in a separate prior run.
@@ -131,13 +133,12 @@ with source, DVC, split, and augmentation hashes in the provenance manifest.
   ignored affine borders, and optical-only radiometric transforms; review it against
   source histograms and paired image/label examples in a reproducible EDA notebook.
 
-Validation: split contracts are disjoint, data-quality reports cover all active
-train/validation scenes, and augmentation tests cover seeded replay, nearest-neighbor
-masks, ignored affine borders, and optical-only transforms. The notebook kernel was
-verified at the project `.venv/bin/python`, restarted, and run from the first code
-cell to the last. Rendered augmentation plots were inspected and the notebook was
-saved without generated cell outputs; reproducible tables, figures, and provenance
-remain in the external Data EDA directory.
+Validation: split and training-config hashes are checked against the locked
+evaluation protocol; data-quality reports cover all active train/validation scenes;
+full-scene IRRG histograms are exact per scene; the elevation audit records grid,
+coverage, and encoding limits. The project `.venv` kernel was verified, restarted,
+and used to run all notebook code cells in order; the Jupytext source also completed
+in a fresh process. Vaihingen test assets remain unopened. No training was run.
 
 ### M12: One unified Kaggle run plan and README
 

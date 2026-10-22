@@ -60,10 +60,13 @@ official reference labels; no labels are inferred or filled. Potsdam has 38 imag
 24 participant labels, and 38 eroded reference labels; the versioned DVC inputs stage
 only the 18 participant training labels and 20 eroded validation labels used here.
 
-The five-channel model views require IRRG, DSM, and nDSM. The currently cataloged
-nDSM JPEG has no verified spatial registration evidence, so those views correctly
-fail alignment validation until a verified co-registration record is supplied.
-IRRG-only views can be exported from the same catalog without weakening that check.
+The current joint DINOv3 plan uses three IRRG channels. Five-channel views also need
+DSM and nDSM, but the data audit found only 37/38 DSM rasters with an exact
+metadata-grid match; Potsdam scene `3_13` is one column short. The 37 matching-size
+nDSM JPEGs have no CRS/affine or co-registration evidence, and the remaining nDSM is
+also one column short. None of the 76 DSM/nDSM files is in the current DVC snapshot.
+Those elevation views remain blocked until source data, grid coverage, registration,
+and value encoding are verified. See the [split protocol and EDA findings](docs/data-pipeline.md#dinov3-split-and-evaluation-lock).
 
 ## Data EDA and augmentation
 
@@ -71,9 +74,10 @@ IRRG-only views can be exported from the same catalog without weakening that che
 the runnable Jupyter notebook, accompanied by its maintainable
 [`notebooks_src/data_eda_augmentation.py`](notebooks_src/data_eda_augmentation.py)
 Jupytext source. It covers scene inventory, alignment evidence, full-scene class
-balance, scene-stratified IRRG profiles, and a seeded augmentation audit. The report
-records label imbalance and ignore coverage for both datasets; validation stays
-natural and unaugmented. The current aerial IRRG policy is versioned as
+balance, full-scene IRRG statistics with per-scene summaries, Potsdam DSM/nDSM
+metadata and value audits, and a seeded augmentation audit. The report records
+label imbalance and ignore coverage for both datasets; validation stays natural and
+unaugmented. The current aerial IRRG policy is versioned as
 `isprs-irrg-aerial-v2`, with synchronized geometry, ignored affine borders, and
 independently seeded optical-only transforms. See the [EDA findings and audit
 method](docs/data-pipeline.md#frozen-eda-snapshot) and the
@@ -88,6 +92,14 @@ radiometry, and separate deterministic validation grids. Checkpoint selection us
 the unweighted mean of the two validation mIoU values. The 20-epoch, 64-update plan
 uses one-sample mixed-precision microbatches with four-step gradient accumulation and
 periodic resumable checkpoints.
+
+Its locked evaluation protocol and exact split manifests are
+[`isprs-dinov3-v1.json`](configs/evaluations/isprs-dinov3-v1.json),
+[`potsdam-dinov3-v1.json`](configs/splits/potsdam-dinov3-v1.json), and
+[`vaihingen-dinov3-v1.json`](configs/splits/vaihingen-dinov3-v1.json). Potsdam has
+no test split; the 17 Vaihingen test scenes stay closed until configuration and
+checkpoint selection are frozen, then are evaluated once. The protocol explicitly
+keeps test labels out of training and selection bundles.
 
 The JSON is a versioned plan; it does not start training. No pretrained weights or
 Kaggle GPU run have been downloaded or launched. Once the gated DINOv3 access is
