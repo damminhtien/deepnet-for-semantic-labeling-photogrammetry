@@ -507,6 +507,40 @@ loader = make_torch_dataloader(
 )
 ```
 
+The shared package does not include a model training loop yet. In a caller-owned
+loop, count the labels returned by the training loader before transferring them to
+the accelerator. This records the patches actually sampled and augmented during
+the epoch, rather than inferring pixel proportions from sampler probabilities.
+
+```python
+import logging
+
+class_names = {
+    0: "impervious surfaces",
+    1: "buildings",
+    2: "low vegetation",
+    3: "trees",
+    4: "cars",
+    5: "clutter/background",
+}
+logger = logging.getLogger("deepnet.training")
+histogram = dataset.new_label_histogram(class_names=class_names)
+
+for epoch in range(num_epochs):
+    dataset.set_epoch(epoch)
+    histogram.reset()
+    for batch in loader:
+        histogram.update(batch["labels"], batch["valid_mask"])
+        train_step(batch)
+    histogram.log(logger, epoch=epoch + 1)
+```
+
+Each JSON log record includes per-class pixel percentages and the percentage of
+patches containing each class. Pixel percentages use non-ignore, valid semantic
+pixels as their denominator; ignored labels and invalid pixels are reported
+separately. This makes car/clutter over-sampling visible even when class-aware
+sampling probability does not translate into the expected patch-level balance.
+
 Supply a model constructed by the caller to `TorchSegmentationAdapter`. It checks
 that model inputs use the configured channel count and layout but does not select
 or construct a network. Dataset code never imports a model architecture.

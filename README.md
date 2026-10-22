@@ -363,8 +363,8 @@ device belong in each run manifest.
 | `deepnet.data.catalog` | Dataset ID descriptors and scene catalog construction |
 | `deepnet.data.raster` | Raster metadata checks, alignment, masks, and lazy window reads |
 | `deepnet.data.preprocessing` | Palette decoding, named model views, and train-only statistics |
-| `deepnet.data.sampling` | Deterministic random sampling, class-aware sampling, and grid coverage |
-| `deepnet.data.dataset` | Shared scene access, patches, collators, and Torch DataLoader factory |
+| `deepnet.data.sampling` | Deterministic random sampling, class-aware sampling, epoch histograms, and grid coverage |
+| `deepnet.data.dataset` | Shared scene access, patches, epoch histogram setup, collators, and Torch DataLoader factory |
 | `deepnet.data.evaluation` | Overlap-weighted full-scene predictions and confusion aggregation |
 | `deepnet.data.bundles` | Portable, checksummed local/cloud bundles |
 | `deepnet.data.lineage` | Run manifest provenance and contract hashes |

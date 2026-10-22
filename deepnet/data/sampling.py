@@ -3,13 +3,205 @@
 from __future__ import annotations
 
 import hashlib
+import json
+import logging
 import math
 import random
 from collections.abc import Mapping, Sequence
+from typing import Any
 
 import numpy as np
 
-from .contracts import SplitManifest, WindowSpec
+from .contracts import PreprocessingSpec, SplitManifest, WindowSpec
+
+
+class ClassPixelHistogram:
+    """Accumulate class pixel and patch-presence counts from sampled labels."""
+
+    def __init__(
+        self,
+        class_ids: Sequence[int],
+        ignore_label: int,
+        *,
+        class_names: Mapping[int, str] | None = None,
+    ) -> None:
+        self.class_ids = tuple(class_ids)
+        if not self.class_ids or any(
+            isinstance(class_id, (bool, np.bool_))
+            or not isinstance(class_id, (int, np.integer))
+            or class_id < 0
+            for class_id in self.class_ids
+        ):
+            raise ValueError("class_ids must contain non-negative integers")
+        if len(set(self.class_ids)) != len(self.class_ids):
+            raise ValueError("class_ids must be unique")
+        if (
+            isinstance(ignore_label, (bool, np.bool_))
+            or not isinstance(ignore_label, (int, np.integer))
+            or ignore_label < 0
+            or ignore_label in self.class_ids
+        ):
+            raise ValueError("ignore_label must be non-negative and outside class_ids")
+        self.ignore_label = int(ignore_label)
+        self.class_names = self._validate_class_names(class_names)
+        self.reset()
+
+    @classmethod
+    def from_preprocessing(
+        cls,
+        preprocessing: PreprocessingSpec,
+        *,
+        class_names: Mapping[int, str] | None = None,
+    ) -> ClassPixelHistogram:
+        """Create a histogram using the canonical class IDs and ignore label."""
+        class_ids = tuple(
+            sorted(
+                {
+                    class_id
+                    for _, _, _, class_id in preprocessing.label_palette
+                    if class_id != preprocessing.ignore_label
+                }
+            )
+        )
+        if not class_ids:
+            raise ValueError("Preprocessing spec does not declare a label palette")
+        return cls(class_ids, preprocessing.ignore_label, class_names=class_names)
+
+    def _validate_class_names(
+        self,
+        class_names: Mapping[int, str] | None,
+    ) -> dict[int, str]:
+        if class_names is None:
+            return {class_id: str(class_id) for class_id in self.class_ids}
+        names = dict(class_names)
+        if set(names) != set(self.class_ids) or any(
+            not isinstance(name, str) or not name.strip() for name in names.values()
+        ):
+            raise ValueError("class_names must name every configured class ID")
+        if len(set(names.values())) != len(names):
+            raise ValueError("class_names must be unique")
+        return names
+
+    def reset(self) -> None:
+        """Clear accumulated counts before the next training epoch."""
+        self.num_patches = 0
+        self.total_pixels = 0
+        self.valid_pixels = 0
+        self.ignored_label_pixels = 0
+        self.invalid_pixels = 0
+        self.class_pixel_counts = dict.fromkeys(self.class_ids, 0)
+        self.class_patch_counts = dict.fromkeys(self.class_ids, 0)
+
+    def update(
+        self,
+        labels: Any,
+        valid_mask: Any | None = None,
+    ) -> None:
+        """Count labels from one patch or a batch after augmentation.
+
+        Labels must have shape ``(height, width)`` or
+        ``(batch, height, width)``. Invalid pixels are excluded from class counts.
+        """
+        label_array = np.asarray(labels)
+        if label_array.ndim not in (2, 3) or any(
+            size <= 0 for size in label_array.shape
+        ):
+            raise ValueError("labels must be a non-empty HW or BHW array")
+        if not np.issubdtype(label_array.dtype, np.integer):
+            raise ValueError("labels must contain integer class IDs")
+        if label_array.ndim == 2:
+            label_array = label_array[np.newaxis, ...]
+
+        if valid_mask is None:
+            valid = np.ones(label_array.shape, dtype=bool)
+        else:
+            valid = np.asarray(valid_mask, dtype=bool)
+            if valid.shape != label_array.shape:
+                if label_array.shape[0] == 1 and valid.shape == label_array.shape[1:]:
+                    valid = valid[np.newaxis, ...]
+                else:
+                    raise ValueError("valid_mask must have the same shape as labels")
+
+        recognized = np.isin(label_array, (*self.class_ids, self.ignore_label))
+        unknown = np.unique(label_array[valid & ~recognized])
+        if unknown.size:
+            raise ValueError(
+                f"Unknown valid class IDs in sampled labels: {unknown.tolist()}"
+            )
+
+        self.num_patches += label_array.shape[0]
+        self.total_pixels += label_array.size
+        self.valid_pixels += int(np.count_nonzero(valid))
+        self.ignored_label_pixels += int(
+            np.count_nonzero(valid & (label_array == self.ignore_label))
+        )
+        self.invalid_pixels += int(np.count_nonzero(~valid))
+
+        for class_id in self.class_ids:
+            class_pixels = valid & (label_array == class_id)
+            self.class_pixel_counts[class_id] += int(np.count_nonzero(class_pixels))
+            self.class_patch_counts[class_id] += int(
+                np.count_nonzero(np.any(class_pixels, axis=(1, 2)))
+            )
+
+    def merge(self, other: ClassPixelHistogram) -> None:
+        """Add counts from another compatible accumulator, such as another rank."""
+        if (self.class_ids, self.ignore_label) != (
+            other.class_ids,
+            other.ignore_label,
+        ):
+            raise ValueError("Only histograms with matching class contracts can merge")
+        self.num_patches += other.num_patches
+        self.total_pixels += other.total_pixels
+        self.valid_pixels += other.valid_pixels
+        self.ignored_label_pixels += other.ignored_label_pixels
+        self.invalid_pixels += other.invalid_pixels
+        for class_id in self.class_ids:
+            self.class_pixel_counts[class_id] += other.class_pixel_counts[class_id]
+            self.class_patch_counts[class_id] += other.class_patch_counts[class_id]
+
+    def summary(self, *, epoch: int) -> dict[str, Any]:
+        """Return JSON-compatible epoch counts and normalized frequencies."""
+        if (
+            isinstance(epoch, (bool, np.bool_))
+            or not isinstance(epoch, (int, np.integer))
+            or epoch < 0
+        ):
+            raise ValueError("epoch must be non-negative")
+        epoch = int(epoch)
+        semantic_pixels = sum(self.class_pixel_counts.values())
+        classes = {}
+        for class_id in self.class_ids:
+            pixel_count = self.class_pixel_counts[class_id]
+            patch_count = self.class_patch_counts[class_id]
+            classes[str(class_id)] = {
+                "name": self.class_names[class_id],
+                "pixel_count": pixel_count,
+                "pixel_percent": round(100 * pixel_count / semantic_pixels, 6)
+                if semantic_pixels
+                else 0.0,
+                "patch_presence_count": patch_count,
+                "patch_presence_percent": round(100 * patch_count / self.num_patches, 6)
+                if self.num_patches
+                else 0.0,
+            }
+        return {
+            "epoch": epoch,
+            "patch_count": self.num_patches,
+            "total_pixels": self.total_pixels,
+            "valid_pixels": self.valid_pixels,
+            "semantic_pixels": semantic_pixels,
+            "ignored_label_pixels": self.ignored_label_pixels,
+            "invalid_pixels": self.invalid_pixels,
+            "classes": classes,
+        }
+
+    def log(self, logger: logging.Logger, *, epoch: int) -> None:
+        """Write one structured JSON log record for the completed epoch."""
+        logger.info(
+            "sampled_training_label_histogram %s",
+            json.dumps(self.summary(epoch=epoch), ensure_ascii=False, sort_keys=True),
+        )
 
 
 def _window_starts(length: int, window_size: int, stride: int) -> tuple[int, ...]:

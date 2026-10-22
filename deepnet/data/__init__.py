@@ -20,12 +20,14 @@ from .contracts import (
     canonical_hash,
 )
 from .lineage import build_run_manifest
+from .sampling import ClassPixelHistogram
 
 __all__ = (
     "AlignmentError",
     "AugmentationSpec",
     "BandSpec",
     "BundleData",
+    "ClassPixelHistogram",
     "GridSpec",
     "DomainSpec",
     "ModelInputSpec",

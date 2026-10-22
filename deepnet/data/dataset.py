@@ -19,7 +19,7 @@ from .contracts import (
 )
 from .preprocessing import apply_model_view, decode_rgb_labels
 from .raster import RasterioSceneReader
-from .sampling import UniformSampler, grid_windows, sample_rng
+from .sampling import ClassPixelHistogram, UniformSampler, grid_windows, sample_rng
 
 
 class SampleAugmenter(Protocol):
@@ -326,6 +326,17 @@ class ScenePatchDataset:
         if epoch < 0:
             raise ValueError("epoch must be non-negative")
         self.epoch = epoch
+
+    def new_label_histogram(
+        self,
+        *,
+        class_names: Mapping[int, str] | None = None,
+    ) -> ClassPixelHistogram:
+        """Create an epoch counter from this training dataset's label contract."""
+        return ClassPixelHistogram.from_preprocessing(
+            self.access.preprocessing,
+            class_names=class_names,
+        )
 
     def __getitem__(self, index: int) -> Sample:
         if not 0 <= index < self.epoch_size:

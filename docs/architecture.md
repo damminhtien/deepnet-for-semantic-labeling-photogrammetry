@@ -61,8 +61,8 @@ split hash.
 | `deepnet/data/augmentations.py` | Lazy Albumentations construction with synchronized band and mask transforms |
 | `deepnet/data/raster.py` | CRS/affine/dtype/nodata verification and lazy Rasterio reads |
 | `deepnet/data/preprocessing.py` | Label decoding, model views, and train-only statistics |
-| `deepnet/data/sampling.py` | Random, class-aware, deterministic grid, and coverage sampling |
-| `deepnet/data/dataset.py` | Split-bound scene access, patches, collation, DataLoader creation |
+| `deepnet/data/sampling.py` | Random, class-aware, epoch histogram, deterministic grid, and coverage sampling |
+| `deepnet/data/dataset.py` | Split-bound scene access, patches, histogram setup, collation, DataLoader creation |
 | `deepnet/data/evaluation.py` | Full-scene, overlap-weighted logits and confusion metrics |
 | `deepnet/data/bundles.py` | Content-addressed portable model-view bundles |
 | `deepnet/data/lineage.py` | Run manifest builder with data/source/runtime provenance |

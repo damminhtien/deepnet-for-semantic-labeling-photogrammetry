@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import sys
 from contextlib import nullcontext
 from dataclasses import replace
@@ -48,6 +49,7 @@ from deepnet.data.preprocessing import (
 from deepnet.data.raster import RasterioSceneReader, inspect_raster
 from deepnet.data.sampling import (
     ClassAwareSampler,
+    ClassPixelHistogram,
     UniformSampler,
     coverage_counts,
     grid_windows,
@@ -567,6 +569,79 @@ def test_scene_access_augments_raw_bands_before_model_normalization(pipeline_fix
     access.close()
 
 
+def test_class_pixel_histogram_counts_augmented_batch_pixels_and_patch_presence(
+    caplog,
+):
+    histogram = ClassPixelHistogram(
+        (0, 1, 4, 5),
+        ignore_label=6,
+        class_names={0: "surface", 1: "building", 4: "car", 5: "clutter"},
+    )
+    labels = np.array(
+        [
+            [[0, 0, 1], [1, 6, 4]],
+            [[4, 4, 6], [9, 9, 9]],
+        ],
+        dtype=np.int64,
+    )
+    valid_mask = np.array(
+        [
+            [[True, True, True], [True, True, True]],
+            [[True, True, True], [False, False, False]],
+        ]
+    )
+
+    histogram.update(labels, valid_mask)
+    summary = histogram.summary(epoch=2)
+
+    assert summary["patch_count"] == 2
+    assert summary["total_pixels"] == 12
+    assert summary["valid_pixels"] == 9
+    assert summary["semantic_pixels"] == 7
+    assert summary["ignored_label_pixels"] == 2
+    assert summary["invalid_pixels"] == 3
+    assert summary["classes"]["4"] == {
+        "name": "car",
+        "pixel_count": 3,
+        "pixel_percent": 42.857143,
+        "patch_presence_count": 2,
+        "patch_presence_percent": 100.0,
+    }
+    assert summary["classes"]["5"]["pixel_count"] == 0
+    assert summary["classes"]["5"]["patch_presence_percent"] == 0.0
+
+    logger = logging.getLogger("test.sampled-training-histogram")
+    with caplog.at_level(logging.INFO, logger=logger.name):
+        histogram.log(logger, epoch=2)
+    assert "sampled_training_label_histogram" in caplog.text
+    assert '"epoch": 2' in caplog.text
+
+    histogram.reset()
+    assert histogram.summary(epoch=3)["patch_count"] == 0
+
+
+def test_class_pixel_histogram_rejects_unknown_valid_labels():
+    histogram = ClassPixelHistogram((0, 1), ignore_label=6)
+
+    with pytest.raises(ValueError, match="Unknown valid class IDs"):
+        histogram.update(np.array([[7]], dtype=np.int64))
+
+
+def test_class_pixel_histogram_merges_distributed_counts():
+    histogram = ClassPixelHistogram((0, 1), ignore_label=6)
+    other = ClassPixelHistogram((0, 1), ignore_label=6)
+    histogram.update(np.array([[0, 1]], dtype=np.int64))
+    other.update(np.array([[1, 6]], dtype=np.int64))
+
+    histogram.merge(other)
+    summary = histogram.summary(epoch=0)
+
+    assert summary["patch_count"] == 2
+    assert summary["semantic_pixels"] == 3
+    assert summary["ignored_label_pixels"] == 1
+    assert summary["classes"]["1"]["pixel_count"] == 2
+
+
 def test_window_reader_preserves_nodata_mask_and_boundless_padding(pipeline_fixture):
     data_root, scenes, _, _, _ = pipeline_fixture
     scene = scenes[0]
@@ -604,6 +679,9 @@ def test_shared_dataset_and_bundle_round_trip_are_reproducible(
     )
     sample = dataset[0]
     assert sample.image.shape == (1, 4, 4)
+    histogram = dataset.new_label_histogram(class_names={0: "zero", 1: "one"})
+    histogram.update(sample.labels, sample.valid_mask)
+    assert histogram.summary(epoch=0)["patch_count"] == 1
     batch = collate_samples([sample, dataset[0]])
     assert batch["image"].shape == (2, 1, 4, 4)
     repeated = dataset[0]
