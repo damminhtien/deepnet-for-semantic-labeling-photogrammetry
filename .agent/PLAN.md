@@ -158,3 +158,26 @@ weight, bundle, and durable-output preflights pass.
 
 Validation: local static and synthetic checks only; no Kaggle GPU pilot. Commit and
 push focused milestones after reviewing the exact diff.
+
+### M13: Rare-class, boundary, and padding augmentation audit
+
+Status: audit complete (2026-10-22); the augmentation and training configs remain
+unchanged pending review. A train-only scan covered 12,121 overlapping candidate
+windows across 30 scenes. Five focused crops per dataset were replayed with eight
+deterministic seeds each. It found that two of 16 Potsdam car-containing trials
+removed the rare class from a low-density crop, and optical transforms changed
+affine-padding values despite correct ignore labels and validity masks. Model
+patch-stride padding was zero for both configured crop sizes. Tables, provenance,
+and visual examples are stored outside Git in the EDA artifact directory.
+
+- Review per-class retention and semantic-edge density for car and clutter/background.
+- Fix the photometric-padding interaction, or make optical transforms mask-aware,
+  before full training; rerun the focused audit after any policy change.
+- Review class-aware sampling or a bounded geometric policy for sparse rare-class
+  crops. Keep the validation and official test distributions untouched.
+
+Validation: the project `.venv` kernel was restarted, then the notebook's analysis
+cells ran through Jupyter MCP. The final artifact-export cell source ran in that same
+fresh kernel through the Jupyter MCP code tool because the notebook document endpoint
+reported zero cells for that final index. Ruff and Python compilation passed; no
+training was run.

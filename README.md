@@ -83,6 +83,16 @@ independently seeded optical-only transforms. See the [EDA findings and audit
 method](docs/data-pipeline.md#frozen-eda-snapshot) and the
 [augmentation design](docs/data-pipeline.md#augmentation-policy-and-audit).
 
+The expanded train-only audit scans 12,121 overlapping candidate windows across
+30 training scenes, then replays five rare-class/boundary crops per dataset with
+eight deterministic seeds each. It found that sparse Potsdam car pixels disappear
+in two of 16 car-containing replay trials, and that optical transforms alter values
+inside affine padding even though its labels and validity mask are correct. Keep the
+current policy out of a full training run until padding values are restored after
+radiometry and the rare-car crop behavior is reviewed. The versioned augmentation
+config is unchanged. Audit tables, provenance, and visual examples are written
+outside Git under the configured EDA data root.
+
 ## DINOv3 training plan
 
 `configs/training/isprs-dinov3-joint-v1.json` describes one balanced IRRG run across

@@ -34,6 +34,11 @@ import rasterio
 from IPython.display import display
 from matplotlib.colors import ListedColormap
 
+from deepnet.data.augmentation_audit import (
+    semantic_boundary_mask,
+    window_starts,
+    window_sum_grid,
+)
 from deepnet.data.augmentations import AlbumentationsAugmenter
 from deepnet.data.catalog import (
     load_augmentation_spec,
@@ -63,6 +68,7 @@ def _find_repository_root() -> Path:
 
 
 REPOSITORY_ROOT = _find_repository_root()
+print(f"Notebook Python interpreter: {sys.executable}")
 DATA_ROOT = (
     Path(os.environ.get("DEEPNET_DATA_ROOT", REPOSITORY_ROOT / "data/raw/inputs"))
     .expanduser()
@@ -1671,6 +1677,816 @@ fig.savefig(ARTIFACT_ROOT / "augmentation-examples.png", dpi=160)
 plt.show()
 
 # %% [markdown]
+# ## Rare classes, semantic edges, and padding audit
+#
+# The audit scans overlapping candidate windows across every training scene and
+# reports crop-level rare-class coverage and semantic boundary density. A class is
+# rare when it occupies at most 6% of train semantic pixels or occurs in at most
+# half of train scenes. The held-out test split is never read. Boundary metrics use
+# 4-neighbor semantic class transitions; same-class object boundaries are not
+# observable because the labels have no instance IDs. Affine padding is measured
+# separately from source
+# NoData, label ignore pixels, and model patch-stride padding. A class is considered
+# rare when it occupies at most 6% of train semantic pixels or occurs in at most half
+# of train scenes. Candidate windows overlap at half the configured crop size.
+
+# %%
+MODEL_CONFIG_PATH = CONFIG_ROOT / "models" / f"{TRAINING_CONFIG['model_id']}-v1.json"
+MODEL_CONFIG = json.loads(MODEL_CONFIG_PATH.read_text(encoding="utf-8"))
+MODEL_PATCH_SIZE = int(MODEL_CONFIG["backbone"]["patch_size"])
+RARE_CLASS_SHARE_THRESHOLD = 0.06
+RARE_CLASS_SCENE_PRESENCE_THRESHOLD = 0.5
+AUDIT_GRID_STRIDE_DIVISOR = 2
+RARE_BOUNDARY_SEEDS_PER_CROP = 8
+RARE_CLASS_IDS: dict[str, tuple[int, ...]] = {}
+window_scan_rows: list[dict[str, Any]] = []
+focus_summary_rows: list[dict[str, Any]] = []
+
+
+def _read_full_training_labels(
+    scene: SceneRecord,
+    label_asset: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Read one training label raster and its validity mask without imagery."""
+    grid = scene.reference_grid
+    window = WindowSpec(0, 0, grid.height, grid.width)
+    with RasterioSceneReader(scene, DATA_ROOT) as reader:
+        labels_rgb, valid = reader.read_window_with_mask(
+            label_asset,
+            window,
+            resampling=PREPROCESSING.categorical_resampling,
+        )
+    labels = decode_rgb_labels(labels_rgb, PREPROCESSING, valid_mask=valid)
+    labels[~valid] = PREPROCESSING.ignore_label
+    return labels, valid
+
+
+def _window_key(row: pd.Series) -> tuple[str, str, int, int]:
+    """Return a stable identifier for one dataset scene crop."""
+    return (
+        str(row["dataset"]),
+        str(row["scene_id"]),
+        int(row["row"]),
+        int(row["col"]),
+    )
+
+
+for dataset_name in DATASET_CONFIGS:
+    split = SPLITS[dataset_name]
+    crop_size = DATASET_CONFIGS[dataset_name]["crop_size"]
+    label_asset = split.label_asset_for("train")
+    train_scenes = sorted(split.train_scene_ids)
+    scene_counts = label_counts.loc[
+        (label_counts["dataset"] == dataset_name) & (label_counts["role"] == "train")
+    ]
+    semantic_total = int(
+        sum(
+            scene_counts[f"pixels_{CLASS_NAMES[class_id]}"].sum()
+            for class_id in range(6)
+        )
+    )
+    rare_classes = []
+    for class_id in range(6):
+        class_name = CLASS_NAMES[class_id]
+        class_column = f"pixels_{class_name}"
+        class_pixels = int(scene_counts[class_column].sum())
+        scene_presence = int((scene_counts[class_column] > 0).sum())
+        class_share = class_pixels / max(semantic_total, 1)
+        presence_fraction = scene_presence / max(len(train_scenes), 1)
+        is_rare = (
+            class_share <= RARE_CLASS_SHARE_THRESHOLD
+            or presence_fraction <= RARE_CLASS_SCENE_PRESENCE_THRESHOLD
+        )
+        if is_rare:
+            rare_classes.append(class_id)
+    RARE_CLASS_IDS[dataset_name] = tuple(rare_classes)
+
+    crop_stride = max(1, crop_size // AUDIT_GRID_STRIDE_DIVISOR)
+    for scene_id in train_scenes:
+        scene = scene_lookup[dataset_name][str(scene_id)]
+        scene.require_aligned((label_asset,))
+        labels, valid = _read_full_training_labels(scene, label_asset)
+        height, width = labels.shape
+        rows = window_starts(height, crop_size, crop_stride)
+        columns = window_starts(width, crop_size, crop_stride)
+        row_grid, column_grid = np.meshgrid(rows, columns, indexing="ij")
+        flat_rows = row_grid.ravel()
+        flat_columns = column_grid.ravel()
+        window_area = crop_size * crop_size
+
+        valid_counts = window_sum_grid(
+            valid, rows, columns, (crop_size, crop_size)
+        ).ravel()
+        ignore_counts = window_sum_grid(
+            valid & (labels == PREPROCESSING.ignore_label),
+            rows,
+            columns,
+            (crop_size, crop_size),
+        ).ravel()
+        semantic_boundaries = semantic_boundary_mask(
+            labels,
+            valid,
+            num_classes=PREPROCESSING.ignore_label,
+        )
+        boundary_counts = window_sum_grid(
+            semantic_boundaries,
+            rows,
+            columns,
+            (crop_size, crop_size),
+        ).ravel()
+        class_counts = {
+            class_id: window_sum_grid(
+                valid & (labels == class_id),
+                rows,
+                columns,
+                (crop_size, crop_size),
+            ).ravel()
+            for class_id in range(PREPROCESSING.ignore_label)
+        }
+
+        for window_index, (row, col) in enumerate(
+            zip(flat_rows, flat_columns, strict=True)
+        ):
+            semantic_pixels = int(
+                sum(class_counts[class_id][window_index] for class_id in range(6))
+            )
+            record: dict[str, Any] = {
+                "dataset": dataset_name,
+                "role": "train",
+                "scene_id": str(scene_id),
+                "row": int(row),
+                "col": int(col),
+                "height": crop_size,
+                "width": crop_size,
+                "candidate_stride": crop_stride,
+                "valid_pixels": int(valid_counts[window_index]),
+                "source_invalid_pixels": window_area - int(valid_counts[window_index]),
+                "source_valid_fraction": float(valid_counts[window_index])
+                / window_area,
+                "label_ignore_pixels": int(ignore_counts[window_index]),
+                "label_ignore_fraction": float(ignore_counts[window_index])
+                / window_area,
+                "semantic_pixels": semantic_pixels,
+                "semantic_boundary_pixels": int(boundary_counts[window_index]),
+                "semantic_boundary_fraction": float(boundary_counts[window_index])
+                / max(semantic_pixels, 1),
+                "model_patch_size": MODEL_PATCH_SIZE,
+                "model_padding_bottom": (-crop_size) % MODEL_PATCH_SIZE,
+                "model_padding_right": (-crop_size) % MODEL_PATCH_SIZE,
+            }
+            for class_id in range(6):
+                count = int(class_counts[class_id][window_index])
+                record[f"class_{class_id}_pixels"] = count
+                record[f"class_{class_id}_share"] = count / max(semantic_pixels, 1)
+            window_scan_rows.append(record)
+
+        print(
+            f"Scanned training label windows: {dataset_name} scene {scene_id} "
+            f"({len(rows) * len(columns)} candidate crops)"
+        )
+
+window_scan = pd.DataFrame(window_scan_rows)
+
+for dataset_name in DATASET_CONFIGS:
+    candidates = window_scan.loc[window_scan["dataset"] == dataset_name]
+    train_scenes = label_counts.loc[
+        (label_counts["dataset"] == dataset_name) & (label_counts["role"] == "train")
+    ]
+    scene_count = int(train_scenes["scene_id"].nunique())
+    dataset_scene_counts = label_counts.loc[
+        (label_counts["dataset"] == dataset_name) & (label_counts["role"] == "train")
+    ]
+    dataset_semantic_total = int(
+        sum(
+            dataset_scene_counts[f"pixels_{CLASS_NAMES[class_id]}"].sum()
+            for class_id in range(6)
+        )
+    )
+    for class_id in range(6):
+        class_column = f"pixels_{CLASS_NAMES[class_id]}"
+        train_pixels = int(dataset_scene_counts[class_column].sum())
+        scenes_with_class = int((dataset_scene_counts[class_column] > 0).sum())
+        global_share = train_pixels / max(dataset_semantic_total, 1)
+        presence_fraction = scenes_with_class / max(scene_count, 1)
+        is_rare = class_id in RARE_CLASS_IDS[dataset_name]
+        class_share = candidates[f"class_{class_id}_share"]
+        present_crop_shares = class_share.loc[class_share > 0]
+        class_stats = {
+            "focus_type": "rare_class" if is_rare else "class_coverage",
+            "dataset": dataset_name,
+            "class_id": class_id,
+            "class_name": CLASS_NAMES[class_id],
+            "rare_class": is_rare,
+            "train_scenes": scene_count,
+            "train_scenes_with_class": scenes_with_class,
+            "train_scene_presence_fraction": presence_fraction,
+            "train_class_pixels": train_pixels,
+            "global_train_share": global_share,
+            "candidate_windows": int(len(candidates)),
+            "candidate_windows_with_class": int((class_share > 0).sum()),
+            "candidate_window_presence_fraction": float((class_share > 0).mean()),
+            "crop_class_share_p50": float(class_share.quantile(0.50)),
+            "crop_class_share_p95": float(class_share.quantile(0.95)),
+            "crop_class_share_max": float(class_share.max()),
+            "crop_class_share_p95_when_present": (
+                float(present_crop_shares.quantile(0.95))
+                if not present_crop_shares.empty
+                else 0.0
+            ),
+            "crop_boundary_fraction_p95": float(
+                candidates["semantic_boundary_fraction"].quantile(0.95)
+            ),
+            "model_patch_size": MODEL_PATCH_SIZE,
+            "model_window_padding_bottom": (-DATASET_CONFIGS[dataset_name]["crop_size"])
+            % MODEL_PATCH_SIZE,
+            "model_window_padding_right": (-DATASET_CONFIGS[dataset_name]["crop_size"])
+            % MODEL_PATCH_SIZE,
+        }
+        focus_summary_rows.append(class_stats)
+
+    focus_summary_rows.append(
+        {
+            "focus_type": "semantic_boundary",
+            "dataset": dataset_name,
+            "class_id": np.nan,
+            "class_name": "4-neighbor class transition",
+            "rare_class": False,
+            "train_scenes": scene_count,
+            "train_scenes_with_class": np.nan,
+            "train_scene_presence_fraction": np.nan,
+            "train_class_pixels": np.nan,
+            "global_train_share": np.nan,
+            "candidate_windows": int(len(candidates)),
+            "candidate_windows_with_class": int(
+                (candidates["semantic_boundary_pixels"] > 0).sum()
+            ),
+            "candidate_window_presence_fraction": float(
+                (candidates["semantic_boundary_pixels"] > 0).mean()
+            ),
+            "crop_class_share_p50": float(
+                candidates["semantic_boundary_fraction"].quantile(0.50)
+            ),
+            "crop_class_share_p95": float(
+                candidates["semantic_boundary_fraction"].quantile(0.95)
+            ),
+            "crop_class_share_max": float(
+                candidates["semantic_boundary_fraction"].max()
+            ),
+            "crop_class_share_p95_when_present": float(
+                candidates.loc[
+                    candidates["semantic_boundary_pixels"] > 0,
+                    "semantic_boundary_fraction",
+                ].quantile(0.95)
+            ),
+            "crop_boundary_fraction_p95": float(
+                candidates["semantic_boundary_fraction"].quantile(0.95)
+            ),
+            "model_patch_size": MODEL_PATCH_SIZE,
+            "model_window_padding_bottom": (-DATASET_CONFIGS[dataset_name]["crop_size"])
+            % MODEL_PATCH_SIZE,
+            "model_window_padding_right": (-DATASET_CONFIGS[dataset_name]["crop_size"])
+            % MODEL_PATCH_SIZE,
+        }
+    )
+
+augmentation_focus_summary = pd.DataFrame(focus_summary_rows)
+display(
+    augmentation_focus_summary.loc[
+        (augmentation_focus_summary["rare_class"])
+        | (augmentation_focus_summary["focus_type"] == "semantic_boundary")
+    ]
+)
+
+# %% [markdown]
+# ## Select dense, sparse, and boundary-rich train crops
+#
+# For each rare class, keep one crop at the highest observed density and one near
+# the 10th percentile of positive crop densities. Add a distinct crop with the most
+# semantic class transitions. This exposes both class-rich and fragile low-pixel
+# examples while keeping crop choice deterministic and train-only.
+
+# %%
+selected_focus_examples: dict[tuple[str, str, int, int], dict[str, Any]] = {}
+
+
+def _add_focus_example(row: pd.Series, focus: str) -> None:
+    """Keep a crop once and attach all deterministic reasons for selecting it."""
+    key = _window_key(row)
+    selected = selected_focus_examples.setdefault(
+        key,
+        {
+            "dataset": str(row["dataset"]),
+            "scene_id": str(row["scene_id"]),
+            "row": int(row["row"]),
+            "col": int(row["col"]),
+            "height": int(row["height"]),
+            "width": int(row["width"]),
+            "focus_categories": [],
+            "source_window_boundary_fraction": float(row["semantic_boundary_fraction"]),
+            **{
+                f"window_class_{class_id}_pixels": int(row[f"class_{class_id}_pixels"])
+                for class_id in range(6)
+            },
+            **{
+                f"window_class_{class_id}_share": float(row[f"class_{class_id}_share"])
+                for class_id in range(6)
+            },
+        },
+    )
+    if focus not in selected["focus_categories"]:
+        selected["focus_categories"].append(focus)
+
+
+for dataset_name in DATASET_CONFIGS:
+    candidates = window_scan.loc[window_scan["dataset"] == dataset_name]
+    used_keys: set[tuple[str, str, int, int]] = set()
+    for class_id in RARE_CLASS_IDS[dataset_name]:
+        class_column = f"class_{class_id}_pixels"
+        present = candidates.loc[candidates[class_column] > 0]
+        if present.empty:
+            raise RuntimeError(
+                f"Rare class {CLASS_NAMES[class_id]} has no candidate crop in "
+                f"{dataset_name} training scenes"
+            )
+        class_share_column = f"class_{class_id}_share"
+        ranked_high = present.sort_values(
+            [class_share_column, "semantic_boundary_fraction", class_column],
+            ascending=False,
+        )
+        high_density_row = ranked_high.iloc[0]
+        _add_focus_example(
+            high_density_row,
+            f"rare_class_{class_id}_{CLASS_NAMES[class_id]}_high_density",
+        )
+        used_keys.add(_window_key(high_density_row))
+
+        lower_quantile = float(present[class_share_column].quantile(0.10))
+        ranked_low = present.assign(
+            _density_distance=(present[class_share_column] - lower_quantile).abs()
+        ).sort_values(
+            ["_density_distance", class_column, "semantic_boundary_fraction"],
+            ascending=[True, True, False],
+        )
+        for _, low_density_row in ranked_low.iterrows():
+            if _window_key(low_density_row) not in used_keys:
+                _add_focus_example(
+                    low_density_row,
+                    f"rare_class_{class_id}_{CLASS_NAMES[class_id]}_p10_density",
+                )
+                used_keys.add(_window_key(low_density_row))
+                break
+
+    ranked_boundaries = candidates.sort_values(
+        ["semantic_boundary_fraction", "semantic_boundary_pixels"],
+        ascending=False,
+    )
+    boundary_row = None
+    for _, candidate in ranked_boundaries.iterrows():
+        key = _window_key(candidate)
+        if key not in used_keys:
+            boundary_row = candidate
+            break
+    if boundary_row is None:
+        boundary_row = ranked_boundaries.iloc[0]
+    _add_focus_example(boundary_row, "boundary_rich_crop")
+
+rare_boundary_manifest = pd.DataFrame(selected_focus_examples.values())
+
+# %% [markdown]
+# ## Replay rare-class and boundary crops
+#
+# Each selected training crop is replayed with eight deterministic seeds. The audit
+# checks class-pixel retention, class-boundary density, affine support masks, label
+# ignore fill, radiometric changes inside padding, and model patch-stride padding.
+# The visualization shows one affine-padded example per selected crop when available.
+
+# %%
+rare_boundary_audit_rows: list[dict[str, Any]] = []
+padding_audit_rows: list[dict[str, Any]] = []
+rare_boundary_visuals: list[dict[str, Any]] = []
+
+for dataset_name in DATASET_CONFIGS:
+    scene_counts = label_counts.loc[
+        (label_counts["dataset"] == dataset_name) & (label_counts["role"] == "train")
+    ]
+    dataset_examples = rare_boundary_manifest.loc[
+        rare_boundary_manifest["dataset"] == dataset_name
+    ].reset_index(drop=True)
+    for example_index, example in dataset_examples.iterrows():
+        scene = scene_lookup[dataset_name][str(example["scene_id"])]
+        label_asset = SPLITS[dataset_name].label_asset_for("train")
+        channels, source_labels, source_valid = _read_patch(
+            scene,
+            label_asset,
+            int(example["height"]),
+            int(example["row"]),
+            int(example["col"]),
+        )
+        source_labels = source_labels.copy()
+        source_labels[~source_valid] = PREPROCESSING.ignore_label
+        source_boundaries = semantic_boundary_mask(
+            source_labels,
+            source_valid,
+            num_classes=PREPROCESSING.ignore_label,
+        )
+        source_counts = _semantic_counts(source_labels, source_valid)
+        source_edge_counts = np.bincount(
+            source_labels[source_boundaries], minlength=PREPROCESSING.ignore_label
+        )
+        source_area = max(int(source_counts.sum()), 1)
+        source_ignore_fraction = float(
+            np.mean(source_labels == PREPROCESSING.ignore_label)
+        )
+        target_class_ids = RARE_CLASS_IDS[dataset_name]
+        padding_mask_for_visual = None
+        visual_channels = None
+        visual_labels = None
+        visual_valid = None
+        visual_seed = None
+        last_visual: dict[str, Any] | None = None
+
+        for repeat_index in range(RARE_BOUNDARY_SEEDS_PER_CROP):
+            seed = int(
+                np.random.SeedSequence(
+                    [
+                        RANDOM_SEED,
+                        300_000,
+                        list(DATASET_CONFIGS).index(dataset_name),
+                        example_index,
+                        repeat_index,
+                    ]
+                ).generate_state(1, dtype=np.uint32)[0]
+            )
+            geometric, geometric_labels, geometric_valid = GEOMETRY_ONLY_AUGMENTER(
+                channels,
+                source_labels,
+                source_valid,
+                seed=seed,
+            )
+            augmented, augmented_labels, augmented_valid = AUGMENTER(
+                channels,
+                source_labels,
+                source_valid,
+                seed=seed,
+            )
+            support_labels = np.zeros_like(source_labels)
+            _, _, geometric_support = GEOMETRY_ONLY_AUGMENTER(
+                channels,
+                support_labels,
+                np.ones_like(source_valid, dtype=bool),
+                seed=seed,
+            )
+            geometric_support = np.asarray(geometric_support, dtype=bool)
+            padding_mask = ~geometric_support
+            np.testing.assert_array_equal(geometric_labels, augmented_labels)
+            np.testing.assert_array_equal(geometric_valid, augmented_valid)
+            if np.any(augmented_valid & padding_mask):
+                raise AssertionError("Affine-generated padding is marked valid")
+            if np.any(augmented_labels[padding_mask] != PREPROCESSING.ignore_label):
+                raise AssertionError("Affine-generated padding is not ignore-labeled")
+            if np.any(augmented_labels[~augmented_valid] != PREPROCESSING.ignore_label):
+                raise AssertionError(
+                    "Invalid augmentation pixels are not ignore-labeled"
+                )
+
+            for band_name, values in augmented.items():
+                if not np.isfinite(values).all():
+                    raise AssertionError(
+                        f"Augmentation produced non-finite {band_name} values"
+                    )
+                if np.any(values < 0) or np.any(values > 255):
+                    raise AssertionError(
+                        f"Augmentation moved {band_name} outside [0, 255]"
+                    )
+
+            geometry_boundaries = semantic_boundary_mask(
+                geometric_labels,
+                geometric_valid,
+                num_classes=PREPROCESSING.ignore_label,
+            )
+            geometry_counts = _semantic_counts(geometric_labels, geometric_valid)
+            geometry_edge_counts = np.bincount(
+                geometric_labels[geometry_boundaries],
+                minlength=PREPROCESSING.ignore_label,
+            )
+            semantic_geometry_total = max(int(geometry_counts.sum()), 1)
+            padding_pixels = int(padding_mask.sum())
+            if padding_pixels:
+                geometric_padding = np.stack(
+                    [geometric[name] for name in AUGMENTER.optical_channels], axis=-1
+                )[padding_mask]
+                augmented_padding = np.stack(
+                    [augmented[name] for name in AUGMENTER.optical_channels], axis=-1
+                )[padding_mask]
+                padding_geometry_nonzero_fraction = float(
+                    np.mean(np.abs(geometric_padding) > 1e-6)
+                )
+                padding_augmented_nonzero_fraction = float(
+                    np.mean(np.abs(augmented_padding) > 1e-6)
+                )
+                padding_radiometry_change_fraction = float(
+                    np.mean(np.abs(augmented_padding - geometric_padding) > 1e-6)
+                )
+                padding_radiometry_mean_abs_delta = float(
+                    np.mean(np.abs(augmented_padding - geometric_padding))
+                )
+            else:
+                padding_geometry_nonzero_fraction = np.nan
+                padding_augmented_nonzero_fraction = np.nan
+                padding_radiometry_change_fraction = np.nan
+                padding_radiometry_mean_abs_delta = np.nan
+
+            model_padding_bottom = (-int(example["height"])) % MODEL_PATCH_SIZE
+            model_padding_right = (-int(example["width"])) % MODEL_PATCH_SIZE
+            padding_audit_rows.append(
+                {
+                    "dataset": dataset_name,
+                    "role": "train",
+                    "scene_id": str(example["scene_id"]),
+                    "example_id": f"{dataset_name}:{example_index}",
+                    "row": int(example["row"]),
+                    "col": int(example["col"]),
+                    "focus_categories": ";".join(example["focus_categories"]),
+                    "seed": seed,
+                    "repeat_index": repeat_index,
+                    "model_patch_size": MODEL_PATCH_SIZE,
+                    "model_padding_bottom": model_padding_bottom,
+                    "model_padding_right": model_padding_right,
+                    "model_patch_padding_fraction": 1.0
+                    - (int(example["height"]) - model_padding_bottom)
+                    * (int(example["width"]) - model_padding_right)
+                    / (int(example["height"]) * int(example["width"])),
+                    "affine_padding_pixels": padding_pixels,
+                    "affine_padding_fraction": padding_pixels
+                    / (int(example["height"]) * int(example["width"])),
+                    "source_invalid_fraction_within_support": float(
+                        np.mean(~augmented_valid[geometric_support])
+                    ),
+                    "label_ignore_fraction_within_support": float(
+                        np.mean(
+                            augmented_labels[geometric_support]
+                            == PREPROCESSING.ignore_label
+                        )
+                    ),
+                    "padding_label_is_ignore": bool(
+                        np.all(
+                            augmented_labels[padding_mask] == PREPROCESSING.ignore_label
+                        )
+                    ),
+                    "padding_mask_is_invalid": bool(
+                        not np.any(augmented_valid[padding_mask])
+                    ),
+                    "padding_optical_nonzero_fraction_after_geometry": (
+                        padding_geometry_nonzero_fraction
+                    ),
+                    "padding_optical_nonzero_fraction_after_radiometry": (
+                        padding_augmented_nonzero_fraction
+                    ),
+                    "padding_optical_radiometry_change_fraction": (
+                        padding_radiometry_change_fraction
+                    ),
+                    "padding_optical_radiometry_mean_abs_delta": (
+                        padding_radiometry_mean_abs_delta
+                    ),
+                    "geometry_valid_fraction": float(geometric_valid.mean()),
+                    "source_ignore_fraction": source_ignore_fraction,
+                }
+            )
+
+            for class_id in target_class_ids:
+                source_pixels = int(source_counts[class_id])
+                augmented_pixels = int(geometry_counts[class_id])
+                source_class_edges = int(source_edge_counts[class_id])
+                augmented_class_edges = int(geometry_edge_counts[class_id])
+                class_present = source_pixels > 0
+                row_record = {
+                    "dataset": dataset_name,
+                    "role": "train",
+                    "example_id": f"{dataset_name}:{example_index}",
+                    "scene_id": str(example["scene_id"]),
+                    "row": int(example["row"]),
+                    "col": int(example["col"]),
+                    "focus_categories": ";".join(example["focus_categories"]),
+                    "seed": seed,
+                    "repeat_index": repeat_index,
+                    "class_id": class_id,
+                    "class_name": CLASS_NAMES[class_id],
+                    "rare_class": True,
+                    "source_class_present": class_present,
+                    "source_class_pixels": source_pixels,
+                    "augmented_class_pixels": augmented_pixels,
+                    "class_pixel_retention_ratio": augmented_pixels / source_pixels
+                    if class_present
+                    else np.nan,
+                    "class_disappeared_after_geometry": bool(
+                        source_pixels > 0 and augmented_pixels == 0
+                    )
+                    if class_present
+                    else np.nan,
+                    "source_class_boundary_pixels": source_class_edges,
+                    "augmented_class_boundary_pixels": augmented_class_edges,
+                    "source_class_boundary_fraction": source_class_edges / source_pixels
+                    if class_present
+                    else np.nan,
+                    "augmented_class_boundary_fraction": augmented_class_edges
+                    / augmented_pixels
+                    if augmented_pixels > 0
+                    else np.nan,
+                    "source_semantic_boundary_fraction": int(source_boundaries.sum())
+                    / source_area,
+                    "augmented_semantic_boundary_fraction": int(
+                        geometry_boundaries.sum()
+                    )
+                    / semantic_geometry_total,
+                    "affine_padding_fraction": padding_pixels
+                    / (int(example["height"]) * int(example["width"])),
+                    "geometry_valid_fraction": float(geometric_valid.mean()),
+                }
+                rare_boundary_audit_rows.append(row_record)
+
+            last_visual = {
+                "dataset": dataset_name,
+                "scene_id": str(example["scene_id"]),
+                "row": int(example["row"]),
+                "col": int(example["col"]),
+                "focus_categories": ";".join(example["focus_categories"]),
+                "channels": channels,
+                "limits": {
+                    band_name: tuple(
+                        float(value)
+                        for value in np.percentile(
+                            channels[band_name][source_valid], [2, 98]
+                        )
+                    )
+                    for band_name in ("red", "green", "ir")
+                },
+                "source_labels": source_labels,
+                "source_valid": source_valid,
+                "augmented_channels": augmented,
+                "augmented_labels": augmented_labels,
+                "augmented_valid": augmented_valid,
+                "padding_mask": padding_mask,
+                "geometry_boundaries": geometry_boundaries,
+                "seed": seed,
+            }
+            if visual_seed is None or (
+                padding_pixels > 0
+                and padding_mask_for_visual is not None
+                and not padding_mask_for_visual.any()
+            ):
+                padding_mask_for_visual = padding_mask
+                visual_channels = augmented
+                visual_labels = augmented_labels
+                visual_valid = augmented_valid
+                visual_seed = seed
+
+        if last_visual is not None:
+            if visual_seed is not None:
+                last_visual["augmented_channels"] = visual_channels
+                last_visual["augmented_labels"] = visual_labels
+                last_visual["augmented_valid"] = visual_valid
+                last_visual["padding_mask"] = padding_mask_for_visual
+                last_visual["geometry_boundaries"] = semantic_boundary_mask(
+                    visual_labels,
+                    visual_valid,
+                    num_classes=PREPROCESSING.ignore_label,
+                )
+                last_visual["seed"] = visual_seed
+            rare_boundary_visuals.append(last_visual)
+
+rare_boundary_audit = pd.DataFrame(rare_boundary_audit_rows)
+padding_audit = pd.DataFrame(padding_audit_rows)
+if rare_boundary_audit.empty or padding_audit.empty:
+    raise RuntimeError("The rare-class and padding augmentation audit was empty")
+
+present_rare_boundary_audit = rare_boundary_audit.loc[
+    rare_boundary_audit["source_class_present"]
+].copy()
+rare_boundary_augmentation_summary = present_rare_boundary_audit.groupby(
+    ["dataset", "class_id", "class_name"], as_index=False
+).agg(
+    selected_class_crops=("example_id", "nunique"),
+    crop_seed_trials=("seed", "size"),
+    source_class_pixels_mean=("source_class_pixels", "mean"),
+    class_pixel_retention_median=("class_pixel_retention_ratio", "median"),
+    class_pixel_retention_p05=(
+        "class_pixel_retention_ratio",
+        lambda values: values.quantile(0.05),
+    ),
+    class_disappearance_rate=("class_disappeared_after_geometry", "mean"),
+    source_class_boundary_fraction_mean=("source_class_boundary_fraction", "mean"),
+    augmented_class_boundary_fraction_mean=(
+        "augmented_class_boundary_fraction",
+        "mean",
+    ),
+    source_semantic_boundary_fraction_mean=(
+        "source_semantic_boundary_fraction",
+        "mean",
+    ),
+    augmented_semantic_boundary_fraction_mean=(
+        "augmented_semantic_boundary_fraction",
+        "mean",
+    ),
+    affine_padding_fraction_mean=("affine_padding_fraction", "mean"),
+    affine_padding_fraction_p95=(
+        "affine_padding_fraction",
+        lambda values: values.quantile(0.95),
+    ),
+)
+padding_summary = padding_audit.groupby("dataset", as_index=False).agg(
+    selected_crops=("example_id", "nunique"),
+    seed_trials=("seed", "size"),
+    affine_padding_trial_fraction=(
+        "affine_padding_fraction",
+        lambda values: float((values > 0).mean()),
+    ),
+    affine_padding_fraction_mean=("affine_padding_fraction", "mean"),
+    affine_padding_fraction_p95=(
+        "affine_padding_fraction",
+        lambda values: values.quantile(0.95),
+    ),
+    affine_padding_fraction_max=("affine_padding_fraction", "max"),
+    padding_label_ignore_pass_rate=("padding_label_is_ignore", "mean"),
+    padding_mask_invalid_pass_rate=("padding_mask_is_invalid", "mean"),
+    padding_nonzero_after_geometry_mean=(
+        "padding_optical_nonzero_fraction_after_geometry",
+        "mean",
+    ),
+    padding_nonzero_after_radiometry_mean=(
+        "padding_optical_nonzero_fraction_after_radiometry",
+        "mean",
+    ),
+    padding_radiometry_change_trial_rate=(
+        "padding_optical_radiometry_change_fraction",
+        lambda values: float((values > 0).mean()),
+    ),
+    padding_radiometry_mean_abs_delta=(
+        "padding_optical_radiometry_mean_abs_delta",
+        "mean",
+    ),
+    model_padding_fraction_max=("model_patch_padding_fraction", "max"),
+)
+display(rare_boundary_augmentation_summary)
+display(padding_summary)
+
+EDGE_CMAP = ListedColormap(["#00FFFF"])
+PADDING_CMAP = ListedColormap([(0.0, 0.0, 0.0, 0.0), (1.0, 0.0, 1.0, 0.62)])
+fig, axes = plt.subplots(
+    len(rare_boundary_visuals),
+    4,
+    figsize=(16, max(4, 3.6 * len(rare_boundary_visuals))),
+    squeeze=False,
+    constrained_layout=True,
+)
+for row_index, example in enumerate(rare_boundary_visuals):
+    axes[row_index, 0].imshow(_display_image(example["channels"], example["limits"]))
+    axes[row_index, 0].set_title("source IRRG")
+    axes[row_index, 1].imshow(example["source_labels"], cmap=LABEL_CMAP, vmin=0, vmax=6)
+    source_edges = semantic_boundary_mask(
+        example["source_labels"],
+        example["source_valid"],
+        num_classes=PREPROCESSING.ignore_label,
+    )
+    axes[row_index, 1].imshow(
+        np.ma.masked_where(~source_edges, source_edges),
+        cmap=EDGE_CMAP,
+        alpha=0.9,
+    )
+    axes[row_index, 1].set_title("source labels + semantic edges")
+    axes[row_index, 2].imshow(
+        _display_image(example["augmented_channels"], example["limits"])
+    )
+    axes[row_index, 2].set_title(f"augmented IRRG (seed {example['seed']})")
+    axes[row_index, 3].imshow(
+        example["augmented_labels"], cmap=LABEL_CMAP, vmin=0, vmax=6
+    )
+    axes[row_index, 3].imshow(
+        np.ma.masked_where(
+            ~example["geometry_boundaries"], example["geometry_boundaries"]
+        ),
+        cmap=EDGE_CMAP,
+        alpha=0.9,
+    )
+    axes[row_index, 3].imshow(
+        example["padding_mask"].astype(np.uint8),
+        cmap=PADDING_CMAP,
+        vmin=0,
+        vmax=1,
+    )
+    axes[row_index, 3].set_title("augmented labels + edges + padding")
+    focus_text = example["focus_categories"].replace(";", ", ")
+    axes[row_index, 0].set_ylabel(
+        f"{example['dataset']} {example['scene_id']}\n"
+        f"({example['row']}, {example['col']})\n{focus_text}",
+        fontsize=8,
+    )
+    for axis in axes[row_index]:
+        axis.set_axis_off()
+fig.suptitle("Cyan: semantic class edges. Magenta: affine-generated padding.")
+fig.savefig(ARTIFACT_ROOT / "augmentation-rare-boundary-examples.png", dpi=160)
+plt.show()
+
+# %% [markdown]
 # ## Save tables, figures, and provenance
 #
 # These artifacts are outside the Git checkout. Provenance records DVC, catalog,
@@ -1705,6 +2521,21 @@ augmentation_effect_summary.to_csv(
 augmentation_example_manifest.to_csv(
     ARTIFACT_ROOT / "augmentation-examples-manifest.csv", index=False
 )
+window_scan.to_csv(ARTIFACT_ROOT / "augmentation-training-window-scan.csv", index=False)
+augmentation_focus_summary.to_csv(
+    ARTIFACT_ROOT / "augmentation-focus-summary.csv", index=False
+)
+rare_boundary_manifest.to_csv(
+    ARTIFACT_ROOT / "augmentation-rare-boundary-manifest.csv", index=False
+)
+rare_boundary_audit.to_csv(
+    ARTIFACT_ROOT / "augmentation-rare-boundary-audit.csv", index=False
+)
+rare_boundary_augmentation_summary.to_csv(
+    ARTIFACT_ROOT / "augmentation-rare-boundary-summary.csv", index=False
+)
+padding_audit.to_csv(ARTIFACT_ROOT / "augmentation-padding-audit.csv", index=False)
+padding_summary.to_csv(ARTIFACT_ROOT / "augmentation-padding-summary.csv", index=False)
 
 
 def _sha256(path: Path) -> str:
@@ -1775,8 +2606,40 @@ provenance = {
                 "same seeded geometry with and without optical transforms"
             ),
         },
+        "rare_boundary_padding_audit": {
+            "roles": ["train"],
+            "test_scenes_read": False,
+            "candidate_windows": int(len(window_scan)),
+            "candidate_stride_fraction_of_window": 1 / AUDIT_GRID_STRIDE_DIVISOR,
+            "crop_selection": (
+                "highest-density and 10th-percentile positive crop per rare class, "
+                "plus a distinct boundary-rich crop"
+            ),
+            "rare_class_rule": {
+                "global_train_share_at_most": RARE_CLASS_SHARE_THRESHOLD,
+                "or_train_scene_presence_at_most": (
+                    RARE_CLASS_SCENE_PRESENCE_THRESHOLD
+                ),
+                "class_ids_by_dataset": {
+                    name: list(class_ids) for name, class_ids in RARE_CLASS_IDS.items()
+                },
+            },
+            "boundary_definition": (
+                "both sides of valid 4-neighbor transitions between semantic classes"
+            ),
+            "same_class_instance_edges_available": False,
+            "selected_crop_seed_trials": RARE_BOUNDARY_SEEDS_PER_CROP,
+            "padding_sources_reported_separately": [
+                "affine-generated image borders",
+                "source invalid mask",
+                "label ignore pixels",
+                "model patch-stride padding",
+            ],
+            "model_patch_size": MODEL_PATCH_SIZE,
+        },
     },
     "runtime": {
+        "python_executable": sys.executable,
         "python": sys.version,
         "platform": platform.platform(),
         "numpy": np.__version__,

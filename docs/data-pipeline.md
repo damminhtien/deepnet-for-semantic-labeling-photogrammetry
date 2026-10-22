@@ -312,6 +312,67 @@ Review `augmentation-examples.png`, `augmentation-impact.png`,
 versioned policy. `eda-provenance.json` records the source hash, DVC lock, catalogs,
 splits, quality reports, runtime versions, and seeds.
 
+#### Rare classes, semantic boundaries, and padding follow-up
+
+The expanded audit is restricted to the DINOv3 training scenes (18 Potsdam and 12
+Vaihingen); validation and official test scenes were not used for crop selection or
+augmentation replay. It scanned 12,121 overlapping candidate windows at half-window
+stride (9,522 Potsdam and 2,599 Vaihingen). A class is treated as rare when its
+training-pixel share is at most 6% or it appears in at most half the training scenes.
+This selects car and clutter/background in both datasets. Clutter/background is
+present in only 4 of 12 Vaihingen training scenes.
+
+For each dataset, the audit selected five crops: the highest-density crop and the
+crop nearest the 10th percentile of positive-window density for each rare class,
+plus one distinct boundary-rich crop. Each crop was replayed with eight deterministic
+seeds (40 trials per dataset). The table reports geometry-only class-pixel retention;
+the 5th percentile and disappearance rate are computed over trials where that
+source class was present. Class-edge fractions count valid 4-neighbor semantic
+transitions on both sides of the edge. For each row, the fraction is boundary pixels
+of the target class divided by all valid pixels of that class in the crop; values are
+averaged over seeds.
+
+| Dataset / class | Train pixel share | Class crops / trials | Median retention | 5th percentile | Disappeared | Class-edge fraction, source → after geometry |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Potsdam car | 1.61% | 2 / 16 | 100% | 0% | 12.5% | 10.51% → 10.20% |
+| Potsdam clutter/background | 5.61% | 4 / 32 | 100% | 10.2% | 0% | 7.28% → 10.87% |
+| Vaihingen car | 1.06% | 2 / 16 | 100% | 73.9% | 0% | 14.13% → 14.65% |
+| Vaihingen clutter/background | 0.88% | 2 / 16 | 100% | 92.0% | 0% | 4.47% → 4.60% |
+
+The two Potsdam car disappearances came from the low-density crop in train scene
+`6_7` at `(row=4608, col=3584)`, which contained 1,274 car pixels before
+augmentation. Both occurred in separate affine replays. This does not establish a
+general failure rate for all Potsdam cars, but it shows that the current geometry can
+remove a rare target from a sparse crop. The 4-neighbor measure is a semantic class
+boundary, not an instance boundary; these labels do not identify touching objects
+of the same class.
+
+| Dataset | Trials with affine padding | Mean / p95 / max padded area | Padding labels ignore and mask invalid | Nonzero padded values, after geometry → after radiometry | Trials where radiometry changed padding | Mean absolute change per padded pixel | Model patch padding |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Potsdam | 45% | 2.95% / 9.89% / 13.50% | 100% / 100% | 2.93% → 27.08% | 30% | 2.84 DN | 0% |
+| Vaihingen | 40% | 3.02% / 13.06% / 14.56% | 100% / 100% | 8.23% → 33.33% | 25% | 4.33 DN | 0% |
+
+Padding is labeled and masked correctly, but photometric transforms change the image
+values in those invalid pixels. The nonzero percentages and mean absolute changes
+are averaged over trials with affine padding; the changed-trial percentage uses all
+replay trials. Model patch padding is zero because both crop sizes (512 and 288) are
+divisible by DINOv3 ViT-B/16's patch size of 16.
+
+Before full training, restore the configured image fill value after optical
+radiometry (or keep radiometric operations mask-aware), then rerun this audit. Also
+review a rare-class sampling or bounded geometry policy for low-density car crops.
+Neither the versioned augmentation config nor the training config was changed during
+this audit, and these diagnostics are not model-performance evidence.
+
+The expanded artifacts are stored outside Git under
+`/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/eda/20261022T063946Z/`:
+`augmentation-training-window-scan.csv`, `augmentation-rare-boundary-manifest.csv`,
+`augmentation-rare-boundary-audit.csv`, `augmentation-rare-boundary-summary.csv`,
+`augmentation-padding-audit.csv`, `augmentation-padding-summary.csv`, and
+`augmentation-rare-boundary-examples.png`. In the figure, cyan marks semantic class
+edges and magenta marks affine-generated padding. `eda-provenance.json` includes the
+split/catalog/config hashes, seeds, and runtime details.
+
 The inspected Vaihingen inventory contains 33 image scenes; 17 are missing the
 participant-label asset. Define a supervised split from scenes with the chosen
 label asset, or use the image-only catalog for inference. Missing labels remain
