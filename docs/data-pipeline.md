@@ -233,6 +233,14 @@ configures this protocol but does not yet provide a complete model-loading
 training/evaluation runner. No test evaluation has been performed for this DINOv3
 plan.
 
+When `stride` is omitted, evaluation now uses `floor(window_size / 2)` per axis
+(minimum one pixel), creating real overlap for scenes larger than a window. An
+explicit stride must be smaller on each axis whose window dimension exceeds one
+pixel; a non-overlapping override is rejected. The resolved stride is included in
+the evaluation result's provenance alongside the window size. If a whole scene fits
+in one window, only one window is needed and there are no neighboring logits to
+blend.
+
 The 14 test scenes were evaluated in separate historical experiments. This v2 keeps
 them out of DINOv3 training and model selection, but the result should be described
 as benchmark-aligned held-out evaluation, not as a never-before-used program-level

@@ -824,15 +824,24 @@ def test_scene_evaluation_uses_full_grid_and_ignores_nodata(
         access,
         ("validation-a",),
         window_size=(4, 4),
-        stride=(3, 3),
         batch_size=2,
         scratch_dir=scratch_dir,
     )
 
     assert result["mean_iou"] == pytest.approx(1.0), result
     assert result["pixels_scored"] == 34
-    assert result["scenes"][0]["window_count"] == 6
+    assert result["window_size"] == [4, 4]
+    assert result["stride"] == [2, 2]
+    assert result["scenes"][0]["window_count"] == 12
     assert not list(scratch_dir.iterdir())
+    with pytest.raises(ValueError, match="ensure overlap"):
+        evaluate_scenes(
+            PatternModel(),
+            access,
+            ("validation-a",),
+            window_size=(4, 4),
+            stride=(4, 4),
+        )
     access.close()
 
 

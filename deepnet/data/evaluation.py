@@ -126,6 +126,32 @@ def _model_device(model: Any, torch: Any, requested: Any | None) -> Any:
         return torch.device("cpu")
 
 
+def _resolve_evaluation_stride(
+    window_size: tuple[int, int],
+    stride: tuple[int, int] | None,
+) -> tuple[int, int]:
+    """Resolve a stride that guarantees overlap on non-singleton axes."""
+    if len(window_size) != 2 or any(size <= 0 for size in window_size):
+        raise ValueError("window_size must contain two positive dimensions")
+    resolved = (
+        tuple(max(1, size // 2) for size in window_size)
+        if stride is None
+        else tuple(stride)
+    )
+    if len(resolved) != 2 or any(step <= 0 for step in resolved):
+        raise ValueError("stride must contain two positive dimensions")
+    if any(step > size for step, size in zip(resolved, window_size, strict=True)):
+        raise ValueError("stride must not exceed window_size")
+    if any(
+        size > 1 and step >= size
+        for step, size in zip(resolved, window_size, strict=True)
+    ):
+        raise ValueError(
+            "Evaluation stride must be smaller than window_size to ensure overlap"
+        )
+    return resolved
+
+
 def _evaluate_scene(
     model: Any,
     access: SceneAccess,
@@ -133,7 +159,7 @@ def _evaluate_scene(
     *,
     number_of_classes: int,
     window_size: tuple[int, int],
-    stride: tuple[int, int] | None,
+    stride: tuple[int, int],
     batch_size: int,
     device: Any,
     scratch_root: Path,
@@ -270,13 +296,18 @@ def evaluate_scenes(
     class_names: Sequence[str] | None = None,
     scratch_dir: Path | None = None,
 ) -> dict[str, Any]:
-    """Score scenes; labels are read only through the selected split contract."""
+    """Score scenes with overlapping tiles and split-bound reference labels.
+
+    The default stride is half the window size on each axis. Explicit strides must
+    overlap on every axis whose window dimension is greater than one pixel.
+    """
     if not scene_ids:
         raise ValueError("At least one scene is required for evaluation")
     if len(scene_ids) != len(set(scene_ids)):
         raise ValueError("Evaluation scene IDs must not contain duplicates")
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
+    resolved_stride = _resolve_evaluation_stride(window_size, stride)
     if access.split_name not in {"validation", "test"}:
         raise ValueError(
             "Full-scene evaluation requires validation or test data access"
@@ -322,7 +353,7 @@ def evaluate_scenes(
                     scene_id,
                     number_of_classes=number_of_classes,
                     window_size=window_size,
-                    stride=stride,
+                    stride=resolved_stride,
                     batch_size=batch_size,
                     device=selected_device,
                     scratch_root=scene_scratch,
@@ -347,7 +378,7 @@ def evaluate_scenes(
             "model_input_hash": canonical_hash(access.model_input.to_dict()),
             "scene_ids": list(scene_ids),
             "window_size": list(window_size),
-            "stride": list(stride or window_size),
+            "stride": list(resolved_stride),
             "scenes": scene_results,
         }
     )
