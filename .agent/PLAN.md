@@ -112,14 +112,14 @@ bytes or machine credentials are staged in Git.
 ### M11: Dataset splits, DINOv3 views, and robust augmentation
 
 Status: implementation and local EDA complete (2026-10-22). The reproducible
-Jupytext cell source ran as a fresh project Python process against DVC lock
-`3cff56c46a3471b1`. It scanned full-scene labels and all active train/validation
-scenes, sampled IRRG windows across each scene, and audited synchronized geometry and
-optical transforms over three seeds per training scene. Albumentations child
-transforms now receive independent deterministic seeds; the aerial policy is v2.
-Outputs are under the external Data EDA directory. Jupyter MCP returned
-`Invalid URL 'local/login'`, so an executable `.ipynb` could not be created or run
-through the notebook service; the source cells and conversion command are documented.
+Jupytext source ran as a fresh project process and as a 17-cell Jupyter notebook
+against DVC lock `17994ddb59a804bc`. After restarting the project `.venv` kernel, all
+nine code cells executed in order. The analysis scanned full-scene labels and active
+train/validation scenes, sampled IRRG windows across every scene, and audited
+synchronized geometry and optical transforms over three seeds per training scene.
+Albumentations child transforms now receive independent deterministic seeds; the
+aerial policy is v2. Tables and figures are under the external Data EDA directory,
+with source, DVC, split, and augmentation hashes in the provenance manifest.
 
 - Use 18 participant-labeled Potsdam scenes for training and 20 eroded-reference
   scenes for validation, including the 14 scenes held out in a separate prior run.
@@ -133,10 +133,11 @@ through the notebook service; the source cells and conversion command are docume
 
 Validation: split contracts are disjoint, data-quality reports cover all active
 train/validation scenes, and augmentation tests cover seeded replay, nearest-neighbor
-masks, ignored affine borders, and optical-only transforms. A fresh-process run of
-the Jupytext source generated the saved plots and tables, which were inspected.
-Jupyter MCP returned an invalid `local/login` URL and did not permit creating or
-running the `.ipynb` during this run.
+masks, ignored affine borders, and optical-only transforms. The notebook kernel was
+verified at the project `.venv/bin/python`, restarted, and run from the first code
+cell to the last. Rendered augmentation plots were inspected and the notebook was
+saved without generated cell outputs; reproducible tables, figures, and provenance
+remain in the external Data EDA directory.
 
 ### M12: One unified Kaggle run plan and README
 

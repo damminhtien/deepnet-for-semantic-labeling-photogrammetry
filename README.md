@@ -67,12 +67,14 @@ IRRG-only views can be exported from the same catalog without weakening that che
 
 ## Data EDA and augmentation
 
+[`notebooks/data_eda_augmentation.ipynb`](notebooks/data_eda_augmentation.ipynb) is
+the runnable Jupyter notebook, accompanied by its maintainable
 [`notebooks_src/data_eda_augmentation.py`](notebooks_src/data_eda_augmentation.py)
-provides reproducible notebook-style cells for scene inventory, alignment evidence,
-full-scene class balance, scene-stratified IRRG profiles, and a seeded augmentation
-audit. The report records label imbalance and ignore coverage for both datasets;
-validation stays natural and unaugmented. The current aerial IRRG policy is versioned
-as `isprs-irrg-aerial-v2`, with synchronized geometry, ignored affine borders, and
+Jupytext source. It covers scene inventory, alignment evidence, full-scene class
+balance, scene-stratified IRRG profiles, and a seeded augmentation audit. The report
+records label imbalance and ignore coverage for both datasets; validation stays
+natural and unaugmented. The current aerial IRRG policy is versioned as
+`isprs-irrg-aerial-v2`, with synchronized geometry, ignored affine borders, and
 independently seeded optical-only transforms. See the [EDA findings and audit
 method](docs/data-pipeline.md#frozen-eda-snapshot) and the
 [augmentation design](docs/data-pipeline.md#augmentation-policy-and-audit).

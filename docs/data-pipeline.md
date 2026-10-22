@@ -116,11 +116,23 @@ per-scene asset coverage and raster metadata, explicit alignment evidence, full-
 label counts, deterministic IRRG histograms, and aligned before/after augmentation
 examples. It saves tables and figures under `DEEPNET_ARTIFACT_ROOT`, outside Git.
 
-The analysis uses notebook-style cells in
+Open the runnable
+[`notebooks/data_eda_augmentation.ipynb`](../notebooks/data_eda_augmentation.ipynb)
+after installing `.[notebooks,vision,data-versioning]`, materializing the DVC inputs,
+and running `dvc repro`. Its companion Jupytext source is
 [`notebooks_src/data_eda_augmentation.py`](../notebooks_src/data_eda_augmentation.py).
-Install `.[notebooks,vision,data-versioning]`, materialize the DVC inputs, and run
-`dvc repro`. Open the source with a Jupytext-enabled editor or convert it to an
-`.ipynb` using:
+Register the project environment once and select **Python (DeepNet EDA)** in
+Jupyter:
+
+```bash
+uv run python -m ipykernel install --user \
+  --name deepnet-eda --display-name "Python (DeepNet EDA)"
+```
+
+The committed notebook contains source cells without generated outputs. Run all
+cells from the top; result tables, figures, and provenance are saved outside Git
+under `DEEPNET_ARTIFACT_ROOT`. To regenerate the notebook from the companion source,
+run:
 
 ```bash
 uv run jupytext --to ipynb \
@@ -148,7 +160,7 @@ The official six-class palette and ignored black boundaries are documented by
 ### Frozen EDA snapshot
 
 The current analysis was generated against DVC lock SHA-256
-`3cff56c46a3471b123e3e7c74c1c09fa25e192d9d4b662693605516e27b9eb0d`. Label
+`17994ddb59a804bc847d3429cdd17dce1b0435db1c054e207e15565f28217b9c`. Label
 proportions below come from complete train/validation scene scans. Each class share
 is normalized over the six semantic classes; the ignore share uses all labeled
 pixels.
