@@ -22,8 +22,45 @@ class FeatureBackbone(Protocol):
         """Return four NCHW feature maps in shallow-to-deep order."""
 
 
+def _find_lora_target_modules(
+    model: nn.Module,
+    target_modules: Sequence[str],
+) -> tuple[str, ...]:
+    """Resolve configured PEFT suffixes against a model's actual module names."""
+    module_names = tuple(name for name, _ in model.named_modules() if name)
+    unmatched_targets = tuple(
+        target
+        for target in target_modules
+        if not any(
+            name == target or name.endswith(f".{target}") for name in module_names
+        )
+    )
+    if unmatched_targets:
+        available_linear_names = sorted(
+            {
+                name.rsplit(".", maxsplit=1)[-1]
+                for name, module in model.named_modules()
+                if isinstance(module, nn.Linear)
+            }
+        )
+        raise ValueError(
+            f"LoRA target modules {list(unmatched_targets)!r} do not match modules "
+            f"in {type(model).__name__}. Available linear module names: "
+            f"{available_linear_names!r}"
+        )
+
+    return tuple(
+        name
+        for name in module_names
+        if any(
+            name == target or name.endswith(f".{target}") for target in target_modules
+        )
+    )
+
+
 def apply_lora(model: nn.Module, spec: LoRASpec) -> nn.Module:
     """Wrap a caller-supplied encoder using LoRA names from its model config."""
+    matched_module_names = _find_lora_target_modules(model, spec.target_modules)
     try:
         from peft import LoraConfig, get_peft_model
     except ImportError as error:
@@ -38,7 +75,25 @@ def apply_lora(model: nn.Module, spec: LoRASpec) -> nn.Module:
         target_modules=list(spec.target_modules),
         bias="none",
     )
-    return get_peft_model(model, lora_config)
+    adapted_model = get_peft_model(model, lora_config)
+    adapted_layer_count = sum(
+        hasattr(module, "lora_A") and hasattr(module, "lora_B")
+        for module in adapted_model.modules()
+    )
+    if adapted_layer_count != len(matched_module_names):
+        raise RuntimeError(
+            "PEFT adapted an unexpected number of modules: expected "
+            f"{len(matched_module_names)}, got {adapted_layer_count}"
+        )
+
+    trainable_parameter_count = sum(
+        parameter.numel()
+        for parameter in adapted_model.parameters()
+        if parameter.requires_grad
+    )
+    if trainable_parameter_count == 0:
+        raise RuntimeError("PEFT added no trainable LoRA parameters")
+    return adapted_model
 
 
 class TransformerFeatureBackbone(nn.Module):

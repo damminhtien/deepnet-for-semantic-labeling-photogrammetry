@@ -14,11 +14,12 @@ from deepnet.data.contracts import (
     NormalizationRule,
 )
 from deepnet.models.adapters import MultimodalInputAdapter
-from deepnet.models.backbones import TransformerFeatureBackbone
+from deepnet.models.backbones import TransformerFeatureBackbone, apply_lora
 from deepnet.models.segmenter import MultimodalSegmenter
 from deepnet.models.specs import (
     BackboneSpec,
     InputAdapterSpec,
+    LoRASpec,
     SegmentationModelSpec,
     load_model_spec,
 )
@@ -123,6 +124,33 @@ def test_huggingface_backbone_removes_prefix_tokens_using_patch_grid():
     assert all(feature.shape == (2, 8, 2, 3) for feature in features)
     for feature, block in zip(features, (3, 6, 9, 12), strict=True):
         assert torch.all(feature == block)
+
+
+def test_apply_lora_rejects_unmatched_configured_target_modules():
+    model = nn.Sequential(nn.Linear(3, 4))
+    spec = LoRASpec(rank=2, alpha=4, dropout=0.0, target_modules=("qkv",))
+
+    with pytest.raises(ValueError, match="qkv"):
+        apply_lora(model, spec)
+
+
+@pytest.mark.parametrize(
+    "filename",
+    (
+        "dinov2-vitb14-multimodal-v1.json",
+        "dinov3-vitb16-multimodal-v1.json",
+    ),
+)
+def test_dino_specs_target_huggingface_attention_projections(filename: str):
+    model_spec = load_model_spec(filename.removesuffix(".json"))
+
+    assert model_spec.backbone.lora is not None
+    assert model_spec.backbone.lora.target_modules == (
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+    )
 
 
 def test_rgb_uses_identity_while_irrg_uses_learnable_spectral_projection():
