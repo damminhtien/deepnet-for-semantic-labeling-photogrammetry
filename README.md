@@ -217,7 +217,8 @@ never edits the source dataset. DVC therefore sees exactly 18 Potsdam train labe
 6 Potsdam validation labels, 12 Vaihingen train labels, and 4 Vaihingen validation
 labels in the default training/validation bundles. The 14 Potsdam challenge-test
 references are present in its versioned source assets, but remain out of that bundle.
-Vaihingen's 17 post-selection references remain outside the default DVC snapshot.
+Vaihingen's 17 post-selection references are now in a separate eroded-label DVC
+source with its four validation references; they remain excluded from default bundles.
 `dvc.yaml` rebuilds SHA-256 catalogs,
 validates alignment and label quality for the active train/validation scenes, and
 exports bundles with only their split-specific labels. `import-url` freezes the
@@ -229,29 +230,19 @@ resolved raster paths remain inside the data root.
 
 For a full run, materialize the held-out scenes as separate bundles through
 `pipelines/evaluation/dvc.yaml`. The Potsdam stage uses the already versioned
-eroded references. Before running the Vaihingen stage, stage its 17 test references
-and refresh the eroded-label import with the existing four validation references:
+eroded references. The DVC snapshot now contains the 17 Vaihingen test references
+together with its four validation references. On a new machine, pull the versioned
+data before building the bundles:
 
 ```bash
-uv run python scripts/stage_split_label_subset.py \
-  --dataset-id isprs-vaihingen --asset-name label_eroded \
-  --split configs/splits/vaihingen-dinov3-v1.json --split-role test \
-  --data-root "$SOURCE_ROOT" \
-  --output-dir "$DVC_DATA_ROOT/staging/vaihingen-test-labels"
-mkdir -p "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels"
-cp -R "$DVC_DATA_ROOT/staging/vaihingen-validation-labels/." \
-  "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels/"
-cp -R "$DVC_DATA_ROOT/staging/vaihingen-test-labels/." \
-  "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels/"
-uv run dvc import-url --force \
-  "$DVC_DATA_ROOT/staging/vaihingen-evaluation-labels" \
-  data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
-uv run dvc repro catalog_vaihingen
+uv run dvc pull -r storage
+uv run dvc repro pipelines/evaluation/dvc.yaml:bundle_potsdam_test
+uv run dvc repro pipelines/evaluation/dvc.yaml:bundle_vaihingen_test
 ```
 
-Then target the desired evaluation bundle stage. Keep both test bundles separate
-from the training/validation bundles; the single-run Kaggle evaluator must not
-score them until checkpoint selection is frozen.
+Each test target validates alignment, scans test-label quality and exports only its
+test scenes. Keep both bundles separate from the training/validation bundles; the
+single-run Kaggle evaluator must not score them until checkpoint selection is frozen.
 
 For the one full Kaggle run, package the two verified DVC bundles and the pure-Python
 wheel into one private Kaggle Dataset version. Prepare those inputs without starting

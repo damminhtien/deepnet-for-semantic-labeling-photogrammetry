@@ -191,23 +191,24 @@ validation roles; test labels are excluded from training and checkpoint-selectio
 bundles.
 
 The isolated [`evaluation DVC pipeline`](../pipelines/evaluation/dvc.yaml) validates
-each test split against its catalog and exports a test-only bundle to the configured
-path. Run a target explicitly; `uv run dvc repro` does not include this pipeline:
+each test split against its catalog, scans its image/label quality, and exports a
+test-only bundle to the configured path. Run a target explicitly;
+`uv run dvc repro` does not include this pipeline:
 
 ```bash
 uv run dvc repro pipelines/evaluation/dvc.yaml:bundle_potsdam_test
 uv run dvc repro pipelines/evaluation/dvc.yaml:bundle_vaihingen_test
 ```
 
-Potsdam's 14 eroded-reference labels are already in its DVC-managed source. The
-current Vaihingen DVC snapshot contains only the four validation labels. Before
-targeting its test bundle, stage the 17 post-selection references, combine them with
-the four validation references into an external directory, refresh the `labels_eroded`
-import with `dvc import-url --force`, and rebuild `catalog_vaihingen`. See the
-[data preparation instructions](../README.md#version-and-prepare-data-with-dvc) for
-the exact commands. Package the test bundles as separate Kaggle inputs for the one
-full run. The model-selection loader must not consume them; the evaluation caller
-scores them only after the validation-selected checkpoint has been frozen.
+Potsdam's 14 eroded-reference labels and Vaihingen's 17 post-selection references
+are now in DVC-managed source assets. Vaihingen's eroded-label import contains the
+four validation references plus those 17 test references; the default train/validation
+bundles still contain only their assigned scenes. The optional pipeline writes
+`post-selection-test-validation.json`, `post-selection-test-quality.json`, and a
+test-only bundle for each dataset. Package the test bundles as separate Kaggle
+inputs for the one full run. The model-selection loader must not consume them; the
+evaluation caller scores them only after the validation-selected checkpoint has
+been frozen.
 
 For Potsdam, the local test references are the eroded/no-boundary labels. The
 [ISPRS Potsdam results table](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/results/label_challenge_2D_potsdam_result_ifr.html)

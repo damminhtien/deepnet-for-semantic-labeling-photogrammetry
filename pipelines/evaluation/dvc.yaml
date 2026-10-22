@@ -15,6 +15,25 @@ stages:
     outs:
       - data/prepared/potsdam/post-selection-test-validation.json
 
+  quality_potsdam_test:
+    wdir: ../..
+    cmd: >-
+      deepnet-data quality-report --catalog data/prepared/potsdam/catalog.json
+      --split configs/splits/potsdam-dinov3-v2.json
+      --preprocessing-id isprs-canonical-v2
+      --data-root data/raw/inputs --tile-size 1024
+      --view-assets irrg-view=irrg --include-split test
+      --output data/prepared/potsdam/post-selection-test-quality.json
+    deps:
+      - configs/preprocessing/isprs-canonical-v2.json
+      - configs/splits/potsdam-dinov3-v2.json
+      - data/prepared/potsdam/post-selection-test-validation.json
+      - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+      - data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+      - deepnet/data
+    outs:
+      - data/prepared/potsdam/post-selection-test-quality.json
+
   bundle_potsdam_test:
     wdir: ../..
     cmd: >-
@@ -30,6 +49,7 @@ stages:
       - configs/splits/potsdam-dinov3-v2.json
       - data/prepared/potsdam/catalog.json
       - data/prepared/potsdam/post-selection-test-validation.json
+      - data/prepared/potsdam/post-selection-test-quality.json
       - data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
       - data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
       - deepnet/data
@@ -50,6 +70,25 @@ stages:
     outs:
       - data/prepared/vaihingen/post-selection-test-validation.json
 
+  quality_vaihingen_test:
+    wdir: ../..
+    cmd: >-
+      deepnet-data quality-report --catalog data/prepared/vaihingen/catalog.json
+      --split configs/splits/vaihingen-dinov3-v1.json
+      --preprocessing-id isprs-canonical-v2
+      --data-root data/raw/inputs --tile-size 1024
+      --view-assets irrg-view=irrg --include-split test
+      --output data/prepared/vaihingen/post-selection-test-quality.json
+    deps:
+      - configs/preprocessing/isprs-canonical-v2.json
+      - configs/splits/vaihingen-dinov3-v1.json
+      - data/prepared/vaihingen/post-selection-test-validation.json
+      - data/raw/inputs/vaihingen-isprs-official-20261019/images
+      - data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+      - deepnet/data
+    outs:
+      - data/prepared/vaihingen/post-selection-test-quality.json
+
   bundle_vaihingen_test:
     wdir: ../..
     cmd: >-
@@ -65,6 +104,7 @@ stages:
       - configs/splits/vaihingen-dinov3-v1.json
       - data/prepared/vaihingen/catalog.json
       - data/prepared/vaihingen/post-selection-test-validation.json
+      - data/prepared/vaihingen/post-selection-test-quality.json
       - data/raw/inputs/vaihingen-isprs-official-20261019/images
       - data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
       - deepnet/data

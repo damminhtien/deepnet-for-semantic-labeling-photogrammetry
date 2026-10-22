@@ -2,3 +2,6 @@
 /catalog-validation.json
 /quality.json
 /train-validation-bundle
+/post-selection-test-validation.json
+/post-selection-test-bundle
+/post-selection-test-quality.json

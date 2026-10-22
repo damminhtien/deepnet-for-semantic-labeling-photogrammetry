@@ -1,0 +1,237 @@
+schema: '2.0'
+stages:
+  validate_potsdam_test:
+    cmd: deepnet-data validate-catalog --catalog
+      data/prepared/potsdam/catalog.json --split
+      configs/splits/potsdam-dinov3-v2.json --require-hashes --view-assets
+      irrg-view=irrg --include-split test >
+      data/prepared/potsdam/post-selection-test-validation.json
+    deps:
+    - path: configs/splits/potsdam-dinov3-v2.json
+      hash: md5
+      md5: 7e36ecd1dc375e41b42c96105a75557f
+      size: 2052
+    - path: data/prepared/potsdam/catalog.json
+      hash: md5
+      md5: 1f72879562f4ff239c57f97b89f75985
+      size: 89013
+    - path: deepnet/data
+      hash: md5
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
+    outs:
+    - path: data/prepared/potsdam/post-selection-test-validation.json
+      hash: md5
+      md5: 8915b87d9b26c854548256135a3196b9
+      size: 249
+  bundle_potsdam_test:
+    cmd: deepnet-data export-bundle --catalog data/prepared/potsdam/catalog.json
+      --split configs/splits/potsdam-dinov3-v2.json --preprocessing-id
+      isprs-canonical-v2 --model-input-id isprs-irrg-unit-v1 --data-root
+      data/raw/inputs --include-split test --output
+      data/prepared/potsdam/post-selection-test-bundle
+    deps:
+    - path: configs/model-inputs/isprs-irrg-unit-v1.json
+      hash: md5
+      md5: 7ae7fefc5889ff4db5805a8c1e647084
+      size: 618
+    - path: configs/preprocessing/isprs-canonical-v2.json
+      hash: md5
+      md5: d22bab448f7b7d595e960e52d94c2122
+      size: 554
+    - path: configs/splits/potsdam-dinov3-v2.json
+      hash: md5
+      md5: 7e36ecd1dc375e41b42c96105a75557f
+      size: 2052
+    - path: data/prepared/potsdam/catalog.json
+      hash: md5
+      md5: 1f72879562f4ff239c57f97b89f75985
+      size: 89013
+    - path: data/prepared/potsdam/post-selection-test-quality.json
+      hash: md5
+      md5: e5eda4c2428c8e7f11a731be2736617e
+      size: 19662
+    - path: data/prepared/potsdam/post-selection-test-validation.json
+      hash: md5
+      md5: 8915b87d9b26c854548256135a3196b9
+      size: 249
+    - path: data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+      hash: md5
+      md5: 5a249e31abaf738582f3529dfa1fcb6e.dir
+      size: 2160966200
+      nfiles: 20
+    - path: data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+      hash: md5
+      md5: 12774fccf314503ebcd2105c5e8a12c7.dir
+      size: 4139032978
+      nfiles: 76
+    - path: deepnet/data
+      hash: md5
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
+    outs:
+    - path: data/prepared/potsdam/post-selection-test-bundle
+      hash: md5
+      md5: b3759fa4be21a6209372e47fe1df608c.dir
+      size: 3037604004
+      nfiles: 33
+  validate_vaihingen_test:
+    cmd: deepnet-data validate-catalog --catalog
+      data/prepared/vaihingen/catalog.json --split
+      configs/splits/vaihingen-dinov3-v1.json --require-hashes --view-assets
+      irrg-view=irrg --include-split test >
+      data/prepared/vaihingen/post-selection-test-validation.json
+    deps:
+    - path: configs/splits/vaihingen-dinov3-v1.json
+      hash: md5
+      md5: f1f7c9ca21ba2c71c70f0cb664ddea6c
+      size: 1573
+    - path: data/prepared/vaihingen/catalog.json
+      hash: md5
+      md5: 4d16b6ed1f803a06c2794c123be81101
+      size: 67727
+    - path: deepnet/data
+      hash: md5
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
+    outs:
+    - path: data/prepared/vaihingen/post-selection-test-validation.json
+      hash: md5
+      md5: 2566139552866b17a251c70a050c3440
+      size: 253
+  bundle_vaihingen_test:
+    cmd: deepnet-data export-bundle --catalog
+      data/prepared/vaihingen/catalog.json --split
+      configs/splits/vaihingen-dinov3-v1.json --preprocessing-id
+      isprs-canonical-v2 --model-input-id isprs-irrg-unit-v1 --data-root
+      data/raw/inputs --include-split test --output
+      data/prepared/vaihingen/post-selection-test-bundle
+    deps:
+    - path: configs/model-inputs/isprs-irrg-unit-v1.json
+      hash: md5
+      md5: 7ae7fefc5889ff4db5805a8c1e647084
+      size: 618
+    - path: configs/preprocessing/isprs-canonical-v2.json
+      hash: md5
+      md5: d22bab448f7b7d595e960e52d94c2122
+      size: 554
+    - path: configs/splits/vaihingen-dinov3-v1.json
+      hash: md5
+      md5: f1f7c9ca21ba2c71c70f0cb664ddea6c
+      size: 1573
+    - path: data/prepared/vaihingen/catalog.json
+      hash: md5
+      md5: 4d16b6ed1f803a06c2794c123be81101
+      size: 67727
+    - path: data/prepared/vaihingen/post-selection-test-quality.json
+      hash: md5
+      md5: 7db1a909e14046172dcaea6e9aa0fd63
+      size: 21352
+    - path: data/prepared/vaihingen/post-selection-test-validation.json
+      hash: md5
+      md5: 2566139552866b17a251c70a050c3440
+      size: 253
+    - path: data/raw/inputs/vaihingen-isprs-official-20261019/images
+      hash: md5
+      md5: 1b217841aeddbf3866c2375df90a4530.dir
+      size: 508410796
+      nfiles: 33
+    - path: data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+      hash: md5
+      md5: 2f1130619a9d728f317fe112ab354700.dir
+      size: 329638420
+      nfiles: 21
+    - path: deepnet/data
+      hash: md5
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
+    outs:
+    - path: data/prepared/vaihingen/post-selection-test-bundle
+      hash: md5
+      md5: 9c4e978d4e75da96bd2f9d12583ccc62.dir
+      size: 543434697
+      nfiles: 39
+  quality_potsdam_test:
+    cmd: deepnet-data quality-report --catalog
+      data/prepared/potsdam/catalog.json --split
+      configs/splits/potsdam-dinov3-v2.json --preprocessing-id
+      isprs-canonical-v2 --data-root data/raw/inputs --tile-size 1024
+      --view-assets irrg-view=irrg --include-split test --output
+      data/prepared/potsdam/post-selection-test-quality.json
+    deps:
+    - path: configs/preprocessing/isprs-canonical-v2.json
+      hash: md5
+      md5: d22bab448f7b7d595e960e52d94c2122
+      size: 554
+    - path: configs/splits/potsdam-dinov3-v2.json
+      hash: md5
+      md5: 7e36ecd1dc375e41b42c96105a75557f
+      size: 2052
+    - path: data/prepared/potsdam/post-selection-test-validation.json
+      hash: md5
+      md5: 8915b87d9b26c854548256135a3196b9
+      size: 249
+    - path: data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+      hash: md5
+      md5: 5a249e31abaf738582f3529dfa1fcb6e.dir
+      size: 2160966200
+      nfiles: 20
+    - path: data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+      hash: md5
+      md5: 12774fccf314503ebcd2105c5e8a12c7.dir
+      size: 4139032978
+      nfiles: 76
+    - path: deepnet/data
+      hash: md5
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
+    outs:
+    - path: data/prepared/potsdam/post-selection-test-quality.json
+      hash: md5
+      md5: e5eda4c2428c8e7f11a731be2736617e
+      size: 19662
+  quality_vaihingen_test:
+    cmd: deepnet-data quality-report --catalog
+      data/prepared/vaihingen/catalog.json --split
+      configs/splits/vaihingen-dinov3-v1.json --preprocessing-id
+      isprs-canonical-v2 --data-root data/raw/inputs --tile-size 1024
+      --view-assets irrg-view=irrg --include-split test --output
+      data/prepared/vaihingen/post-selection-test-quality.json
+    deps:
+    - path: configs/preprocessing/isprs-canonical-v2.json
+      hash: md5
+      md5: d22bab448f7b7d595e960e52d94c2122
+      size: 554
+    - path: configs/splits/vaihingen-dinov3-v1.json
+      hash: md5
+      md5: f1f7c9ca21ba2c71c70f0cb664ddea6c
+      size: 1573
+    - path: data/prepared/vaihingen/post-selection-test-validation.json
+      hash: md5
+      md5: 2566139552866b17a251c70a050c3440
+      size: 253
+    - path: data/raw/inputs/vaihingen-isprs-official-20261019/images
+      hash: md5
+      md5: 1b217841aeddbf3866c2375df90a4530.dir
+      size: 508410796
+      nfiles: 33
+    - path: data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+      hash: md5
+      md5: 2f1130619a9d728f317fe112ab354700.dir
+      size: 329638420
+      nfiles: 21
+    - path: deepnet/data
+      hash: md5
+      md5: f5223244bb06034c237db14be8c4f882.dir
+      size: 173028
+      nfiles: 15
+    outs:
+    - path: data/prepared/vaihingen/post-selection-test-quality.json
+      hash: md5
+      md5: 7db1a909e14046172dcaea6e9aa0fd63
+      size: 21352
