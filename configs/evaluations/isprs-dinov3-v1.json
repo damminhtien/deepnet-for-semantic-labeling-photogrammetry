@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "protocol_id": "isprs-dinov3",
+  "version": 1,
+  "status": "locked",
+  "training_config": {
+    "path": "configs/training/isprs-dinov3-joint-v1.json",
+    "sha256": "b5e170e4f1192b587a6d97f8db798c5fcbc0bc6d07edadd4c4a006f394df7124"
+  },
+  "split_manifests": {
+    "isprs-potsdam": {
+      "path": "configs/splits/potsdam-dinov3-v1.json",
+      "split_id": "potsdam-dinov3",
+      "version": 1,
+      "content_hash": "13304bf239c1e2e16bc476d32b4135552ea6e74d9645193d104403d10404ad80"
+    },
+    "isprs-vaihingen": {
+      "path": "configs/splits/vaihingen-dinov3-v1.json",
+      "split_id": "vaihingen-dinov3",
+      "version": 1,
+      "content_hash": "4c016ced70c4056c360a73df0268882b40361eaf6202341fcd5671386f94478a"
+    }
+  },
+  "roles": {
+    "train_labels": "label_participant",
+    "validation_labels": "label_eroded",
+    "post_selection_test_labels": "label_eroded"
+  },
+  "model_selection": {
+    "role": "validation",
+    "metric": "mean_dataset_validation_miou",
+    "aggregation": "unweighted_mean",
+    "datasets": ["isprs-potsdam", "isprs-vaihingen"],
+    "dataset_metrics_are_reported_separately": true,
+    "scene_aggregation": "sum_confusion_matrices_within_each_dataset",
+    "inference": "full_scene_tiled_overlap_weighted"
+  },
+  "post_selection_evaluation": {
+    "dataset_id": "isprs-vaihingen",
+    "role": "test",
+    "purpose": "post-selection cross-dataset transfer evaluation for this DINOv3 run",
+    "scene_ids_source": "vaihingen-dinov3-v1.json:test_scene_ids",
+    "open_only_after": [
+      "training configuration and checkpoint selection are frozen",
+      "run manifest records the selected checkpoint and configuration hash"
+    ],
+    "evaluation_runs_after_unlock": 1,
+    "include_test_labels_in_training_or_selection_bundle": false
+  },
+  "unavailable_test_sets": {
+    "isprs-potsdam": "All 38 participant-labeled scenes are assigned to train or validation in potsdam-dinov3-v1; this run has no independent Potsdam test split."
+  },
+  "metrics": {
+    "class_ids": [0, 1, 2, 3, 4, 5],
+    "ignore_label": 6,
+    "primary": "mean_iou",
+    "report": [
+      "mean_iou",
+      "per_class_iou",
+      "overall_accuracy",
+      "pixels_scored",
+      "confusion_matrix"
+    ],
+    "ignore_and_invalid_pixels_are_excluded": true,
+    "cross_dataset_pixel_pooling": false
+  },
+  "preprocessing": {
+    "fitted_statistics_roles": ["train"],
+    "validation_augmentation": "disabled",
+    "test_augmentation": "disabled"
+  },
+  "spatial_scope": {
+    "split_unit": "scene",
+    "region_disjoint": false,
+    "interpretation": "Scene-held-out evaluation; neighboring tiles may occur in different roles, so do not claim region-independent generalization."
+  },
+  "historical_context": "Previously reported experiments are separate from this DINOv3 run. Their use of related scenes does not change this run's locked selection rule; describe the resulting scores as this run's post-selection evaluation, not as a never-before-seen geographic benchmark."
+}

@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "run_id": "isprs-dinov3-joint-v1",
+  "evaluation_protocol_id": "isprs-dinov3-v1",
   "status": "configured-not-trained",
   "model_id": "dinov3-vitb16-multimodal",
   "domain_id": "isprs-irrg-aerial-v1",
