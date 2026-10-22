@@ -40,30 +40,66 @@ end-to-end commands.
 
 ## Supported data
 
-The initial catalog descriptors cover ISPRS Potsdam and Vaihingen. Source imagery
-and labels are external inputs; they are not stored in Git. Set the data root to the
-directory containing the configured source folders. Do not edit raw assets in place.
+The catalog descriptors cover ISPRS Potsdam and Vaihingen. Source imagery and labels
+are versioned with DVC; raster bytes and credentials are not stored in Git. The DVC
+cache and local remote stay outside the repository. Do not edit raw assets in place.
 
-The Potsdam `potsdam-legacy-v1` manifest records its former 18/6/14 scene assignment
-for a reproducible rerun. It prevents scene overlap, but it is not a region-held-out
-evaluation. The catalog records Vaihingen rasters as pixel-local where the source
-files contain no georeferencing metadata.
+The DINOv3 preparation uses 18 Potsdam training scenes and 20 validation scenes. The
+20 validation scenes include the 6 scenes previously used for validation and the 14
+scenes held out in an earlier, independent experiment. Their previous use does not
+prevent this DINOv3 run from using them for model selection; after selection they are
+not a Potsdam test set for this run. Validation uses eroded references on both
+datasets. Vaihingen uses 12 training, 4 validation, and 17 post-selection scenes.
+Official Vaihingen heldout labels are excluded from DVC training inputs and exported
+bundles. The catalog records Vaihingen rasters as pixel-local where the source files
+contain no georeferencing metadata.
 
-The source inventory has 33 Vaihingen images and 17 scenes without the participant
-label asset. Use the catalog's per-scene asset inventory to define a supervised
-split; the pipeline does not fill or infer missing labels.
+The source inventory has 33 Vaihingen images and 17 scenes without participant
+labels. Those 17 images remain available for post-selection evaluation against the
+official reference labels; no labels are inferred or filled. Potsdam has 38 images,
+24 participant labels, and 38 eroded reference labels; the versioned DVC inputs stage
+only the 18 participant training labels and 20 eroded validation labels used here.
 
 The five-channel model views require IRRG, DSM, and nDSM. The currently cataloged
 nDSM JPEG has no verified spatial registration evidence, so those views correctly
 fail alignment validation until a verified co-registration record is supplied.
 IRRG-only views can be exported from the same catalog without weakening that check.
 
+## Data EDA and augmentation
+
+[`notebooks_src/data_eda_augmentation.py`](notebooks_src/data_eda_augmentation.py)
+provides reproducible notebook-style cells for scene inventory, alignment evidence,
+full-scene class balance, scene-stratified IRRG profiles, and a seeded augmentation
+audit. The report records label imbalance and ignore coverage for both datasets;
+validation stays natural and unaugmented. The current aerial IRRG policy is versioned
+as `isprs-irrg-aerial-v2`, with synchronized geometry, ignored affine borders, and
+independently seeded optical-only transforms. See the [EDA findings and audit
+method](docs/data-pipeline.md#frozen-eda-snapshot) and the
+[augmentation design](docs/data-pipeline.md#augmentation-policy-and-audit).
+
+## DINOv3 training plan
+
+`configs/training/isprs-dinov3-joint-v1.json` describes one balanced IRRG run across
+both datasets. It uses 512-pixel Potsdam crops and 288-pixel Vaihingen crops, a 50/50
+dataset cycle, train-only class-aware sampling, synchronized geometry, optical-only
+radiometry, and separate deterministic validation grids. Checkpoint selection uses
+the unweighted mean of the two validation mIoU values. The 20-epoch, 64-update plan
+uses one-sample mixed-precision microbatches with four-step gradient accumulation and
+periodic resumable checkpoints.
+
+The JSON is a versioned plan; it does not start training. No pretrained weights or
+Kaggle GPU run have been downloaded or launched. Once the gated DINOv3 access is
+approved, complete the generic training caller and local data/weight preflights, then
+run one full Kaggle job. Do not spend a GPU session on a pilot. Keep test labels out
+of its attached bundles and evaluate them only after the validation-selected
+checkpoint is fixed.
+
 ## Install locally
 
 Use Python 3.10 or newer. `uv` is recommended for an isolated local environment:
 
 ```bash
-uv sync --extra dev --extra train --extra models --extra vision
+uv sync --extra dev --extra train --extra models --extra vision --extra data-versioning --extra notebooks
 ```
 
 Or use pip in a virtual environment:
@@ -74,9 +110,91 @@ python -m pip install -e ".[dev,train]"
 
 `rasterio` is a required data dependency. PyTorch is optional for catalog, quality,
 and bundle operations. The `models` extra provides Hugging Face Transformers and PEFT;
-the `vision` extra pins Albumentations 2.0.8. None of these optional packages
-downloads model weights during installation or import. Ruff is the configured
-source-style checker.
+the `vision` extra pins Albumentations 2.0.8; and `data-versioning` provides DVC. None
+of these optional packages downloads model weights during installation or import.
+Ruff is the configured source-style checker.
+
+## Version and prepare data with DVC
+
+DVC tracks the immutable source snapshot and the derived catalog, quality reports,
+and train/validation bundles. Point its cache and local remote at machine data
+storage; both locations are kept in ignored `.dvc/config.local`:
+
+```bash
+export SOURCE_ROOT="/path/to/inputs"
+export DVC_DATA_ROOT="/path/to/Data/deepnet/dvc"
+
+uv run dvc cache dir --local "$DVC_DATA_ROOT/cache"
+uv run dvc config --local cache.type hardlink,copy
+uv run dvc remote add --local --default storage "$DVC_DATA_ROOT/remote"
+
+mkdir -p \
+  data/raw/inputs/potsdamvaihingen/3_ortho_irrg \
+  data/raw/inputs/potsdamvaihingen/5_labels_for_participants \
+  data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary \
+  data/raw/inputs/vaihingen-isprs-official-20261019/images \
+  data/raw/inputs/vaihingen-isprs-official-20261019/labels_participant \
+  data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+
+uv run python scripts/stage_split_label_subset.py \
+  --dataset-id isprs-potsdam --asset-name label_participant \
+  --split configs/splits/potsdam-dinov3-v1.json --split-role train \
+  --data-root "$SOURCE_ROOT" \
+  --output-dir "$DVC_DATA_ROOT/staging/potsdam-train-labels"
+uv run python scripts/stage_split_label_subset.py \
+  --dataset-id isprs-potsdam --asset-name label_eroded \
+  --split configs/splits/potsdam-dinov3-v1.json --split-role validation \
+  --data-root "$SOURCE_ROOT" \
+  --output-dir "$DVC_DATA_ROOT/staging/potsdam-validation-labels"
+uv run python scripts/stage_split_label_subset.py \
+  --dataset-id isprs-vaihingen --asset-name label_participant \
+  --split configs/splits/vaihingen-dinov3-v1.json --split-role train \
+  --data-root "$SOURCE_ROOT" \
+  --output-dir "$DVC_DATA_ROOT/staging/vaihingen-train-labels"
+uv run python scripts/stage_split_label_subset.py \
+  --dataset-id isprs-vaihingen --asset-name label_eroded \
+  --split configs/splits/vaihingen-dinov3-v1.json --split-role validation \
+  --data-root "$SOURCE_ROOT" \
+  --output-dir "$DVC_DATA_ROOT/staging/vaihingen-validation-labels"
+
+uv run dvc import-url \
+  "$SOURCE_ROOT/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG" \
+  data/raw/inputs/potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG
+uv run dvc import-url "$DVC_DATA_ROOT/staging/potsdam-train-labels" \
+  data/raw/inputs/potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants
+uv run dvc import-url "$DVC_DATA_ROOT/staging/potsdam-validation-labels" \
+  data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
+uv run dvc import-url \
+  "$SOURCE_ROOT/vaihingen-isprs-official-20261019/images" \
+  data/raw/inputs/vaihingen-isprs-official-20261019/images
+uv run dvc import-url "$DVC_DATA_ROOT/staging/vaihingen-train-labels" \
+  data/raw/inputs/vaihingen-isprs-official-20261019/labels_participant
+uv run dvc import-url "$DVC_DATA_ROOT/staging/vaihingen-validation-labels" \
+  data/raw/inputs/vaihingen-isprs-official-20261019/labels_eroded
+
+uv run dvc repro
+uv run dvc push -r storage
+```
+
+The staging helper copies only manifest-selected labels and prints their hashes; it
+never edits the source dataset. DVC therefore sees exactly 18 Potsdam train labels,
+20 Potsdam validation labels, 12 Vaihingen train labels, and 4 Vaihingen validation
+labels. The 17 Vaihingen post-selection labels stay out of this snapshot. `dvc.yaml`
+rebuilds SHA-256 catalogs,
+validates alignment and label quality for the active train/validation scenes, and
+exports bundles with only their split-specific labels. `import-url` freezes the
+selected source files into the DVC cache; the absolute local source path in each
+`.dvc` file is only needed to refresh that import. On another machine, configure its
+own cache and a remote containing the pushed objects, then run `dvc pull -r storage`
+before `dvc repro`. The committed DVC config uses hardlinks with copy fallback so
+resolved raster paths remain inside the data root.
+
+For the one full Kaggle run, package the two verified DVC bundles and the pure-Python
+wheel into one private Kaggle Dataset version. Prepare those inputs without starting
+a GPU session. The local DVC remote is not accessible from Kaggle, so the attached
+Kaggle dataset version and bundle manifests are the cloud handoff. Once Hugging Face
+access is approved, add an `HF_TOKEN` Kaggle secret for gated weight download; never
+put the token in Git or a notebook.
 
 ## Prepare data locally
 
@@ -109,7 +227,7 @@ For model views with z-score normalization, fit statistics from training windows
 deepnet-data fit-statistics \
   --catalog "$DEEPNET_DATA_ROOT/manifests/potsdam-catalog.json" \
   --split configs/splits/potsdam-legacy-v1.json \
-  --preprocessing-id isprs-canonical \
+  --preprocessing-id isprs-canonical-v1 \
   --model-input-id isprs-irrg-zscore-v1 \
   --data-root "$DEEPNET_DATA_ROOT" \
   --output "$DEEPNET_DATA_ROOT/manifests/isprs-canonical.json"
@@ -126,7 +244,7 @@ Export a portable bundle for any configured model view:
 deepnet-data export-bundle \
   --catalog "$DEEPNET_DATA_ROOT/manifests/potsdam-catalog.json" \
   --split configs/splits/potsdam-legacy-v1.json \
-  --preprocessing-id isprs-canonical \
+  --preprocessing-id isprs-canonical-v1 \
   --model-input-id isprs-irrg-zscore-v1 \
   --data-root "$DEEPNET_DATA_ROOT" \
   --output "$DEEPNET_DATA_ROOT/bundles/potsdam-irrg-native-v1"
@@ -239,13 +357,11 @@ load it. DINOv2 is distributed under
 specification records each license reference. The implementation does not fetch
 weights unless the caller explicitly invokes `from_pretrained`.
 
-The fixed Potsdam settings are recorded in
-`configs/training/potsdam-dinov3-multimodal-v1.json`. They specify 512-pixel crops,
-AdamW, cosine warmup, cross-entropy plus soft Dice, a 70/30 uniform-to-aware sampler,
-and validation-mIoU checkpoint selection. This is configuration only; no model has
-been trained by this change. The config requires nDSM decoding, coregistration, and
-train-fitted elevation statistics to pass data preflight first. The catalog does not
-currently establish those nDSM guarantees.
+The legacy five-channel Potsdam settings remain in
+`configs/training/potsdam-dinov3-multimodal-v1.json`. The new joint IRRG plan is
+`configs/training/isprs-dinov3-joint-v1.json`; it follows the updated 18/20 Potsdam
+split and the separate 12/4/17 Vaihingen split. No training has been run. The
+five-channel nDSM view still requires verified decoding and coregistration evidence.
 
 To construct the optional augmenter and model after installing the relevant extras:
 

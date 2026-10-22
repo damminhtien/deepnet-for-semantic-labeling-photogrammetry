@@ -87,3 +87,72 @@ Validation: 32 unit tests, Ruff, formatter, diff check, local MPS smoke test, pu
 Python wheel build/install, packaged config loading, and Graphify update passed. No
 remote Kaggle execution was started. The DINOv3 Hub weights require user access and
 license acceptance before explicit loading.
+
+## Follow-up: DINOv3 training preparation for Potsdam and Vaihingen
+
+### M10: DVC data versioning and portable handoff
+
+Status: implementation and local DVC handoff complete (2026-10-21). DVC catalogs,
+quality reports, split-specific bundles, and remote objects were verified for both
+datasets. The staged DVC snapshot excludes Vaihingen's 17 post-selection labels.
+No Kaggle session was used for validation or piloting.
+
+- Initialize DVC without adding raw rasters or credentials to Git. Keep machine-local
+  cache and remote locations in ignored local configuration.
+- Define versioned data inputs for both datasets and document how to materialize the
+  exact DVC revision locally or package it once for Kaggle.
+- Stage only the labels assigned to train and validation; keep Vaihingen's 17
+  post-selection references outside this DVC snapshot.
+- Reuse existing Kaggle data when the scene inventory and hashes match; do not start
+  a GPU session for validation or piloting.
+
+Validation: DVC metadata parses, source manifests resolve, and no raster/checkpoint
+bytes or machine credentials are staged in Git.
+
+### M11: Dataset splits, DINOv3 views, and robust augmentation
+
+Status: implementation and local EDA complete (2026-10-22). The reproducible
+Jupytext cell source ran as a fresh project Python process against DVC lock
+`3cff56c46a3471b1`. It scanned full-scene labels and all active train/validation
+scenes, sampled IRRG windows across each scene, and audited synchronized geometry and
+optical transforms over three seeds per training scene. Albumentations child
+transforms now receive independent deterministic seeds; the aerial policy is v2.
+Outputs are under the external Data EDA directory. Jupyter MCP returned
+`Invalid URL 'local/login'`, so an executable `.ipynb` could not be created or run
+through the notebook service; the source cells and conversion command are documented.
+
+- Use 18 participant-labeled Potsdam scenes for training and 20 eroded-reference
+  scenes for validation, including the 14 scenes held out in a separate prior run.
+  This DINOv3 split has no independent Potsdam test set.
+- Use 12 participant-labeled Vaihingen scenes for training, 4 eroded-reference
+  scenes for validation, and keep 17 official references for post-selection
+  evaluation. Keep unverified Potsdam nDSM out of the unified run.
+- Expand the config-driven aerial augmentation policy with synchronized geometry,
+  ignored affine borders, and optical-only radiometric transforms; review it against
+  source histograms and paired image/label examples in a reproducible EDA notebook.
+
+Validation: split contracts are disjoint, data-quality reports cover all active
+train/validation scenes, and augmentation tests cover seeded replay, nearest-neighbor
+masks, ignored affine borders, and optical-only transforms. A fresh-process run of
+the Jupytext source generated the saved plots and tables, which were inspected.
+Jupyter MCP returned an invalid `local/login` URL and did not permit creating or
+running the `.ipynb` during this run.
+
+### M12: One unified Kaggle run plan and README
+
+Status: configuration and documentation complete; training is deferred. DINOv3
+weights remain access-gated, and the user has requested approval. No GPU pilot or
+training session was started. The plan requires one full Kaggle run after access,
+weight, bundle, and durable-output preflights pass.
+
+- Configure one multi-domain DINOv3 run with balanced dataset sampling, separate
+  validation metrics, deterministic manifests, and resumable checkpoints. Potsdam
+  selection uses its 20-scene validation set; Vaihingen's 17 official scenes remain
+  outside selection.
+- Document local Mac preparation, DVC materialization, Kaggle packaging/secrets, and
+  the single-run policy in the README and data-pipeline guide.
+- Download weights only after Hugging Face grants access; do not start Kaggle before
+  all data, package, license, checkpoint, and durable-output preflights pass.
+
+Validation: local static and synthetic checks only; no Kaggle GPU pilot. Commit and
+push focused milestones after reviewing the exact diff.
