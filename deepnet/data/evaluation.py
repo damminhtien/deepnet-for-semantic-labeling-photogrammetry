@@ -342,26 +342,28 @@ def evaluate_scenes(
     model.eval()
     total_confusion = np.zeros((number_of_classes, number_of_classes), dtype=np.int64)
     scene_results = []
-    with TemporaryDirectory(dir=scratch_dir, prefix="deepnet-evaluation-") as scratch:
-        for index, scene_id in enumerate(scene_ids):
-            scene_scratch = Path(scratch) / f"scene-{index:04d}"
-            scene_scratch.mkdir()
-            with torch.no_grad():
-                scene_result = _evaluate_scene(
-                    model,
-                    access,
-                    scene_id,
-                    number_of_classes=number_of_classes,
-                    window_size=window_size,
-                    stride=resolved_stride,
-                    batch_size=batch_size,
-                    device=selected_device,
-                    scratch_root=scene_scratch,
-                    torch=torch,
-                )
-            matrix = np.asarray(scene_result["confusion_matrix"], dtype=np.int64)
-            total_confusion += matrix
-            scene_results.append(scene_result)
+    for scene_id in scene_ids:
+        with (
+            TemporaryDirectory(
+                dir=scratch_dir, prefix="deepnet-evaluation-"
+            ) as scratch,
+            torch.no_grad(),
+        ):
+            scene_result = _evaluate_scene(
+                model,
+                access,
+                scene_id,
+                number_of_classes=number_of_classes,
+                window_size=window_size,
+                stride=resolved_stride,
+                batch_size=batch_size,
+                device=selected_device,
+                scratch_root=Path(scratch),
+                torch=torch,
+            )
+        matrix = np.asarray(scene_result["confusion_matrix"], dtype=np.int64)
+        total_confusion += matrix
+        scene_results.append(scene_result)
 
     result = summarize_confusion(total_confusion)
     result.update(

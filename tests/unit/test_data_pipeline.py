@@ -14,6 +14,7 @@ import rasterio
 from rasterio.transform import from_origin
 
 from deepnet import runtime
+from deepnet.data import evaluation as evaluation_module
 from deepnet.data.bundles import export_model_bundle, load_bundle, verify_bundle
 from deepnet.data.catalog import DatasetCatalog, load_split_manifest
 from deepnet.data.contracts import (
@@ -853,6 +854,12 @@ def test_scene_evaluation_uses_full_grid_and_ignores_nodata(
     pipeline_fixture, monkeypatch, tmp_path
 ):
     data_root, scenes, split, preprocessing, model_input = pipeline_fixture
+    split = replace(
+        split,
+        validation_scene_ids=("validation-a", "test-a"),
+        test_scene_ids=(),
+        label_assets=(("train", "labels"), ("validation", "labels")),
+    )
 
     class FakeTensor:
         def __init__(self, array):
@@ -909,23 +916,48 @@ def test_scene_evaluation_uses_full_grid_and_ignores_nodata(
     )
     scratch_dir = tmp_path / "scratch"
     scratch_dir.mkdir()
+    original_evaluate = evaluation_module._evaluate_scene
+    evaluated_scene_ids = []
+
+    def check_scratch_lifecycle(*args, **kwargs):
+        assert not list(scratch_dir.rglob("*.bin"))
+        evaluated_scene_ids.append(args[2])
+        return original_evaluate(*args, **kwargs)
+
+    monkeypatch.setattr(evaluation_module, "_evaluate_scene", check_scratch_lifecycle)
     result = evaluate_scenes(
         PatternModel(),
         access,
-        ("validation-a",),
+        split.validation_scene_ids,
         window_size=(4, 4),
         batch_size=2,
         scratch_dir=scratch_dir,
     )
 
     assert result["mean_iou"] == pytest.approx(1.0), result
-    assert result["pixels_scored"] == 34
+    assert result["pixels_scored"] == 68
     assert result["window_size"] == [4, 4]
     assert result["stride"] == [2, 2]
     assert result["scenes"][0]["window_count"] == 12
     np.testing.assert_array_equal(
-        result["scenes"][0]["confusion_matrix"], result["confusion_matrix"]
+        np.sum([scene["confusion_matrix"] for scene in result["scenes"]], axis=0),
+        result["confusion_matrix"],
     )
+    assert evaluated_scene_ids == list(split.validation_scene_ids)
+    assert not list(scratch_dir.iterdir())
+
+    class FailingModel(PatternModel):
+        def __call__(self, _batch):
+            raise RuntimeError("inference failed")
+
+    with pytest.raises(RuntimeError, match="inference failed"):
+        evaluate_scenes(
+            FailingModel(),
+            access,
+            split.validation_scene_ids,
+            window_size=(4, 4),
+            scratch_dir=scratch_dir,
+        )
     assert not list(scratch_dir.iterdir())
     with pytest.raises(ValueError, match="ensure overlap"):
         evaluate_scenes(

@@ -161,4 +161,8 @@ Document verified segmentation evaluations and research, then push the resulting
 - Fix 3 complete: evaluator returns each scene confusion matrix and the aggregate.
   The existing full-grid evaluation test now checks their equality; test and Ruff
   passed.
-- Next: bound evaluator scratch files to a single scene, including failures.
+- Fix 4 complete: per-scene temporary directories are removed before the next
+  scene and on inference failure. The existing evaluator test now uses two scenes,
+  checks summed matrices, and verifies scratch cleanup on success and failure.
+  Focused test, Ruff, and formatting passed.
+- Next: support constant-padded reads through WarpedVRT.
