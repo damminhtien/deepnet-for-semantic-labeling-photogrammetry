@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import platform
 import subprocess
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -53,7 +53,7 @@ def build_run_manifest(
         "schema_version": 1,
         "run_id": run_id,
         "status": "initialized",
-        "created_utc": datetime.now(UTC).isoformat(),
+        "created_utc": datetime.now(timezone.utc).isoformat(),
         "dataset_id": bundle.manifest["dataset_id"],
         "bundle_sha256": bundle.manifest["bundle_sha256"],
         "catalog_hash": bundle.manifest["catalog_hash"],

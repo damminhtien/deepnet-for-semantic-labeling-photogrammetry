@@ -170,4 +170,8 @@ Document verified segmentation evaluations and research, then push the resulting
   coverage excludes areas outside the source footprint even without source nodata.
   Both padded/in-bounds paths passed with and without nodata; all 35 pipeline tests
   and Ruff passed.
-- Next: verify Python 3.10-compatible imports and timestamps.
+- Fix 6 complete: lineage uses datetime.timezone.utc, retaining Python >=3.10.
+  Built and installed the package with only core dependencies in an isolated uv
+  Python 3.10.22 runtime outside the project. Package import, UTC timestamp, and
+  CLI help passed; two existing bundle/lineage tests and Ruff passed.
+- Next: correct the joint Vaihingen evaluation description.
