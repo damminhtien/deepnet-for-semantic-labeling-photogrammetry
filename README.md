@@ -121,6 +121,11 @@ keeps test labels out of training and selection bundles. Include test-only DVC
 bundles as separate inputs to the single Kaggle run; the evaluator must not read
 them until it freezes the selected checkpoint.
 
+Both datasets contribute training scenes. The Vaihingen test result therefore
+measures performance on held-out scenes after joint training. A cross-dataset
+transfer experiment would require excluding Vaihingen from training and model
+selection.
+
 The JSON is a versioned plan; it does not start training. No pretrained weights or
 Kaggle GPU run have been downloaded or launched. Once the gated DINOv3 access is
 approved, complete the generic training caller and local data/weight preflights, then

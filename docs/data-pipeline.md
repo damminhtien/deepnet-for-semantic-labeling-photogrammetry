@@ -197,6 +197,11 @@ and recorded in the run manifest. The default DVC graph exports only train and
 validation roles; test labels are excluded from training and checkpoint-selection
 bundles.
 
+Both Potsdam and Vaihingen contribute training and validation scenes to this joint
+run. Its Vaihingen test scores measure generalization to held-out scenes after
+joint training. Cross-dataset transfer would require a separate experiment that
+excludes Vaihingen from training and model selection.
+
 The isolated [`evaluation DVC pipeline`](../pipelines/evaluation/dvc.yaml) validates
 each test split against its catalog, scans its image/label quality, and exports a
 test-only bundle to the configured path. Run a target explicitly;

@@ -174,4 +174,7 @@ Document verified segmentation evaluations and research, then push the resulting
   Built and installed the package with only core dependencies in an isolated uv
   Python 3.10.22 runtime outside the project. Package import, UTC timestamp, and
   CLI help passed; two existing bundle/lineage tests and Ruff passed.
-- Next: correct the joint Vaihingen evaluation description.
+- Fix 7 complete: the active protocol and documentation describe Vaihingen as
+  scene-held-out evaluation after joint training. The training configuration and
+  split memberships are unchanged; their protocol hashes were verified.
+- Next: run final core checks, update Graphify, and refresh DVC pipeline evidence.

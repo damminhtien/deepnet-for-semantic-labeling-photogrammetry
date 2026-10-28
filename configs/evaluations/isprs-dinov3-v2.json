@@ -110,7 +110,7 @@
     {
       "dataset_id": "isprs-vaihingen",
       "role": "test",
-      "purpose": "post-selection cross-dataset transfer evaluation for this DINOv3 run",
+      "purpose": "post-selection scene-held-out Vaihingen evaluation after joint Potsdam/Vaihingen training",
       "scene_ids_source": "vaihingen-dinov3-v1.json:test_scene_ids",
       "bundle_path": "data/prepared/vaihingen/post-selection-test-bundle",
       "evaluate_only_after": [
