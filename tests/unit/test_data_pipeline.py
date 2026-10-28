@@ -923,6 +923,9 @@ def test_scene_evaluation_uses_full_grid_and_ignores_nodata(
     assert result["window_size"] == [4, 4]
     assert result["stride"] == [2, 2]
     assert result["scenes"][0]["window_count"] == 12
+    np.testing.assert_array_equal(
+        result["scenes"][0]["confusion_matrix"], result["confusion_matrix"]
+    )
     assert not list(scratch_dir.iterdir())
     with pytest.raises(ValueError, match="ensure overlap"):
         evaluate_scenes(

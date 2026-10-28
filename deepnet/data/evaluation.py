@@ -359,7 +359,7 @@ def evaluate_scenes(
                     scratch_root=scene_scratch,
                     torch=torch,
                 )
-            matrix = np.asarray(scene_result.pop("confusion_matrix"), dtype=np.int64)
+            matrix = np.asarray(scene_result["confusion_matrix"], dtype=np.int64)
             total_confusion += matrix
             scene_results.append(scene_result)
 

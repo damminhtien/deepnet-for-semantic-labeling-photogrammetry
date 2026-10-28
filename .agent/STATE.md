@@ -158,4 +158,7 @@ Document verified segmentation evaluations and research, then push the resulting
   raster/finite masks per view, and separates valid from scored pixels. Regression
   cases cover missing/shifted images, nodata, NaN, and independent view masks.
   All 33 data-pipeline tests passed; Ruff passed.
-- Next: retain per-scene confusion matrices in evaluator output.
+- Fix 3 complete: evaluator returns each scene confusion matrix and the aggregate.
+  The existing full-grid evaluation test now checks their equality; test and Ruff
+  passed.
+- Next: bound evaluator scratch files to a single scene, including failures.
