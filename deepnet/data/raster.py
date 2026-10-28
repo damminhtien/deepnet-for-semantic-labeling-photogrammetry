@@ -170,69 +170,10 @@ class RasterioSceneReader:
         resampling: str = "nearest",
         fill_value: float = 0,
     ) -> np.ndarray:
-        """Return HWC pixels, reprojecting only between georeferenced grids."""
-        _rasterio()
-        from affine import Affine
-        from rasterio.enums import Resampling
-        from rasterio.vrt import WarpedVRT
-        from rasterio.windows import Window
-
-        assets = self.scene.asset_map()
-        asset = assets[asset_name]
-        window.validate_for(self.scene.reference_grid)
-        self.scene.require_aligned(
-            (asset_name,), allow_reprojection=self.allow_reprojection
-        )
-        source = self._open(asset_name)
-        attested_pixel_pair = (
-            (asset.grid.width, asset.grid.height)
-            == (self.scene.reference_grid.width, self.scene.reference_grid.height)
-            and asset.alignment_evidence is not None
-            and (
-                not asset.grid.georeferenced
-                or not self.scene.reference_grid.georeferenced
-            )
-        )
-        source_grid_matches = (
-            asset.grid.same_grid(self.scene.reference_grid) or attested_pixel_pair
-        )
-        if source_grid_matches:
-            result = source.read(
-                window=Window(window.col, window.row, window.width, window.height),
-                boundless=window.padding == "constant",
-                fill_value=fill_value,
-            )
-        elif self.allow_reprojection and asset.grid.georeferenced:
-            if not self.scene.reference_grid.georeferenced:
-                raise AlignmentError(
-                    "Cannot reproject into a pixel-local reference grid"
-                )
-            try:
-                resampling_method = getattr(Resampling, resampling)
-            except AttributeError as error:
-                raise ValueError(
-                    f"Unknown raster resampling method: {resampling}"
-                ) from error
-            reference = self.scene.reference_grid
-            assert reference.affine is not None and reference.crs is not None
-            with WarpedVRT(
-                source,
-                crs=reference.crs,
-                transform=Affine(*reference.affine),
-                width=reference.width,
-                height=reference.height,
-                resampling=resampling_method,
-            ) as warped:
-                result = warped.read(
-                    window=Window(window.col, window.row, window.width, window.height),
-                    boundless=window.padding == "constant",
-                    fill_value=fill_value,
-                )
-        else:
-            raise AlignmentError(
-                f"Asset {asset_name!r} does not match the scene reference grid"
-            )
-        return np.ascontiguousarray(result.transpose(1, 2, 0))
+        """Return HWC pixels through the shared grid-aware read path."""
+        return self.read_window_with_mask(
+            asset_name, window, resampling=resampling, fill_value=fill_value
+        )[0]
 
     def read_window_with_mask(
         self,
@@ -245,7 +186,7 @@ class RasterioSceneReader:
         """Return HWC pixels and a 2D mask separate from categorical labels."""
         _rasterio()
         from affine import Affine
-        from rasterio.enums import Resampling
+        from rasterio.enums import ColorInterp, Resampling
         from rasterio.vrt import WarpedVRT
         from rasterio.windows import Window
 
@@ -290,6 +231,10 @@ class RasterioSceneReader:
                     f"Unknown raster resampling method: {resampling}"
                 ) from error
             assert reference.affine is not None and reference.crs is not None
+            real_height = min(window.height, reference.height - window.row)
+            real_width = min(window.width, reference.width - window.col)
+            clipped_window = Window(window.col, window.row, real_width, real_height)
+            indexes = tuple(range(1, source.count + 1))
             with WarpedVRT(
                 source,
                 crs=reference.crs,
@@ -297,16 +242,18 @@ class RasterioSceneReader:
                 width=reference.width,
                 height=reference.height,
                 resampling=resampling_method,
+                add_alpha=ColorInterp.alpha not in source.colorinterp,
             ) as warped:
-                data = warped.read(
-                    window=window_arg,
-                    boundless=window.padding == "constant",
-                    fill_value=fill_value,
-                )
-                masks = warped.read_masks(
-                    window=window_arg,
-                    boundless=window.padding == "constant",
-                )
+                data = warped.read(indexes=indexes, window=clipped_window)
+                masks = warped.read_masks(indexes=indexes, window=clipped_window)
+            padding = (
+                (0, 0),
+                (0, window.height - real_height),
+                (0, window.width - real_width),
+            )
+            data = np.pad(data, padding, constant_values=fill_value)
+            masks = np.pad(masks, padding, constant_values=0)
+
         else:
             raise AlignmentError(
                 f"Asset {asset_name!r} does not match the scene reference grid"

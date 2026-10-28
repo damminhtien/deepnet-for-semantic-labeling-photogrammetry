@@ -165,4 +165,9 @@ Document verified segmentation evaluations and research, then push the resulting
   scene and on inference failure. The existing evaluator test now uses two scenes,
   checks summed matrices, and verifies scratch cleanup on success and failure.
   Focused test, Ruff, and formatting passed.
-- Next: support constant-padded reads through WarpedVRT.
+- Fix 5 complete: both raster APIs share one read path. WarpedVRT reads are
+  clipped to the reference grid, data and masks are padded explicitly, and alpha
+  coverage excludes areas outside the source footprint even without source nodata.
+  Both padded/in-bounds paths passed with and without nodata; all 35 pipeline tests
+  and Ruff passed.
+- Next: verify Python 3.10-compatible imports and timestamps.

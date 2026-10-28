@@ -366,6 +366,46 @@ def test_alignment_never_uses_matching_dimensions_alone():
         pixel_local_scene.require_aligned(("pixel-local-labels",))
 
 
+@pytest.mark.parametrize("source_has_nodata", [True, False])
+def test_reprojected_windows_clip_and_pad_data_and_coverage_masks(
+    pipeline_fixture, source_has_nodata
+):
+    root, scenes, _, _, _ = pipeline_fixture
+    scene = scenes[0]
+    assets = scene.asset_map()
+    image_path = root / assets["irrg"].uri
+    if not source_has_nodata:
+        with rasterio.open(image_path, "r+") as image:
+            image.nodata = None
+        assets["irrg"] = replace(assets["irrg"], nodata=None)
+    scene = replace(
+        scene,
+        reference_grid=replace(scene.reference_grid, affine=(1, 0, 101, 0, -1, 200)),
+        assets=tuple(assets.items()),
+    )
+    with rasterio.open(image_path) as image:
+        source_pixels = image.read(1)
+    with RasterioSceneReader(scene, root, allow_reprojection=True) as reader:
+        for padding in ("error", "constant"):
+            window = WindowSpec(0, 0, 3, 4, padding=padding)
+            pixels, valid = reader.read_window_with_mask("irrg", window)
+            np.testing.assert_array_equal(pixels[..., 0], source_pixels[:3, 1:5])
+            assert valid.all()
+            np.testing.assert_array_equal(reader.read_window("irrg", window), pixels)
+
+        window = WindowSpec(3, 5, 4, 4, padding="constant")
+        pixels, valid = reader.read_window_with_mask("irrg", window, fill_value=17)
+        expected_mask = np.zeros((4, 4), dtype=bool)
+        expected_mask[:2, 0] = True
+        np.testing.assert_array_equal(valid, expected_mask)
+        np.testing.assert_array_equal(pixels[:2, 0, 0], source_pixels[3:5, 6])
+        assert (pixels[2:, :] == 17).all()
+        assert (pixels[:, 2:] == 17).all()
+        np.testing.assert_array_equal(
+            reader.read_window("irrg", window, fill_value=17), pixels
+        )
+
+
 def test_label_decoder_rejects_unknown_valid_colors_and_preserves_ignore(
     pipeline_fixture,
 ):
