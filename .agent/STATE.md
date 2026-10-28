@@ -144,3 +144,14 @@ Document verified segmentation evaluations and research, then push the resulting
 - Test membership is exact: Potsdam 14/14 and Vaihingen 17/17. Test quality reports passed across 504,000,000 Potsdam pixels and 90,200,065 Vaihingen pixels; valid-pixel fraction is 1.0 in both. All four train/validation and test bundles passed `deepnet-data verify-bundle`; `uv run dvc status` reports up to date.
 - DVC remote `storage` received 31 files. No model inference, test scoring, training, or Kaggle session was started. The training/evaluation caller and the previously identified augmentation padding correction remain prerequisites for the full run.
 - The earlier benchmark note saying Vaihingen test references were absent is superseded by this section. Historical local DVC source staging is `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/dvc/staging/vaihingen-eroded-evaluation-labels`.
+
+## Seven audit repairs — 2026-10-28
+
+- User authorized all seven fixes from the repository audit, with tests only where
+  necessary. See TASK.md and PLAN.md for the bounded scope and verification steps.
+- Initial HEAD: `6084012`. The existing unrelated PSPNet wording edit in this file
+  is preserved and must not be included in these commits.
+- Fix 1 complete: count-based F1; 48 published macro-F1 fields verified, 33
+  corrected, source counts retained, correction reproducible and idempotent.
+  Five focused tests and Ruff passed. All other existing report fields unchanged.
+- Next: validate imagery and per-view pixel coverage in quality reports.

@@ -254,6 +254,21 @@ def test_confusion_matrix_accepts_only_declared_classes_and_ignore():
         )
 
 
+@pytest.mark.parametrize(
+    ("matrix", "expected"),
+    [
+        ([[0, 10], [5, 5]], [0.0, 0.4]),
+        ([[0, 10], [0, 5]], [0.0, 0.5]),
+        ([[5, 2], [0, 0]], [5 / 6, 0.0]),
+        ([[5, 0], [0, 0]], [1.0, None]),
+    ],
+)
+def test_f1_is_zero_for_missed_classes_and_undefined_only_when_empty(matrix, expected):
+    actual = summarize_confusion(np.array(matrix))["per_class_f1"]
+    for value, target in zip(actual, expected, strict=True):
+        assert value is None if target is None else value == pytest.approx(target)
+
+
 def test_split_rejects_scene_and_spatial_group_leakage():
     with pytest.raises(ValueError, match="occurs in both"):
         SplitManifest(

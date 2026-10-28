@@ -22,6 +22,30 @@ The primary metrics use eroded/no-boundary references. Potsdam uses a fixed 18/6
 
 The Potsdam 5 m validation probe preceding this run measured mIoU of 23.75% for UniverSat, 17.15% for AnySat, and 20.39% for TerraMind. A train-majority baseline measured 5.57% mIoU on the held-out Potsdam grid and 4.79% on the Vaihingen held-out grid.
 
+### Macro-F1 correction, 2026-10-28
+
+The archived evaluator treated zero-true-positive classes as undefined F1 and
+excluded them from the macro average. The corrected JSON uses
+`F1 = 2*TP / (truth_count + prediction_count)`: classes with a nonzero denominator
+and no true positives contribute zero. Only classes absent from both truth and
+prediction are undefined. This corrects 33 published macro-F1 values, including
+folds and majority baselines. Overall accuracy, IoU, splits, and predictions are
+unchanged; no training or inference was rerun.
+
+| Encoder | Previous Vaihingen OOF macro-F1 | Corrected Vaihingen OOF macro-F1 |
+|---|---:|---:|
+| UniverSat | 46.9700% | 39.1417% |
+| AnySat | 49.1835% | 32.7890% |
+| TerraMind | 47.8839% | 31.9226% |
+
+The JSON retains the confusion counts supporting its macro-F1 fields, corrected
+per-class F1, and SHA-256 hashes of the original metric files. Original local
+artifacts remain unchanged. Reproduce the correction with:
+
+```bash
+python scripts/correct_foundation_metrics.py --source-dir /path/to/model_results
+```
+
 ### Reference-mask sensitivity
 
 | Encoder | Potsdam full reference OA / mIoU | Potsdam eroded reference OA / mIoU | Vaihingen full reference OA / mIoU | Vaihingen eroded reference OA / mIoU |

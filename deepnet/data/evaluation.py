@@ -86,10 +86,10 @@ def summarize_confusion(matrix: np.ndarray) -> dict[str, Any]:
         where=ground_truth != 0,
     )
     f1 = np.divide(
-        2 * precision * recall,
-        precision + recall,
+        2 * true_positive,
+        ground_truth + predicted,
         out=np.full(matrix.shape[0], np.nan, dtype=np.float64),
-        where=np.isfinite(precision + recall) & ((precision + recall) != 0),
+        where=(ground_truth + predicted) != 0,
     )
     total = int(matrix.sum())
     return {
