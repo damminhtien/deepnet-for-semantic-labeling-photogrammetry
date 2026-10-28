@@ -46,6 +46,7 @@ from deepnet.data.preprocessing import (
     fit_model_statistics,
     fit_train_statistics,
 )
+from deepnet.data.quality import validate_data_quality
 from deepnet.data.raster import RasterioSceneReader, inspect_raster
 from deepnet.data.sampling import (
     ClassAwareSampler,
@@ -376,6 +377,80 @@ def test_label_decoder_rejects_unknown_valid_colors_and_preserves_ignore(
     np.testing.assert_array_equal(decoded, [[0, 6], [1, 6]])
     with pytest.raises(ValueError, match="unresolved RGB colors"):
         decode_rgb_labels(image, preprocessing)
+
+
+@pytest.mark.parametrize("problem", ["missing", "metadata"])
+def test_quality_report_checks_required_image_files(pipeline_fixture, problem):
+    root, scenes, split, preprocessing, _ = pipeline_fixture
+    image_path = root / scenes[0].asset_map()["irrg"].uri
+    if problem == "missing":
+        image_path.unlink()
+        expected_error, message = FileNotFoundError, "train-a-image"
+    else:
+        with rasterio.open(image_path, "r+") as image:
+            image.transform = from_origin(101, 200, 1, 1)
+        expected_error, message = AlignmentError, "CRS/affine changed"
+
+    with pytest.raises(expected_error, match=message):
+        validate_data_quality(
+            scenes,
+            root,
+            split,
+            preprocessing,
+            {"irrg-view": ("irrg",)},
+            include_splits=("train",),
+        )
+
+
+def test_quality_coverage_intersects_image_masks_and_finite_values_per_view(
+    pipeline_fixture,
+):
+    root, scenes, split, preprocessing, _ = pipeline_fixture
+    scene = scenes[0]
+    image_path = root / scene.asset_map()["irrg"].uri
+    with rasterio.open(image_path) as image:
+        pixels, profile = image.read(1).astype(np.float32), image.profile
+    pixels[0, 1] = 255  # Image-only nodata, with a valid label.
+    pixels[0, 2] = np.nan
+    profile.update(dtype="float32")
+    with rasterio.open(image_path, "w", **profile) as image:
+        image.write(pixels, 1)
+    aux_path = root / "aux.tif"
+    auxiliary = np.ones_like(pixels)
+    auxiliary[1, 1] = 255
+    with rasterio.open(aux_path, "w", **profile) as image:
+        image.write(auxiliary, 1)
+    assets = scene.asset_map()
+    for name, path in (("irrg", image_path), ("aux", aux_path)):
+        assets[name] = inspect_raster(
+            path,
+            asset_id=name,
+            uri=path.name,
+            bands=("red",),
+            grid_id=scene.reference_grid.grid_id,
+        )
+    with rasterio.open(root / assets["labels"].uri, "r+") as labels:
+        labels.write(np.zeros((3, 1, 1), dtype=np.uint8), window=((0, 1), (3, 4)))
+    scenes = (replace(scene, assets=tuple(assets.items())), *scenes[1:])
+
+    report = validate_data_quality(
+        scenes,
+        root,
+        split,
+        preprocessing,
+        {"optical": ("irrg",), "auxiliary": ("aux",)},
+        tile_size=4,
+        include_splits=("train",),
+    )["splits"]["train"]
+
+    assert report["total_pixels"] == 35
+    assert report["valid_pixels"] == 31
+    assert report["scored_pixels"] == 30
+    assert sum(report["class_counts"].values()) == 31
+    assert report["views"]["optical"]["valid_pixels"] == 32
+    assert report["views"]["auxiliary"]["valid_pixels"] == 33
+    assert report["views"]["optical"]["scored_pixels"] == 31
+    assert report["scenes"][0]["views"] == report["views"]
 
 
 def test_label_decoder_uses_explicit_rgb_tolerance_and_rejects_outliers(

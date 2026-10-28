@@ -103,9 +103,16 @@ deepnet-data quality-report \
 ```
 
 Each required view is checked against the per-scene reference grid and the label
-asset selected by the split. Unknown valid label colors outside the configured
-palette tolerance, missing assets, bad hashes, and unsupported alignment fail
-explicitly.
+asset selected by the split. The scan opens every required image, verifies its
+metadata, and intersects its raster mask and finite-value mask with the label mask.
+Missing images, changed metadata, unsupported alignment, and unknown valid label
+colors outside the configured palette tolerance fail explicitly. Bundle verification
+checks content hashes separately.
+
+Each scene and split reports independent `views` coverage. The top-level
+`valid_pixels` uses the intersection of all required views; `class_counts` includes
+ignore labels, while `scored_pixels` excludes them. A valid fraction of 1.0 therefore
+does not imply that every raster pixel contributes to metrics.
 
 ## Explore the data and review augmentation
 

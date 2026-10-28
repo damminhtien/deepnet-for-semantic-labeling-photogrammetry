@@ -154,4 +154,8 @@ Document verified segmentation evaluations and research, then push the resulting
 - Fix 1 complete: count-based F1; 48 published macro-F1 fields verified, 33
   corrected, source counts retained, correction reproducible and idempotent.
   Five focused tests and Ruff passed. All other existing report fields unchanged.
-- Next: validate imagery and per-view pixel coverage in quality reports.
+- Fix 2 complete: quality scans every required image and its metadata, intersects
+  raster/finite masks per view, and separates valid from scored pixels. Regression
+  cases cover missing/shifted images, nodata, NaN, and independent view masks.
+  All 33 data-pipeline tests passed; Ruff passed.
+- Next: retain per-scene confusion matrices in evaluator output.
