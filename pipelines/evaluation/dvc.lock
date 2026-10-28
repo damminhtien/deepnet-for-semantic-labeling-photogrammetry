@@ -17,8 +17,8 @@ stages:
       size: 89013
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/post-selection-test-validation.json
@@ -50,8 +50,8 @@ stages:
       size: 89013
     - path: data/prepared/potsdam/post-selection-test-quality.json
       hash: md5
-      md5: e5eda4c2428c8e7f11a731be2736617e
-      size: 19662
+      md5: 824b4da7ca8dfa2615aa58d6f6a8e654
+      size: 28279
     - path: data/prepared/potsdam/post-selection-test-validation.json
       hash: md5
       md5: 8915b87d9b26c854548256135a3196b9
@@ -68,13 +68,13 @@ stages:
       nfiles: 76
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/post-selection-test-bundle
       hash: md5
-      md5: b3759fa4be21a6209372e47fe1df608c.dir
+      md5: f0871a328c882150e2aa80f9ced38a4a.dir
       size: 3037604004
       nfiles: 33
   validate_vaihingen_test:
@@ -94,8 +94,8 @@ stages:
       size: 67727
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/post-selection-test-validation.json
@@ -128,8 +128,8 @@ stages:
       size: 67727
     - path: data/prepared/vaihingen/post-selection-test-quality.json
       hash: md5
-      md5: 7db1a909e14046172dcaea6e9aa0fd63
-      size: 21352
+      md5: 7078ce1804e089b8c215ec2355ef9583
+      size: 31202
     - path: data/prepared/vaihingen/post-selection-test-validation.json
       hash: md5
       md5: 2566139552866b17a251c70a050c3440
@@ -146,13 +146,13 @@ stages:
       nfiles: 21
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/post-selection-test-bundle
       hash: md5
-      md5: 9c4e978d4e75da96bd2f9d12583ccc62.dir
+      md5: 2dd6e033853cc92ec2d11e8ab36a9701.dir
       size: 543434697
       nfiles: 39
   quality_potsdam_test:
@@ -187,14 +187,14 @@ stages:
       nfiles: 76
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/post-selection-test-quality.json
       hash: md5
-      md5: e5eda4c2428c8e7f11a731be2736617e
-      size: 19662
+      md5: 824b4da7ca8dfa2615aa58d6f6a8e654
+      size: 28279
   quality_vaihingen_test:
     cmd: deepnet-data quality-report --catalog
       data/prepared/vaihingen/catalog.json --split
@@ -227,11 +227,11 @@ stages:
       nfiles: 21
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/post-selection-test-quality.json
       hash: md5
-      md5: 7db1a909e14046172dcaea6e9aa0fd63
-      size: 21352
+      md5: 7078ce1804e089b8c215ec2355ef9583
+      size: 31202

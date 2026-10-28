@@ -177,4 +177,25 @@ Document verified segmentation evaluations and research, then push the resulting
 - Fix 7 complete: the active protocol and documentation describe Vaihingen as
   scene-held-out evaluation after joint training. The training configuration and
   split memberships are unchanged; their protocol hashes were verified.
-- Next: run final core checks, update Graphify, and refresh DVC pipeline evidence.
+- Final core checks: 58 tests and 2 subtests passed in tests/unit plus the existing
+  SAM loss test. Ruff check and format check passed for deepnet, tests/unit,
+  scripts, and notebooks_src. Graphify code update completed (1063 nodes).
+- Rechecked all 48 published macro-F1 records directly from their saved matrices;
+  33 corrections and no changes to any other pre-existing report field. Original
+  metric-file SHA-256 hashes still match the correction provenance.
+- Default DVC pipeline rerun passed. Quality scans covered 24 Potsdam and 16
+  Vaihingen train/validation scenes, including required imagery; validity is 1.0.
+  Both rebuilt training bundles passed all file hashes and embedded contracts;
+  content fingerprints are unchanged and test scenes remain excluded.
+- Isolated test DVC pipeline rerun passed for all 14 Potsdam and 17 Vaihingen
+  scenes. Potsdam has 504,000,000 valid / 467,862,855 scored test pixels;
+  Vaihingen has 90,200,065 valid / 81,991,943 scored test pixels.
+- All four rebuilt bundles passed file SHA-256, inventory, embedded contracts,
+  exact role membership, and comparison with the previous manifests in DVC cache.
+  Every bundle content fingerprint is unchanged; source_revision records the
+  repaired code at 161bc06. Both DVC pipelines report up to date.
+- Validation boundary: the initial full-suite collection remains blocked in five
+  historical SAM modules by missing torchvision. No full scientific model run was
+  performed. Original external artifacts and the unrelated working-tree edit are
+  preserved; no training, cloud jobs, or remote pushes were started.
+- Complete: all seven repairs and final verification are committed locally.

@@ -26,8 +26,8 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/catalog.json
@@ -51,8 +51,8 @@ stages:
       size: 89013
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/catalog-validation.json
@@ -97,14 +97,14 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/quality.json
       hash: md5
-      md5: 943c1223f4f909001a8f9b3fe385fc11
-      size: 33844
+      md5: 727d1a2fece85d808c9e065fdb29d2cf
+      size: 48086
   bundle_potsdam:
     cmd: deepnet-data export-bundle --catalog data/prepared/potsdam/catalog.json
       --split configs/splits/potsdam-dinov3-v2.json --preprocessing-id
@@ -130,8 +130,8 @@ stages:
       size: 89013
     - path: data/prepared/potsdam/quality.json
       hash: md5
-      md5: 943c1223f4f909001a8f9b3fe385fc11
-      size: 33844
+      md5: 727d1a2fece85d808c9e065fdb29d2cf
+      size: 48086
     - path: data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary
       hash: md5
       md5: 5a249e31abaf738582f3529dfa1fcb6e.dir
@@ -150,13 +150,13 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/train-validation-bundle
       hash: md5
-      md5: b86bb20e199fe9ebe1f95541ebd67943.dir
+      md5: 05abc80db83f0809dd373a634333a350.dir
       size: 5207151275
       nfiles: 53
   catalog_vaihingen:
@@ -185,8 +185,8 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/catalog.json
@@ -210,8 +210,8 @@ stages:
       size: 67727
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/catalog-validation.json
@@ -255,14 +255,14 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/quality.json
       hash: md5
-      md5: 24bf9ca0a78578607f954889396a92f6
-      size: 20182
+      md5: edcf847cfec047ba536cab711c6fb085
+      size: 29544
   bundle_vaihingen:
     cmd: deepnet-data export-bundle --catalog
       data/prepared/vaihingen/catalog.json --split
@@ -289,8 +289,8 @@ stages:
       size: 67727
     - path: data/prepared/vaihingen/quality.json
       hash: md5
-      md5: 24bf9ca0a78578607f954889396a92f6
-      size: 20182
+      md5: edcf847cfec047ba536cab711c6fb085
+      size: 29544
     - path: data/raw/inputs/vaihingen-isprs-official-20261019/images
       hash: md5
       md5: 1b217841aeddbf3866c2375df90a4530.dir
@@ -308,12 +308,12 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: f5223244bb06034c237db14be8c4f882.dir
-      size: 173028
+      md5: 587a3f92105219f206d0ffa9ac827485.dir
+      size: 183325
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/train-validation-bundle
       hash: md5
-      md5: 090d3422df2979ac68b1d9c0ac704803.dir
+      md5: aa3785e1dc394da61669813c637e7a5c.dir
       size: 476547085
       nfiles: 37
