@@ -8,7 +8,7 @@
    and one post-selection full-scene test evaluation per dataset.
 3. [x] Verify synthetic end-to-end training/resume and real pretrained forward/
    backward locally; run relevant checks and verify four immutable data bundles.
-4. [ ] Package source, pinned weights, and data as private Kaggle inputs; verify
+4. [x] Package source, pinned weights, and data as private Kaggle inputs; verify
    package hashes and launch one full GPU job with durable outputs and logs.
 5. [ ] Verify live training progress, persist exact run identity/state, retrieve
    and audit final artifacts when available, and commit the implementation/state.

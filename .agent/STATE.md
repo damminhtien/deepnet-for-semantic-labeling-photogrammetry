@@ -249,3 +249,18 @@ Document verified segmentation evaluations and research, then push the resulting
   checkpoint selection, exactly-once test status, and summed per-scene counts.
   Its audit passed on the synthetic end-to-end training output; all 3 runner
   tests and relevant Ruff checks passed after adding this audit.
+- Milestone 4: launched private Kaggle kernel version 1 on requested
+  NvidiaTeslaT4, 12-hour platform timeout, full 20-epoch configuration:
+  https://www.kaggle.com/code/damminhtien/dinov2-joint-irrg-segmentation-20261031.
+  Remote pulled bootstrap SHA-256 matches the staged source; GPU/private flags and
+  all three attached inputs are verified. Initial observed status is QUEUED.
+- Persistent local watcher PID 21591 polls once per minute, captures remote logs,
+  and downloads/audits terminal artifacts under the external run folder's monitor/.
+  Exact source/config/bootstrap hashes and launch identity are in
+  /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/isprs-dinov2-joint-v1-20261031-kaggle/cloud-run.json.
+  Final model metrics do not exist yet; milestone 5 remains pending.
+- Final local core check after adding the retrieval audit: 63 tests and 2 subtests
+  passed in 5.15 seconds. The watcher is independent of the foreground agent;
+  caffeinate PID 21761 prevents idle sleep while watcher PID 21591 exists.
+  GPU allocation remains queued as of 2026-10-31 14:48:45 UTC; no cloud training
+  loss or final model metrics have been observed yet.
