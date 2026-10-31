@@ -253,6 +253,46 @@ def test_affine_padding_is_invalid_and_label_interpolation_is_nearest():
         np.testing.assert_array_equal(first[0][name], repeated[0][name])
 
 
+@pytest.mark.parametrize("fill", [0, 17])
+def test_radiometry_preserves_configured_fill_on_invalid_pixels(fill):
+    pytest.importorskip("albumentations")
+    from dataclasses import replace
+
+    domain = load_domain_spec("isprs-irrg-aerial-v1")
+    model_input = _view(("ir", "red", "green"))
+    spec = load_augmentation_spec("isprs-irrg-aerial-v2")
+    affine = TransformSpec(
+        "affine",
+        probability=1.0,
+        parameters=(
+            ("translate_percent", (0.25, 0.25)),
+            ("border_mode", "constant"),
+            ("fill", fill),
+            ("fill_mask", 6),
+        ),
+    )
+    brightness = TransformSpec(
+        "random_brightness_contrast",
+        probability=1.0,
+        parameters=(("brightness_limit", (0.2, 0.2)), ("contrast_limit", (0, 0))),
+    )
+    spec = replace(spec, geometry=(affine,), optical=(brightness,))
+    augmenter = AlbumentationsAugmenter(domain, model_input, spec, ignore_label=6)
+    channels = {
+        name: np.full((32, 32), 100, np.float32) for name in model_input.channels
+    }
+    labels = np.zeros((32, 32), np.uint8)
+    valid = np.ones(labels.shape, bool)
+
+    images, target, mask = augmenter(channels, labels, valid, seed=7)
+
+    assert (~mask).any()
+    assert (target[~mask] == 6).all()
+    for image in images.values():
+        assert (image[~mask] == fill).all()
+        assert (image[mask] > 100).all()
+
+
 def test_irrg_aerial_policy_json_builds_with_pinned_augmentation_api():
     pytest.importorskip("albumentations")
     domain = load_domain_spec("isprs-irrg-aerial-v1")

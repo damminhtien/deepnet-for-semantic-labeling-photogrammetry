@@ -433,6 +433,16 @@ review a rare-class sampling or bounded geometry policy for low-density car crop
 Neither the versioned augmentation config nor the training config was changed during
 this audit, and these diagnostics are not model-performance evidence.
 
+On 2026-10-31, the augmenter was corrected to preserve pre-radiometry image values
+where the transformed validity mask is false. The new `isprs-irrg-aerial-v3`
+policy uses scale 0.95–1.05, rotation ±6°, translation ±2%, and affine probability
+0.25; its optical transforms retain the v2 settings. Replaying the selected
+train-only rare/boundary crops at DINOv2's 504/280 window sizes produced 80 trials,
+including 17 with invalid pixels. No invalid-fill change or complete disappearance
+of a source-present car/clutter class occurred. The replay does not establish
+retention for every possible crop or model accuracy. Reproduce it with
+`scripts/audit_training_augmentation.py` and the archived crop-selection CSV.
+
 The expanded artifacts are stored outside Git under
 `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/eda/20261022T063946Z/`:
 `augmentation-training-window-scan.csv`, `augmentation-rare-boundary-manifest.csv`,

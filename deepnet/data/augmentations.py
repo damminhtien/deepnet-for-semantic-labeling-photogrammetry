@@ -260,6 +260,7 @@ class AlbumentationsAugmenter:
                 arrays[name] = transformed[f"aux_{index}"]
 
         if self.optical is not None:
+            invalid_values = optical[~valid].copy()
             low, high = self.optical_value_range
             optical = np.asarray(optical, dtype=np.float32)
             optical = np.clip((optical - low) / (high - low), 0.0, 1.0)
@@ -267,6 +268,7 @@ class AlbumentationsAugmenter:
             _seed_compose(self.optical, optical_seed, "optical")
             optical = self.optical(image=optical)["image"]
             optical = np.clip(optical, 0.0, 1.0) * (high - low) + low
+            optical[~valid] = invalid_values
 
         for index, name in enumerate(self.optical_channels):
             arrays[name] = optical[..., index]

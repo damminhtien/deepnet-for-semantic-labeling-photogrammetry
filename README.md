@@ -84,7 +84,7 @@ Jupytext source. It covers scene inventory, alignment evidence, full-scene class
 balance, full-scene IRRG statistics with per-scene summaries, Potsdam DSM/nDSM
 metadata and value audits, and a seeded augmentation audit. The report records
 label imbalance and ignore coverage for both datasets; validation stays natural and
-unaugmented. The current aerial IRRG policy is versioned as
+unaugmented. The historical aerial IRRG policy is versioned as
 `isprs-irrg-aerial-v2`, with synchronized geometry, ignored affine borders, and
 independently seeded optical-only transforms. See the [historical EDA findings and audit
 method](docs/data-pipeline.md#historical-eda-snapshot-from-dinov3-v1) and the
@@ -94,10 +94,13 @@ The expanded train-only audit scans 12,121 overlapping candidate windows across
 30 training scenes, then replays five rare-class/boundary crops per dataset with
 eight deterministic seeds each. It found that sparse Potsdam car pixels disappear
 in two of 16 car-containing replay trials, and that optical transforms alter values
-inside affine padding even though its labels and validity mask are correct. Keep the
-current policy out of a full training run until padding values are restored after
-radiometry and the rare-car crop behavior is reviewed. The versioned augmentation
-config is unchanged. Audit tables, provenance, and visual examples are written
+inside affine padding even though its labels and validity mask are correct. The
+2026-10-31 implementation restores invalid image values after radiometry. The new
+`isprs-irrg-aerial-v3` policy bounds affine scale to 0.95–1.05, rotation to ±6°, and
+translation to ±2%, with a 0.25 affine probability. A train-only replay of 80 trials
+at DINOv2's 504/280-pixel windows found no invalid-fill changes or complete loss of
+a source-present car/clutter class. This is a data preflight, not a model score.
+Audit tables, provenance, and visual examples are written
 outside Git under the configured EDA data root. Stored EDA artifacts are historical
 v1 results; regenerate outputs with the active v2 split before using them for model
 selection or data-driven tuning.

@@ -1,12 +1,13 @@
-# Repair the seven repository-audit findings
+# Train DINOv2 through the complete shared pipeline
 
-Fix incorrect zero-true-positive F1 and correct the published historical metrics
-from saved confusion counts; validate image assets in quality reports; preserve
-per-scene confusion matrices; bound evaluation scratch storage to one scene; support
-padded reprojected reads; retain Python 3.10 compatibility; and describe the joint
-Vaihingen evaluation accurately.
+The user authorized an end-to-end DINOv2 training run on 2026-10-31. Complete the
+shared training/evaluation caller, remove the known augmentation-padding blocker,
+validate it locally, and launch one full private Kaggle GPU job using DINOv2
+ViT-B/14 with LoRA and the existing joint Potsdam/Vaihingen IRRG data.
 
-Keep the fixes focused. Add regression tests only for behavior that needs them.
-Preserve raw data, historical external artifacts, unrelated working-tree edits, and
-the frozen train/validation/test memberships. Do not launch training or cloud jobs.
-Validate each fix, refresh Graphify, and create atomic local commits.
+Preserve the scene splits, raw rasters, historical experiments, DINOv3 configs, and
+unrelated edits. Keep test bundles separate until validation selects and freezes
+the checkpoint; score each test set once and retain per-scene confusion matrices.
+Persist resumable checkpoints and runtime/data/model/configuration provenance.
+Keep outputs outside Git and retrieve verified run artifacts locally. No Colab
+restart, public data publication, Git push, or DVC push is requested.

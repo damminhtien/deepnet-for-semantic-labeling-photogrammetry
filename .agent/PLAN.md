@@ -1,22 +1,17 @@
-# Seven audit repairs
+# DINOv2 full-run milestones
 
-1. [x] Fix count-based F1 and publish a reproducible historical metric correction.
-   Validate zero-TP/empty-class cases and all corrected historical records.
-2. [x] Scan required image assets, masks, finite values, and view coverage in quality
-   reports. Validate missing/changed imagery and independent view masks.
-3. [x] Retain per-scene confusion matrices. Extend the existing evaluation test to
-   verify that their sum equals the aggregate.
-4. [x] Release evaluation scratch files after each scene, including failures. Validate
-   the lifecycle with two synthetic scenes.
-5. [x] Clip WarpedVRT reads and pad data/masks explicitly. Validate in-bounds and edge
-   windows through both raster-reader APIs.
-6. [x] Replace datetime.UTC with timezone.utc. Verify package/CLI imports on Python 3.10
-   where an interpreter is available, without installing project training extras.
-7. [x] Correct the joint Vaihingen evaluation wording without changing split members
-   or training configuration. Check protocol hashes and related documentation.
+1. [x] Correct post-radiometry invalid-pixel fill, add a focused regression, and
+   replay the train-only rare-class/padding audit before enabling augmentation.
+2. [ ] Add a pinned DINOv2 joint-run configuration/protocol and reusable runner:
+   balanced class-aware sampling, masked CE/Dice, LoRA optimizer, accumulation,
+   mixed precision, warmup/cosine, resumable checkpoints, validation-only selection,
+   and one post-selection full-scene test evaluation per dataset.
+3. [ ] Verify synthetic end-to-end training/resume and real pretrained forward/
+   backward locally; run relevant checks and verify four immutable data bundles.
+4. [ ] Package source, pinned weights, and data as private Kaggle inputs; verify
+   package hashes and launch one full GPU job with durable outputs and logs.
+5. [ ] Verify live training progress, persist exact run identity/state, retrieve
+   and audit final artifacts when available, and commit the implementation/state.
 
-After each item, record evidence in STATE.md and commit the focused change. Finish
-with core tests, Ruff/format, Graphify update, and a final diff/status review.
-
-- [x] Core tests, Ruff/format, and code-only Graphify update.
-- [x] Refresh both DVC pipelines, verify four bundles, and review the final diff.
+Record observed results after each milestone. Do not describe static checks,
+synthetic tests, or a running job as completed scientific training.

@@ -199,3 +199,24 @@ Document verified segmentation evaluations and research, then push the resulting
   performed. Original external artifacts and the unrelated working-tree edit are
   preserved; no training, cloud jobs, or remote pushes were started.
 - Complete: all seven repairs and final verification are committed locally.
+
+## DINOv2 full run — 2026-10-31
+
+- User explicitly requested the full training flow and DINOv2 training. Initial
+  HEAD is 4ff585b; the pre-existing PSPNet wording edit remains unrelated.
+- Kaggle CLI authentication works. Local runtime is Python 3.13 / Torch 2.14.1
+  with MPS, Transformers 5.20.2, PEFT 0.21.2, and Albumentations 2.0.8.
+- Existing DINOv2 attention module names match the configured LoRA suffixes in the
+  installed Transformers. Public facebook/dinov2-base is ungated at revision
+  f9e44c814b77203eaa57a6bdbbd535f21ede1415 (observed via Hugging Face API).
+- Milestone 1: radiometry restores the exact pre-radiometry values at invalid
+  pixels, preserving configured affine fill. New policy isprs-irrg-aerial-v3 uses
+  bounded affine ranges (scale 0.95–1.05, rotation ±6°, translation ±2%, p=0.25).
+  Eight augmentation tests passed, including zero/nonzero fill regressions.
+- Replayed 80 train-only rare-class/boundary trials at the actual 504/280 windows:
+  17 trials had invalid pixels, zero invalid-fill changes, and zero disappearance
+  of a source-present car/clutter class. External report is
+  /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/isprs-dinov2-joint-v1-20261031-preflight/augmentation-audit.json.
+- Downloaded the pinned public pretrained snapshot to the external models folder;
+  model.safetensors SHA-256 is d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841.
+- Next: finish and validate the shared training/evaluation caller.
