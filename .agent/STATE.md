@@ -233,3 +233,19 @@ Document verified segmentation evaluations and research, then push the resulting
   generated output stays ignored. DVC default and isolated test pipelines reran;
   all quality reports passed, all four bundle content hashes stayed unchanged,
   and dvc status is up to date. No trained-model accuracy is claimed yet.
+- Prepared and uploaded three new private Kaggle datasets (all version 1):
+  damminhtien/isprs-irrg-train-validation-20261031,
+  damminhtien/isprs-irrg-heldout-20261031, and
+  damminhtien/dinov2-joint-source-20261031. All are ready; metadata confirms
+  isPrivate=true. Remote expanded inventories and byte sizes match all payloads.
+- Kaggle auto-extracts tar.gz inputs. Bootstrap now verifies all 167 expanded
+  payload files against locally frozen SHA-256 inventories, then links the
+  read-only inputs into the expected layout. Normal archive inputs remain supported.
+  Local corruption/traversal rejection checks passed. No GPU pilot was launched.
+- Uploaded runner wheel comes from 885535f, SHA-256
+  b0b9cd21a24d7763cad02ebc93f9cb5e440a1b943e389a2340473c89d6a5bf8d.
+  Bootstrap changes are separately committed; source inputs remain immutable.
+- Added a local watcher to retrieve terminal outputs and verify artifact hashes,
+  checkpoint selection, exactly-once test status, and summed per-scene counts.
+  Its audit passed on the synthetic end-to-end training output; all 3 runner
+  tests and relevant Ruff checks passed after adding this audit.

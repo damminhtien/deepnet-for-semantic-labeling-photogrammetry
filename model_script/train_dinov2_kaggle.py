@@ -13,6 +13,7 @@ import tarfile
 from pathlib import Path
 
 EXPECTED_INPUTS = {}
+EXPANDED_FILES = {}
 RUN_ID = "isprs-dinov2-joint-v1-20261031"
 LOGGER = logging.getLogger(__name__)
 
@@ -33,6 +34,22 @@ def extract(path: Path, root: Path) -> None:
             ):
                 raise ValueError(f"Unsafe archive member: {member.name}")
         source.extractall(root, filter="data")
+
+
+def verify_file(path: Path, record: dict) -> None:
+    if path.stat().st_size != record["bytes"] or checksum(path) != record["sha256"]:
+        raise ValueError(f"Input checksum mismatch: {path}")
+
+
+def verify_expanded(root: Path, records: list[dict]) -> None:
+    expected = {record["path"] for record in records}
+    observed = {
+        path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file()
+    }
+    if observed != expected:
+        raise ValueError(f"Expanded archive inventory differs: {root}")
+    for record in records:
+        verify_file(root / record["path"], record)
 
 
 def main() -> None:
@@ -58,11 +75,15 @@ def main() -> None:
             if relative.is_absolute() or len(relative.parts) != 1:
                 raise ValueError("Unsafe input file path")
             payload = path.parent / relative
-            if (
-                payload.stat().st_size != record["bytes"]
-                or checksum(payload) != record["sha256"]
-            ):
-                raise ValueError(f"Input checksum mismatch: {payload}")
+            if payload.exists():
+                verify_file(payload, record)
+            elif payload.name.endswith(".tar.gz"):
+                verify_expanded(
+                    payload.with_name(payload.name.removesuffix(".tar.gz")),
+                    EXPANDED_FILES[role][payload.name],
+                )
+            else:
+                raise FileNotFoundError(payload)
         inputs[role] = path.parent
         LOGGER.info("Verified input %s", role)
     if set(inputs) != {"source", "training", "test"}:
@@ -70,9 +91,28 @@ def main() -> None:
     root = Path("/tmp/deepnet-inputs")
     root.mkdir()
     for role in ("training", "test", "source"):
-        for path in inputs[role].glob("*.tar.gz"):
-            LOGGER.info("Extracting %s/%s", role, path.name)
-            extract(path, root)
+        for name in EXPANDED_FILES[role]:
+            path = inputs[role] / name
+            if path.exists():
+                LOGGER.info("Extracting %s/%s", role, path.name)
+                extract(path, root)
+                continue
+            dataset = name.removesuffix(".tar.gz")
+            relative = (
+                Path("pretrained")
+                if role == "source"
+                else Path(dataset)
+                / (
+                    "train-validation-bundle"
+                    if role == "training"
+                    else "post-selection-test-bundle"
+                )
+            )
+            target = root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.symlink_to(
+                inputs[role] / dataset / relative, target_is_directory=True
+            )
     for dataset in ("potsdam", "vaihingen"):
         shutil.copy2(
             inputs["training"] / f"{dataset}-quality.json",

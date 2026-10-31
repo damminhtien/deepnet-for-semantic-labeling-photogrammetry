@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import runpy
 from pathlib import Path
 
 import numpy as np
@@ -16,7 +17,7 @@ from deepnet.data.catalog import load_model_input_spec, load_preprocessing_spec
 from deepnet.data.contracts import SceneRecord, SplitManifest
 from deepnet.data.quality import validate_data_quality
 from deepnet.data.raster import inspect_raster, sha256_file
-from deepnet.training_utils import load_checkpoint, write_json
+from deepnet.training_utils import artifact_index, load_checkpoint, write_json
 
 
 @pytest.fixture
@@ -199,6 +200,11 @@ def test_joint_training_freezes_selection_before_loading_each_test_once(
     assert test_reads == ["potsdam", "vaihingen"]
     with pytest.raises(FileExistsError):
         training_run(output)
+    artifact_index(output)
+    audit = runpy.run_path(
+        str(Path(__file__).resolve().parents[2] / "scripts/watch_dinov2_kaggle.py")
+    )["audit"]
+    assert audit(output)["status"] == "verified"
 
 
 def test_interrupted_training_resume_matches_uninterrupted_weights(

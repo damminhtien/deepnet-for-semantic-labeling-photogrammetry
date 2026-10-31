@@ -21,11 +21,21 @@ SLUGS = {
 }
 
 
-def archive(source: Path, destination: Path, prefix: str) -> None:
+def archive(source: Path, destination: Path, prefix: str) -> list[dict]:
+    files = []
     with tarfile.open(destination, "w:gz", compresslevel=1) as target:
         for path in sorted(source.rglob("*")):
             if path.is_file() and ".cache" not in path.relative_to(source).parts:
-                target.add(path, arcname=f"{prefix}/{path.relative_to(source)}")
+                relative = f"{prefix}/{path.relative_to(source)}"
+                target.add(path, arcname=relative)
+                files.append(
+                    {
+                        "path": relative,
+                        "bytes": path.stat().st_size,
+                        "sha256": sha256_file(path),
+                    }
+                )
+    return files
 
 
 def package(data: Path, pretrained: Path, output: Path, owner: str) -> None:
@@ -37,7 +47,9 @@ def package(data: Path, pretrained: Path, output: Path, owner: str) -> None:
         ["git", "rev-parse", "HEAD"], cwd=repository, text=True
     ).strip()
     manifests = {}
+    expanded_files = {}
     for role, slug in SLUGS.items():
+        expanded_files[role] = {}
         stage = output / role
         stage.mkdir()
         write_json(
@@ -61,7 +73,9 @@ def package(data: Path, pretrained: Path, output: Path, owner: str) -> None:
                 bundle = load_bundle(source)
                 manifest["bundles"][dataset] = bundle.manifest["bundle_sha256"]
                 print(f"Verified {dataset}/{bundle_name}; compressing", flush=True)
-                archive(source, stage / f"{dataset}.tar.gz", f"{dataset}/{bundle_name}")
+                expanded_files[role][f"{dataset}.tar.gz"] = archive(
+                    source, stage / f"{dataset}.tar.gz", f"{dataset}/{bundle_name}"
+                )
                 if role == "training":
                     shutil.copy2(
                         data / dataset / "quality.json",
@@ -72,7 +86,9 @@ def package(data: Path, pretrained: Path, output: Path, owner: str) -> None:
             verify_pretrained(
                 pretrained, spec.backbone.model_id, spec.backbone.revision
             )
-            archive(pretrained, stage / "pretrained.tar.gz", "pretrained")
+            expanded_files[role]["pretrained.tar.gz"] = archive(
+                pretrained, stage / "pretrained.tar.gz", "pretrained"
+            )
             subprocess.run(
                 ["uv", "build", "--wheel", "--out-dir", str(stage)],
                 cwd=repository,
@@ -99,6 +115,9 @@ def package(data: Path, pretrained: Path, output: Path, owner: str) -> None:
     bootstrap = (repository / "model_script/train_dinov2_kaggle.py").read_text()
     bootstrap = bootstrap.replace(
         "EXPECTED_INPUTS = {}", f"EXPECTED_INPUTS = {manifests!r}"
+    )
+    bootstrap = bootstrap.replace(
+        "EXPANDED_FILES = {}", f"EXPANDED_FILES = {expanded_files!r}"
     )
     (kernel / "train_dinov2_kaggle.py").write_text(bootstrap)
     write_json(
