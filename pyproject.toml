@@ -31,6 +31,7 @@ dev = ["pytest>=8.0", "ruff>=0.13"]
 
 [project.scripts]
 deepnet-data = "deepnet.data.cli:main"
+deepnet-train = "deepnet.training:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -45,6 +46,7 @@ include = ["deepnet*", "semantic_labeling*"]
 "share/deepnet-satellite-labeling/configs/augmentations" = ["configs/augmentations/*.json"]
 "share/deepnet-satellite-labeling/configs/models" = ["configs/models/*.json"]
 "share/deepnet-satellite-labeling/configs/training" = ["configs/training/*.json"]
+"share/deepnet-satellite-labeling/configs/evaluations" = ["configs/evaluations/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

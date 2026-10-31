@@ -111,7 +111,11 @@ references are recorded with each model config.
 The previous PSPNet and SAM training loops and the old modules under
 `semantic_labeling/` are retained as historical experiment code. They still consume
 the previous model-specific bundle format and are not the current training entry
-points. The new architecture does not add a training runner; sampling orchestration,
-loss execution, checkpointing, and evaluation remain caller-owned. The configured
+points. `deepnet/training.py` now orchestrates balanced joint DINOv2 training,
+masked CE/Dice, resumable optimizer/RNG checkpoints, full-scene validation, and
+post-selection test evaluation. `deepnet/training_utils.py` holds persistence,
+learning-rate, pretrained verification, and artifact inventory helpers. The
+Kaggle bootstrap installs the packaged runner and verifies private input hashes.
+The configured
 Potsdam five-channel plan requires verified nDSM decoding and coregistration before
 data access. The notebooks mark their saved outputs as historical pending reruns.

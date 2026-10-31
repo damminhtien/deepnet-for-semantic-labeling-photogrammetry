@@ -75,6 +75,7 @@ class BackboneSpec:
     feature_blocks: tuple[int, ...]
     feature_channels: int
     lora: LoRASpec | None = None
+    revision: str | None = None
 
     def __post_init__(self) -> None:
         if self.backend not in {"huggingface", "injected"}:
@@ -91,7 +92,7 @@ class BackboneSpec:
             raise ValueError("Feature blocks must be unique and increasing")
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        value = {
             "backend": self.backend,
             "model_id": self.model_id,
             "patch_size": self.patch_size,
@@ -99,6 +100,9 @@ class BackboneSpec:
             "feature_channels": self.feature_channels,
             "lora": self.lora.to_dict() if self.lora is not None else None,
         }
+        if self.revision is not None:
+            value["revision"] = self.revision
+        return value
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> BackboneSpec:
@@ -110,6 +114,7 @@ class BackboneSpec:
             feature_blocks=tuple(int(item) for item in value["feature_blocks"]),
             feature_channels=int(value["feature_channels"]),
             lora=LoRASpec.from_dict(lora) if lora is not None else None,
+            revision=value.get("revision"),
         )
 
 

@@ -26,8 +26,8 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/catalog.json
@@ -51,8 +51,8 @@ stages:
       size: 89013
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/catalog-validation.json
@@ -97,8 +97,8 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/quality.json
@@ -150,13 +150,13 @@ stages:
       nfiles: 18
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/potsdam/train-validation-bundle
       hash: md5
-      md5: 05abc80db83f0809dd373a634333a350.dir
+      md5: e6e4fbfcb7e4f063c66fe1a7b139d99c.dir
       size: 5207151275
       nfiles: 53
   catalog_vaihingen:
@@ -185,8 +185,8 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/catalog.json
@@ -210,8 +210,8 @@ stages:
       size: 67727
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/catalog-validation.json
@@ -255,8 +255,8 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/quality.json
@@ -308,12 +308,12 @@ stages:
       nfiles: 12
     - path: deepnet/data
       hash: md5
-      md5: 587a3f92105219f206d0ffa9ac827485.dir
-      size: 183325
+      md5: 8442bd360780817a8e1c5216d4900d91.dir
+      size: 183422
       nfiles: 15
     outs:
     - path: data/prepared/vaihingen/train-validation-bundle
       hash: md5
-      md5: aa3785e1dc394da61669813c637e7a5c.dir
+      md5: 13320c6936286c453487116c02f263d6.dir
       size: 476547085
       nfiles: 37

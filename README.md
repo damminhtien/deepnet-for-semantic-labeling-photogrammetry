@@ -129,14 +129,34 @@ measures performance on held-out scenes after joint training. A cross-dataset
 transfer experiment would require excluding Vaihingen from training and model
 selection.
 
-The JSON is a versioned plan; it does not start training. No pretrained weights or
-Kaggle GPU run have been downloaded or launched. Once the gated DINOv3 access is
-approved, complete the generic training caller and local data/weight preflights, then
-run one full Kaggle job. Do not spend a GPU session on a pilot. Keep test labels out
-of its training/validation bundles and evaluate them only after the validation-
-selected checkpoint is fixed. The repository has the shared full-scene evaluation
-API but no complete model-loading training/evaluation runner yet; implement that
-caller before starting the full run.
+The DINOv3 JSON remains an unexecuted versioned plan requiring gated model access.
+The shared runner is now available through `deepnet-train`; the active run uses
+the ungated DINOv2 checkpoint described below.
+
+## DINOv2 joint training
+
+[`isprs-dinov2-joint-v1.json`](configs/training/isprs-dinov2-joint-v1.json) and its
+[`locked protocol`](configs/evaluations/isprs-dinov2-v1.json) bind the existing scene
+splits to DINOv2 ViT-B/14, LoRA rank 8, 504/280-pixel windows, and augmentation v3.
+The runner balances dataset microbatches, applies train-only class weights and
+class-aware sampling, accumulates four microbatches per update, and selects by the
+mean of the two full-scene validation mIoUs. Best/latest checkpoints retain model,
+optimizer, mixed-precision scaler, RNG, progress, and provenance. Test bundles are
+opened only after `selection.json` freezes the chosen checkpoint hash. Per-scene
+and summed confusion matrices are retained; interrupted test evaluation requires
+review before rescoring.
+
+The pinned pretrained snapshot passed a real MPS forward/backward update on both
+datasets (initial loss 1.506485). Synthetic end-to-end tests also verify exact
+checkpoint continuation and one-time post-selection evaluation. These checks do
+not establish trained-model accuracy. Run status and cloud identity are recorded
+in `.agent/STATE.md`; final scientific results require the completed run artifacts.
+
+`scripts/package_dinov2_kaggle.py` builds three private inputs with SHA-256
+inventories. `model_script/train_dinov2_kaggle.py` verifies them, preserves Kaggle's
+accelerator-specific Torch installation, and runs training, validation selection,
+then held-out evaluation. Extracted data stays in `/tmp`; only logs, checkpoints,
+manifests, and metrics are written to Kaggle outputs.
 
 ## Install locally
 

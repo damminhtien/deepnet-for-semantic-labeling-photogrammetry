@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
 import torch
@@ -109,7 +110,9 @@ class TransformerFeatureBackbone(nn.Module):
         self.feature_channels = spec.feature_channels
 
     @classmethod
-    def from_pretrained(cls, spec: BackboneSpec) -> TransformerFeatureBackbone:
+    def from_pretrained(
+        cls, spec: BackboneSpec, *, pretrained_path: Path | None = None
+    ) -> TransformerFeatureBackbone:
         """Load configured weights only when explicitly requested by a caller."""
         if spec.backend != "huggingface":
             raise ValueError("Only Hugging Face specs can load pretrained weights")
@@ -120,7 +123,11 @@ class TransformerFeatureBackbone(nn.Module):
                 "Install the 'models' extra to load Hugging Face backbones"
             ) from error
 
-        model = AutoModel.from_pretrained(spec.model_id)
+        model = AutoModel.from_pretrained(
+            str(pretrained_path) if pretrained_path is not None else spec.model_id,
+            revision=spec.revision,
+            local_files_only=pretrained_path is not None,
+        )
         if spec.lora is not None:
             model = apply_lora(model, spec.lora)
         return cls(model, spec)

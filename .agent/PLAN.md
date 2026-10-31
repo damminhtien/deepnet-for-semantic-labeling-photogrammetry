@@ -2,11 +2,11 @@
 
 1. [x] Correct post-radiometry invalid-pixel fill, add a focused regression, and
    replay the train-only rare-class/padding audit before enabling augmentation.
-2. [ ] Add a pinned DINOv2 joint-run configuration/protocol and reusable runner:
+2. [x] Add a pinned DINOv2 joint-run configuration/protocol and reusable runner:
    balanced class-aware sampling, masked CE/Dice, LoRA optimizer, accumulation,
    mixed precision, warmup/cosine, resumable checkpoints, validation-only selection,
    and one post-selection full-scene test evaluation per dataset.
-3. [ ] Verify synthetic end-to-end training/resume and real pretrained forward/
+3. [x] Verify synthetic end-to-end training/resume and real pretrained forward/
    backward locally; run relevant checks and verify four immutable data bundles.
 4. [ ] Package source, pinned weights, and data as private Kaggle inputs; verify
    package hashes and launch one full GPU job with durable outputs and logs.

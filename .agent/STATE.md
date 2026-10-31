@@ -220,3 +220,16 @@ Document verified segmentation evaluations and research, then push the resulting
 - Downloaded the pinned public pretrained snapshot to the external models folder;
   model.safetensors SHA-256 is d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841.
 - Next: finish and validate the shared training/evaluation caller.
+- Milestones 2–3: added the shared joint runner and pinned DINOv2 v2 model spec,
+  training config, and locked evaluation protocol. It persists optimizer/scaler/RNG
+  checkpoints, exact partial-epoch histograms, validation confusion matrices, and
+  frozen checkpoint selection before any test-bundle access.
+- Real pretrained MPS preflight passed on one augmented training crop per domain:
+  loss 1.5064847469, 11,777,170 trainable parameters. Output is outside Git at
+  /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/isprs-dinov2-joint-v1-20261031-preflight/local-mps-step.
+- Focused core validation: 63 tests and 2 subtests passed, including exact
+  uninterrupted/resumed weight equality and one-time post-selection scoring.
+  Ruff check/format passed. Graphify code update produced 1,120 nodes/2,823 edges;
+  generated output stays ignored. DVC default and isolated test pipelines reran;
+  all quality reports passed, all four bundle content hashes stayed unchanged,
+  and dvc status is up to date. No trained-model accuracy is claimed yet.

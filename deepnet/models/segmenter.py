@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 
 import torch
 from torch import nn
@@ -64,9 +65,13 @@ class MultimodalSegmenter(nn.Module):
         domain: DomainSpec,
         model_input: ModelInputSpec,
         spec: SegmentationModelSpec,
+        *,
+        pretrained_path: Path | None = None,
     ) -> MultimodalSegmenter:
         """Explicitly load the configured backbone and compose its segmentation head."""
-        backbone = TransformerFeatureBackbone.from_pretrained(spec.backbone)
+        backbone = TransformerFeatureBackbone.from_pretrained(
+            spec.backbone, pretrained_path=pretrained_path
+        )
         return cls(domain, model_input, spec, backbone)
 
     def forward(self, images: torch.Tensor) -> torch.Tensor:
