@@ -335,3 +335,41 @@ Document verified segmentation evaluations and research, then push the resulting
   External analysis-20261101/ contains comparison JSON, all 20 parsed observations,
   reproducible Matplotlib PNG/PDF and SHA-256 evidence. Four data-comparison checks
   passed; the figure was visually inspected. Only analysis/docs changed.
+
+## DINOv2 final retrieval and scientific assessment — 2026-11-01
+
+- Fresh Kaggle status is COMPLETE. Scientific evaluation completed 16:47:46 SGT;
+  the full flow exited successfully at 16:47:53. The old watcher had stopped before
+  completion. Restarted retrieval only; all outputs downloaded/audited by 17:03:45.
+  No new training, local inference, held-out rerun or configuration change.
+- External attempt-02 monitor/outputs/ contains both checkpoints and the complete
+  original output. Its index verifies 12 artifacts / 882,900,091 bytes; supplied
+  and independent audits have errors: []. Recomputed 45 per-scene/aggregate metric
+  matrices, verified source/configuration/protocol/binding hashes, checkpoint
+  progress and selection, and one completed test evaluation per dataset.
+- Selected best.pt is epoch 15 / step 960, SHA-256
+  22c5c4bd342b79cc767a2f8c8f4c03c73e09c60ee14d5803250b5573f0b033f9.
+  last.pt is epoch 20 / step 1,280 with optimizer, AMP scaler and RNG state. Frozen
+  selection is the maximum recorded validation mean; all 48 LoRA B tensors updated.
+- Potsdam test: 48.652261% mIoU, 74.657628% OA, 467,862,855 pixels / 14 scenes.
+  Vaihingen test: 49.178756% mIoU, 78.303265% OA, 81,991,943 pixels / 17 scenes.
+  Validation remains 51.033863% Potsdam and 47.690299% Vaihingen at epoch 15.
+- Potsdam test gap to historical SAM is -25.0501 mIoU points. Matching scene IDs,
+  scored counts and GT class supports; lower scores on all 14 scenes. Different
+  inference/training recipes still prevent an isolated backbone comparison.
+- Test class IoUs (impervious/building/low vegetation/tree/car/clutter): Potsdam
+  62.7431/58.0959/62.9809/65.9835/39.9906/2.1195%; Vaihingen
+  67.2368/68.6921/55.6821/70.8283/21.3713/11.2618%. Potsdam clutter recall is
+  2.2018%; only 1.212M predicted versus 19.920M truth pixels. Car and clutter
+  account for 53.25% of the gap, but every class regresses against SAM.
+- Training histograms show clutter was present in 1,781/2,560 Potsdam patches
+  (44.342M pixel presentations, 6.88%). Missing all clutter training samples is
+  ruled out. Checkpoint spectral projection's third row is entirely negative;
+  its normalized unit-input bounds are [-7.9782, -1.7615]. This confirms an input
+  distribution concern; causal accuracy effects and other interface hypotheses
+  still need future validation-only controls.
+- Final report: docs/experiments/isprs-dinov2-joint-final-review-2026-11-01.md.
+  review-final-20261101/ holds independent-audit.json, CSVs, exposure/adapter data,
+  reproducible Matplotlib figures and review-sha256.json. Both PNGs were visually
+  inspected. Milestone 6 is complete; preserve artifacts/protocol and do not start
+  further training without a new experiment decision/request.

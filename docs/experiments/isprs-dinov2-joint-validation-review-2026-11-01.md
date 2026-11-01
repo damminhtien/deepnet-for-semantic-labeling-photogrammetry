@@ -1,5 +1,9 @@
 # DINOv2 joint-run validation review, 2026-11-01
 
+Final checkpoint/test artifacts have since been retrieved and verified. See the
+[final artifact review](isprs-dinov2-joint-final-review-2026-11-01.md). The values
+and pending status below preserve the earlier observation time.
+
 The first successful DINOv2 joint training attempt has completed 20 epochs and
 1,280 optimizer updates. Its selected epoch 15 is substantially weaker on Potsdam
 validation than the audited historical SAM candidate. This establishes a gap
