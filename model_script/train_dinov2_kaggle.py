@@ -15,6 +15,7 @@ from pathlib import Path
 EXPECTED_INPUTS = {}
 EXPANDED_FILES = {}
 RUN_ID = "isprs-dinov2-joint-v1-20261031"
+ATTEMPT_ID = RUN_ID
 LOGGER = logging.getLogger(__name__)
 
 
@@ -50,6 +51,20 @@ def verify_expanded(root: Path, records: list[dict]) -> None:
         raise ValueError(f"Expanded archive inventory differs: {root}")
     for record in records:
         verify_file(root / record["path"], record)
+
+
+def prepare_lora_runtime() -> str | None:
+    # This run uses ordinary floating-point LoRA, without torchao quantization.
+    # PEFT probes installed optional backends even when their layers are unused.
+    try:
+        version = importlib.metadata.version("torchao")
+    except importlib.metadata.PackageNotFoundError:
+        return None
+    LOGGER.info("Removing unused torchao %s from the ephemeral runtime", version)
+    subprocess.run(
+        [sys.executable, "-m", "pip", "uninstall", "--yes", "torchao"], check=True
+    )
+    return version
 
 
 def main() -> None:
@@ -146,17 +161,47 @@ def main() -> None:
     subprocess.run(
         [sys.executable, "-m", "pip", "install", "--no-deps", str(wheel)], check=True
     )
+    removed_torchao = prepare_lora_runtime()
     if any(
         importlib.metadata.version(name) != version
         for name, version in accelerator_versions.items()
     ):
         raise RuntimeError("Kaggle accelerator packages changed")
+    (working / "bootstrap-runtime.json").write_text(
+        json.dumps(
+            {
+                "experiment_id": RUN_ID,
+                "attempt_id": ATTEMPT_ID,
+                "removed_unused_torchao": removed_torchao,
+                "packages": {
+                    name: importlib.metadata.version(name)
+                    for name in (
+                        "torch",
+                        "torchvision",
+                        "transformers",
+                        "peft",
+                        "albumentations",
+                        "rasterio",
+                    )
+                },
+            },
+            indent=2,
+        )
+        + "\n"
+    )
     subprocess.run(
         [
             sys.executable,
             "-c",
-            "import torch; assert torch.cuda.is_available(); "
-            "print(torch.cuda.get_device_name())",
+            "import torch; from peft import LoraConfig, get_peft_model; "
+            "assert torch.cuda.is_available(); "
+            "model = get_peft_model(torch.nn.Sequential(torch.nn.Linear(4, 4)), "
+            "LoraConfig(r=2, target_modules=['0'])); "
+            "model(torch.ones(1, 4)).sum().backward(); "
+            "assert any(p.grad is not None for n,p in model.named_parameters() "
+            "if 'lora_B' in n); "
+            "print('LoRA CPU forward/backward passed; GPU:', "
+            "torch.cuda.get_device_name())",
         ],
         check=True,
     )
@@ -179,7 +224,7 @@ def main() -> None:
             "--source-manifest",
             str(source_manifest),
             "--output",
-            str(working / RUN_ID),
+            str(working / ATTEMPT_ID),
             "--device",
             "cuda",
         ],

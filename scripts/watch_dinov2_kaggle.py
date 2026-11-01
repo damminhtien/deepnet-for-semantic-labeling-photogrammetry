@@ -25,8 +25,6 @@ def audit(root: Path) -> dict:
         return {"status": "incomplete", "errors": ["Expected one run manifest"]}
     output = manifests[0].parent
     manifest = json.loads(manifests[0].read_text())
-    if manifest["status"] != "complete":
-        return {"status": "incomplete", "run_status": manifest["status"], "errors": []}
     index = json.loads((output / "artifact_sha256_manifest.json").read_text())
     for record in index["files"]:
         path = output / record["path"]
@@ -36,6 +34,16 @@ def audit(root: Path) -> dict:
             or sha256_file(path) != record["sha256"]
         ):
             errors.append(f"Artifact checksum differs: {record['path']}")
+    if manifest["status"] != "complete":
+        failed = manifest["status"] == "failed"
+        if failed:
+            errors.append("Training run failed; inspect training.log")
+        return {
+            "status": "failed" if failed or errors else "incomplete",
+            "run_status": manifest["status"],
+            "artifacts_checked": len(index["files"]),
+            "errors": errors,
+        }
     metrics = json.loads((output / "metrics.json").read_text())
     selection = json.loads((output / "selection.json").read_text())
     if sha256_file(output / "best.pt") != selection["checkpoint_sha256"]:

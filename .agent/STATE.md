@@ -264,3 +264,26 @@ Document verified segmentation evaluations and research, then push the resulting
   caffeinate PID 21761 prevents idle sleep while watcher PID 21591 exists.
   GPU allocation remains queued as of 2026-10-31 14:48:45 UTC; no cloud training
   loss or final model metrics have been observed yet.
+
+## DINOv2 result review and runtime repair — 2026-11-01
+
+- Live Kaggle check confirms attempt 1 / kernel version 1 ended ERROR. Watcher
+  observed RUNNING at 2026-10-31 23:05 SGT and ERROR at 23:08 SGT, retrieved six
+  files, and exited. No checkpoint, optimizer update, selection, or model metrics
+  exists; the failure occurred during PEFT LoRA construction, before training.
+- All three input groups passed bootstrap SHA-256 checks. Actual accelerator was
+  Tesla T4 with Torch 2.11.0+cu128. The traceback is explicit: PEFT 0.21.2 found
+  preinstalled torchao 0.10.0 but requires at least 0.16.0 for that optional backend.
+- Independently verified both indexed failure artifacts and the downloaded source
+  manifest. Preserved original files unchanged. Derived failure review is under
+  the original external run folder at review-20261101/failure-review.json.
+- Fixed bootstrap to remove unused torchao in the ephemeral Kaggle runtime, retain
+  accelerator package versions, and perform an actual CPU LoRA forward/backward
+  preflight. It records package versions/removal and a distinct attempt identity.
+- Reproduced the exact PEFT error using a fake old backend in an isolated temporary
+  environment; the real removal path then passed actual PEFT LoRA forward/backward.
+  Four training/audit tests and Ruff passed. Failed-run audits now verify hashes
+  and report failed explicitly rather than returning incomplete with empty errors.
+- Continue the original authorized full-training task using the frozen config,
+  protocol, source wheel and all three existing input datasets. A new kernel and
+  local attempt folder will preserve attempt 1; scientific results remain pending.

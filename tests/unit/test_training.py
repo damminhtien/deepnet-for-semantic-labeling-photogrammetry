@@ -20,6 +20,22 @@ from deepnet.data.raster import inspect_raster, sha256_file
 from deepnet.training_utils import artifact_index, load_checkpoint, write_json
 
 
+def test_kaggle_audit_verifies_failed_run_artifacts(tmp_path):
+    audit = runpy.run_path(
+        str(Path(__file__).resolve().parents[2] / "scripts/watch_dinov2_kaggle.py")
+    )["audit"]
+    write_json(tmp_path / "run_manifest.json", {"status": "failed"})
+    log = tmp_path / "training.log"
+    log.write_text("ImportError: incompatible optional backend\n")
+    artifact_index(tmp_path)
+    report = audit(tmp_path)
+    assert report["status"] == "failed"
+    assert report["artifacts_checked"] == 2
+    assert report["errors"] == ["Training run failed; inspect training.log"]
+    log.write_text("modified\n")
+    assert "Artifact checksum differs: training.log" in audit(tmp_path)["errors"]
+
+
 @pytest.fixture
 def training_run(tmp_path, monkeypatch):
     repository = Path(__file__).resolve().parents[2]
