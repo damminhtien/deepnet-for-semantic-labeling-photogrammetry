@@ -287,3 +287,23 @@ Document verified segmentation evaluations and research, then push the resulting
 - Continue the original authorized full-training task using the frozen config,
   protocol, source wheel and all three existing input datasets. A new kernel and
   local attempt folder will preserve attempt 1; scientific results remain pending.
+- Attempt 2 launched as a separate private kernel, version 1:
+  https://www.kaggle.com/code/damminhtien/dinov2-joint-irrg-segmentation-20261101.
+  Remote bootstrap source hash/private/GPU/input metadata verified. Runner wheel
+  remains frozen at 885535f; bootstrap repair is 5f94d35. Training/protocol/input
+  hashes are unchanged; the experiment ID stays fixed and attempt/output IDs differ.
+- New attempt folder:
+  /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/isprs-dinov2-joint-v1-20261101-attempt-02.
+  Watcher PID 2836, idle-sleep guard PID 2837, live-log stream PID 2869. All
+  three input groups passed cloud hashes. Removed torchao 0.10.0 successfully;
+  actual LoRA CPU forward/backward passed inside the T4 runtime.
+- Full DINOv2 model initialization passed the previous failure point. Actual
+  GPU optimizer update 1 completed at 2026-11-01 12:41:33 SGT, loss 1.512652.
+  Epoch 1 reached 64/64 updates at 12:42:11 SGT, last update loss 1.390912;
+  full-scene Potsdam validation began at 12:42:13. No held-out test scoring yet.
+- Local final core validation after the repair: 64 tests and 2 subtests passed
+  in 5.38 seconds; Ruff check/format and diff checks passed. Graphify code update
+  completed with 1,132 nodes/2,870 edges, generated output remains ignored.
+- Milestone 5 now records verified recovery/GPU progress. Milestone 6 remains
+  pending for final artifacts and scientific assessment; training loss alone
+  does not establish validation/test accuracy or convergence.
