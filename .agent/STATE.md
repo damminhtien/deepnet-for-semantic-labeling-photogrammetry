@@ -307,3 +307,31 @@ Document verified segmentation evaluations and research, then push the resulting
 - Milestone 5 now records verified recovery/GPU progress. Milestone 6 remains
   pending for final artifacts and scientific assessment; training loss alone
   does not establish validation/test accuracy or convergence.
+
+## DINOv2 validation comparison — 2026-11-01
+
+- Attempt 2 completed all 20 epochs / 1,280 optimizer updates. Final validation
+  completed at 16:20:17 SGT. Selected epoch 15: Potsdam mIoU 51.0339%, OA 77.9859%;
+  Vaihingen mIoU 47.6903%, OA 79.1191%; selection mean 49.3621%. These are rounded
+  live-log observations, not yet downloaded full-precision artifacts.
+- Potsdam test began at 16:21:34 SGT. Fresh watcher status at 16:37 SGT remains
+  RUNNING. Preserve the selected checkpoint and one-time test protocol. Milestone
+  6 stays pending; per-class metrics and final hash audit are not available yet.
+- Directly inspected the historical SAM candidate-b-r4-p384 metrics, manifest and
+  all 30 validation records. Its Potsdam validation mIoU is 74.321623%, a 23.2877
+  point gap. Scene IDs, per-scene scored counts and all six GT class supports match
+  current quality records. Historical non-overlapping inference and current
+  weighted-overlap inference still differ; this is not a controlled backbone test.
+- Total trainable parameters are 618,182 for SAM and 11,777,170 for DINOv2. Full-run
+  Potsdam input pixel presentations are 2.013 billion versus 0.650 billion. At
+  roughly matched exposure SAM epoch 10 already achieved 68.8812% versus DINOv2
+  epoch 20's 50.9364%; budget alone is an insufficient established explanation.
+- Source review found raw intermediate DINOv2 hidden states without the reference
+  final LayerNorm, randomly initialized IRRG projection, a larger unnormalized
+  convolutional decoder, and different joint-domain sampling. These are concrete
+  differences and candidate causes, not measured causal effects. No new training
+  or test rerun was launched. Do not infer overfitting or class collapse yet.
+- Review: docs/experiments/isprs-dinov2-joint-validation-review-2026-11-01.md.
+  External analysis-20261101/ contains comparison JSON, all 20 parsed observations,
+  reproducible Matplotlib PNG/PDF and SHA-256 evidence. Four data-comparison checks
+  passed; the figure was visually inspected. Only analysis/docs changed.
