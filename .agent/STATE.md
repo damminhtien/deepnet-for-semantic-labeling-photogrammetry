@@ -383,3 +383,19 @@ Document verified segmentation evaluations and research, then push the resulting
   and versioned in the local DVC cache.
 - Validation and held-out accuracy require new Kaggle evidence. Do not report
   the local smoke or previous runs as results of this study.
+- Kaggle preflight v1 stopped before training on the GPU-count check. Version 2
+  completed on two allocated T4s; the runner charged both devices. The fixed
+  eight-patch fit reached 94.4832% train mIoU at update 64.
+- On scene `4_12`, stride 252 took 121.394 s for 576 windows versus 34.554 s
+  for 144 windows at stride 504. Raster I/O and preprocessing took 91.802 s of
+  the 121.394 s. The pilot froze four passes with full validation at 2 and 4:
+  projected 3.464 GPU-hours per arm with headroom, versus 5.196 for six passes.
+  The projected validation share is 30.17%; measure it from each completed arm.
+- Verified canonical pilot protocol hash:
+  `de5b58717cb3127c8d89c366d450ffca0dbc2ec7005fc5aeebc949b06b8f24b7`.
+  Evidence and submission receipts are in the external study's
+  `kaggle/preflight-v2-evidence/` directory.
+- Selection A (IRRG/D4) and B (IRRG/D4 plus spectral index and verified DSM)
+  version 1 were both running as of 14:25 SGT. The local watcher checks finished
+  artifacts and ranks validation matrices before submitting C and the gated
+  seed-43 confirmation. No refit or held-out job has been submitted.
