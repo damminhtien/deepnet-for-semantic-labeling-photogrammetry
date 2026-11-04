@@ -408,3 +408,19 @@ Document verified segmentation evaluations and research, then push the resulting
   The external `continue-refit.py` watcher is waiting for a verified selection
   lock. It will generate and compare a fresh train-only export, upload it privately,
   and submit at most one refit job. Held-out remains a separate gate.
+- A and B completed all 3,456 updates. Independent audit
+  `kaggle/preflight-v2-evidence/audit-ab.json` verifies ten indexed files,
+  24 per-scene validation matrices and four aggregate matrices. The scored
+  support is 199,409,714 pixels with the same class totals as historical SAM.
+  Both arms met all four SAM floors at updates 1,728 and 3,456; both selected
+  update 3,456.
+- A: OA/mIoU/car IoU/clutter IoU = 92.8544/79.5207/92.9568/38.9670%.
+  B: 92.7614/79.3020/92.7330/38.6506%. Validation shares were 24.28% and
+  36.51% versus 92.83% historically; runner charges were 2.7075 and 3.4812
+  GPU-hours. A won the fixed ranking and was ahead on five of six scenes.
+- C version 1 started with A's features and the predeclared affine/optical
+  recipe. Live log recorded 704/3,456 updates as of 16:27 SGT. A or C will
+  advance to the seed-43 confirmation. The external `continue-heldout.py`
+  watcher is gated on the audited, complete 1,152-update refit checkpoint.
+  It will allow one held-out attempt and verify the final matrices and hash.
+  No refit or held-out job has been submitted.
