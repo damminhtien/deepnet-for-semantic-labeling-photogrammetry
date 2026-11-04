@@ -399,3 +399,12 @@ Document verified segmentation evaluations and research, then push the resulting
   version 1 were both running as of 14:25 SGT. The local watcher checks finished
   artifacts and ranks validation matrices before submitting C and the gated
   seed-43 confirmation. No refit or held-out job has been submitted.
+- Live Kaggle logs at 14:46 SGT confirmed actual optimizer progress: A
+  1,024/3,456 and B 768/3,456 updates. Both were still below the first full
+  validation checkpoint at update 1,728.
+- Rechecked the local refit QA bundle against the frozen split and source hashes:
+  24 participant-labeled scenes, fingerprint
+  `a32734f4410dc97fa19b91d68bc49f8643390d7d4fc573bfd1ec37f5e3ee0679`.
+  The external `continue-refit.py` watcher is waiting for a verified selection
+  lock. It will generate and compare a fresh train-only export, upload it privately,
+  and submit at most one refit job. Held-out remains a separate gate.
