@@ -55,7 +55,7 @@ split hash.
 | `configs/domains/` | Versioned sensor and band-role descriptions |
 | `configs/augmentations/` | Domain-scoped stochastic training transforms |
 | `configs/models/` | Backbone, spectral adapter, decoder, task, and license settings |
-| `configs/training/` | A configured Potsdam run plan; it has not been executed |
+| `configs/training/` | Versioned joint-training plans and Potsdam study settings |
 | `deepnet/data/contracts.py` | Immutable versioned data contracts and canonical hashes |
 | `deepnet/data/catalog.py` | Catalog discovery, source inspection, and schema loading |
 | `deepnet/data/augmentations.py` | Lazy Albumentations construction with synchronized band and mask transforms |
@@ -67,6 +67,7 @@ split hash.
 | `deepnet/data/bundles.py` | Content-addressed portable model-view bundles |
 | `deepnet/data/lineage.py` | Run manifest builder with data/source/runtime provenance |
 | `deepnet/runtime.py` | CUDA/MPS/CPU detection and execution defaults |
+| `deepnet/potsdam_study.py` | Potsdam pilot, validation selection, train-only refit, and held-out evaluation |
 | `deepnet/models/specs.py` | Versioned backbone, input adapter, and task-head contracts |
 | `deepnet/models/backbones.py` | Hugging Face feature extraction and injected backbone interface |
 | `deepnet/models/adapters.py` | Optical projection and separate auxiliary spatial features |
@@ -116,6 +117,8 @@ masked CE/Dice, resumable optimizer/RNG checkpoints, full-scene validation, and
 post-selection test evaluation. `deepnet/training_utils.py` holds persistence,
 learning-rate, pretrained verification, and artifact inventory helpers. The
 Kaggle bootstrap installs the packaged runner and verifies private input hashes.
-The configured
-Potsdam five-channel plan requires verified nDSM decoding and coregistration before
-data access. The notebooks mark their saved outputs as historical pending reruns.
+The [Potsdam coverage study](experiments/potsdam-dinov2-coverage-refit.md) uses
+separate jobs and bundles for validation selection, refit and held-out evaluation.
+Its verified DSM relief and availability mask are separate from the older
+five-channel view, which requires verified nDSM decoding and co-registration.
+The notebooks mark their saved outputs as historical pending reruns.

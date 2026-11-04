@@ -79,8 +79,12 @@ python -m deepnet.potsdam_study heldout \
 ```
 
 `pack-refit` requires the validation winner and seed-43 confirmation. It
-exports participant labels for all 24 scenes. The refit job checks original
-IRRG and training label hashes against selection, inherits the winner's
+exports participant labels for all 24 scenes. Point `ISPRS_INPUT_ROOT` at the
+verified original input tree containing those 24 participant labels. The
+default DVC train/validation staging contains participant labels only for the
+18 selection-training scenes, so it cannot supply the other six.
+The refit job checks original IRRG and training label hashes against selection,
+inherits the winner's
 weights, feature scale, class weights and augmentation, and resets AdamW and
 AMP state at half learning rate. It trains one 1,152-update pass, without
 running validation. A paused training stage can resume from its bound

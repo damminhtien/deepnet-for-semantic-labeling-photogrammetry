@@ -167,6 +167,10 @@ The official six-class palette and ignored black boundaries are documented by
 
 ### DINOv3 v2 split and evaluation protocol
 
+This section describes the joint DINOv3 plan. The Potsdam DINOv2 coverage study
+shares the scene assignments but has its own selection, refit and evaluation
+rules in the [study runbook](experiments/potsdam-dinov2-coverage-refit.md).
+
 The current joint run follows the outer split used by the [ISPRS 2D Semantic
 Labeling contest](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx): 24 Potsdam tiles have references for training or internal evaluation, while 14 challenge tiles are held out for test. The [ISPRS 2015 report](https://isprs.org/society/si/SI-2015/ISPRS-SI2015-Gerke_report_WGIII4_2015.pdf) confirms that references are released for 24 of 38 tiles and the remaining 14 are submitted for organizer evaluation. ISPRS does not define a mandatory train/validation split within those 24 labeled tiles. A later [ISPRS Annals study](https://isprs-annals.copernicus.org/articles/V-2-2022/275/2022/isprs-annals-V-2-2022-275-2022.pdf) used 18 randomly selected training tiles, 6 validation tiles, and the same 14-tile test set. This project uses those counts with its fixed versioned scene IDs; the internal 18/6 assignment is project-defined, not an official contest split.
 
@@ -322,11 +326,13 @@ criterion.
 
 ### Potsdam DSM/nDSM alignment and value audit
 
-The notebook audited all 38 Potsdam train/validation DSM and configured lastools
-nDSM files from `DEEPNET_AUX_DATA_ROOT`; it hashed each file and scanned its values
-by native blocks. These 76 elevation files are not in the DVC input snapshot (0/76
-found under `data/raw/inputs`), so their hashes and audit outputs are provenance
-records, not DVC-managed source versions.
+The historical notebook audited 38 Potsdam DSM TIFFs and 38 configured lastools
+nDSM files from `DEEPNET_AUX_DATA_ROOT`. None was in the raw DVC input snapshot
+at the time. The [separate DSM snapshot](../data/auxiliary/potsdam-dsm-v1.dvc)
+now tracks the verified source TIFFs and world files. The Potsdam coverage study
+derives local relief from them and uses an availability mask for the missing
+column in scene `3_13`. Its DSM branch is separate from the legacy DSM+nDSM
+model view described below; JPEG nDSM remains excluded.
 
 | Asset | Result against the matching IRRG reference grid | Scene match vs pixel-grid evidence |
 | --- | --- | --- |
@@ -343,12 +349,11 @@ block-stratified sample of about 100,000 pixels per scene. The nDSM JPEG stores
 uint8 digital numbers from 0 to 255; its histograms and quantiles are exact encoded
 value summaries, not metric heights.
 
-Do not train the five-channel view from these files yet. First add immutable DSM and
-nDSM sources to DVC with checksums and source provenance; restore the full `3_13`
-rasters or explicitly record a supported common-coverage mask; obtain authoritative
-nDSM decoding and co-registration evidence; then validate all grids and fit elevation
-statistics on training scenes only. The joint DINOv3 configuration currently uses
-IRRG only, so it does not consume the unverified elevation channels.
+Before using the legacy five-channel view, obtain authoritative nDSM decoding
+and co-registration evidence and version that source with checksums. Verify the
+full grids or document a supported missing-data mask, then fit elevation
+statistics on training scenes only. The joint DINOv3 configuration uses IRRG
+only.
 
 ### Augmentation policy and audit
 
