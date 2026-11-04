@@ -320,6 +320,7 @@ class SplitManifest:
     label_assets: tuple[tuple[str, str], ...]
     spatial_scope: str
     schema_version: int = 1
+    refit_parent_hash: str | None = None
 
     def __post_init__(self) -> None:
         if not self.dataset_id.strip() or not self.split_id.strip():
@@ -331,8 +332,20 @@ class SplitManifest:
             "validation": self.validation_scene_ids,
             "test": self.test_scene_ids,
         }
+        if self.refit_parent_hash is not None and (
+            len(self.refit_parent_hash) != 64
+            or any(c not in "0123456789abcdef" for c in self.refit_parent_hash)
+            or self.validation_scene_ids
+            or self.test_scene_ids
+        ):
+            raise ValueError(
+                "A refit split must be train-only and name its parent hash"
+            )
         for name, scene_ids in splits.items():
-            if name != "test" and not scene_ids:
+            required = name == "train" or (
+                name == "validation" and self.refit_parent_hash is None
+            )
+            if required and not scene_ids:
                 raise ValueError(f"Split {name!r} must not be empty")
             if any(not scene_id.strip() for scene_id in scene_ids):
                 raise ValueError(f"Split {name!r} contains an empty scene ID")
@@ -421,6 +434,11 @@ class SplitManifest:
             "spatial_groups": dict(self.spatial_groups),
             "label_assets": dict(self.label_assets),
             "spatial_scope": self.spatial_scope,
+            **(
+                {"refit_parent_hash": self.refit_parent_hash}
+                if self.refit_parent_hash is not None
+                else {}
+            ),
         }
 
     @property
@@ -440,6 +458,7 @@ class SplitManifest:
             spatial_groups=tuple(sorted(value["spatial_groups"].items())),
             label_assets=tuple(sorted(value["label_assets"].items())),
             spatial_scope=value["spatial_scope"],
+            refit_parent_hash=value.get("refit_parent_hash"),
         )
 
 

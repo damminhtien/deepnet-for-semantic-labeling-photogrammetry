@@ -18,3 +18,11 @@
 
 Record observed results after each milestone. Do not describe static checks,
 synthetic tests, or a running job as completed scientific training.
+
+## Potsdam coverage and refit study
+
+1. Verify residual/decoder behavior and real pretrained forward/backward.
+2. Validate the DSM source snapshot, feature grid, train-only statistics and
+   refit bundle boundaries; preserve previous split artifacts.
+3. Run the CUDA small-fit and timing pilot before freezing the selection schedule.
+4. Select on 18/6, confirm the winner, continue on 24, then score 14 once.

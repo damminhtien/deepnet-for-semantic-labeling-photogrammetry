@@ -1,0 +1,65 @@
+{
+  "study_id": "potsdam-dinov2-coverage-refit-v1",
+  "selection_split_hash": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd",
+  "validation_pixels": 199409714,
+  "heldout_pixels": 467862855,
+  "sam_validation_confusion": [
+    [
+      51353625,
+      1512887,
+      1677114,
+      735690,
+      97385,
+      1097608
+    ],
+    [
+      1393570,
+      63532454,
+      1195906,
+      203183,
+      64442,
+      1015502
+    ],
+    [
+      1150575,
+      301536,
+      32875495,
+      3547112,
+      8255,
+      529488
+    ],
+    [
+      576430,
+      209079,
+      1992678,
+      25932072,
+      117604,
+      177295
+    ],
+    [
+      12037,
+      51185,
+      3513,
+      11773,
+      2960093,
+      51545
+    ],
+    [
+      923050,
+      823346,
+      478599,
+      134339,
+      75431,
+      2587818
+    ]
+  ],
+  "sam_source": "candidate-b-r4-p384 / snapshot-20261020-retrain-04",
+  "gpu_hours": {
+    "preflight": 1,
+    "per_selection_run": 4.5,
+    "refit": 2,
+    "heldout": 2,
+    "reserve": 1
+  },
+  "old_checkpoint_sha256": "22c5c4bd342b79cc767a2f8c8f4c03c73e09c60ee14d5803250b5573f0b033f9"
+}

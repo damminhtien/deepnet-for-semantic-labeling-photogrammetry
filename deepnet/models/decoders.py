@@ -10,14 +10,15 @@ from torch import nn
 from torch.nn import functional as functional
 
 
-def _conv_refinement(channels: int) -> nn.Sequential:
+def _conv_refinement(channels: int, groups: int) -> nn.Sequential:
     """Build a compact spatial refinement block without batch-statistics state."""
-    return nn.Sequential(
-        nn.Conv2d(channels, channels, 3, padding=1),
-        nn.GELU(),
-        nn.Conv2d(channels, channels, 3, padding=1),
-        nn.GELU(),
-    )
+    layers = []
+    for _ in range(2):
+        layers.append(nn.Conv2d(channels, channels, 3, padding=1))
+        if groups:
+            layers.append(nn.GroupNorm(groups, channels))
+        layers.append(nn.GELU())
+    return nn.Sequential(*layers)
 
 
 class DPTFusionDecoder(nn.Module):
@@ -32,6 +33,7 @@ class DPTFusionDecoder(nn.Module):
         spatial_channels: int,
         decoder_width: int,
         num_classes: int,
+        norm_groups: int = 0,
     ) -> None:
         super().__init__()
         if min(feature_channels, spatial_channels, decoder_width, num_classes) <= 0:
@@ -40,10 +42,11 @@ class DPTFusionDecoder(nn.Module):
             nn.Conv2d(feature_channels, decoder_width, 1) for _ in self._feature_strides
         )
         self.stage_refinement = nn.ModuleList(
-            _conv_refinement(decoder_width) for _ in self._feature_strides
+            _conv_refinement(decoder_width, norm_groups) for _ in self._feature_strides
         )
         self.top_down_fusion = nn.ModuleList(
-            _conv_refinement(decoder_width) for _ in self._feature_strides[:-1]
+            _conv_refinement(decoder_width, norm_groups)
+            for _ in self._feature_strides[:-1]
         )
         self.spatial_projection = nn.Conv2d(spatial_channels, decoder_width, 1)
         self.output_fusion = nn.Sequential(

@@ -105,6 +105,7 @@ class TransformerFeatureBackbone(nn.Module):
         if spec.backend != "huggingface":
             raise ValueError("TransformerFeatureBackbone requires a Hugging Face spec")
         self.model = model
+        self.normalize_features = spec.normalize_features
         self.patch_size = spec.patch_size
         self.feature_blocks = spec.feature_blocks
         self.feature_channels = spec.feature_channels
@@ -167,6 +168,12 @@ class TransformerFeatureBackbone(nn.Module):
         grid_width = width // self.patch_size
         patch_count = grid_height * grid_width
         features = []
+        norm = None
+        if self.normalize_features:
+            base = getattr(self.model, "get_base_model", lambda: self.model)()
+            norm = getattr(base, "layernorm", None)
+            if not isinstance(norm, nn.LayerNorm):
+                raise ValueError("Backbone does not expose its pretrained LayerNorm")
         for block in self.feature_blocks:
             tokens = hidden_states[block]
             prefix_count = tokens.shape[1] - patch_count
@@ -175,6 +182,8 @@ class TransformerFeatureBackbone(nn.Module):
                     f"Block {block} has fewer tokens than the input patch grid"
                 )
             patch_tokens = tokens[:, prefix_count:, :]
+            if norm is not None:
+                patch_tokens = norm(patch_tokens)
             if patch_tokens.shape[-1] != self.feature_channels:
                 raise ValueError(
                     f"Block {block} has width {patch_tokens.shape[-1]}; expected "

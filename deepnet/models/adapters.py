@@ -21,6 +21,17 @@ def _spatial_branch(input_channels: int, output_channels: int) -> nn.Sequential:
     )
 
 
+class ResidualIdentityProjection(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.delta = nn.Conv2d(3, 3, 1)
+        nn.init.zeros_(self.delta.weight)
+        nn.init.zeros_(self.delta.bias)
+
+    def forward(self, optical: torch.Tensor) -> torch.Tensor:
+        return optical + 0.1 * self.delta(optical)
+
+
 class MultimodalInputAdapter(nn.Module):
     """Map named sensor bands to backbone inputs and high-resolution features."""
 
@@ -53,7 +64,14 @@ class MultimodalInputAdapter(nn.Module):
         selected_optical_order = tuple(
             model_input.channels[index] for index in self.optical_indices
         )
-        if (
+        self.spectral_index = spec.spectral_index
+        if self.spectral_index and selected_optical_order != ("ir", "red", "green"):
+            raise ValueError("IR/red index requires IRRG channel order")
+        if spec.projection_init == "residual_identity":
+            if len(self.optical_indices) != 3 or backbone_channels != 3:
+                raise ValueError("Residual identity requires three optical channels")
+            self.spectral_projection = ResidualIdentityProjection()
+        elif (
             spec.identity_channel_order
             and selected_optical_order == spec.identity_channel_order
         ):
@@ -78,11 +96,18 @@ class MultimodalInputAdapter(nn.Module):
 
         spatial_channels = spec.spatial_channels
         self.optical_detail = _spatial_branch(backbone_channels, spatial_channels)
-        self.auxiliary_spatial = (
-            _spatial_branch(len(self.auxiliary_indices), spatial_channels)
-            if self.auxiliary_indices
-            else None
-        )
+        auxiliary_channels = len(self.auxiliary_indices) + int(self.spectral_index)
+        self.auxiliary_spatial = None
+        if self.spectral_index:
+            # Keep shared A/B weights paired even when B adds a spatial branch.
+            with torch.random.fork_rng(devices=[]):
+                self.auxiliary_spatial = _spatial_branch(
+                    auxiliary_channels, spatial_channels
+                )
+        elif auxiliary_channels:
+            self.auxiliary_spatial = _spatial_branch(
+                auxiliary_channels, spatial_channels
+            )
         self.spatial_fusion = nn.Sequential(
             nn.Conv2d(spatial_channels, spatial_channels, 3, padding=1),
             nn.GELU(),
@@ -105,6 +130,10 @@ class MultimodalInputAdapter(nn.Module):
             return
         raise ValueError(f"Unsupported projection initializer: {initializer}")
 
+    def encoder_views(self, optical: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        projected = self.spectral_projection(optical)
+        return projected, (projected - self.backbone_mean) / self.backbone_std
+
     def forward(self, images: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Return normalized encoder inputs and stride-four spatial features."""
         if images.ndim != 4:
@@ -115,11 +144,14 @@ class MultimodalInputAdapter(nn.Module):
                 f"{len(self.channel_names)}"
             )
         optical = images[:, self.optical_indices]
-        projected = self.spectral_projection(optical)
-        encoder_inputs = (projected - self.backbone_mean) / self.backbone_std
+        _, encoder_inputs = self.encoder_views(optical)
 
         spatial = self.optical_detail(encoder_inputs)
         if self.auxiliary_spatial is not None:
             auxiliary = images[:, self.auxiliary_indices]
+            if self.spectral_index:
+                ir, red = optical[:, :1], optical[:, 1:2]
+                index = (ir - red) / (ir + red + 1e-6)
+                auxiliary = torch.cat((index, auxiliary), dim=1)
             spatial = spatial + self.auxiliary_spatial(auxiliary)
         return encoder_inputs, self.spatial_fusion(spatial)

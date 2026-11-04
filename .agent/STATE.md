@@ -373,3 +373,13 @@ Document verified segmentation evaluations and research, then push the resulting
   reproducible Matplotlib figures and review-sha256.json. Both PNGs were visually
   inspected. Milestone 6 is complete; preserve artifacts/protocol and do not start
   further training without a new experiment decision/request.
+
+## Potsdam coverage and refit study — 2026-11-04
+
+- The dedicated campaign runner separates the 18/6 selection, 24-scene refit
+  and 14-scene held-out roles. Existing experiment configurations are unchanged.
+- Local model smoke checks use pinned DINOv2/DINOv3 weights and real Potsdam
+  training pixels. The DSM source was verified against the extracted archive
+  and versioned in the local DVC cache.
+- Validation and held-out accuracy require new Kaggle evidence. Do not report
+  the local smoke or previous runs as results of this study.

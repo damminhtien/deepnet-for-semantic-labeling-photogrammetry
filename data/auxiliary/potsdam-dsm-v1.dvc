@@ -1,0 +1,6 @@
+outs:
+- md5: cffcbca49bd7b6f28b688ae7ba96f6e6.dir
+  size: 5517399147
+  nfiles: 77
+  hash: md5
+  path: potsdam-dsm-v1

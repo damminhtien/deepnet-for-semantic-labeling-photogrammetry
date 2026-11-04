@@ -76,6 +76,7 @@ class BackboneSpec:
     feature_channels: int
     lora: LoRASpec | None = None
     revision: str | None = None
+    normalize_features: bool = False
 
     def __post_init__(self) -> None:
         if self.backend not in {"huggingface", "injected"}:
@@ -102,6 +103,8 @@ class BackboneSpec:
         }
         if self.revision is not None:
             value["revision"] = self.revision
+        if self.normalize_features:
+            value["normalize_features"] = True
         return value
 
     @classmethod
@@ -115,6 +118,7 @@ class BackboneSpec:
             feature_channels=int(value["feature_channels"]),
             lora=LoRASpec.from_dict(lora) if lora is not None else None,
             revision=value.get("revision"),
+            normalize_features=value.get("normalize_features", False),
         )
 
 
@@ -127,9 +131,14 @@ class InputAdapterSpec:
     backbone_mean: tuple[float, ...]
     backbone_std: tuple[float, ...]
     spatial_channels: int = 64
+    spectral_index: bool = False
 
     def __post_init__(self) -> None:
-        if self.projection_init not in {"identity", "kaiming_uniform"}:
+        if self.projection_init not in {
+            "identity",
+            "kaiming_uniform",
+            "residual_identity",
+        }:
             raise ValueError(
                 f"Unsupported projection initializer: {self.projection_init}"
             )
@@ -153,6 +162,7 @@ class InputAdapterSpec:
             "backbone_mean": list(self.backbone_mean),
             "backbone_std": list(self.backbone_std),
             "spatial_channels": self.spatial_channels,
+            **({"spectral_index": True} if self.spectral_index else {}),
         }
 
     @classmethod
@@ -163,6 +173,7 @@ class InputAdapterSpec:
             backbone_mean=tuple(float(item) for item in value["backbone_mean"]),
             backbone_std=tuple(float(item) for item in value["backbone_std"]),
             spatial_channels=int(value.get("spatial_channels", 64)),
+            spectral_index=value.get("spectral_index", False),
         )
 
 
@@ -180,12 +191,17 @@ class SegmentationModelSpec:
     label_ontology: str
     license_id: str
     license_url: str
+    decoder_norm_groups: int = 0
 
     def __post_init__(self) -> None:
         if not self.model_id.strip() or self.version <= 0:
             raise ValueError("Model ID and positive version are required")
         if self.decoder_width <= 0 or self.num_classes <= 0:
             raise ValueError("Decoder width and class count must be positive")
+        if self.decoder_norm_groups < 0 or (
+            self.decoder_norm_groups and self.decoder_width % self.decoder_norm_groups
+        ):
+            raise ValueError("Decoder width must be divisible by normalization groups")
         if self.ignore_index < self.num_classes:
             raise ValueError("ignore_index must not overlap model output classes")
         if not self.label_ontology.strip() or not self.license_id.strip():
@@ -201,6 +217,11 @@ class SegmentationModelSpec:
             "backbone": self.backbone.to_dict(),
             "input_adapter": self.input_adapter.to_dict(),
             "decoder_width": self.decoder_width,
+            **(
+                {"decoder_norm_groups": self.decoder_norm_groups}
+                if self.decoder_norm_groups
+                else {}
+            ),
             "num_classes": self.num_classes,
             "ignore_index": self.ignore_index,
             "label_ontology": self.label_ontology,
@@ -218,6 +239,7 @@ class SegmentationModelSpec:
             backbone=BackboneSpec.from_dict(value["backbone"]),
             input_adapter=InputAdapterSpec.from_dict(value["input_adapter"]),
             decoder_width=int(value["decoder_width"]),
+            decoder_norm_groups=int(value.get("decoder_norm_groups", 0)),
             num_classes=int(value["num_classes"]),
             ignore_index=int(value["ignore_index"]),
             label_ontology=value["label_ontology"],

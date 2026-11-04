@@ -75,6 +75,7 @@ def export_model_bundle(
     *,
     source_revision: str | None = None,
     include_splits: tuple[str, ...] | None = None,
+    include_world_files: bool = False,
 ) -> dict[str, Any]:
     """Copy only the view's assets and split-specific labels into an atomic bundle.
 
@@ -129,6 +130,12 @@ def export_model_bundle(
                     if key not in copied_paths:
                         shutil.copy2(source_path, bundle_path)
                         copied_paths.add(key)
+                    if include_world_files and (
+                        asset.grid.crs is None and asset.grid.affine is not None
+                    ):
+                        world_file = relative_path.with_suffix(".tfw")
+                        sidecar = _safe_file(root, world_file.as_posix())
+                        shutil.copy2(sidecar, bundle_path.with_suffix(".tfw"))
                     actual_hash = sha256_file(bundle_path)
                     if asset.sha256 is not None and actual_hash != asset.sha256:
                         raise RuntimeError(f"Source checksum mismatch for {asset.uri}")

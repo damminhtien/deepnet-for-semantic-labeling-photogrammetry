@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+import time
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -164,7 +165,21 @@ def _evaluate_scene(
     device: Any,
     scratch_root: Path,
     torch: Any,
+    profile: bool = False,
+    check_budget: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
+    timings: dict[str, float] = {}
+
+    def mark(stage: str, start: float, *, sync: bool = False) -> float:
+        if profile:
+            if sync and device.type == "cuda":
+                torch.cuda.synchronize(device)
+            now = time.perf_counter()
+            timings[stage] = timings.get(stage, 0.0) + now - start
+            return now
+        return start
+
+    begin = time.perf_counter() if profile else 0.0
     grid = access.scenes[scene_id].reference_grid
     scene_height, scene_width = grid.height, grid.width
     windows = grid_windows(scene_height, scene_width, window_size, stride)
@@ -196,16 +211,24 @@ def _evaluate_scene(
     truth_map[:] = access.preprocessing.ignore_label
     valid_scene[:] = False
 
+    mark("memmap_setup", begin)
     for start in range(0, len(windows), batch_size):
+        if check_budget is not None:
+            check_budget()
+        tick = time.perf_counter() if profile else 0.0
         batch_windows = windows[start : start + batch_size]
         samples = [access.read_sample(scene_id, window) for window in batch_windows]
+        tick = mark("raster_io_and_preprocessing", tick)
         inputs = torch.from_numpy(np.stack([sample.image for sample in samples])).to(
             device=device, dtype=torch.float32
         )
+        tick = mark("host_to_device", tick, sync=True)
         outputs = model(inputs)
+        tick = mark("forward", tick, sync=True)
         if isinstance(outputs, (tuple, list)):
             outputs = outputs[0]
         logits = outputs.detach().float().cpu().numpy()
+        tick = mark("device_to_host", tick, sync=True)
         if logits.shape[1] != number_of_classes:
             raise ValueError(
                 f"Model returned {logits.shape[1]} classes; "
@@ -243,6 +266,9 @@ def _evaluate_scene(
             )
             weight_sum[row_slice, col_slice] += weights
 
+        mark("memmap_accumulation", tick)
+
+    tick = time.perf_counter() if profile else 0.0
     matrix = np.zeros((number_of_classes, number_of_classes), dtype=np.int64)
     scored_pixels = 0
     rows_per_chunk = 256
@@ -281,6 +307,9 @@ def _evaluate_scene(
             "valid_pixels": scored_pixels,
         }
     )
+    mark("metric_reduction", tick)
+    if profile:
+        result["profile_seconds"] = timings
     return result
 
 
@@ -295,6 +324,9 @@ def evaluate_scenes(
     device: Any | None = None,
     class_names: Sequence[str] | None = None,
     scratch_dir: Path | None = None,
+    profile: bool = False,
+    diagnostic_no_overlap: bool = False,
+    check_budget: Callable[[], None] | None = None,
 ) -> dict[str, Any]:
     """Score scenes with overlapping tiles and split-bound reference labels.
 
@@ -307,7 +339,12 @@ def evaluate_scenes(
         raise ValueError("Evaluation scene IDs must not contain duplicates")
     if batch_size <= 0:
         raise ValueError("batch_size must be positive")
-    resolved_stride = _resolve_evaluation_stride(window_size, stride)
+    if diagnostic_no_overlap:
+        if not profile or access.split_name != "validation" or stride is not None:
+            raise ValueError("Non-overlap is available only for validation profiling")
+        resolved_stride = window_size
+    else:
+        resolved_stride = _resolve_evaluation_stride(window_size, stride)
     if access.split_name not in {"validation", "test"}:
         raise ValueError(
             "Full-scene evaluation requires validation or test data access"
@@ -360,6 +397,8 @@ def evaluate_scenes(
                 device=selected_device,
                 scratch_root=Path(scratch),
                 torch=torch,
+                profile=profile,
+                check_budget=check_budget,
             )
         matrix = np.asarray(scene_result["confusion_matrix"], dtype=np.int64)
         total_confusion += matrix
