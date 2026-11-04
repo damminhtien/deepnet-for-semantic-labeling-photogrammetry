@@ -101,10 +101,14 @@ held-out only if the winner uses it. The source payload is hashed; the
 stage mounts only the data role it can read. Use the packager's
 `refit-input --bundle "$REFIT_BUNDLE" --output DIR` and upload it with
 `kaggle datasets create -p DIR -r tar` after locking selection.
-Use a single allocated GPU, with Kaggle timeouts of 3,600 seconds for the
-pilot, 16,200 per selection run, and 7,200 each for refit and held-out.
-These caps total 23 GPU-hours; the remaining hour is reserved. Do not
-submit downstream jobs before their prerequisite status is verified.
+The default Kaggle package expects two T4 GPUs. Submit it with
+`--accelerator NvidiaTeslaT4` and timeouts of **1,800 seconds for the pilot,
+8,100 per selection run, and 3,600 each for refit and held-out**. The runner
+uses one GPU but charges the budget for both allocated GPUs. For a verified
+single-GPU allocation, package with `--allocated-devices 1` and double those
+wall-time limits. The phase caps total 23 GPU-hours; the remaining GPU-hour
+covers setup failures or other reserve use. Submit downstream jobs only
+after verifying their prerequisites.
 
 Report validation metrics for the pre-refit checkpoint. Report held-out
 metrics and the OA shortfall only from a complete run on 467,862,855

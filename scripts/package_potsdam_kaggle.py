@@ -181,7 +181,13 @@ def main():
     kernel.add_argument("phase", choices=PHASES)
     kernel.add_argument("--with-dsm", action="store_true")
     kernel.add_argument("--heldout-dsm", action="store_true")
-    kernel.add_argument("--allocated-devices", type=int, choices=(1, 2), default=1)
+    kernel.add_argument(
+        "--allocated-devices",
+        type=int,
+        choices=(1, 2),
+        default=2,
+        help="Physical GPUs allocated by Kaggle (default: two Tesla T4s)",
+    )
     kernel.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     {"inputs": _inputs, "kernel": _kernel, "refit-input": _refit_input}[args.command](

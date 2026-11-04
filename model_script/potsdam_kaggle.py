@@ -118,8 +118,13 @@ def main():
     root = _setup()
     import torch
 
-    if torch.cuda.device_count() != SETTINGS["allocation"]:
-        raise ValueError("Kaggle GPU allocation differs from the package budget")
+    actual = torch.cuda.device_count()
+    expected = SETTINGS["allocation"]
+    print(f"CUDA allocation: expected={expected}, visible={actual}", flush=True)
+    if actual != expected:
+        raise ValueError(
+            f"GPU allocation differs from budget: expected {expected}, got {actual}"
+        )
     study = WORK / "study"
     study.mkdir(exist_ok=False)
     _previous(study)
