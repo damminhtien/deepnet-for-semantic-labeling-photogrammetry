@@ -435,3 +435,19 @@ Document verified segmentation evaluations and research, then push the resulting
   18:23 SGT. The restarted continuation processes run outside the tool session
   and respect existing receipts. Refit still requires D to meet all four floors;
   held-out remains closed until the final refit checkpoint is audited.
+- D version 1 completed 3,456 updates. `audit-d.json` verifies five indexed
+  files and fourteen matrices. Its update-3,456 checkpoint scored
+  92.7150% OA, 79.2770% mIoU, 92.9246% car IoU and 38.3053% clutter IoU
+  on 199,409,714 validation pixels. Both full validation checkpoints passed
+  all four floors. Recovered the stalled artifact download in separate
+  transfers; no Kaggle job was rerun.
+- The selection lock binds C's seed-42 checkpoint
+  `953d91bf89cfdb1add0755659632bf2b427c127bba311e68ef8f8a10bca6cd54`
+  and D's seed-43 confirmation. The train-only bundle was generated from the
+  original input tree with all 24 participant labels and verified against its
+  QA fingerprint. The default DVC staging lacked the six new participant
+  labels. Kaggle accepted the private upload at 21:33 SGT. The status API
+  initially returned 403 while the dataset was being created. The resumed
+  watcher used the accepted receipt without re-uploading. Refit version 1
+  was submitted once and Kaggle reported RUNNING at 21:35 SGT. Held-out
+  remains closed.
