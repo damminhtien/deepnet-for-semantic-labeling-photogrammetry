@@ -424,3 +424,14 @@ Document verified segmentation evaluations and research, then push the resulting
   watcher is gated on the audited, complete 1,152-update refit checkpoint.
   It will allow one held-out attempt and verify the final matrices and hash.
   No refit or held-out job has been submitted.
+- C version 1 completed 3,456 updates. The independent `audit-c.json` verifies
+  five indexed files and fourteen matrices on the frozen six-scene support.
+  C missed the clutter floor at step 1,728 and met all four floors at step 3,456:
+  OA 92.8978%, mIoU 79.5643%, car IoU 92.9585%, clutter IoU 38.9751%.
+  C won the seed-42 ranking; its advantage over A was 0.0434 OA points and
+  0.0436 mIoU points. Its validation share was 24.37%.
+- Recovered C from its existing Kaggle output after local monitoring stopped.
+  D version 1 was submitted once with C's recipe at seed 43 and was running at
+  18:23 SGT. The restarted continuation processes run outside the tool session
+  and respect existing receipts. Refit still requires D to meet all four floors;
+  held-out remains closed until the final refit checkpoint is audited.
