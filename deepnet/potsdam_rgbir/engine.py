@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from collections import deque
 
@@ -20,6 +21,8 @@ from deepnet.training import _autocast, _optimizer_step
 from deepnet.training_utils import learning_rate_factor, make_optimizer
 
 from .sampling import Draw, fit_panel
+
+LOGGER = logging.getLogger(__name__)
 
 
 def pairs(panel):
@@ -196,6 +199,12 @@ def fit_small(model, access, index, runtime, config, budget, weights):
             measured = score_patches(model, access, panel, runtime, config, budget)
             history.append(
                 {"updates": step + 1, "loss": loss, "train_metrics": measured}
+            )
+            LOGGER.info(
+                "Small fit update=%d train_mIoU=%.6f loss=%.5f",
+                step + 1,
+                measured["mean_iou"],
+                loss,
             )
             if measured["mean_iou"] >= config["small_fit"]["minimum_miou"]:
                 break

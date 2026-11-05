@@ -517,6 +517,7 @@ def heldout(args):
             )
         model.load_state_dict(saved["model"])
         with cache.access("test", auxiliary=lock["recipe"]["auxiliary"]) as access:
+            started = time.monotonic()
             metrics = score_scenes(
                 model,
                 access,
@@ -525,10 +526,12 @@ def heldout(args):
                 budget,
                 out / ".scratch",
                 policy=lock["inference"],
+                profile=True,
                 batch_size=protocol["timings"][lock["recipe"]["backbone"]][
                     "batch_size"
                 ],
             )
+            inference_seconds = time.monotonic() - started
         checked = matrix_metrics(
             metrics["confusion_matrix"], protocol["heldout_pixels"]
         )
@@ -538,6 +541,9 @@ def heldout(args):
             "checkpoint_sha256": digest,
             "inference": lock["inference"],
             "heldout_evaluation_count": 1,
+            "inference_seconds": inference_seconds,
+            "remaining_errors": checked["pixels_scored"]
+            - sum(checked["confusion_matrix"][i][i] for i in range(6)),
             "oa_goal": protocol["oa_goal"],
             "oa_shortfall_percentage_points": max(
                 0, 100 * (protocol["oa_goal"] - checked["overall_accuracy"])
