@@ -545,3 +545,13 @@ Document verified segmentation evaluations and research, then push the resulting
 - README, architecture, data guide and the new campaign runbook distinguish the
   old 504/252 protocol from the new 512/256 one. All 41 local links checked in
   these pages resolve. Graphify's ignored code graph was refreshed (1,466 nodes).
+- The private selection dataset is now ready. Submitted preflight version 1 once
+  at 08:28:13 UTC; a fresh Kaggle check reports RUNNING. Submission/package
+  receipts and live logs are external under the new run's `kaggle/preflight/`.
+  The source hash is
+  `db42cc84616a34c5b6439d08eb80892f70ac5ab3ad62c6101edddd51d6f4c41b`.
+  The durable coordinator (PID 7829) follows the verified protocol and will stop
+  at any failed mandatory gate. No selection/refit/benchmark job is submitted yet.
+- The 36-patch initialization panel has RGB means 0.329278/0.349322/0.320644;
+  all channels have zero nonfinite values and zero fraction beyond identity
+  bounds before/after normalization. This is an input diagnostic, not accuracy.
