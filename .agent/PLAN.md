@@ -28,7 +28,7 @@ synthetic tests, or a running job as completed scientific training.
 4. [x] Select on 18/6 and verify the seed-43 confirmation against all four floors.
 5. [x] Continue the locked seed-42 checkpoint on 24 scenes; verify the final
    update-1,152 weights, bundle, optimizer state and artifact inventory.
-6. [ ] Score the 14 held-out scenes once and independently recompute all metrics
+6. [x] Score the 14 held-out scenes once and independently recompute all metrics
    on 467,862,855 valid pixels; verify the final checkpoint and attempt binding.
-7. [ ] Record final results, budget and limitations in the README and artifact
+7. [x] Record final results, budget and limitations in the README and artifact
    review, validate the documentation and commit the task-owned changes.

@@ -15,6 +15,13 @@ stronger augmentation help under a fixed budget.
 
 ## Verified results
 
+The completed Potsdam study reaches **91.48% held-out OA and 79.61% six-class
+mIoU** after continuing the selected DINOv2 checkpoint on 24 labeled scenes.
+It improves on historical SAM by **3.66 OA points and 5.91 mIoU points** on
+the same 14-scene support. The **99% OA target was not reached**; the gap is
+7.52 points. The [final artifact review](docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md)
+records the checkpoint, independently recomputed metrics and remaining errors.
+
 ### Potsdam DINOv2 coverage study
 
 The table reports the selected checkpoint from each configuration on the same
@@ -45,19 +52,28 @@ moved from −3.79 with the historical adapter to −0.51 at initialization with
 residual adapter. Validation took 24.28% of timed training plus validation for A,
 36.51% for B, 24.37% for C and 24.30% for D, versus 92.83% in the older joint run.
 
-The study's **99% OA target is for held-out Potsdam**. The table above describes
-validation before the 24-scene continuation. These scores do not establish the
-final held-out accuracy. See the
-[run record](.agent/STATE.md#potsdam-coverage-and-refit-study--2026-11-04) for
-the continuation and held-out status.
+The table above describes validation before the 24-scene continuation. The former
+validation scenes then entered the train-only refit bundle with participant
+labels. Refit completed exactly 1,152 updates without validation or checkpoint
+selection; its final weights were scored once on held-out. The
+[run record](.agent/STATE.md#potsdam-final-refit-and-held-out-audit--2026-11-05)
+records completion and audit evidence.
 
-### Historical held-out results
+### Held-out results
 
 | Experiment | Dataset | Held-out scenes | Scored pixels | OA | mIoU |
 | --- | --- | ---: | ---: | ---: | ---: |
 | SAM ViT-B + LoRA | Potsdam | 14 | 467,862,855 | 87.81% | 73.70% |
+| **Potsdam DINOv2 C + 24-scene refit** | **Potsdam** | **14** | **467,862,855** | **91.48%** | **79.61%** |
 | Joint DINOv2 ViT-B/14 + LoRA | Potsdam | 14 | 467,862,855 | 74.66% | 48.65% |
 | Joint DINOv2 ViT-B/14 + LoRA | Vaihingen | 17 | 81,991,943 | 78.30% | 49.18% |
+
+The final refit model improves OA and mIoU over SAM on all 14 Potsdam scenes
+and IoU on all six classes. Building IoU is 94.66%, car IoU 92.72% and clutter
+IoU 42.37%. Clutter recall remains 51.33%, and tree/low-vegetation confusions
+account for 29.63% of all errors. The completed phases used 13.30 runner-accounted
+GPU-hours, charging both allocated T4s; execution logs including bootstrap and
+the failed initial preflight total about 13.47 allocated GPU-hours.
 
 The [joint DINOv2 artifact review](docs/experiments/isprs-dinov2-joint-final-review-2026-11-01.md)
 verifies the original checkpoints, scene counts and confusion matrices. The

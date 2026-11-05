@@ -479,3 +479,34 @@ Document verified segmentation evaluations and research, then push the resulting
   process logs are external. Kaggle initially reported QUEUED. This is the
   preauthorized single evaluation of the locked final checkpoint; final held-out
   accuracy remains unmeasured locally until its matrices are retrieved and audited.
+- Held-out version 1 completed. `audit-heldout.json` verified three indexed
+  files, the single-attempt marker, protocol/final-checkpoint bindings and all
+  fifteen aggregate/per-scene matrices. Audit finished at 13:48 SGT. Exactly
+  467,862,855 pixels were scored with 504-pixel windows and stride 252.
+  Final OA is 91.4785%, six-class mIoU 79.6122%; the 99% OA target was missed
+  by 7.5215 percentage points. This is the sole evaluation of the final model.
+- Recomputed historical SAM and joint DINOv2 metrics from their verified files.
+  Scene IDs, per-scene class supports and scored counts match. The final recipe
+  improves over SAM by 3.6643 OA and 5.9097 mIoU points; both metrics improve on
+  all 14 scenes and aggregate IoU improves in all six classes. Gains over the
+  old joint recipe are 16.8209 OA and 30.9599 mIoU points. These comparisons do
+  not isolate backbone, augmentation, adapter or refit effects.
+- Final IoU/F1 by class: impervious 87.8091/93.5089%, building
+  94.6559/97.2546%, low vegetation 79.0312/88.2876%, tree 81.0786/89.5507%,
+  car 92.7234/96.2243%, clutter 42.3747/59.5256%. Clutter recall is only
+  51.3326%; tree/low-vegetation swaps account for 29.63% of 39,868,882 errors.
+  Reaching 99% at this support would require 35,190,254 fewer errors.
+- Completed phases used 13.2968 runner-accounted GPU-hours. Execution-log
+  durations including bootstrap and the failed first preflight total 13.4696
+  allocated GPU-hours; neither figure is a provider billing export. Both T4s
+  are charged. Refit/evaluation used 0.8211/0.6442 runner GPU-hours.
+- Final artifact review:
+  docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md.
+  External `review-final-20261105/` contains analysis, class/scene/confusion CSVs,
+  standalone PNG/PDF and an input/output hash inventory. The PNG was visually
+  inspected. README now separates pre-refit selection from final held-out scores.
+- Final checks verified 36 analysis input/output hashes, 21 local documentation
+  links, all reported class IoU/F1 strings and budget totals. Pandoc parsed the
+  README and review tables; analysis Ruff and `git diff --check` passed. The
+  frozen runner source hash remains unchanged. Graphify's ignored code graph
+  was updated locally. The campaign milestones are complete; OA 99% is unmet.
