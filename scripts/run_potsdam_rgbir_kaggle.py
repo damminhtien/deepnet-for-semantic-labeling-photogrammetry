@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import base64
 import io
+import json
 import os
 import re
 import shutil
@@ -222,7 +223,7 @@ def await_phase(run, phase):
                         "status": "failed",
                         "phase": phase,
                         "terminal_state": state,
-                        "execution_gpu_hours": marker["execution_gpu_seconds"] / 3600,
+                        **execution_accounting(target, marker),
                     },
                 )
                 raise RuntimeError(
@@ -245,6 +246,21 @@ def _verify_index(root, name="artifact_sha256_manifest.json"):
         ):
             raise ValueError(f"Downloaded artifact differs: {relative}")
     return len(records)
+
+
+def execution_accounting(output, marker):
+    """Include the notebook wrapper after the worker exits, using provider logs."""
+    logs = [p for p in output.glob("*.log") if p.name != "runner.log"]
+    if len(logs) != 1:
+        raise ValueError("Expected one Kaggle execution log for GPU accounting")
+    events = json.loads(logs[0].read_text())
+    end = max(float(event["time"]) for event in events)
+    seconds = max(marker["execution_gpu_seconds"], marker["allocated_devices"] * end)
+    return {
+        "execution_gpu_hours": seconds / 3600,
+        "worker_gpu_hours": marker["execution_gpu_seconds"] / 3600,
+        "execution_log_sha256": sha256_file(logs[0]),
+    }
 
 
 def _verify_metrics(metrics, pixels=None):
@@ -329,7 +345,7 @@ def audit(run, phase, output):
         "phase": phase,
         "indexed_files": count,
         "protocol_hash": protocol["protocol_hash"],
-        "execution_gpu_hours": marker["execution_gpu_seconds"] / 3600,
+        **execution_accounting(output, marker),
         "runner_gpu_hours": budget["gpu_seconds"] / 3600,
     }
     write_json(run / "kaggle" / phase / "audit.json", evidence)

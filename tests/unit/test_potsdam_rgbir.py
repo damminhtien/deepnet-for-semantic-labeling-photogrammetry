@@ -62,6 +62,16 @@ study.main()
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_gpu_accounting_includes_provider_wrapper_after_worker_exit(tmp_path):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    account = runpy.run_path(str(script))["execution_accounting"]
+    write_json(tmp_path / "kernel.log", [{"time": 5}, {"time": 27}])
+    result = account(tmp_path, {"allocated_devices": 2, "execution_gpu_seconds": 44})
+    assert result["execution_gpu_hours"] * 3600 == 54
+    assert result["worker_gpu_hours"] * 3600 == 44
+    assert result["execution_log_sha256"] == sha256_file(tmp_path / "kernel.log")
+
+
 def _cache(root, split=None):
     parent = _split()
     split = split or parent
