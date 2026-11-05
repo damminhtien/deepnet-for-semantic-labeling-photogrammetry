@@ -139,6 +139,18 @@ def _execute(phase):
     study = WORK / "study"
     study.mkdir(exist_ok=False)
     _previous(study)
+    if SETTINGS["previous_gpu_seconds"]:
+        target = study / phase
+        target.mkdir(exist_ok=True)
+        (target / "budget.json").write_text(
+            json.dumps(
+                {
+                    "gpu_seconds": SETTINGS["previous_gpu_seconds"],
+                    "in_progress": False,
+                }
+            )
+            + "\n"
+        )
     b = models["facebook/dinov3-vitb16-pretrain-lvd1689m"]
     command = ["select", "--arm", phase] if phase in "ABCLD" else [phase]
     options = ["--root", str(study), "--cache", str(cache), "--pretrained", str(b)]

@@ -66,6 +66,7 @@ def _source():
     paths = [
         *sorted((ROOT / "deepnet").rglob("*.py")),
         ROOT / "semantic_labeling/__init__.py",
+        ROOT / "semantic_labeling/constants.py",
         ROOT / "semantic_labeling/losses.py",
         *sorted((ROOT / "configs").rglob("*.json")),
     ]
@@ -105,6 +106,10 @@ def package(run, phase, cache_path, allocation=2):
         "source_sha256": hashlib.sha256(source).hexdigest(),
         "expected_phases": previous,
         "allocation": allocation,
+        "previous_gpu_seconds": sum(
+            read_json(path)["execution_gpu_hours"] * 3600
+            for path in (run / "kaggle").glob(f"{phase}-failed-*/audit.json")
+        ),
     }
     code = (ROOT / "model_script/potsdam_rgbir_kaggle.py").read_text()
     code = code.replace("SETTINGS = {}", f"SETTINGS = {settings!r}", 1)
@@ -191,7 +196,7 @@ def await_phase(run, phase):
             previous = state
         if state in {"COMPLETE", "ERROR", "CANCELLED", "CANCELED"}:
             version = f"{receipt['slug']}/{receipt['version']}"
-            remote = kaggle("kernels", "logs", version, check=False)
+            remote = kaggle("kernels", "logs", receipt["slug"], check=False)
             (out / "remote.log").write_text(remote.stdout + remote.stderr)
             target = out / "outputs"
             target.mkdir(exist_ok=True)

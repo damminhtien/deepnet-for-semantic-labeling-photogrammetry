@@ -22,6 +22,8 @@ ARM_ORDER = "ABCLD"
 def source_hash():
     files = [
         *sorted((ROOT / "deepnet").rglob("*.py")),
+        ROOT / "semantic_labeling/__init__.py",
+        ROOT / "semantic_labeling/constants.py",
         ROOT / "semantic_labeling/losses.py",
         *sorted((ROOT / "configs/models").glob("dinov3-*-rgbir*-v2.json")),
     ]

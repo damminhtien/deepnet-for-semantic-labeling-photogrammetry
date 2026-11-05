@@ -1,5 +1,10 @@
 """Regression witnesses for RGBIR masks, reproducibility, and experiment gates."""
 
+import io
+import runpy
+import subprocess
+import sys
+import zipfile
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -28,6 +33,33 @@ from deepnet.potsdam_rgbir.protocol import (
 from deepnet.potsdam_rgbir.sampling import Draw, loader, schedule, training_index
 from deepnet.potsdam_study import _split
 from deepnet.training_utils import write_json
+
+
+def test_kaggle_source_archive_imports_without_worktree_dependencies(tmp_path):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    source = runpy.run_path(str(script))["_source"]()
+    with zipfile.ZipFile(io.BytesIO(source)) as archive:
+        archive.extractall(tmp_path)
+    code = """
+import pathlib, sys
+root = pathlib.Path(sys.argv[1])
+sys.path.insert(0, str(root))
+import deepnet.potsdam_rgbir.study as study
+import semantic_labeling.losses as losses
+import semantic_labeling.constants as constants
+for module in (study, losses, constants):
+    assert pathlib.Path(module.__file__).is_relative_to(root), module.__file__
+sys.argv = ['study', '--help']
+study.main()
+"""
+    result = subprocess.run(
+        [sys.executable, "-I", "-c", code, str(tmp_path)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 def _cache(root, split=None):
