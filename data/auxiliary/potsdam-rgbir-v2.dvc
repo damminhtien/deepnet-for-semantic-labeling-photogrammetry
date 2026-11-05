@@ -1,0 +1,6 @@
+outs:
+- md5: f952919f0c402ba957c4caba43e30d1d.dir
+  size: 9605915346
+  nfiles: 78
+  hash: md5
+  path: potsdam-rgbir-v2
