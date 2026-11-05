@@ -1,4 +1,20 @@
-# DINOv2 full-run milestones
+# Potsdam DINOv3 RGBIR v2 milestones
+
+1. [x] Implement named RGB/auxiliary routing, DINOv3 normalization, gated fusion,
+   compact normalized decoder and pinned model specs; verify real pretrained LoRA.
+2. [x] Verify RGBIR provenance, create scoped caches, implement deterministic
+   pixel-centered rare sampling and mask-aware baseline/enhanced augmentation.
+3. [x] Implement config-driven selection/confirmation/TTA/refit/benchmark phases,
+   immutable bindings, budget pilot, resume and final-only scoring guards.
+4. [x] Run focused regression checks, real-data cache/model checks, and update
+   docs/Graphify; commit changes by subsystem.
+5. [ ] Package private Kaggle inputs and run the CUDA preflight within two GPU-hours;
+   freeze model roster and the common 12/8/6-pass schedule only if gates pass.
+6. [ ] Run eligible selection arms and seed 43 within 16 GPU-hours; lock TTA/recipe.
+7. [ ] Refit 24 scenes for 1,152 updates, score once if eligible, audit artifacts,
+   report measured results and allocated GPU-hours, and commit final task state.
+
+## Completed DINOv2 full-run milestones
 
 1. [x] Correct post-radiometry invalid-pixel fill, add a focused regression, and
    replay the train-only rare-class/padding audit before enabling augmentation.

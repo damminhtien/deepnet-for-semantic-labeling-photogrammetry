@@ -68,6 +68,7 @@ split hash.
 | `deepnet/data/lineage.py` | Run manifest builder with data/source/runtime provenance |
 | `deepnet/runtime.py` | CUDA/MPS/CPU detection and execution defaults |
 | `deepnet/potsdam_study.py` | Potsdam pilot, validation selection, train-only refit, and held-out evaluation |
+| `deepnet/potsdam_rgbir/` | Verified RGBIR caches, deterministic sampling, DINOv3 pilot, selection/TTA, fixed refit and historical benchmark |
 | `deepnet/models/specs.py` | Versioned backbone, input adapter, and task-head contracts |
 | `deepnet/models/backbones.py` | Hugging Face feature extraction and injected backbone interface |
 | `deepnet/models/adapters.py` | Optical projection and separate auxiliary spatial features |
@@ -75,6 +76,7 @@ split hash.
 | `deepnet/models/segmenter.py` | Composition that pads inputs and returns dense task logits |
 | `deepnet/models/adapter.py` | Thin input/output contract around a caller-provided Torch model |
 | `model_script/` | Model definitions, thin shared-data bundle commands, and historical training runners |
+| `scripts/run_potsdam_rgbir_kaggle.py` | Private phase packaging, submission receipts, gated continuation and downloaded artifact audits |
 | `model_kernel/` | Historical notebooks awaiting reruns against the new pipeline |
 
 ## Alignment and dataset scope
@@ -122,3 +124,12 @@ separate jobs and bundles for validation selection, refit and held-out evaluatio
 Its verified DSM relief and availability mask are separate from the older
 five-channel view, which requires verified nDSM decoding and co-registration.
 The notebooks mark their saved outputs as historical pending reruns.
+
+The [DINOv3 RGBIR campaign](experiments/potsdam-dinov3-rgbir-v2.md) uses a separate
+config and package. Named R/G/B bands reach the pretrained encoder; IR, the
+post-augmentation IR/red index and DSM relief/mask enter a gated detail branch.
+The feature adapter resolves DINOv2 `layernorm` and DINOv3 `norm` and validates
+CLS/register token counts. New normalization/gating fields default to the old
+behavior, preserving existing serialized model contracts. The campaign requires
+real pretrained gradient checks in preflight and does not derive quality claims
+from synthetic unit tests.

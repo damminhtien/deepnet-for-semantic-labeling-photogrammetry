@@ -5,12 +5,14 @@ pretrained vision encoders. Its data pipeline verifies raster alignment and labe
 provenance, assigns whole scenes before sampling patches, and exports checksummed
 bundles that the same code can read locally or on Kaggle.
 
-The current Potsdam study asks whether broader training coverage, a
-channel-preserving IRRG adapter, and a smaller DINOv2 decoder can improve on the
-historical SAM baseline. It also tests whether spectral and elevation features or
-stronger augmentation help under a fixed budget.
+The new Potsdam campaign tests DINOv3 with verified RGB encoder inputs, separate
+IR/DSM features and stronger augmentation under a fresh 24 allocated-GPU-hour
+budget. The completed DINOv2 coverage/refit study supplies the current measured
+baseline. The target remains OA >=99%; new accuracy claims require audited GPU
+experiments.
 
-[Study protocol and runbook](docs/experiments/potsdam-dinov2-coverage-refit.md) ·
+[DINOv3 RGBIR protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md) ·
+[Completed DINOv2 protocol](docs/experiments/potsdam-dinov2-coverage-refit.md) ·
 [Data pipeline guide](docs/data-pipeline.md) · [Architecture](docs/architecture.md)
 
 ## Verified results
@@ -21,6 +23,20 @@ It improves on historical SAM by **3.66 OA points and 5.91 mIoU points** on
 the same 14-scene support. The **99% OA target was not reached**; the gap is
 7.52 points. The [final artifact review](docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md)
 records the checkpoint, independently recomputed metrics and remaining errors.
+
+The new [DINOv3 RGBIR campaign](docs/experiments/potsdam-dinov3-rgbir-v2.md)
+has verified 38 RGBIR sources and real offline pretrained forward/backward for
+ViT-B/16 and satellite ViT-L/16. Its data/model/runner code has passed local
+regression checks. CUDA fit, throughput and accuracy remain subject to the new
+preflight and selection gates. It uses 512-pixel windows, stride 256 and RGB
+encoder inputs; the DINOv2 tables below retain their original 504/252 protocol.
+
+The RGBIR source audit also found that the historical three-band files match
+RGBIR bands 4/2/3 across all 38 scenes, although their configured names were
+IR/red/green. Historical scores and files are preserved; interpret those channel
+and spectral-index descriptions with this measured discrepancy. The new RGB
+path is byte-verified against the independent official RGB archive and its index
+uses the actual IR/red bands 4/1.
 
 ### Potsdam DINOv2 coverage study
 
@@ -97,7 +113,8 @@ The evaluator sums per-scene confusion matrices before computing aggregate score
 These are project scores against local references; they are not submissions to
 the ISPRS leaderboard.
 
-Each selection pass contains 2,592 base windows of **504 × 504 pixels**, plus
+In the completed DINOv2 study, each selection pass contains 2,592 base windows of
+**504 × 504 pixels**, plus
 432 car-prioritized and 432 clutter-prioritized draws. Four microbatches per
 optimizer step give **864 updates per pass**. A fixed 72-window validation probe
 tracks progress. Only full-scene validation at the prescribed checkpoints can
@@ -130,7 +147,7 @@ the isolated effect of adding the six scenes.
    labels and valid-pixel masks. The sampler and augmentation policy are
    versioned. Each bundle contains role-specific rasters, split and preprocessing
    contracts, and a file-level SHA-256 inventory.
-3. **Adapt and segment.** The current
+3. **Adapt and segment.** The completed DINOv2 study's
    [DINOv2 model spec](configs/models/dinov2-vitb14-multimodal-v3.json)
    uses ViT-B/14 with LoRA, a zero-initialized residual IRRG projection,
    pretrained normalization at blocks 3/6/9/12 and a width-128 decoder with
@@ -146,6 +163,15 @@ mask. Scene `3_13` is one column short; missing DSM pixels retain their original
 scoring eligibility. The older five-channel DSM+nDSM view remains blocked
 because JPEG nDSM registration and height encoding have not been established.
 The winning C recipe uses IRRG without elevation or the spectral index.
+
+The new [DINOv3-B spec](configs/models/dinov3-vitb16-rgbir-v2.json) selects RGB
+by band name, applies the pretrained DINOv3 `norm`, and adds IR, post-augmentation
+NDVI and verified relief through a separate branch with a zero-initialized gate.
+The compact decoder and detail/fusion blocks use GroupNorm. Role-scoped scene
+caches bind source hashes, labels, split and preprocessing; DSM availability
+does not remove scored pixels. The optional
+[satellite L spec](configs/models/dinov3-vitl16-rgbir-sat-v2.json) enters selection
+only after passing the same quality and budget gates.
 
 The [joint DINOv3 configuration](configs/training/isprs-dinov3-joint-v2.json)
 is an unexecuted training plan. An offline check of a pinned DINOv3 ViT-B/16
@@ -163,6 +189,7 @@ versioning and development:
 uv sync --extra dev --extra train --extra models --extra vision --extra data-versioning
 uv run deepnet-data --help
 uv run python -m deepnet.potsdam_study --help
+uv run python -m deepnet.potsdam_rgbir.study --help
 ```
 
 Configure a DVC remote with the matching source objects or follow the

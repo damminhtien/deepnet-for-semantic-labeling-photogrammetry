@@ -2,6 +2,10 @@
 
 This document describes the common path from external raster sources to a
 reproducible local or Kaggle run. Large data and outputs belong outside Git.
+The [DINOv3 RGBIR runbook](experiments/potsdam-dinov3-rgbir-v2.md) describes the
+new audited RGBIR snapshot, role-scoped scene caches and deterministic rare-pixel
+sampling. It records a measured discrepancy in the historical IRRG band names;
+the new campaign derives RGB and IR/red features from verified four-band inputs.
 
 ## Install
 
@@ -542,10 +546,12 @@ loader = make_torch_dataloader(
 )
 ```
 
-The shared package does not include a model training loop yet. In a caller-owned
-loop, count the labels returned by the training loader before transferring them to
-the accelerator. This records the patches actually sampled and augmented during
-the epoch, rather than inferring pixel proportions from sampler probabilities.
+The shared package provides `deepnet.training` for joint training,
+`deepnet.potsdam_study` for the completed DINOv2 study and
+`deepnet.potsdam_rgbir.study` for the new DINOv3 campaign. A caller-owned loop can
+also count the labels returned by its loader before accelerator transfer. This
+records the sampled and augmented pixels rather than inferring their proportions
+from sampling probabilities.
 
 ```python
 import logging
@@ -588,8 +594,8 @@ raw inputs remain untouched.
 
 The local preflight selects MPS on a supported Apple Silicon setup and CUDA on a
 GPU runtime such as Kaggle. The CPU fallback is intended for data preparation and
-small smoke runs. This verifies device discovery only; model training must still
-be launched by the caller's training loop.
+small smoke runs. Device discovery alone does not establish training; the chosen
+runner must complete its quality, throughput and provenance checks.
 
 ## Reproducibility and validation
 

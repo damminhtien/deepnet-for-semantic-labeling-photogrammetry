@@ -510,3 +510,38 @@ Document verified segmentation evaluations and research, then push the resulting
   README and review tables; analysis Ruff and `git diff --check` passed. The
   frozen runner source hash remains unchanged. Graphify's ignored code graph
   was updated locally. The campaign milestones are complete; OA 99% is unmet.
+
+## DINOv3 RGBIR v2 implementation — 2026-11-05
+
+- Started branch `dev/potsdam-dinov3-rgbir-v2` for the newly approved 24-GPU-hour
+  campaign. Preserve the earlier unrelated PSPNet status edit in this file.
+  Historical source, checkpoints, metrics and report payloads are unchanged.
+- Verified all 38 RGBIR rasters byte-for-byte against the separate official RGB
+  archive. Historical IRRG files match RGBIR bands 4/2/3, not the configured
+  4/1/2 interpretation. The new source manifest records the correspondence;
+  the new model uses RGB bands 1/2/3 and the index uses IR/red bands 4/1.
+- Created the separate RGBIR DVC snapshot (78 files, 9,605,915,346 bytes,
+  object `f952919f0c402ba957c4caba43e30d1d.dir`). Snapshot content hash is
+  `e5b4975baafbbcdbcf751def28eb290220ebf010a69279dcec07566883f1a164`.
+- Created the selection memmap cache outside Git at
+  `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/selection-cache`.
+  Hash `49efbfb559d47932942924dc859e87116f0303c5c3629acd7215760cb02fb734`
+  binds 123 inventoried files and 24 role-scoped scenes. Validation support is
+  exactly 199,409,714 pixels. Twelve real reference patches match Rasterio
+  image/labels/masks exactly. The full 18-scene base grid has 2,592 windows;
+  432+432 pixel-centered rare draws give 3,456 samples / 864 updates.
+- Offline real-patch smoke checks passed for pinned DINOv3-B and satellite L:
+  48/96 LoRA B matrices receive nonzero finite gradients; original backbone
+  parameters stay frozen; pretrained `norm`, four register tokens and feature
+  tensor values match the reference forward. Main runs discard smoke/fit weights.
+- Added config-driven preflight/selection/TTA/refit/benchmark runners, allocation
+  budgets, immutable bindings, deterministic worker-independent resume, final-only
+  scoring and private Kaggle receipt/artifact tools. All 74 unit tests and focused
+  Ruff checks pass. No CUDA quality/throughput or new accuracy is established yet.
+- Model/data/runner changes committed as `62baf5e`, `4f66ca5`, and `0485483`.
+  Kaggle accepted the private selection input upload; dataset creation is pending
+  and its status/files endpoints currently return 403. Preserve the receipt and
+  do not re-upload. No GPU job has been submitted and no benchmark cache opened.
+- README, architecture, data guide and the new campaign runbook distinguish the
+  old 504/252 protocol from the new 512/256 one. All 41 local links checked in
+  these pages resolve. Graphify's ignored code graph was refreshed (1,466 nodes).
