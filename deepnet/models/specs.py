@@ -132,6 +132,10 @@ class InputAdapterSpec:
     backbone_std: tuple[float, ...]
     spatial_channels: int = 64
     spectral_index: bool = False
+    encoder_bands: tuple[str, ...] = ()
+    spectral_index_bands: tuple[str, ...] = ()
+    spatial_norm_groups: int = 0
+    auxiliary_gate: bool = False
 
     def __post_init__(self) -> None:
         if self.projection_init not in {
@@ -154,6 +158,25 @@ class InputAdapterSpec:
             raise ValueError("Backbone standard deviations must be finite and positive")
         if self.spatial_channels < 4:
             raise ValueError("Spatial branch width must be at least four channels")
+        if self.encoder_bands and (
+            len(self.encoder_bands) != len(self.backbone_mean)
+            or len(set(self.encoder_bands)) != len(self.encoder_bands)
+        ):
+            raise ValueError("Encoder bands must name each backbone channel once")
+        if self.spectral_index_bands and (
+            not self.spectral_index
+            or len(self.spectral_index_bands) != 2
+            or len(set(self.spectral_index_bands)) != 2
+        ):
+            raise ValueError("A spectral index requires two different named bands")
+        if self.spatial_norm_groups < 0 or (
+            self.spatial_norm_groups
+            and any(
+                channels % self.spatial_norm_groups
+                for channels in (self.spatial_channels, self.spatial_channels // 2)
+            )
+        ):
+            raise ValueError("Spatial widths must be divisible by normalization groups")
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -163,6 +186,22 @@ class InputAdapterSpec:
             "backbone_std": list(self.backbone_std),
             "spatial_channels": self.spatial_channels,
             **({"spectral_index": True} if self.spectral_index else {}),
+            **(
+                {"encoder_bands": list(self.encoder_bands)}
+                if self.encoder_bands
+                else {}
+            ),
+            **(
+                {"spectral_index_bands": list(self.spectral_index_bands)}
+                if self.spectral_index_bands
+                else {}
+            ),
+            **(
+                {"spatial_norm_groups": self.spatial_norm_groups}
+                if self.spatial_norm_groups
+                else {}
+            ),
+            **({"auxiliary_gate": True} if self.auxiliary_gate else {}),
         }
 
     @classmethod
@@ -174,6 +213,10 @@ class InputAdapterSpec:
             backbone_std=tuple(float(item) for item in value["backbone_std"]),
             spatial_channels=int(value.get("spatial_channels", 64)),
             spectral_index=value.get("spectral_index", False),
+            encoder_bands=tuple(value.get("encoder_bands", ())),
+            spectral_index_bands=tuple(value.get("spectral_index_bands", ())),
+            spatial_norm_groups=int(value.get("spatial_norm_groups", 0)),
+            auxiliary_gate=bool(value.get("auxiliary_gate", False)),
         )
 
 
@@ -192,6 +235,7 @@ class SegmentationModelSpec:
     license_id: str
     license_url: str
     decoder_norm_groups: int = 0
+    normalize_fusion: bool = False
 
     def __post_init__(self) -> None:
         if not self.model_id.strip() or self.version <= 0:
@@ -217,6 +261,7 @@ class SegmentationModelSpec:
             "backbone": self.backbone.to_dict(),
             "input_adapter": self.input_adapter.to_dict(),
             "decoder_width": self.decoder_width,
+            **({"normalize_fusion": True} if self.normalize_fusion else {}),
             **(
                 {"decoder_norm_groups": self.decoder_norm_groups}
                 if self.decoder_norm_groups
@@ -240,6 +285,7 @@ class SegmentationModelSpec:
             input_adapter=InputAdapterSpec.from_dict(value["input_adapter"]),
             decoder_width=int(value["decoder_width"]),
             decoder_norm_groups=int(value.get("decoder_norm_groups", 0)),
+            normalize_fusion=bool(value.get("normalize_fusion", False)),
             num_classes=int(value["num_classes"]),
             ignore_index=int(value["ignore_index"]),
             label_ontology=value["label_ontology"],

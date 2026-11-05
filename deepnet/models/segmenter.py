@@ -53,6 +53,7 @@ class MultimodalSegmenter(nn.Module):
             decoder_width=spec.decoder_width,
             num_classes=spec.num_classes,
             norm_groups=spec.decoder_norm_groups,
+            normalize_fusion=spec.normalize_fusion,
         )
         self.patch_size = backbone.patch_size
         self.input_channels = model_input.channels

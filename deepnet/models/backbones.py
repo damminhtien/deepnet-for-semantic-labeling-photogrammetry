@@ -172,6 +172,8 @@ class TransformerFeatureBackbone(nn.Module):
         if self.normalize_features:
             base = getattr(self.model, "get_base_model", lambda: self.model)()
             norm = getattr(base, "layernorm", None)
+            if norm is None:
+                norm = getattr(base, "norm", None)
             if not isinstance(norm, nn.LayerNorm):
                 raise ValueError("Backbone does not expose its pretrained LayerNorm")
         for block in self.feature_blocks:
@@ -181,6 +183,15 @@ class TransformerFeatureBackbone(nn.Module):
                 raise ValueError(
                     f"Block {block} has fewer tokens than the input patch grid"
                 )
+            base = getattr(self.model, "get_base_model", lambda: self.model)()
+            config = getattr(base, "config", None)
+            if config is not None:
+                expected_prefix = 1 + getattr(config, "num_register_tokens", 0)
+                if prefix_count != expected_prefix:
+                    raise ValueError(
+                        f"Block {block} prefix count {prefix_count} differs from "
+                        f"configured CLS/register count {expected_prefix}"
+                    )
             patch_tokens = tokens[:, prefix_count:, :]
             if norm is not None:
                 patch_tokens = norm(patch_tokens)

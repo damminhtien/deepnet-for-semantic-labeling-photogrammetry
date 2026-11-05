@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from types import SimpleNamespace
 
 import pytest
@@ -232,3 +233,69 @@ def test_model_configs_load_without_loading_pretrained_weights(filename: str):
     assert len(model_spec.backbone.feature_blocks) == 4
     assert model_spec.num_classes == 6
     assert model_spec.content_hash
+
+
+def test_named_rgb_routing_preserves_rgb_and_gates_multimodal_features():
+    names = ("ir", "relief", "blue", "red", "dsm_available", "green")
+    domain = DomainSpec(
+        "rgbir",
+        1,
+        "ISPRS",
+        tuple(
+            BandSpec(
+                name, "auxiliary" if name in {"relief", "dsm_available"} else "optical"
+            )
+            for name in names
+        ),
+    )
+    spec = load_model_spec("dinov3-vitb16-rgbir-v2").input_adapter
+    torch.manual_seed(42)
+    rgb = MultimodalInputAdapter(
+        domain,
+        _model_input(("red", "green", "blue")),
+        replace(spec, spectral_index=False, spectral_index_bands=()),
+    )
+    torch.manual_seed(42)
+    enriched = MultimodalInputAdapter(domain, _model_input(names), spec)
+    image = torch.rand(1, len(names), 32, 48)
+    visible = image[:, [3, 5, 2]]
+    projected, _ = enriched.encoder_views(visible)
+    assert torch.equal(projected, visible)
+    captured = []
+    handle = enriched.auxiliary_spatial.register_forward_pre_hook(
+        lambda _module, inputs: captured.append(inputs[0].detach())
+    )
+    base_encoder, base_spatial = rgb(visible)
+    encoder, spatial = enriched(image)
+    handle.remove()
+    assert torch.equal(encoder, base_encoder)
+    assert torch.equal(spatial, base_spatial)
+    expected = (image[:, :1] - image[:, 3:4]) / (image[:, :1] + image[:, 3:4] + 1e-6)
+    torch.testing.assert_close(captured[0][:, :1], expected)
+    spatial.square().mean().backward()
+    assert enriched.auxiliary_gate.grad is not None
+    assert torch.isfinite(enriched.auxiliary_gate.grad)
+
+
+def test_dinov3_uses_pretrained_norm_and_rejects_unexpected_prefix_count():
+    class V3(FakeTransformer):
+        def __init__(self):
+            super().__init__()
+            self.norm = nn.LayerNorm(8)
+            self.config = SimpleNamespace(num_register_tokens=1)
+
+    model = V3()
+    spec = BackboneSpec(
+        "huggingface",
+        "fake-v3",
+        16,
+        (3, 6, 9, 12),
+        8,
+        normalize_features=True,
+    )
+    backbone = TransformerFeatureBackbone(model, spec)
+    features = backbone(torch.zeros(1, 3, 32, 48))
+    assert all(torch.equal(feature, torch.zeros_like(feature)) for feature in features)
+    model.config.num_register_tokens = 4
+    with pytest.raises(ValueError, match="CLS/register"):
+        backbone(torch.zeros(1, 3, 32, 48))

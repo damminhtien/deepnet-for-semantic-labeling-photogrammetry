@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "model_id": "dinov3-vitb16-rgbir",
+  "version": 2,
+  "backbone": {
+    "backend": "huggingface",
+    "model_id": "facebook/dinov3-vitb16-pretrain-lvd1689m",
+    "patch_size": 16,
+    "feature_blocks": [
+      3,
+      6,
+      9,
+      12
+    ],
+    "feature_channels": 768,
+    "revision": "5931719e67bbdb9737e363e781fb0c67687896bc",
+    "normalize_features": true,
+    "lora": {
+      "rank": 8,
+      "alpha": 16,
+      "dropout": 0.05,
+      "target_modules": [
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj"
+      ]
+    }
+  },
+  "input_adapter": {
+    "identity_channel_order": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "projection_init": "residual_identity",
+    "backbone_mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "backbone_std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "spatial_channels": 64,
+    "encoder_bands": [
+      "red",
+      "green",
+      "blue"
+    ],
+    "spectral_index": true,
+    "spectral_index_bands": [
+      "ir",
+      "red"
+    ],
+    "spatial_norm_groups": 8,
+    "auxiliary_gate": true
+  },
+  "decoder_width": 128,
+  "decoder_norm_groups": 8,
+  "normalize_fusion": true,
+  "num_classes": 6,
+  "ignore_index": 6,
+  "label_ontology": "isprs-six-class-v1",
+  "license_id": "DINOv3 License",
+  "license_url": "https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md"
+}

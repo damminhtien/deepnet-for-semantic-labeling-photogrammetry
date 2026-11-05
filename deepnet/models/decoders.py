@@ -34,6 +34,7 @@ class DPTFusionDecoder(nn.Module):
         decoder_width: int,
         num_classes: int,
         norm_groups: int = 0,
+        normalize_fusion: bool = False,
     ) -> None:
         super().__init__()
         if min(feature_channels, spatial_channels, decoder_width, num_classes) <= 0:
@@ -49,18 +50,19 @@ class DPTFusionDecoder(nn.Module):
             for _ in self._feature_strides[:-1]
         )
         self.spatial_projection = nn.Conv2d(spatial_channels, decoder_width, 1)
-        self.output_fusion = nn.Sequential(
-            nn.Conv2d(decoder_width * 2, decoder_width, 3, padding=1),
-            nn.GELU(),
-            nn.Conv2d(decoder_width, decoder_width, 3, padding=1),
-            nn.GELU(),
-        )
+        fusion = []
+        for source in (decoder_width * 2, decoder_width):
+            fusion.append(nn.Conv2d(source, decoder_width, 3, padding=1))
+            if normalize_fusion and norm_groups:
+                fusion.append(nn.GroupNorm(norm_groups, decoder_width))
+            fusion.append(nn.GELU())
+        self.output_fusion = nn.Sequential(*fusion)
         head_width = max(decoder_width // 2, num_classes)
-        self.classifier = nn.Sequential(
-            nn.Conv2d(decoder_width, head_width, 3, padding=1),
-            nn.GELU(),
-            nn.Conv2d(head_width, num_classes, 1),
-        )
+        classifier = [nn.Conv2d(decoder_width, head_width, 3, padding=1)]
+        if normalize_fusion and norm_groups:
+            classifier.append(nn.GroupNorm(norm_groups, head_width))
+        classifier.extend((nn.GELU(), nn.Conv2d(head_width, num_classes, 1)))
+        self.classifier = nn.Sequential(*classifier)
 
     def _stage_size(self, height: int, width: int, stride: int) -> tuple[int, int]:
         return math.ceil(height / stride), math.ceil(width / stride)

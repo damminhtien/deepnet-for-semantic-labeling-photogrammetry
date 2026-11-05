@@ -10,15 +10,21 @@ from deepnet.data.contracts import DomainSpec, ModelInputSpec
 from .specs import InputAdapterSpec
 
 
-def _spatial_branch(input_channels: int, output_channels: int) -> nn.Sequential:
+def _spatial_branch(
+    input_channels: int, output_channels: int, groups: int = 0
+) -> nn.Sequential:
     """Create a stride-four convolutional branch without batch-size assumptions."""
     hidden_channels = max(output_channels // 2, 2)
-    return nn.Sequential(
-        nn.Conv2d(input_channels, hidden_channels, 3, stride=2, padding=1),
-        nn.GELU(),
-        nn.Conv2d(hidden_channels, output_channels, 3, stride=2, padding=1),
-        nn.GELU(),
-    )
+    layers = []
+    for source, target in (
+        (input_channels, hidden_channels),
+        (hidden_channels, output_channels),
+    ):
+        layers.append(nn.Conv2d(source, target, 3, stride=2, padding=1))
+        if groups:
+            layers.append(nn.GroupNorm(groups, target))
+        layers.append(nn.GELU())
+    return nn.Sequential(*layers)
 
 
 class ResidualIdentityProjection(nn.Module):
@@ -47,15 +53,25 @@ class MultimodalInputAdapter(nn.Module):
         domain.validate_model_input(model_input)
         self.channel_names = model_input.channels
         band_roles = {band.name: band.role for band in domain.bands}
-        self.optical_indices = tuple(
-            index
-            for index, name in enumerate(model_input.channels)
-            if band_roles[name] == "optical"
-        )
+        if spec.encoder_bands:
+            if any(
+                name not in model_input.channels or band_roles[name] != "optical"
+                for name in spec.encoder_bands
+            ):
+                raise ValueError("Encoder bands must be available optical channels")
+            self.optical_indices = tuple(
+                model_input.channels.index(name) for name in spec.encoder_bands
+            )
+        else:
+            self.optical_indices = tuple(
+                index
+                for index, name in enumerate(model_input.channels)
+                if band_roles[name] == "optical"
+            )
         self.auxiliary_indices = tuple(
             index
             for index, name in enumerate(model_input.channels)
-            if band_roles[name] == "auxiliary"
+            if index not in self.optical_indices
         )
         if not self.optical_indices:
             raise ValueError("A segmentation model requires optical input channels")
@@ -65,8 +81,20 @@ class MultimodalInputAdapter(nn.Module):
             model_input.channels[index] for index in self.optical_indices
         )
         self.spectral_index = spec.spectral_index
-        if self.spectral_index and selected_optical_order != ("ir", "red", "green"):
-            raise ValueError("IR/red index requires IRRG channel order")
+        self.index_indices = ()
+        if self.spectral_index:
+            pair = spec.spectral_index_bands or ("ir", "red")
+            if not spec.spectral_index_bands and selected_optical_order != (
+                "ir",
+                "red",
+                "green",
+            ):
+                raise ValueError("IR/red index requires IRRG channel order")
+            if any(name not in model_input.channels for name in pair):
+                raise ValueError("Spectral index bands are missing from model input")
+            self.index_indices = tuple(
+                model_input.channels.index(name) for name in pair
+            )
         if spec.projection_init == "residual_identity":
             if len(self.optical_indices) != 3 or backbone_channels != 3:
                 raise ValueError("Residual identity requires three optical channels")
@@ -95,22 +123,31 @@ class MultimodalInputAdapter(nn.Module):
         )
 
         spatial_channels = spec.spatial_channels
-        self.optical_detail = _spatial_branch(backbone_channels, spatial_channels)
+        groups = spec.spatial_norm_groups
+        self.optical_detail = _spatial_branch(
+            backbone_channels, spatial_channels, groups
+        )
         auxiliary_channels = len(self.auxiliary_indices) + int(self.spectral_index)
         self.auxiliary_spatial = None
         if self.spectral_index:
             # Keep shared A/B weights paired even when B adds a spatial branch.
             with torch.random.fork_rng(devices=[]):
                 self.auxiliary_spatial = _spatial_branch(
-                    auxiliary_channels, spatial_channels
+                    auxiliary_channels, spatial_channels, groups
                 )
         elif auxiliary_channels:
             self.auxiliary_spatial = _spatial_branch(
-                auxiliary_channels, spatial_channels
+                auxiliary_channels, spatial_channels, groups
             )
-        self.spatial_fusion = nn.Sequential(
-            nn.Conv2d(spatial_channels, spatial_channels, 3, padding=1),
-            nn.GELU(),
+        fusion = [nn.Conv2d(spatial_channels, spatial_channels, 3, padding=1)]
+        if groups:
+            fusion.append(nn.GroupNorm(groups, spatial_channels))
+        fusion.append(nn.GELU())
+        self.spatial_fusion = nn.Sequential(*fusion)
+        self.auxiliary_gate = (
+            nn.Parameter(torch.zeros(()))
+            if spec.auxiliary_gate and self.auxiliary_spatial is not None
+            else None
         )
 
     @staticmethod
@@ -150,8 +187,12 @@ class MultimodalInputAdapter(nn.Module):
         if self.auxiliary_spatial is not None:
             auxiliary = images[:, self.auxiliary_indices]
             if self.spectral_index:
-                ir, red = optical[:, :1], optical[:, 1:2]
+                first, second = self.index_indices
+                ir, red = images[:, first : first + 1], images[:, second : second + 1]
                 index = (ir - red) / (ir + red + 1e-6)
                 auxiliary = torch.cat((index, auxiliary), dim=1)
-            spatial = spatial + self.auxiliary_spatial(auxiliary)
+            extra = self.auxiliary_spatial(auxiliary)
+            if self.auxiliary_gate is not None:
+                extra = self.auxiliary_gate.tanh() * extra
+            spatial = spatial + extra
         return encoder_inputs, self.spatial_fusion(spatial)
