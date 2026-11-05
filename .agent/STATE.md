@@ -451,3 +451,31 @@ Document verified segmentation evaluations and research, then push the resulting
   watcher used the accepted receipt without re-uploading. Refit version 1
   was submitted once and Kaggle reported RUNNING at 21:35 SGT. Held-out
   remains closed.
+
+## Potsdam final refit and held-out audit — 2026-11-05
+
+- Retrieved refit version 1 after a fresh Kaggle COMPLETE status. The independent
+  external `kaggle/preflight-v2-evidence/audit-refit.json` verifies all four
+  indexed files, the final and resumable checkpoint bindings, finite model
+  tensors, update 1,152 and one completed pass. The 24 train scenes exactly
+  match the locked train/validation union and contain no held-out scene.
+- Refit continued C's seed-42 checkpoint with the selected strong-augmentation
+  IRRG recipe, without spectral or DSM features. AdamW's saved initial rates
+  are 5e-5 and 1.5e-4. No validation or checkpoint selection ran during refit.
+  The final checkpoint SHA-256 is
+  `03af62b805bad33c3ba29746c17406daeb772469229cb61d04af0e76d263d33d`.
+- Independent `audit-refit-weight-delta.json` confirms that all 96 LoRA
+  tensors, eight adapter tensors and all 74 decoder tensors changed from C,
+  while all 223 non-LoRA backbone tensors remained exactly equal.
+- Refit recorded 1,144,117,429 valid pixel presentations, 1,137.985 seconds of
+  training and 0.8211 runner-accounted GPU-hours, charging both allocated T4s.
+  On the fixed 36-patch panel, all three channels have 9,023,616 valid non-ignore
+  pixels, no nonfinite values and no values outside the identity bounds before
+  or after backbone normalization. Ignore/masked pixels are excluded from this
+  diagnostic count.
+- Recovered the stopped local watcher without rerunning training. The verified
+  held-out package was submitted once at 13:26:47 SGT as version 1 of
+  `damminhtien/potsdam-dinov2-coverage-refit-v1-heldout`. Submission receipt and
+  process logs are external. Kaggle initially reported QUEUED. This is the
+  preauthorized single evaluation of the locked final checkpoint; final held-out
+  accuracy remains unmeasured locally until its matrices are retrieved and audited.

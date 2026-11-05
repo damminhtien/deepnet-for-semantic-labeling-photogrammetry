@@ -21,8 +21,14 @@ synthetic tests, or a running job as completed scientific training.
 
 ## Potsdam coverage and refit study
 
-1. Verify residual/decoder behavior and real pretrained forward/backward.
-2. Validate the DSM source snapshot, feature grid, train-only statistics and
+1. [x] Verify residual/decoder behavior and real pretrained forward/backward.
+2. [x] Validate the DSM source snapshot, feature grid, train-only statistics and
    refit bundle boundaries; preserve previous split artifacts.
-3. Run the CUDA small-fit and timing pilot before freezing the selection schedule.
-4. Select on 18/6, confirm the winner, continue on 24, then score 14 once.
+3. [x] Run the CUDA small-fit and timing pilot before freezing the selection schedule.
+4. [x] Select on 18/6 and verify the seed-43 confirmation against all four floors.
+5. [x] Continue the locked seed-42 checkpoint on 24 scenes; verify the final
+   update-1,152 weights, bundle, optimizer state and artifact inventory.
+6. [ ] Score the 14 held-out scenes once and independently recompute all metrics
+   on 467,862,855 valid pixels; verify the final checkpoint and attempt binding.
+7. [ ] Record final results, budget and limitations in the README and artifact
+   review, validate the documentation and commit the task-owned changes.
