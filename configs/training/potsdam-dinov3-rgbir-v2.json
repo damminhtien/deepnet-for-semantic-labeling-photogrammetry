@@ -1,0 +1,164 @@
+{
+  "schema_version": 2,
+  "study_id": "potsdam-dinov3-rgbir-v2",
+  "selection_split_hash": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd",
+  "validation_pixels": 199409714,
+  "heldout_pixels": 467862855,
+  "reference_validation_confusion": [
+    [
+      53201334,
+      478063,
+      1624060,
+      663647,
+      48952,
+      458253
+    ],
+    [
+      495914,
+      66252002,
+      245457,
+      146584,
+      1606,
+      263494
+    ],
+    [
+      1271264,
+      291066,
+      33608490,
+      2955417,
+      1557,
+      284667
+    ],
+    [
+      454734,
+      160404,
+      1467632,
+      26769080,
+      70816,
+      82492
+    ],
+    [
+      14254,
+      12159,
+      643,
+      17346,
+      3027052,
+      18692
+    ],
+    [
+      1103388,
+      632395,
+      748615,
+      105669,
+      43271,
+      2389245
+    ]
+  ],
+  "reference_checkpoint_sha256": "953d91bf89cfdb1add0755659632bf2b427c127bba311e68ef8f8a10bca6cd54",
+  "window_size": [
+    512,
+    512
+  ],
+  "stride": [
+    256,
+    256
+  ],
+  "global_batch": 4,
+  "seed": 42,
+  "confirmation_seed": 43,
+  "models": {
+    "B": "dinov3-vitb16-rgbir-v2",
+    "L": "dinov3-vitl16-rgbir-sat-v2"
+  },
+  "sampling": {
+    "rare_fraction_per_class": 0.16666666666666666,
+    "center_jitter": 96
+  },
+  "augmentation": {
+    "baseline": {
+      "affine_probability": 0.25,
+      "rotation": 6,
+      "scale": [
+        0.95,
+        1.05
+      ],
+      "translation": 0.02,
+      "halo": 96,
+      "gain_probability": 0.25,
+      "gain_range": [
+        0.95,
+        1.05
+      ],
+      "gamma_probability": 0,
+      "gamma_range": [
+        1,
+        1
+      ],
+      "noise_probability": 0,
+      "noise_std": 0,
+      "dsm_dropout": 0
+    },
+    "enhanced": {
+      "affine_probability": 0.35,
+      "rotation": 10,
+      "scale": [
+        0.9,
+        1.1
+      ],
+      "translation": 0.03,
+      "halo": 96,
+      "gain_probability": 0.3,
+      "gain_range": [
+        0.9,
+        1.1
+      ],
+      "gamma_probability": 0.15,
+      "gamma_range": [
+        0.9,
+        1.1
+      ],
+      "noise_probability": 0.1,
+      "noise_std": 0.005,
+      "dsm_dropout": 0.1
+    }
+  },
+  "optimizer": {
+    "learning_rates": {
+      "lora": 0.0001,
+      "input_adapter_and_decoder": 0.0003
+    },
+    "weight_decay": 0.01
+  },
+  "execution": {
+    "mixed_precision": "float16",
+    "gradient_clip_norm": 1,
+    "num_workers": 2,
+    "prefetch_factor": 2
+  },
+  "loss": {
+    "ignore_index": 6,
+    "cross_entropy_weight": 0.7,
+    "soft_dice_weight": 0.3
+  },
+  "inference": {
+    "minimum_tta_oa_gain": 0.001,
+    "available_policies": [
+      "identity",
+      "hflip"
+    ]
+  },
+  "gpu_hours": {
+    "preflight": 2,
+    "selection": 16,
+    "refit": 2,
+    "heldout": 2,
+    "reserve": 2,
+    "total": 24
+  },
+  "small_fit": {
+    "minimum_miou": 0.9,
+    "max_updates": 512,
+    "patches": 8
+  },
+  "oa_goal": 0.99
+}
