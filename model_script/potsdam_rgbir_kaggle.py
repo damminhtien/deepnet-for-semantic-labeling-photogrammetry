@@ -199,14 +199,18 @@ def main():
                     }
                 )
         (WORK / "output-index.json").write_text(json.dumps({"files": files}) + "\n")
+        torch = sys.modules.get("torch")
+        devices = (
+            torch.cuda.device_count() if torch is not None else SETTINGS["allocation"]
+        )
         marker = {
             "study_id": "potsdam-dinov3-rgbir-v2",
             "phase": phase,
             "status": status,
             "source_sha256": SETTINGS["source_sha256"],
-            "allocated_devices": SETTINGS["allocation"],
-            "execution_gpu_seconds": SETTINGS["allocation"]
-            * (time.monotonic() - STARTED),
+            "allocated_devices": devices,
+            "allocation_verified": torch is not None,
+            "execution_gpu_seconds": devices * (time.monotonic() - STARTED),
         }
         (WORK / "rgbir-phase.json").write_text(json.dumps(marker, indent=2) + "\n")
 
