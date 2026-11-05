@@ -594,3 +594,41 @@ Document verified segmentation evaluations and research, then push the resulting
 - A's live log reaches update 1,088/6,912 after the first complete coverage pass.
   Coordinator PID 8664 remains active. Selection/confirmation/refit/benchmark
   milestones remain open; do not report a new OA or infer it from the small fit.
+
+## DINOv3 A selection audited and B started — 2026-11-05
+
+- A version 1 completed on Kaggle. The earlier chat-owned coordinator/log follower
+  stopped after the preceding turn; B had not been submitted. Preserve those
+  receipts/logs. Retrieved A after a fresh COMPLETE check and independently
+  verified indexed files, source/protocol hashes, checkpoint step and finite
+  tensors. No completed phase was resubmitted.
+- A update 6,912 is eligible on exactly 199,409,714 validation pixels: OA
+  93.0440866085%, mIoU 80.7497737355%, car IoU 93.9552359161%, clutter IoU
+  43.8339148923%. Versus old C seed 42 the deltas are +0.1463/+1.1854/+0.9967/
+  +4.8588 percentage points. Update 3,456 fails the OA floor. Best SHA-256 is
+  `fbc022c284b42ed0a4a9a25397e9fa502267b549b2c10164b8a0b196fad066fb`.
+- Recomputed all 30 saved train/probe/full/per-scene matrices and verified the
+  6,993,985,512 valid-pixel presentations sum. A makes 13,870,767 validation
+  errors, 291,744 fewer than the reference (2.06% reduction). This is validation,
+  not a new benchmark score or isolated backbone effect.
+- A's full execution cost is 2.9335358 allocated GPU-hours, charging both T4s.
+  Completed preflight+A total 3.3260785; running B consumption is additional.
+  Validation takes 542.1253 seconds / (4,301.9162 train + 542.1253 validation),
+  or 11.19%. Frozen model source and protocol hashes remain unchanged.
+- Started the independent user launchd job
+  `local.deepnet.potsdam-dinov3-rgbir-v2` (PID 6324, parent PID 1). Its external
+  plist/logs are under `kaggle/campaign-launchd.*`; it stops on failure without
+  automatically retrying a gate. B version 1 was accepted at 19:15:43 Singapore
+  time; a fresh Kaggle check reports RUNNING. Selection/confirmation/refit and
+  benchmark milestones remain pending. Do not open the benchmark yet.
+- Fresh remote B logs verify both allocated GPUs, pinned model loading and
+  optimizer update 128/6,912 at 19:20:00 Singapore time. Launchd coordinator
+  remains alive with parent PID 1; current `campaign.pid` and a separate recovery
+  receipt record the new owner without removing earlier chat-owned evidence.
+- Review: docs/experiments/potsdam-dinov3-rgbir-v2-selection-review-2026-11-05.md.
+  External `review-selection/` contains the derived analysis, class/scene CSVs,
+  input hashes and review inventory. Dataset, cache, weights and logs remain
+  outside Git; the pre-existing PSPNet status edit remains unstaged.
+- Documentation checks pass: 34 local links, reported metrics/cost/exposure values,
+  review artifact hashes and Pandoc parsing. `git diff --check` passes. No model,
+  data or training source changed; no training tests or GPU phases were repeated.

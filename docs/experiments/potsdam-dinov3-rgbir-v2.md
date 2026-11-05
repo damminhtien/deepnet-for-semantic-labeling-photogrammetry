@@ -8,7 +8,10 @@ claim about the new code.
 
 The implementation, offline checks and [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
 are complete. The frozen schedule uses ViT-B for eight passes per run; L passes
-the quality gates but exceeds the six-pass cost limit. Configuration A is running.
+the quality gates but exceeds the six-pass cost limit. Configuration A has
+completed and passed all four validation floors; B is running. The
+[selection review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-05.md) records
+A's verified metrics and accounting.
 Selection, confirmation, refit and benchmark results must be read from the new
 campaign's audited artifacts. Offline smoke and small-fit tests establish no
 validation or benchmark accuracy.
