@@ -27,8 +27,12 @@ records the checkpoint, independently recomputed metrics and remaining errors.
 The new [DINOv3 RGBIR campaign](docs/experiments/potsdam-dinov3-rgbir-v2.md)
 has verified 38 RGBIR sources and real offline pretrained forward/backward for
 ViT-B/16 and satellite ViT-L/16. Its data/model/runner code has passed local
-regression checks. CUDA fit, throughput and accuracy remain subject to the new
-preflight and selection gates. It uses 512-pixel windows, stride 256 and RGB
+regression checks. The [GPU preflight](docs/experiments/potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
+passed: B reached 95.39% train mIoU on eight fixed patches, and cached full-scene
+inference matched Rasterio exactly while taking 3.17 times less time. The locked
+schedule uses B for eight passes per arm; L exceeds the budget. Configuration A
+is running, so new validation/benchmark accuracy remains unmeasured.
+The campaign uses 512-pixel windows, stride 256 and RGB
 encoder inputs; the DINOv2 tables below retain their original 504/252 protocol.
 
 The RGBIR source audit also found that the historical three-band files match

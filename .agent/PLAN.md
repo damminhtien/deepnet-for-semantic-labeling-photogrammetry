@@ -8,7 +8,7 @@
    immutable bindings, budget pilot, resume and final-only scoring guards.
 4. [x] Run focused regression checks, real-data cache/model checks, and update
    docs/Graphify; commit changes by subsystem.
-5. [ ] Package private Kaggle inputs and run the CUDA preflight within two GPU-hours;
+5. [x] Package private Kaggle inputs and run the CUDA preflight within two GPU-hours;
    freeze model roster and the common 12/8/6-pass schedule only if gates pass.
 6. [ ] Run eligible selection arms and seed 43 within 16 GPU-hours; lock TTA/recipe.
 7. [ ] Refit 24 scenes for 1,152 updates, score once if eligible, audit artifacts,

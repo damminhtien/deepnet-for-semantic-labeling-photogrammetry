@@ -555,3 +555,42 @@ Document verified segmentation evaluations and research, then push the resulting
 - The 36-patch initialization panel has RGB means 0.329278/0.349322/0.320644;
   all channels have zero nonfinite values and zero fraction beyond identity
   bounds before/after normalization. This is an input diagnostic, not accuracy.
+- Preflight v1 failed before model loading because the source allowlist omitted
+  `semantic_labeling.constants`. Its zero-update artifacts and 44.3164 allocated
+  GPU-seconds are preserved under `kaggle/preflight-failed-v1`. Fixed packaging
+  and added an isolated archive-import regression; all 75 unit tests pass.
+  The retry carries that charge into its preflight budget, rather than resetting
+  accounting. No selection protocol was frozen by the failed attempt.
+- Submitted preflight v2 once at 08:35:34 UTC. Its runner source hash is
+  `050ba61e3d018f643bf5c463e605f551da093f13172f287dba587a1d7c04d466`.
+  Fresh remote logs show two allocated GPUs, successful real weight loading and
+  32 small-fit updates with train mIoU 0.899029. The 0.90 quality gate and full
+  throughput gate are still pending. The current coordinator PID is 8214.
+- Preflight v2 completed and the local audit verified report/budget inventories,
+  source, protocol and train-index bindings. B passes small fit at 64 updates
+  (95.3932% mIoU); satellite L passes at 32 (90.9492%). Both real backend checks
+  pass, including frozen base parameters and 48/96 LoRA B gradients.
+- Locked protocol
+  `db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d`:
+  A/B/C and seed 43 use ViT-B, eight passes / 6,912 updates per run, full
+  validation only at passes 4/8 (updates 3,456/6,912). B's eight-pass forecast
+  with 25% headroom is 3.7062 GPU-hours; twelve passes need 5.3072. L's six-pass
+  forecast is 5.7650 GPU-hours versus its 3.2-hour allowance, so L is excluded.
+- Cached and Rasterio inference yield identical matrices on all 33,463,460
+  scored pixels of scene 4_12. Latency is 28.2614 versus 89.5161 seconds
+  (3.1674x speedup). Source I/O/preprocessing falls from 61.23 to 2.15 seconds;
+  forward remains about 18 seconds. Overlap costs 3.0907x non-overlap.
+- Reconciled accounting with complete Kaggle execution logs, including notebook
+  finalization: v1/v2 cost 0.0150355/0.3775072 allocated GPU-hours, total
+  0.3925426. Original worker-only receipts remain preserved. The coordinator
+  now uses this complete scope for the global budget; its current PID is 8664.
+- A version 1 was submitted once at 08:48:09 UTC and is running from fresh
+  pretrained weights. New validation/benchmark accuracy is still unmeasured.
+  Pilot review: docs/experiments/potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md.
+- Latest local verification: 76 unit tests pass; focused Ruff, format and
+  `git diff --check` pass. The review's local links and reported protocol/timing
+  values were mechanically checked against the audited JSON. Graphify's ignored
+  graph has 1,475 nodes / 4,473 edges. Frozen runner source still matches 050ba61e.
+- A's live log reaches update 1,088/6,912 after the first complete coverage pass.
+  Coordinator PID 8664 remains active. Selection/confirmation/refit/benchmark
+  milestones remain open; do not report a new OA or infer it from the small fit.

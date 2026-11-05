@@ -6,9 +6,12 @@ This campaign implements the protocol approved on 2026-11-05. It has a new
 require about 88.26% fewer errors. This is a research target, not an acceptance
 claim about the new code.
 
-The implementation and offline checks are complete. CUDA fit, throughput,
-selection, confirmation, refit and benchmark results must be read from the new
-campaign's audited artifacts. Offline smoke tests establish no trained accuracy.
+The implementation, offline checks and [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
+are complete. The frozen schedule uses ViT-B for eight passes per run; L passes
+the quality gates but exceeds the six-pass cost limit. Configuration A is running.
+Selection, confirmation, refit and benchmark results must be read from the new
+campaign's audited artifacts. Offline smoke and small-fit tests establish no
+validation or benchmark accuracy.
 
 ## Sources and the historical channel discrepancy
 
