@@ -6,19 +6,21 @@ This campaign implements the protocol approved on 2026-11-05. It has a new
 require about 88.26% fewer errors. This is a research target, not an acceptance
 claim about the new code.
 
-The implementation, offline checks and [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
-are complete. The frozen schedule uses ViT-B for eight passes per run; L passes
-the quality gates but exceeds the six-pass cost limit. A/B/C have completed and
-passed all four validation floors; A wins the seed-42 ranking. D confirms A's
-RGB recipe with seed 43 at 92.9477% OA and 80.4596% mIoU. The
+The implementation, offline checks, [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md),
+selection, confirmation, refit and single benchmark are complete. The frozen
+schedule uses ViT-B for eight passes per run; L passes the quality gate but
+exceeds the six-pass cost limit. A wins and seed 43 confirms RGB with baseline
+augmentation. Horizontal-flip TTA fails the declared gain threshold, so identity
+inference stays locked. The
 [selection summary](potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md)
-records the verified confirmation, rejected TTA and selection lock. Identity
-inference is frozen; the 24-scene refit cache is being prepared. The earlier
-[A/B review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md) retains the
-observed reboot recovery.
-Selection, confirmation, refit and benchmark results must be read from the new
-campaign's audited artifacts. Offline smoke and small-fit tests establish no
-validation or benchmark accuracy.
+retains the pre-refit decisions; the
+[final artifact review](potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md)
+verifies the exact update-1,152 checkpoint and benchmark OA **92.0397%** /
+mIoU **81.0932%** on 467,862,855 pixels. The OA 99% goal remains
+unmet by 6.9603 points. Full recorded execution cost is
+13.4557472 allocated GPU-hours. Historical artifacts and the earlier
+[A/B review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md) are preserved.
+Offline smoke and small-fit tests establish no validation or benchmark accuracy.
 
 ## Sources and the historical channel discrepancy
 

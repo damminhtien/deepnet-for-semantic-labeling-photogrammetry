@@ -8,6 +8,11 @@ After seed-43 confirmation, continue seed 42 on all 24 participant-label scenes
 for exactly 1,152 updates and score the locked final model once. OA >=99% is a
 research target; report measured outcomes and preserve negative results.
 
+Completed on 2026-11-06: final update-1,152 checkpoint scored once on the
+historical 14-scene benchmark. Independent OA is 92.0397%, six-class mIoU 81.0932%
+on 467,862,855 pixels; total allocation is 13.4557472 GPU-hours. OA 99% remains
+unmet by 6.9603 points. See the final 2026-11-06 DINOv3 artifact review.
+
 Keep historical artifacts immutable. Use the previous C validation confusion
 matrix as the four-metric eligibility reference. Historical test results have
 already been observed; do not describe the 14-scene benchmark as fresh holdout.

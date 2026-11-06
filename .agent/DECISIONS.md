@@ -15,6 +15,22 @@
 - Keep all source/data/weight uploads private and all large artifacts outside
   Git. Local static/offline checks do not establish CUDA throughput or accuracy.
 
+## Frozen selection — 2026-11-06
+
+- A wins the eight-pass seed-42 ranking and D passes the same four floors with
+  seed 43. Continue A's RGB/baseline-augmentation weights for the exact refit.
+- Keep identity inference with 512/256 overlap. Hflip improves OA by only
+  0.0785799/0.0689946 point, below the required 0.1 for either seed. Preserve
+  these measured negative TTA decisions; do not revise the threshold afterward.
+- The canonical selection-lock hash is
+  `6408c4737250c4bc0c0d27a28b6e325b4928ed38e7cfc49ec0a203c524d998b8`.
+  Cache preparation and upload recovery do not change this lock or the protocol.
+
+- Final benchmark is complete with the update-1,152 refit weights and identity
+  policy: OA 92.0397%, mIoU 81.0932%, evaluation count one. Retain the measured
+  car-IoU regression and the two scene-OA regressions. OA 99% is unmet; this
+  completed campaign does not revise its frozen selection using benchmark labels.
+
 ## Completed preceding campaign decisions — 2026-10-31
 
 - The user's request to run DINOv2 supersedes the completed audit task's temporary

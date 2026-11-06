@@ -13,7 +13,7 @@
 6. [x] Run eligible selection arms and seed 43 within 16 GPU-hours; lock TTA/recipe.
    A wins and D confirms all four floors. TTA gains less than 0.1 OA point for
    both seeds, so the locked policy is identity with 512/256 overlap inference.
-7. [ ] Refit 24 scenes for 1,152 updates, score once if eligible, audit artifacts,
+7. [x] Refit 24 scenes for 1,152 updates, score once if eligible, audit artifacts,
    report measured results and allocated GPU-hours, and commit final task state.
 
 ## Completed DINOv2 full-run milestones

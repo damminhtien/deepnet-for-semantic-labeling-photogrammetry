@@ -823,3 +823,54 @@ Document verified segmentation evaluations and research, then push the resulting
 - All 19 focused RGBIR tests pass in 12.90 seconds, including default benchmark
   source routing. Ruff, git diff --check and code-only Graphify update . pass;
   the ignored graph has 1,512 nodes / 4,522 edges.
+
+## DINOv3 benchmark cache and execution — 2026-11-06
+
+- Coordinator PID 11318 resumes with source-path fix c873b2c. Refit is audited;
+  the scientific source/protocol/selection lock remain unchanged. The independent
+  benchmark cache audit verifies 73 files / 5,544,040,723 bytes, all 14 scene
+  histograms and exactly 467,862,855 scored pixels. All 42 source patch panels
+  match image/labels/masks. DSM's missing 3_13 column stays zero without reducing
+  scoring support. Receipt: review-final-20261106/benchmark-cache-audit.json.
+- Cache hash: a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4.
+  Private benchmark-input upload is in progress with a submitting receipt.
+  Preserve that receipt and wait for acceptance/readiness; do not duplicate it.
+  Completed allocation ledger is 13.1630665 GPU-hours before benchmark execution.
+- Kaggle accepted the private heldout input dataset at 20:36:41 Singapore time.
+  Upload receipt is accepted and cache-bound; the coordinator waits for server
+  processing to reach ready. No benchmark receipt or evaluation attempt exists yet.
+- Dataset became ready and the sole benchmark notebook heldout-run version 1
+  was accepted at 20:39:36 and RUNNING at 20:39:38 Singapore time. Package SHA-256:
+  3cc43ba665e00d1fb7d5c2ffab2166c4aa52c52292ed8eac771197ae8d5c7ef5.
+  The coordinator follows this existing receipt; a read-only follower writes
+  kaggle/heldout/live-20261106.log. Do not submit or evaluate a second checkpoint.
+- Benchmark COMPLETE at 20:48:38, audited at 20:48:49 Singapore time. All three
+  indexed files match their hashes. Independent review recomputes 45 aggregate/
+  scene matrices across new DINOv3, historical DINOv2 refit and SAM, without new
+  inference. Attempt count is one, bound to the final refit SHA and identity.
+- Final OA 92.0397143%, mIoU 81.0931796% on 467,862,855 pixels. Versus DINOv2
+  refit: +0.5612033 OA points / +1.4810292 mIoU points / 2,625,662 fewer errors.
+  OA improves on 12/14 scenes and IoU on 5/6 classes; preserve car IoU -0.2816221
+  point and scene 5_13/5_14 OA regressions. Clutter IoU is 48.4382503%, +6.0635296
+  points. OA 99% is unmet by 6.9602857 points: 32,564,592 errors must still be
+  removed (87.44% of the remaining 37,243,220).
+- End-to-end scoring takes 405.2340 seconds. Full benchmark execution uses
+  0.2926808 GPU-hours; all attempts/phases total 13.4557472 / 24 allocated GPU-hours,
+  including bootstrap, failed preflight, provider wrapper and both T4s. These
+  are recorded execution scopes rather than a provider billing export.
+- Independent source/cache/refit/final arithmetic, class/scene CSVs, PNG/PDF and
+  review scripts are preserved in review-final-20261106/. Report figure was
+  visually checked and copied byte-for-byte into docs/experiments/figures/.
+  Winning-path pixel presentations are 8,159,728,531 vs historical 4,575,287,363
+  (1.7834x), so accuracy differences do not isolate the backbone or refit effect.
+- Fresh Kaggle status confirms benchmark COMPLETE. The finished coordinator
+  service was unloaded and its matching-SHA LaunchAgent removed at 20:51:20;
+  receipt kaggle/coordinator-cleanup-20261106.json preserves the exact identity.
+  Campaign milestones are complete; no further benchmark tuning is performed.
+- Final README/runbook/review validation passes: 41 local links, 185 numeric/hash
+  checks, three Pandoc parses and all 12 derived inventory files. Figure SHA-256
+  is 2bf2f03db61bc51d8e00e6e6115383abec12094258a5f5843cada075d4427a6b
+  (121,071 bytes, 2608x1071), identical to the external visually reviewed source.
+  Receipt: kaggle/documentation-checks-final-20261106.json. Ruff, all 19 focused
+  tests and code-only Graphify refresh were completed with the source-path fix;
+  final changes are reporting/task state only. Preserve the unrelated PSPNet edit.
