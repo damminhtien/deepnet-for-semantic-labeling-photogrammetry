@@ -672,3 +672,50 @@ Document verified segmentation evaluations and research, then push the resulting
   links, 37 reported numeric/hash tokens, five review hashes, input finiteness,
   Pandoc parsing and `git diff --check`. No model/training source or experiment
   configuration changed, and no GPU phase or training test was repeated.
+
+## DINOv3 seed-42 selection and confirmation — 2026-11-06
+
+- C version 1 completed and its original artifact inventory was audited before
+  D was submitted. Its selected update-6,912 checkpoint is eligible: OA
+  92.9690401141%, mIoU 80.5115357187%, car IoU 94.0595100963%, clutter IoU
+  42.6426197882%. SHA-256 is
+  `4d5bf3453a8466fb4d47869dd5066a1ffd677c05c2493561a16b51176eda6d58`.
+- A wins the frozen seed-42 ranking. C minus A is -0.0750/-0.2382/+0.1043/
+  -1.1913 percentage points; C makes 149,650 additional validation errors.
+  Enhanced augmentation does not improve OA/mIoU at this eight-pass budget.
+  All pass-four OAs fail the historical floor; all three pass-eight checkpoints
+  pass all four floors. Neither schedule nor ranking was changed after results.
+- Independently rechecked all 90 saved A/B/C confusion matrices, phase inventories,
+  checkpoint hashes, exposure sums and finite full-validation input diagnostics.
+  C has 6,991,404,308 actual valid-pixel presentations (2,581,204 fewer than A,
+  below 0.04%); all source coverage windows remain scheduled. Source 050ba61e
+  and protocol db177017 remain unchanged.
+- D version 1 was accepted at 14:55:24 Singapore time and audited at 16:33:38.
+  A's RGB/baseline-augmentation recipe passes seed 43: OA 92.9477061484%, mIoU
+  80.4595739060%, car IoU 93.7906857975%, clutter IoU 42.8663844969%. Its selected
+  update-6,912 checkpoint SHA-256 is
+  `7dc88b20879b950af86e0fb1665c9b790d1338530ea7306207ab46541c7c341a`.
+- Hflip TTA gains 0.0785799/0.0689946 OA point for seeds 42/43 and preserves
+  the other three metrics, but both gains fail the declared >=0.1-point gate.
+  Identity inference is frozen, retaining 512/256 overlap. Canonical lock hash:
+  `6408c4737250c4bc0c0d27a28b6e325b4928ed38e7cfc49ec0a203c524d998b8`.
+  Both seeds qualify; milestone 6 is complete. Do not switch to TTA afterward.
+- Independently verified all 134 history/TTA confusion matrices, four original
+  phase inventories, finite input panels, exposures and selection-lock bindings.
+  External review-confirmation-20261106/ preserves analysis/CSV/inventory.
+  D cost 3.2084227 allocated GPU-hours including 0.3278253 inner TTA hours; do
+  not double-count TTA. All completed phases, including failed preflight v1,
+  total 12.5675127 allocated GPU-hours. Source/protocol hashes are unchanged.
+- Prepared docs/experiments/potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md
+  and a small report PNG under docs/experiments/figures/. The PNG was visually
+  inspected and matches the external original byte-for-byte; the PDF stays
+  external. New review-selection-abc-20261106/ preserves derived analysis,
+  class/scene CSVs, PNG/PDF and inventories. Earlier reports/artifacts remain.
+- Coordinator PID 1210 is building refit-cache from the historical locked
+  train-only 24-scene participant bundle. Wait for the cache manifest and remote
+  receipt; do not submit a duplicate. Refit must continue A seed 42 for exactly
+  1,152 updates, reset optimizer/scaler, and use the frozen half learning rates.
+  Benchmark stays closed until that final checkpoint is complete and hash-locked.
+  No model/training source changed. Documentation checks pass: 39 local links,
+  42 numeric/hash tokens, seven review-file hashes, PNG identity, three Pandoc
+  parses and git diff --check. The 134-matrix independent artifact review passes.

@@ -8,11 +8,14 @@ claim about the new code.
 
 The implementation, offline checks and [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
 are complete. The frozen schedule uses ViT-B for eight passes per run; L passes
-the quality gates but exceeds the six-pass cost limit. A and B have completed
-and passed all four validation floors. A ranks higher, so C is running from
-pretrained with A's RGB recipe and enhanced augmentation. The
-[A/B selection review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md)
-records the verified metrics, accounting and reboot recovery.
+the quality gates but exceeds the six-pass cost limit. A/B/C have completed and
+passed all four validation floors; A wins the seed-42 ranking. D confirms A's
+RGB recipe with seed 43 at 92.9477% OA and 80.4596% mIoU. The
+[selection summary](potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md)
+records the verified confirmation, rejected TTA and selection lock. Identity
+inference is frozen; the 24-scene refit cache is being prepared. The earlier
+[A/B review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md) retains the
+observed reboot recovery.
 Selection, confirmation, refit and benchmark results must be read from the new
 campaign's audited artifacts. Offline smoke and small-fit tests establish no
 validation or benchmark accuracy.
