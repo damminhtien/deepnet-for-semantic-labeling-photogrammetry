@@ -11,6 +11,8 @@
 5. [x] Package private Kaggle inputs and run the CUDA preflight within two GPU-hours;
    freeze model roster and the common 12/8/6-pass schedule only if gates pass.
 6. [ ] Run eligible selection arms and seed 43 within 16 GPU-hours; lock TTA/recipe.
+   A/B are complete and eligible; A ranks first. C is running with A's RGB recipe
+   and enhanced augmentation. Seed 43 and the inference lock remain pending.
 7. [ ] Refit 24 scenes for 1,152 updates, score once if eligible, audit artifacts,
    report measured results and allocated GPU-hours, and commit final task state.
 

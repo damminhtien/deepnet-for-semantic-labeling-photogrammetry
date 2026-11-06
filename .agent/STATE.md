@@ -632,3 +632,43 @@ Document verified segmentation evaluations and research, then push the resulting
 - Documentation checks pass: 34 local links, reported metrics/cost/exposure values,
   review artifact hashes and Pandoc parsing. `git diff --check` passes. No model,
   data or training source changed; no training tests or GPU phases were repeated.
+
+## DINOv3 A/B comparison and reboot recovery — 2026-11-06
+
+- B version 1 completed all eight passes / 6,912 updates. Retrieved once after a
+  fresh COMPLETE check; phase audit verifies its original inventory, checkpoint,
+  finite tensors and unchanged source/protocol. Best SHA-256 is
+  `cfacfd341ccac5527f8622ea47149f116a372f79ed2ccff748dfa155dcbe1222`.
+- B is eligible against old C on 199,409,714 validation pixels: OA 92.9923403832%,
+  mIoU 80.6096711921%, car IoU 93.9180169238%, clutter IoU 43.4670312905%.
+  It trails A by 0.0517/0.1401/0.0372/0.3669 percentage points; all aggregate
+  class IoUs are slightly lower. B makes 103,187 more errors than A. The learned
+  auxiliary gate is active (raw -0.1867475, tanh -0.1846064); this paired seed
+  does not demonstrate benefit from the joint IR/index/DSM features.
+- Reverified A/B artifact inventories and all 60 saved confusion matrices. Both
+  arms have 6,993,985,512 actual valid-pixel presentations. B uses 3.2024464
+  allocated GPU-hours; completed preflight+A+B total 6.5285249. C consumption is
+  additional. Validation is 11.19%/9.25% of timed train+validation for A/B.
+- C version 1 was submitted once at 13:28:03 Singapore time, from pretrained
+  using A's RGB recipe with enhanced augmentation, as required by the ranking.
+  Remote logs verify update 1,408/6,912 at 13:45:46. Source remains 050ba61e and
+  protocol remains db177017; no schedule or selection threshold changed.
+- A machine restart removed the earlier session-only LaunchAgent. Installed the
+  task-owned plist at
+  /Users/macbook/Library/LaunchAgents/local.deepnet.potsdam-dinov3-rgbir-v2.plist.
+  A further actual restart at 13:39:38 verified automatic login recovery: PID
+  1210 / parent 1 resumes watching C version 1 without resubmitting it. KeepAlive
+  is false. External coordinator-recovery-20261106.json binds plist checksum,
+  boot time, PID and submission; older receipts/logs are preserved.
+- After the terminal campaign audit, unload this task-owned service and remove
+  its login plist only if the checksum matches the recovery receipt. Keep the
+  external receipts. C, seed-43 confirmation, refit and benchmark remain pending;
+  do not describe validation results as a new benchmark or open benchmark early.
+- New review: docs/experiments/potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md.
+  External review-selection-20261106/ contains derived analysis, class/scene CSVs
+  and their inventory. Preserve the earlier report and unrelated PSPNet edit.
+- Latest C log reaches update 1,600/6,912 at 13:47:52 Singapore time; login
+  coordinator PID 1210 remains alive. Documentation validation passes 35 local
+  links, 37 reported numeric/hash tokens, five review hashes, input finiteness,
+  Pandoc parsing and `git diff --check`. No model/training source or experiment
+  configuration changed, and no GPU phase or training test was repeated.

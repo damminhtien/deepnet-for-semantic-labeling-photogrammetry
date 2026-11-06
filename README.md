@@ -30,12 +30,13 @@ ViT-B/16 and satellite ViT-L/16. Its data/model/runner code has passed local
 regression checks. The [GPU preflight](docs/experiments/potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
 passed: B reached 95.39% train mIoU on eight fixed patches, and cached full-scene
 inference matched Rasterio exactly while taking 3.17 times less time. The locked
-schedule uses B for eight passes per arm; L exceeds the budget. Configuration A
-has completed and its [audited selection review](docs/experiments/potsdam-dinov3-rgbir-v2-selection-review-2026-11-05.md)
-reports **93.0441% validation OA and 80.7498% mIoU**, with car/clutter IoU
-93.9552%/43.8339%. All four metrics exceed the old C seed-42 reference; OA gains
-0.1463 percentage point. B is running. Selection and seed-43 confirmation remain
-open, and no new benchmark result is available.
+schedule uses ViT-B for eight passes per arm; L exceeds the budget. A and B
+have completed. Their [audited comparison](docs/experiments/potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md)
+keeps RGB-only A ahead at **93.0441% validation OA and 80.7498% mIoU**, versus
+92.9923%/80.6097% for B with IR, spectral index and DSM features. Both pass the
+old C seed-42 floors. C is running from pretrained with A's RGB recipe and
+enhanced augmentation. Selection and seed-43 confirmation remain open, and no
+new benchmark result is available.
 The campaign uses 512-pixel windows, stride 256 and RGB
 encoder inputs; the DINOv2 tables below retain their original 504/252 protocol.
 
