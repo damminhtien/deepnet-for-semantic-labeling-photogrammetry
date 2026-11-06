@@ -193,5 +193,8 @@ The coordinator resumes already audited phases, follows the frozen roster,
 stops on quality/confirmation failures, and creates role-specific private refit
 and benchmark inputs only after their gates. A submission/upload with an
 unconfirmed receipt requires remote reconciliation before another attempt.
+An accepted upload must match the cache hash and reach Kaggle's `ready` status
+before a kernel is submitted. Dataset processing errors or a 30-minute timeout
+stop this CPU-side wait; they do not start a GPU job or trigger another upload.
 Dataset/cache/checkpoint/log files stay outside Git; only DVC pointers, source,
 tests, configuration and documentation are committed.

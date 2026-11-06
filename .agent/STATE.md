@@ -719,3 +719,35 @@ Document verified segmentation evaluations and research, then push the resulting
   No model/training source changed. Documentation checks pass: 39 local links,
   42 numeric/hash tokens, seven review-file hashes, PNG identity, three Pandoc
   parses and git diff --check. The 134-matrix independent artifact review passes.
+
+## DINOv3 refit upload recovery — 2026-11-06
+
+- Commit 51c0cf0 records the confirmed selection, ABC figure and independent
+  134-matrix review. The unrelated PSPNet edit remains unstaged.
+- Refit cache is complete: hash
+  `28d7ee619dbac25dd182773acf84f778df452179cc22798078d33b0c8b26226e`,
+  123 verified files / 9,504,069,222 bytes. Its exact 24 participant-label scenes
+  contain 864,000,000 valid pixels and no benchmark scene. Reconstructed sampling
+  has 3,456 base windows + 576 car + 576 clutter = 1,152 optimizer updates.
+  Independent receipt: review-confirmation-20261106/refit-cache-review.json.
+- The upload was interrupted before confirmation. The coordinator stopped on
+  its submitting receipt instead of duplicating the upload or opening refit.
+  Fresh authenticated Kaggle owner inventory at 19:12 Singapore time contained
+  only selection inputs; refit status/files were unavailable, and D remained
+  COMPLETE. No refit submission exists and no additional GPU phase was charged.
+- Preserved the unconfirmed receipt and remote inventory in timestamped files
+  under kaggle/. A single private create retry started at 19:12:12 using the
+  same cache and package; log input-refit-upload-recovery-20261106T111212Z.log.
+  Wait for accepted receipt and dataset readiness before kickstarting the
+  existing coordinator. Do not create a second dataset or launch refit manually.
+- The private create retry was accepted. Added transport-only wait_inputs() to
+  verify the accepted cache-bound receipt and wait up to 30 minutes for Kaggle
+  ready before refit/benchmark submission. Processing failure/timeout stops;
+  no upload is retried by this wait. Training source/protocol hashes remain
+  050ba61e/db177017 and the canonical selection lock remains 6408c473.
+- Ruff check/format and git diff --check pass. All 15 tests in
+  tests/unit/test_potsdam_rgbir.py pass in 13.04 seconds, including five new
+  readiness/receipt cases. The sandbox run was interrupted at the existing
+  two-worker IPC check after ten passes; the same full file passes outside
+  the sandbox, with no test skipped. Graphify update . completes code-only:
+  1,502 nodes / 4,500 edges; generated graph remains ignored.

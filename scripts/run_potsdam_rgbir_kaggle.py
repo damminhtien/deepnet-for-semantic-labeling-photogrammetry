@@ -376,6 +376,34 @@ def _phase(run, phase, cache, allowance):
     audit(run, phase, await_phase(run, phase))
 
 
+def wait_inputs(run, phase, cache_hash, *, timeout=1800):
+    """Wait for an accepted, matching private dataset to finish processing."""
+    receipt = read_json(run / "kaggle" / f"input-{phase}-receipt.json")
+    if receipt != {"status": "accepted", "cache_hash": cache_hash}:
+        raise ValueError("Private upload receipt needs reconciliation")
+    deadline, previous = time.monotonic() + timeout, None
+    while True:
+        result = kaggle("datasets", "status", _slug(phase), check=False)
+        output = (result.stdout + result.stderr).strip()
+        lines = result.stdout.strip().splitlines()
+        status = (
+            lines[-1].strip().lower()
+            if lines and not result.returncode
+            else "unavailable"
+        )
+        if status == "ready":
+            return
+        if status in {"error", "failed"}:
+            raise RuntimeError(f"Private {phase} dataset failed processing: {output}")
+        if status != previous:
+            log(f"Private {phase} inputs: {status}; waiting before submission")
+            previous = status
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError(f"Private {phase} dataset is not ready: {output}")
+        time.sleep(min(30, remaining))
+
+
 def phase_inputs(data, run, phase):
     """Create private refit/benchmark inputs only after the relevant model gate."""
     protocol = load_protocol(run / "study")
@@ -449,8 +477,7 @@ def phase_inputs(data, run, phase):
         write_json(
             receipt, {"status": "accepted", "cache_hash": cache.manifest["cache_hash"]}
         )
-    if read_json(receipt)["status"] != "accepted":
-        raise ValueError("An unconfirmed private upload needs reconciliation")
+    wait_inputs(run, phase, cache.manifest["cache_hash"])
     return cache_path
 
 

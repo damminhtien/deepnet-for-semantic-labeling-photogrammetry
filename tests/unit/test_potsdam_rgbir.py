@@ -72,6 +72,76 @@ def test_gpu_accounting_includes_provider_wrapper_after_worker_exit(tmp_path):
     assert result["execution_log_sha256"] == sha256_file(tmp_path / "kernel.log")
 
 
+def test_private_inputs_wait_for_ready_without_reupload(tmp_path, monkeypatch):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    wait = runpy.run_path(str(script))["wait_inputs"]
+    write_json(
+        tmp_path / "kaggle/input-refit-receipt.json",
+        {"status": "accepted", "cache_hash": "locked"},
+    )
+    results = iter(
+        [
+            SimpleNamespace(returncode=0, stdout="processing\n", stderr=""),
+            SimpleNamespace(returncode=1, stdout="", stderr="403 processing"),
+            SimpleNamespace(returncode=0, stdout="CLI warning\nready\n", stderr=""),
+        ]
+    )
+    calls, sleeps = [], []
+
+    def remote(*args, **kwargs):
+        calls.append(args)
+        assert kwargs == {"check": False}
+        return next(results)
+
+    monkeypatch.setitem(wait.__globals__, "kaggle", remote)
+    monkeypatch.setattr(wait.__globals__["time"], "sleep", sleeps.append)
+    wait(tmp_path, "refit", "locked")
+    assert len(calls) == 3 and all(c[:2] == ("datasets", "status") for c in calls)
+    assert sleeps == [30, 30]
+
+
+@pytest.mark.parametrize("status", ["error", "processing"])
+def test_private_inputs_stop_before_submission_when_not_ready(
+    tmp_path, monkeypatch, status
+):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    wait = runpy.run_path(str(script))["wait_inputs"]
+    write_json(
+        tmp_path / "kaggle/input-heldout-receipt.json",
+        {"status": "accepted", "cache_hash": "locked"},
+    )
+    monkeypatch.setitem(
+        wait.__globals__,
+        "kaggle",
+        lambda *args, **kwargs: SimpleNamespace(returncode=0, stdout=status, stderr=""),
+    )
+    error = RuntimeError if status == "error" else TimeoutError
+    with pytest.raises(error, match="Private heldout dataset"):
+        wait(tmp_path, "heldout", "locked", timeout=0)
+
+
+@pytest.mark.parametrize(
+    "receipt",
+    [
+        {"status": "submitting", "cache_hash": "locked"},
+        {"status": "accepted", "cache_hash": "different"},
+    ],
+)
+def test_private_inputs_require_confirmed_matching_receipt(
+    tmp_path, monkeypatch, receipt
+):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    wait = runpy.run_path(str(script))["wait_inputs"]
+    write_json(tmp_path / "kaggle/input-refit-receipt.json", receipt)
+    monkeypatch.setitem(
+        wait.__globals__,
+        "kaggle",
+        lambda *args, **kwargs: pytest.fail("Unconfirmed upload"),
+    )
+    with pytest.raises(ValueError, match="needs reconciliation"):
+        wait(tmp_path, "refit", "locked")
+
+
 def _cache(root, split=None):
     parent = _split()
     split = split or parent
