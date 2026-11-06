@@ -800,3 +800,26 @@ Document verified segmentation evaluations and research, then push the resulting
   pass in 12.84 seconds, with Ruff and git diff --check passing.
 - Graphify update . completes code-only with 1,509 nodes / 4,518 edges;
   generated graph files remain local and ignored.
+
+## DINOv3 refit verified and benchmark source — 2026-11-06
+
+- Resumed coordinator PID 11099 using commit 4898f07 and the accepted refit-run
+  version-1 receipt. Refit artifact audit completed at 20:08:47 Singapore time;
+  all five files match hashes. Full execution cost is 0.5955538 GPU-hours.
+- Independent review-final-20261106/refit-audit.json verifies exact update 1,152,
+  one pass, train-only history, final/last model equality, 211 unchanged backbone
+  tensors, and changes in 96 LoRA / 14 adapter / 80 decoder tensors. All 190
+  AdamW states are at step 1,152 with reset half learning rates. Initial input
+  diagnostics exactly match A's selected weights; the final panel is finite.
+  Final SHA-256: 5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420.
+- Coordinator stopped before creating the benchmark cache because it looked for
+  the frozen prepared bundle below the external data root. Corrected the
+  script's default path to ROOT/data/prepared/potsdam/post-selection-test-bundle.
+  No frozen model/data recipe changed and no benchmark was submitted.
+- Independently verified the actual source bundle: all 32 files, exactly 14 test
+  scenes, eroded labels and the original split hash. Bundle hash is
+  94043d3197bf42e7d33e5f8dc95d01efd2edab6994735ea7c403009d167d7918.
+  Receipt: review-final-20261106/benchmark-source-audit.json.
+- All 19 focused RGBIR tests pass in 12.90 seconds, including default benchmark
+  source routing. Ruff, git diff --check and code-only Graphify update . pass;
+  the ignored graph has 1,512 nodes / 4,522 edges.

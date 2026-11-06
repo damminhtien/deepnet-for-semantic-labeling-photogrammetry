@@ -208,6 +208,30 @@ def test_phase_watch_recovers_status_timeout_without_resubmitting(
     assert [c[1] for c in calls] == ["status", "status", "logs", "output"]
 
 
+def test_benchmark_inputs_use_repository_prepared_bundle(tmp_path, monkeypatch):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    prepare = runpy.run_path(str(script))["phase_inputs"]
+    repository, external = tmp_path / "repository", tmp_path / "external"
+    run = external / "runs/study"
+    write_json(run / "study/selection-lock.json", {})
+    write_json(run / "study/refit/manifest.json", {})
+    monkeypatch.setitem(prepare.__globals__, "ROOT", repository)
+    monkeypatch.setitem(prepare.__globals__, "load_protocol", lambda root: {})
+    monkeypatch.setitem(prepare.__globals__, "validate_final", lambda *args: None)
+    monkeypatch.setitem(prepare.__globals__, "sha256_file", lambda path: "final")
+
+    def build(source, rgbir, dsm, output):
+        assert source == repository / "data/prepared/potsdam/post-selection-test-bundle"
+        assert rgbir == external / "inputs/potsdam-rgbir-v2"
+        assert dsm == external / "runs/potsdam-dinov2-coverage-refit-v1/dsm-features"
+        assert output == run / "heldout-cache"
+        raise RuntimeError("Verified bundle routing before cache creation")
+
+    monkeypatch.setitem(prepare.__globals__, "build_cache", build)
+    with pytest.raises(RuntimeError, match="Verified bundle routing"):
+        prepare(external, run, "heldout")
+
+
 def _cache(root, split=None):
     parent = _split()
     split = split or parent

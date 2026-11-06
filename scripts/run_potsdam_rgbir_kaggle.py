@@ -432,7 +432,7 @@ def phase_inputs(data, run, phase):
     source = (
         old / "locked-refit-bundle"
         if phase == "refit"
-        else data / "prepared/potsdam/post-selection-test-bundle"
+        else ROOT / "data/prepared/potsdam/post-selection-test-bundle"
     )
     cache_path = run / f"{phase}-cache"
     if not (cache_path / "cache_manifest.json").exists():
