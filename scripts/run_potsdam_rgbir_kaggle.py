@@ -58,6 +58,15 @@ def kaggle(*arguments, timeout=120, check=True):
     return result
 
 
+def _read_status(kind, slug):
+    arguments = (kind, "status", slug)
+    try:
+        return kaggle(*arguments, timeout=45, check=False)
+    except subprocess.TimeoutExpired as error:
+        log(f"{kind} status timed out for {slug}; retrying the read")
+        return subprocess.CompletedProcess(arguments, 124, "", str(error))
+
+
 def _slug(phase):
     suffix = "-run" if phase in ("refit", "heldout") else ""
     return f"{OWNER}/{STUDY}-{phase.lower()}{suffix}"
@@ -194,7 +203,7 @@ def await_phase(run, phase):
         raise ValueError("Unconfirmed submission needs remote reconciliation")
     previous = None
     while True:
-        result = kaggle("kernels", "status", receipt["slug"], timeout=45, check=False)
+        result = _read_status("kernels", receipt["slug"])
         match = re.search(r"KernelWorkerStatus\.([A-Z_]+)", result.stdout)
         state = match[1] if match else "UNAVAILABLE"
         if state != previous:
@@ -388,7 +397,7 @@ def wait_inputs(run, phase, cache_hash, *, timeout=1800):
         raise ValueError("Private upload receipt needs reconciliation")
     deadline, previous = time.monotonic() + timeout, None
     while True:
-        result = kaggle("datasets", "status", _input_slug(phase), check=False)
+        result = _read_status("datasets", _input_slug(phase))
         output = (result.stdout + result.stderr).strip()
         lines = result.stdout.strip().splitlines()
         status = (

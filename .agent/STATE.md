@@ -769,3 +769,34 @@ Document verified segmentation evaluations and research, then push the resulting
 - All 17 tests in tests/unit/test_potsdam_rgbir.py pass in 13.06 seconds, with
   Ruff check/format and git diff --check passing. Graphify update . completes
   code-only with 1,504 nodes / 4,506 edges; generated files stay ignored.
+
+## DINOv3 refit runtime — 2026-11-06
+
+- Commit 598e814 fixes the confirmed namespace conflict. The rejected package
+  and receipts are preserved under
+  kaggle/refit-rejected-name-conflict-20261106T113814Z/. Reconciliation confirms
+  zero GPU runs from those rejections and verifies all 132 remote dataset files
+  / 11,059,341,030 bytes against the local input package, including pinned models.
+- New private notebook damminhtien/potsdam-dinov3-rgbir-v2-refit-run version 1
+  was accepted at 19:39:18 Singapore time and RUNNING at 19:39:19. Its package
+  SHA-256 is 011b23732045046331ab4ac780c5c3cb4c4dc8f951f1217167b4b7b2e46bf806.
+  Continue A seed 42 for exactly 1,152 updates; benchmark remains closed.
+- Durable coordinator PID 10454 / parent 1 watches this job. campaign.pid and
+  coordinator-refit-submitted-20261106.json record the current process/receipt.
+  One read-only log follower writes kaggle/refit/live-20261106.log. Preserve the
+  original launch plist and unload/remove it by matching SHA only after the
+  terminal campaign audit. Completed GPU ledger remains 12.5675127 before refit;
+  running-phase consumption is additional and must be audited at completion.
+
+## DINOv3 status polling recovery — 2026-11-06
+
+- Refit reached update 1,152 at 19:56:46 Singapore time. Fresh Kaggle status is
+  COMPLETE. Coordinator PID 10454 stopped on a 45-second status API timeout;
+  the accepted refit-run version-1 receipt is unchanged. Resume retrieval from
+  this receipt; do not resubmit refit or open benchmark before the final audit.
+- Read-only notebook/dataset status calls now recover from transport timeouts.
+  Regression verifies status/status/logs/output only and preserves the receipt;
+  mutating upload/submission behavior is unchanged. All 18 focused RGBIR tests
+  pass in 12.84 seconds, with Ruff and git diff --check passing.
+- Graphify update . completes code-only with 1,509 nodes / 4,518 edges;
+  generated graph files remain local and ignored.

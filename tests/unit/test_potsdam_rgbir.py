@@ -81,6 +81,7 @@ def test_private_inputs_wait_for_ready_without_reupload(tmp_path, monkeypatch):
     )
     results = iter(
         [
+            subprocess.TimeoutExpired("dataset status", 45),
             SimpleNamespace(returncode=0, stdout="processing\n", stderr=""),
             SimpleNamespace(returncode=1, stdout="", stderr="403 processing"),
             SimpleNamespace(returncode=0, stdout="CLI warning\nready\n", stderr=""),
@@ -90,14 +91,20 @@ def test_private_inputs_wait_for_ready_without_reupload(tmp_path, monkeypatch):
 
     def remote(*args, **kwargs):
         calls.append(args)
-        assert kwargs == {"check": False}
-        return next(results)
+        assert kwargs == {"timeout": 45, "check": False}
+        result = next(results)
+        if isinstance(result, Exception):
+            raise result
+        return result
 
     monkeypatch.setitem(wait.__globals__, "kaggle", remote)
     monkeypatch.setattr(wait.__globals__["time"], "sleep", sleeps.append)
     wait(tmp_path, "refit", "locked")
-    assert len(calls) == 3 and all(c[:2] == ("datasets", "status") for c in calls)
-    assert sleeps == [30, 30]
+    assert (
+        calls
+        == [("datasets", "status", "damminhtien/potsdam-dinov3-rgbir-v2-refit")] * 4
+    )
+    assert sleeps == [30, 30, 30]
 
 
 @pytest.mark.parametrize("status", ["error", "processing"])
@@ -171,6 +178,34 @@ def test_phase_package_separates_notebooks_from_existing_input_datasets(
     assert metadata["title"].endswith(phase + " run") and metadata["is_private"]
     if phase == "heldout":
         assert metadata["kernel_sources"][-1] == prefix + "refit-run"
+
+
+def test_phase_watch_recovers_status_timeout_without_resubmitting(
+    tmp_path, monkeypatch
+):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    watch = runpy.run_path(str(script))["await_phase"]
+    receipt = {"slug": "owner/existing-run", "version": 1, "status": "accepted"}
+    write_json(tmp_path / "kaggle/refit/submission.json", receipt)
+    calls, sleeps = [], []
+
+    def remote(*args, **kwargs):
+        calls.append(args)
+        assert args[0] == "kernels" and args[1] in {"status", "logs", "output"}
+        if len(calls) == 1:
+            raise subprocess.TimeoutExpired(args, 45)
+        text = "KernelWorkerStatus.COMPLETE" if args[1] == "status" else ""
+        return subprocess.CompletedProcess(args, 0, text, "")
+
+    monkeypatch.setitem(watch.__globals__, "kaggle", remote)
+    monkeypatch.setitem(watch.__globals__, "_verify_index", lambda *args: None)
+    monkeypatch.setattr(watch.__globals__["time"], "sleep", sleeps.append)
+    assert watch(tmp_path, "refit") == tmp_path / "kaggle/refit/outputs"
+    assert sleeps == [25]
+    assert read_json(tmp_path / "kaggle/refit/submission.json") == receipt
+    terminal = read_json(tmp_path / "kaggle/refit/terminal.json")
+    assert terminal == {"state": "COMPLETE", "version": "owner/existing-run/1"}
+    assert [c[1] for c in calls] == ["status", "status", "logs", "output"]
 
 
 def _cache(root, split=None):

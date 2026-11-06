@@ -200,5 +200,8 @@ Refit/benchmark notebooks use `-refit-run` and `-heldout-run`; their input datas
 keep `-refit` and `-heldout`. Kaggle rejects a notebook name already occupied by
 a dataset, so these identifiers must remain distinct. Selection notebook IDs
 and all frozen study bindings are unchanged.
+Read-only status calls retry after a transport timeout, preserving the accepted
+receipt and notebook version. Uploads and submissions never use this retry path;
+an unconfirmed mutation still requires reconciliation.
 Dataset/cache/checkpoint/log files stay outside Git; only DVC pointers, source,
 tests, configuration and documentation are committed.
