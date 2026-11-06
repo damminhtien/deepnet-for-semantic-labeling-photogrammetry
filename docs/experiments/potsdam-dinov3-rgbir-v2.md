@@ -196,5 +196,9 @@ unconfirmed receipt requires remote reconciliation before another attempt.
 An accepted upload must match the cache hash and reach Kaggle's `ready` status
 before a kernel is submitted. Dataset processing errors or a 30-minute timeout
 stop this CPU-side wait; they do not start a GPU job or trigger another upload.
+Refit/benchmark notebooks use `-refit-run` and `-heldout-run`; their input datasets
+keep `-refit` and `-heldout`. Kaggle rejects a notebook name already occupied by
+a dataset, so these identifiers must remain distinct. Selection notebook IDs
+and all frozen study bindings are unchanged.
 Dataset/cache/checkpoint/log files stay outside Git; only DVC pointers, source,
 tests, configuration and documentation are committed.

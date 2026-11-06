@@ -59,7 +59,12 @@ def kaggle(*arguments, timeout=120, check=True):
 
 
 def _slug(phase):
-    return f"{OWNER}/{STUDY}-{phase.lower()}"
+    suffix = "-run" if phase in ("refit", "heldout") else ""
+    return f"{OWNER}/{STUDY}-{phase.lower()}{suffix}"
+
+
+def _input_slug(role):
+    return f"{OWNER}/{STUDY}-{role}"
 
 
 def _source():
@@ -121,14 +126,14 @@ def package(run, phase, cache_path, allocation=2):
     role = phase if phase in ("refit", "heldout") else "selection"
     metadata = {
         "id": _slug(phase),
-        "title": f"{STUDY} {phase}",
+        "title": f"{STUDY} {phase}" + (" run" if phase in ("refit", "heldout") else ""),
         "code_file": "potsdam_rgbir_kaggle.py",
         "language": "python",
         "kernel_type": "script",
         "is_private": True,
         "enable_gpu": True,
         "enable_internet": True,
-        "dataset_sources": [f"{OWNER}/{STUDY}-{role}"],
+        "dataset_sources": [_input_slug(role)],
         "competition_sources": [],
         "model_sources": [],
         "kernel_sources": [_slug(p) for p in previous],
@@ -383,7 +388,7 @@ def wait_inputs(run, phase, cache_hash, *, timeout=1800):
         raise ValueError("Private upload receipt needs reconciliation")
     deadline, previous = time.monotonic() + timeout, None
     while True:
-        result = kaggle("datasets", "status", _slug(phase), check=False)
+        result = kaggle("datasets", "status", _input_slug(phase), check=False)
         output = (result.stdout + result.stderr).strip()
         lines = result.stdout.strip().splitlines()
         status = (
@@ -447,7 +452,7 @@ def phase_inputs(data, run, phase):
             ):
                 os.link(weights / name, target / name)
         metadata = {
-            "id": _slug(phase),
+            "id": _input_slug(phase),
             "title": f"{STUDY} private {phase} inputs",
             "licenses": [{"name": "other"}],
         }

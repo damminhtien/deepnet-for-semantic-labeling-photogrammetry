@@ -751,3 +751,21 @@ Document verified segmentation evaluations and research, then push the resulting
   two-worker IPC check after ten passes; the same full file passes outside
   the sandbox, with no test skipped. Graphify update . completes code-only:
   1,502 nodes / 4,500 edges; generated graph remains ignored.
+
+## DINOv3 final refit and benchmark — 2026-11-06
+
+- Transport readiness fix is committed as e42d887. The private refit dataset is
+  ready. Coordinator PID 10080 resumed already audited phases, then stopped on
+  a 409 Conflict from SaveKernel before creating any refit notebook.
+- Fresh owner inventory contains no refit notebook. One reconciled SDK retry
+  confirms the server reason: the requested notebook title is already in use
+  by a dataset (ALREADY_EXISTS), not a GPU quota or training error. Evidence:
+  kaggle/refit/reconciliation-20261106T113411Z.json. No GPU phase was started.
+- Fixed the transport namespace: refit/heldout notebooks use -refit-run and
+  -heldout-run; existing private datasets retain -refit/-heldout. Selection IDs,
+  worker code, source/protocol/cache/selection-lock hashes and training schedule
+  stay fixed. Package regression covers both phases and heldout's refit dependency.
+  Preserve the rejected receipts/package before submitting the corrected notebook.
+- All 17 tests in tests/unit/test_potsdam_rgbir.py pass in 13.06 seconds, with
+  Ruff check/format and git diff --check passing. Graphify update . completes
+  code-only with 1,504 nodes / 4,506 edges; generated files stay ignored.

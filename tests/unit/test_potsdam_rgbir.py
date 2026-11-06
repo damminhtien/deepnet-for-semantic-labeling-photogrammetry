@@ -142,6 +142,37 @@ def test_private_inputs_require_confirmed_matching_receipt(
         wait(tmp_path, "refit", "locked")
 
 
+@pytest.mark.parametrize("phase", ["refit", "heldout"])
+def test_phase_package_separates_notebooks_from_existing_input_datasets(
+    tmp_path, monkeypatch, phase
+):
+    script = Path(__file__).resolve().parents[2] / "scripts/run_potsdam_rgbir_kaggle.py"
+    package = runpy.run_path(str(script))["package"]
+    monkeypatch.setitem(
+        package.__globals__, "load_protocol", lambda _: {"arms": list("ABC")}
+    )
+    monkeypatch.setitem(
+        package.__globals__,
+        "CacheBundle",
+        SimpleNamespace(
+            load=lambda _: SimpleNamespace(manifest={"cache_hash": "locked"})
+        ),
+    )
+    monkeypatch.setitem(package.__globals__, "validate_final", lambda *args: None)
+    write_json(tmp_path / "study/selection-lock.json", {})
+    write_json(tmp_path / "study/refit/manifest.json", {})
+    (tmp_path / "study/refit/final.pt").write_bytes(b"final-gate-tested-separately")
+    folder = package(tmp_path, phase, tmp_path / "cache")
+    metadata = read_json(folder / "kernel-metadata.json")
+    prefix = "damminhtien/potsdam-dinov3-rgbir-v2-"
+    assert metadata["dataset_sources"] == [prefix + phase]
+    assert metadata["id"] == prefix + phase + "-run"
+    assert metadata["id"] not in metadata["dataset_sources"]
+    assert metadata["title"].endswith(phase + " run") and metadata["is_private"]
+    if phase == "heldout":
+        assert metadata["kernel_sources"][-1] == prefix + "refit-run"
+
+
 def _cache(root, split=None):
     parent = _split()
     split = split or parent
