@@ -1,4 +1,18 @@
-# Potsdam DINOv3 RGBIR study
+# DINOv3 documentation and default-branch integration
+
+The user requested documentation updates and a merge into the main branch on
+2026-11-06. The repository's existing default branch is `master`; there is no
+`main` branch locally or on origin. Deliver the completed campaign on that
+existing default branch without renaming it.
+
+Synchronize the README, architecture, data guide and invariants with the audited
+Potsdam DINOv3 result. Distinguish the completed Potsdam-only campaign from the
+unexecuted joint DINOv3 plan. Validate documentation against saved artifacts and
+run the unit/source checks before merging. Preserve the unrelated PSPNet state
+edit, historical evidence and large external artifacts. This request authorizes
+the Git integration; no DVC push, input publication or new GPU run is requested.
+
+## Completed Potsdam DINOv3 RGBIR study
 
 Implement the user-approved `potsdam-dinov3-rgbir-v2` study (2026-11-05): real
 RGB to DINOv3-B/16, optional satellite L/16 pilot, aligned IR/NDVI/DSM auxiliary
@@ -17,7 +31,8 @@ Keep historical artifacts immutable. Use the previous C validation confusion
 matrix as the four-metric eligibility reference. Historical test results have
 already been observed; do not describe the 14-scene benchmark as fresh holdout.
 Keep data/checkpoints/logs outside Git. Commit focused changes, preserve unrelated
-edits, and do not push Git/DVC or publish inputs.
+edits. The campaign's original no-push instruction is superseded for Git by the
+documentation/integration request above; DVC and input publication stay excluded.
 
 ## Completed preceding task
 

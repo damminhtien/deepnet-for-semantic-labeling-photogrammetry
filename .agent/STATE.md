@@ -874,3 +874,31 @@ Document verified segmentation evaluations and research, then push the resulting
   Receipt: kaggle/documentation-checks-final-20261106.json. Ruff, all 19 focused
   tests and code-only Graphify refresh were completed with the source-path fix;
   final changes are reporting/task state only. Preserve the unrelated PSPNet edit.
+
+## DINOv3 documentation and integration — 2026-11-06
+
+- User requested documentation updates and a main-branch merge. Fresh origin
+  inspection confirms the default is master, with no main branch. The campaign
+  branch is 18 commits ahead and zero behind origin/master; use fast-forward
+  integration without renaming the default branch.
+- README now leads its model flow with the selected RGB DINOv3-B model. The
+  architecture, data guide and invariants document role-scoped caches, named
+  bands, independent DSM masks, selection/refit boundaries and final-only
+  scoring. The unexecuted joint DINOv3 plan is explicitly separated from the
+  completed Potsdam campaign. Historical source files and metrics are unchanged.
+- The unrelated PSPNet edit is temporarily isolated in a path-specific stash.
+  Its backup patch SHA-256 is
+  6baf8f455587fe3e8071f3566eb0b92736f4f3350d95d1b7c4b0bbe461633890.
+  Restore it after integration and exclude it from all task commits.
+- Documentation validation passes on ten files: 60 local links, 215 numeric and
+  binding checks, ten Pandoc parses and all 12 derived artifact inventory files.
+  The saved benchmark matrices still sum to exactly 467,862,855 pixels and
+  recompute the reported OA/mIoU; the attempt count remains one. Source and
+  protocol hashes remain frozen. Receipt and checker are in /private/tmp under
+  deepnet-dinov3-integration-doc-checks.json and its matching Python script.
+- All 85 unit tests pass in 17.66 seconds. Ruff check and format pass on 50 files;
+  git diff --check passes. Fresh code-only Graphify update completes with 1,530
+  nodes / 4,544 edges; generated graph files remain ignored. No new test, GPU
+  training or benchmark inference was needed for the documentation changes.
+- Next: commit the focused documentation, fast-forward master, verify the remote
+  ref and restore the saved unrelated edit.

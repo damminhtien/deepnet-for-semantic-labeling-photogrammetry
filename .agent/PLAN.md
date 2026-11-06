@@ -1,4 +1,13 @@
-# Potsdam DINOv3 RGBIR v2 milestones
+# DINOv3 documentation and integration milestones
+
+1. [x] Reconcile current documentation with the audited final artifacts and
+   separate completed Potsdam results from the unexecuted joint DINOv3 plan.
+2. [x] Verify local links, Markdown, numeric/contract claims, unit tests and
+   source checks; commit only the documentation and task-owned state.
+3. [ ] Fast-forward the existing default `master` branch, verify origin after
+   integration, and restore the unrelated PSPNet edit unchanged.
+
+## Completed Potsdam DINOv3 RGBIR v2 milestones
 
 1. [x] Implement named RGB/auxiliary routing, DINOv3 normalization, gated fusion,
    compact normalized decoder and pinned model specs; verify real pretrained LoRA.

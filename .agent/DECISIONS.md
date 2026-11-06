@@ -1,4 +1,16 @@
-# Active task decisions — 2026-11-05
+# Documentation and integration decisions — 2026-11-06
+
+- Interpret the requested main-branch merge as integration into the existing
+  default `master`, confirmed by a fresh origin fetch and remote HEAD check.
+  Do not create or rename a default branch. Git delivery is authorized by the
+  latest request; DVC push, public inputs and new GPU runs remain out of scope.
+- Keep the final measured result and negative ablations intact. Documentation
+  must distinguish the completed Potsdam RGBIR campaign from the unexecuted
+  joint Potsdam/Vaihingen DINOv3 configuration.
+- Preserve the unrelated PSPNet STATE edit separately from task commits and
+  restore its exact patch after integration.
+
+## Completed campaign decisions — 2026-11-05
 
 - Implement the approved `potsdam-dinov3-rgbir-v2` campaign with 24 new allocated
   GPU-hours. Count all assigned GPUs and bootstrap/retry execution. Do not charge

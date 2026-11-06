@@ -3,9 +3,48 @@
 This document describes the common path from external raster sources to a
 reproducible local or Kaggle run. Large data and outputs belong outside Git.
 The [DINOv3 RGBIR runbook](experiments/potsdam-dinov3-rgbir-v2.md) describes the
-new audited RGBIR snapshot, role-scoped scene caches and deterministic rare-pixel
+audited RGBIR snapshot, role-scoped scene caches and deterministic rare-pixel
 sampling. It records a measured discrepancy in the historical IRRG band names;
-the new campaign derives RGB and IR/red features from verified four-band inputs.
+the completed campaign derives RGB and IR/red features from verified four-band
+inputs.
+
+## Completed Potsdam DINOv3 campaign
+
+`potsdam-dinov3-rgbir-v2` completed on 2026-11-06. Its final DINOv3-B RGB
+checkpoint reaches **92.0397% OA / 81.0932% six-class mIoU** on the historical
+14-scene benchmark, with **13.4557472 / 24 allocated GPU-hours** used. OA 99%
+remains unmet by 6.9603 percentage points. The
+[final artifact review](experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md)
+binds the checkpoint, confusion matrices, data audits, latency and allocation
+ledger. This is a Potsdam-only campaign; the joint DINOv3 configuration described
+later in this guide has not been trained.
+
+| Phase | Data scope | Checkpoint rule |
+| --- | --- | --- |
+| Selection and confirmation | 18 train scenes with participant labels; six validation scenes with eroded labels and 199,409,714 scored pixels | A/B/C start from pretrained with seed 42; D confirms the winner from pretrained with seed 43; full validation at passes 4/8 selects checkpoints |
+| Refit | Separate train-only cache containing the 24-scene union, participant labels only | Continue the locked seed-42 winner for exactly 1,152 updates with reset optimizer/scaler; all reported metrics are train metrics |
+| Final benchmark | Separate 14-scene eroded-label cache; 467,862,855 scored pixels | Score the completed refit checkpoint once with the frozen policy; review stored matrices afterward |
+
+The verified RGBIR snapshot uses R/G/B/IR order. The encoder reads true RGB;
+the optional branch computes the IR/red index after optical augmentation and
+combines it with IR, train-scaled DSM relief and an independent availability
+mask. A/B validation selected RGB-only A with baseline augmentation. The stronger
+C augmentation and B's combined auxiliary recipe did not improve seed-42 OA;
+horizontal-flip TTA did not pass the required gain for both seeds. The frozen
+final policy is identity inference with **512x512 windows / stride 256**.
+
+`deepnet.potsdam_rgbir.prepare` builds memory-mapped arrays with manifests binding
+sources, split, preprocessing, feature statistics and label roles. Cache use is
+gated by equality with reference Rasterio reads, label histograms and scoring
+support. DSM availability never intersects the image/label scoring mask; scene
+`3_13` retains its missing column in the denominator. Relief normalization remains
+fitted on the original 18 train scenes. JPEG nDSM is excluded.
+
+Use `deepnet.potsdam_rgbir.study` and the private Kaggle coordinator in the
+[runbook](experiments/potsdam-dinov3-rgbir-v2.md) to reproduce the phase boundaries.
+The default DVC train/validation export is a source bundle, not a replacement for
+the separate RGBIR snapshot and role-scoped caches. The completed run's receipts
+and one-attempt marker remain immutable; do not resubmit it to refresh a report.
 
 ## Install
 
@@ -169,21 +208,23 @@ of 69.88. Tied colors or colors farther than the configured tolerance still fail
 The official six-class palette and ignored black boundaries are documented by
 [ISPRS](https://isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx).
 
-### DINOv3 v2 split and evaluation protocol
+### Unexecuted joint DINOv3 split and evaluation protocol
 
-This section describes the joint DINOv3 plan. The Potsdam DINOv2 coverage study
-shares the scene assignments but has its own selection, refit and evaluation
-rules in the [study runbook](experiments/potsdam-dinov2-coverage-refit.md).
+This section describes the unexecuted joint Potsdam/Vaihingen DINOv3 plan.
+The completed Potsdam DINOv3 RGBIR and DINOv2 coverage campaigns share its Potsdam
+scene assignments but have separate selection, refit and evaluation rules in
+their [DINOv3](experiments/potsdam-dinov3-rgbir-v2.md) and
+[DINOv2](experiments/potsdam-dinov2-coverage-refit.md) runbooks.
 
-The current joint run follows the outer split used by the [ISPRS 2D Semantic
+The joint plan follows the outer split used by the [ISPRS 2D Semantic
 Labeling contest](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx): 24 Potsdam tiles have references for training or internal evaluation, while 14 challenge tiles are held out for test. The [ISPRS 2015 report](https://isprs.org/society/si/SI-2015/ISPRS-SI2015-Gerke_report_WGIII4_2015.pdf) confirms that references are released for 24 of 38 tiles and the remaining 14 are submitted for organizer evaluation. ISPRS does not define a mandatory train/validation split within those 24 labeled tiles. A later [ISPRS Annals study](https://isprs-annals.copernicus.org/articles/V-2-2022/275/2022/isprs-annals-V-2-2022-275-2022.pdf) used 18 randomly selected training tiles, 6 validation tiles, and the same 14-tile test set. This project uses those counts with its fixed versioned scene IDs; the internal 18/6 assignment is project-defined, not an official contest split.
 
-The current [evaluation protocol](../configs/evaluations/isprs-dinov3-v2.json) binds
-its training plan and split manifests by SHA-256. The active Potsdam manifest is
+The joint [evaluation protocol](../configs/evaluations/isprs-dinov3-v2.json) binds
+its training plan and split manifests by SHA-256. Its Potsdam manifest is
 [`potsdam-dinov3-v2.json`](../configs/splits/potsdam-dinov3-v2.json); Vaihingen
 continues to use [`vaihingen-dinov3-v1.json`](../configs/splits/vaihingen-dinov3-v1.json).
 The previous DINOv3 v1 manifest and protocol remain unchanged as historical
-configuration; training has not started under either version.
+configuration; joint DINOv3 training has not started under either version.
 
 Exact scene membership is:
 
@@ -205,10 +246,10 @@ and recorded in the run manifest. The default DVC graph exports only train and
 validation roles; test labels are excluded from training and checkpoint-selection
 bundles.
 
-Both Potsdam and Vaihingen contribute training and validation scenes to this joint
-run. Its Vaihingen test scores measure generalization to held-out scenes after
-joint training. Cross-dataset transfer would require a separate experiment that
-excludes Vaihingen from training and model selection.
+Both Potsdam and Vaihingen would contribute training and validation scenes to
+this joint plan. Its Vaihingen test scores would measure generalization to
+held-out scenes after joint training. Cross-dataset transfer would require a
+separate experiment that excludes Vaihingen from training and model selection.
 
 The isolated [`evaluation DVC pipeline`](../pipelines/evaluation/dvc.yaml) validates
 each test split against its catalog, scans its image/label quality, and exports a
@@ -233,9 +274,9 @@ been frozen.
 For Potsdam, the local test references are the eroded/no-boundary labels. The
 [ISPRS Potsdam results table](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/results/label_challenge_2D_potsdam_result_ifr.html)
 reports five per-class F1 scores (excluding clutter/background) and overall
-accuracy from the no-boundary reference. The final report will reproduce those
-metrics, retain per-tile confusion matrices, and sum their counts for the aggregate
-confusion matrix. It will also report all-six-class F1/IoU, precision/recall, and
+accuracy from the no-boundary reference. The planned joint report would reproduce
+those metrics, retain per-tile confusion matrices, and sum their counts for the
+aggregate confusion matrix. It would also report all-six-class F1/IoU, precision/recall, and
 mean IoU as additional project metrics. The official site describes a second
 full-reference evaluation too; the active local catalog currently has no full
 reference for these tiles, so we will not claim that metric without obtaining and
@@ -247,11 +288,12 @@ these as local benchmark-aligned metrics rather than an official contest score.
 The shared `evaluate_scenes` function in
 [`deepnet/data/evaluation.py`](../deepnet/data/evaluation.py) performs deterministic
 full-scene tiled inference, overlap-weighted logit merging, and per-scene plus
-aggregate confusion-matrix scoring. The future training caller must invoke it with
-the manifest's test IDs only after checkpoint selection is frozen; the current plan
-configures this protocol but does not yet provide a complete model-loading
-training/evaluation runner. No test evaluation has been performed for this DINOv3
-plan.
+aggregate confusion-matrix scoring. `deepnet.training` provides the shared
+model-loading training/evaluation runner. The joint DINOv3 configuration remains
+unexecuted; the completed Potsdam-only campaign uses the separate
+`deepnet.potsdam_rgbir.study` runner with a final-refit checkpoint gate. Both
+paths restrict test scene IDs to the frozen manifest and keep test data out of
+checkpoint selection.
 
 When `stride` is omitted, evaluation now uses `floor(window_size / 2)` per axis
 (minimum one pixel), creating real overlap for scenes larger than a window. An
@@ -261,11 +303,11 @@ the evaluation result's provenance alongside the window size. If a whole scene f
 in one window, only one window is needed and there are no neighboring logits to
 blend.
 
-The 14 test scenes were evaluated in separate historical experiments. This v2 keeps
-them out of DINOv3 training and model selection, but the result should be described
-as benchmark-aligned held-out evaluation, not as a never-before-used program-level
-test. All split roles are scene-level, not region-disjoint; neighboring tiles may
-share geographic context.
+The 14 test scenes were evaluated in historical experiments and the completed
+Potsdam DINOv3 RGBIR campaign. Both protocols exclude them from training and
+model selection. Results are local comparisons on a historical benchmark; the
+cohort is not a fresh independent test. All split roles are scene-level, not
+region-disjoint; neighboring tiles may share geographic context.
 
 ### Historical EDA snapshot from DINOv3 v1
 
@@ -304,8 +346,9 @@ uint8 values, and every scanned IRRG pixel passed its raster mask and finite-val
 checks.
 
 The historical v1 table reports pooled band means and medians plus the range of
-per-scene medians in source band order IR, red, green. Its per-scene CSV retains exact minima,
-percentiles, standard deviations, valid-pixel counts, and full 256-bin histograms.
+per-scene medians in the configured IR, red, green order. Its per-scene CSV retains
+exact minima, percentiles, standard deviations, valid-pixel counts, and full
+256-bin histograms.
 
 | Dataset / role | Scenes / pixels per band | Mean IR / red / green | Pooled median IR / red / green | Per-scene median range IR / red / green |
 | --- | ---: | --- | --- | --- |
@@ -314,9 +357,15 @@ percentiles, standard deviations, valid-pixel counts, and full 256-bin histogram
 | Vaihingen train | 12 / 58,554,459 | 121.39 / 82.01 / 80.86 | 121 / 72 / 76 | 98–150 / 58–101 / 61–97 |
 | Vaihingen validation | 4 / 19,533,347 | 114.82 / 79.61 / 78.70 | 112 / 71 / 74 | 101–118 / 64–73 / 70–76 |
 
-Vaihingen's IR channel is brighter and more variable than Potsdam's in this split;
-Vaihingen's red channel is lower. The per-scene ranges also show substantial
-within-dataset variation, especially in Vaihingen training scenes. Keep these
+The band labels in this historical table are the original configured names. The
+new source audit maps Potsdam's three bands to RGBIR 4/2/3 (IR/G/B), so its
+second and third columns must not be interpreted as verified red and green
+measurements for the new RGBIR campaign. The historical values and files are
+unchanged; the audit does not establish a naming discrepancy for Vaihingen.
+
+Vaihingen's IR channel is brighter and more variable than Potsdam's in this
+historical scan. The per-scene ranges also show substantial within-dataset
+variation, especially in Vaihingen training scenes. Keep these
 differences visible in view-specific normalization and diagnostics; do not derive
 training statistics from validation pixels. The full outputs include
 `irrg-band-statistics.csv`, `irrg-per-scene-band-statistics.csv`, and
@@ -346,8 +395,9 @@ model view described below; JPEG nDSM remains excluded.
 The DSM TIFFs have no embedded vertical-unit metadata; the dataset config describes
 them as metres, but the source unit and vertical datum still need authoritative
 confirmation. Full scans found DSM values from -35.75 in train scene `7_10` to
-106.171 in validation scene `7_13`. These extrema need source review before choosing
-elevation clipping or normalization. DSM per-scene mean/min/max and standard
+106.171 in scene `7_13` (validation in historical v1; benchmark in the current
+split). These extrema need source review before choosing elevation clipping or
+normalization. DSM per-scene mean/min/max and standard
 deviation use all valid pixels; its p01–p99 values use a deterministic,
 block-stratified sample of about 100,000 pixels per scene. The nDSM JPEG stores
 uint8 digital numbers from 0 to 255; its histograms and quantiles are exact encoded
@@ -356,8 +406,9 @@ value summaries, not metric heights.
 Before using the legacy five-channel view, obtain authoritative nDSM decoding
 and co-registration evidence and version that source with checksums. Verify the
 full grids or document a supported missing-data mask, then fit elevation
-statistics on training scenes only. The joint DINOv3 configuration uses IRRG
-only.
+statistics on training scenes only. The unexecuted joint DINOv3 configuration uses
+the historical IRRG view only; the completed RGBIR campaign has its own verified
+RGB/auxiliary routing.
 
 ### Augmentation policy and audit
 
@@ -548,8 +599,8 @@ loader = make_torch_dataloader(
 
 The shared package provides `deepnet.training` for joint training,
 `deepnet.potsdam_study` for the completed DINOv2 study and
-`deepnet.potsdam_rgbir.study` for the new DINOv3 campaign. A caller-owned loop can
-also count the labels returned by its loader before accelerator transfer. This
+`deepnet.potsdam_rgbir.study` for the completed Potsdam DINOv3 campaign. A
+caller-owned loop can also count labels from its loader before accelerator transfer. This
 records the sampled and augmented pixels rather than inferring their proportions
 from sampling probabilities.
 
@@ -612,6 +663,10 @@ ruff format --check deepnet tests/unit
 pytest tests/unit
 ```
 
-Tests use small synthetic GeoTIFFs, not the private source data or cloud runtimes.
-They verify data contracts; they do not establish model quality or GPU training
-completion.
+The regular unit suite uses synthetic fixtures and does not require private
+source data or cloud runtimes. Real pretrained integration checks are separate.
+Use `python -m deepnet.potsdam_rgbir.model smoke --help` for the required snapshot
+and cache arguments. The smoke command loads pinned offline B/L weights and a
+real cached Potsdam patch; CUDA preflight repeats the checks before the small-fit
+quality and throughput gates. Unit or smoke success alone does not establish
+model quality or GPU training completion.

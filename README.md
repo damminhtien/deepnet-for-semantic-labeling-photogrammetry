@@ -188,15 +188,16 @@ the isolated effect of adding the six scenes.
    scene IDs to label sources. Georeferenced rasters are checked against CRS and
    affine grids; pixel-local pairs require documented source alignment.
 2. **Sample and export.** Lazy Rasterio reads yield aligned windows, semantic
-   labels and valid-pixel masks. The sampler and augmentation policy are
-   versioned. Each bundle contains role-specific rasters, split and preprocessing
-   contracts, and a file-level SHA-256 inventory.
-3. **Adapt and segment.** The completed DINOv2 study's
-   [DINOv2 model spec](configs/models/dinov2-vitb14-multimodal-v3.json)
-   uses ViT-B/14 with LoRA, a zero-initialized residual IRRG projection,
-   pretrained normalization at blocks 3/6/9/12 and a width-128 decoder with
-   GroupNorm and a high-resolution detail branch. The four feature levels
-   share the same ViT patch grid.
+   labels and valid-pixel masks. The DINOv3 campaign verifies role-specific
+   memory-mapped caches against those source reads before training. Bundles and
+   caches bind the split, preprocessing, label roles and file-level SHA-256
+   inventory; sampling and augmentation are deterministic by seed/pass/draw.
+3. **Adapt and segment.** The selected
+   [DINOv3-B model](configs/models/dinov3-vitb16-rgbir-v2.json)
+   takes named RGB bands through a residual identity adapter into ViT-B/16 with
+   LoRA. It applies pretrained normalization at blocks 3/6/9/12 and uses a
+   width-128 decoder with GroupNorm and a stride-four detail branch. The four
+   block features share the same ViT patch grid and are resized for fusion.
 4. **Record provenance.** Run manifests bind the source, data, runtime, training
    protocol, checkpoint and metrics. Persisted confusion matrices allow scores
    to be recomputed without model inference.
@@ -207,7 +208,8 @@ mask. Scene `3_13` is one column short; missing DSM pixels retain their original
 scoring eligibility. The older five-channel DSM+nDSM view remains blocked
 because JPEG nDSM registration and height encoding have not been established.
 The historical DINOv2 winning C recipe uses IRRG without elevation or the spectral
-index.
+index. Its [model spec](configs/models/dinov2-vitb14-multimodal-v3.json) retains
+ViT-B/14, the residual IRRG adapter and its frozen training contract.
 
 The [DINOv3-B spec](configs/models/dinov3-vitb16-rgbir-v2.json) selects RGB
 by band name and applies the pretrained DINOv3 `norm`. When enabled, IR,

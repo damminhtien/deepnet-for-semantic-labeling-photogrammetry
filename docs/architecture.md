@@ -21,6 +21,8 @@ dataset descriptor ── build-catalog ──► scene catalog + source hashes
                                                ▼
                             lazy window reader + canonical labels/masks
                                                │
+                             verified role-specific memmap cache
+                                               │
                              split-aware sampling and augmentation
                                                │
                                                ▼
@@ -43,6 +45,11 @@ model-view normalization; optical radiometry is applied to optical bands only.
 Validation and test use deterministic windows and the split's declared labels.
 Fitted channel statistics are computed from train windows and bind to the exact
 split hash.
+
+The DINOv3 RGBIR campaign materializes verified scene arrays between source
+reading and sampling. Cache manifests bind source bytes, split roles, label type,
+preprocessing and feature statistics. The shared Rasterio reader remains the
+reference for cache equivalence; other runners can sample directly from it.
 
 ## Core modules
 
@@ -72,7 +79,7 @@ split hash.
 | `deepnet/models/specs.py` | Versioned backbone, input adapter, and task-head contracts |
 | `deepnet/models/backbones.py` | Hugging Face feature extraction and injected backbone interface |
 | `deepnet/models/adapters.py` | Optical projection and separate auxiliary spatial features |
-| `deepnet/models/decoders.py` | DPT-style four-level fusion and high-resolution skip |
+| `deepnet/models/decoders.py` | DPT-style fusion of four block features and a high-resolution detail branch |
 | `deepnet/models/segmenter.py` | Composition that pads inputs and returns dense task logits |
 | `deepnet/models/adapter.py` | Thin input/output contract around a caller-provided Torch model |
 | `model_script/` | Model definitions, thin shared-data bundle commands, and historical training runners |
@@ -133,3 +140,23 @@ CLS/register token counts. New normalization/gating fields default to the old
 behavior, preserving existing serialized model contracts. The campaign requires
 real pretrained gradient checks in preflight and does not derive quality claims
 from synthetic unit tests.
+
+## Completed Potsdam DINOv3 path
+
+The [final artifact review](experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md)
+records the completed campaign. Selection compares A/B/C on 18 training and six
+validation scenes, then confirms the winner from pretrained with seed 43. The
+winning A recipe uses RGB, baseline augmentation and identity inference. Its
+ViT-B/16 features at blocks 3/6/9/12 share one patch grid; the decoder resizes
+them for fusion with its stride-four detail branch.
+
+`deepnet/potsdam_rgbir/protocol.py` binds selection eligibility, both seeds, TTA,
+source hashes and allocation limits. `phases.py` continues the locked seed-42
+checkpoint for exactly 1,152 updates on a separate 24-scene participant-label
+cache. Former validation scenes become training data at that boundary and cannot
+select another checkpoint. Only the completed final checkpoint can enter the
+single historical benchmark evaluation, using 512x512 windows and stride 256.
+
+The joint Potsdam/Vaihingen DINOv3 configuration remains an unexecuted plan.
+Its split and ranking settings do not control the completed Potsdam-only
+campaign. See the [data pipeline guide](data-pipeline.md) for the two scopes.
