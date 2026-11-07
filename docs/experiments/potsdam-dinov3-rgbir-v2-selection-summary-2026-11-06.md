@@ -35,8 +35,9 @@ cannot choose a checkpoint.
 The left panel contains only the two scheduled full validations, passes 4 and 8;
 the lines connect measured checkpoints. All pass-four OAs are below the floor,
 and all pass-eight OAs exceed it. The right panel shows class IoU changes from
-A. The PNG was visually inspected; its source PNG/PDF and input hashes remain
-with the external review artifacts.
+A. The [SciencePlots rendering](../figures.md#dinov3-reports) uses the audited
+manifests and class IoUs. The original PNG/PDF and input hashes remain with
+the external review artifacts.
 
 C improves car IoU by 0.1043 point but loses 1.1913 clutter IoU points. It makes
 14,020,417 validation errors, versus 13,870,767 for A: **149,650 more errors**.
