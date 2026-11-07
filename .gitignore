@@ -13,6 +13,7 @@
 
 # Local development and build artifacts
 .venv/
+/data/runs/
 .pytest_cache/
 .ruff_cache/
 build/

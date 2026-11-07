@@ -1,0 +1,61 @@
+direction,true_class,other_model_prediction,count
+DINOv3 corrects PSPNet,Impervious surfaces,Building,792158
+DINOv3 corrects PSPNet,Impervious surfaces,Low vegetation,1032496
+DINOv3 corrects PSPNet,Impervious surfaces,Tree,515670
+DINOv3 corrects PSPNet,Impervious surfaces,Car,24445
+DINOv3 corrects PSPNet,Impervious surfaces,Clutter/background,725353
+DINOv3 corrects PSPNet,Building,Impervious surfaces,354582
+DINOv3 corrects PSPNet,Building,Low vegetation,166037
+DINOv3 corrects PSPNet,Building,Tree,83603
+DINOv3 corrects PSPNet,Building,Car,1001
+DINOv3 corrects PSPNet,Building,Clutter/background,372541
+DINOv3 corrects PSPNet,Low vegetation,Impervious surfaces,1165241
+DINOv3 corrects PSPNet,Low vegetation,Building,427870
+DINOv3 corrects PSPNet,Low vegetation,Tree,1865210
+DINOv3 corrects PSPNet,Low vegetation,Car,1084
+DINOv3 corrects PSPNet,Low vegetation,Clutter/background,549329
+DINOv3 corrects PSPNet,Tree,Impervious surfaces,490683
+DINOv3 corrects PSPNet,Tree,Building,90912
+DINOv3 corrects PSPNet,Tree,Low vegetation,1934055
+DINOv3 corrects PSPNet,Tree,Car,64716
+DINOv3 corrects PSPNet,Tree,Clutter/background,144372
+DINOv3 corrects PSPNet,Car,Impervious surfaces,8196
+DINOv3 corrects PSPNet,Car,Building,2297
+DINOv3 corrects PSPNet,Car,Low vegetation,1099
+DINOv3 corrects PSPNet,Car,Tree,8271
+DINOv3 corrects PSPNet,Car,Clutter/background,23714
+DINOv3 corrects PSPNet,Clutter/background,Impervious surfaces,1136389
+DINOv3 corrects PSPNet,Clutter/background,Building,575770
+DINOv3 corrects PSPNet,Clutter/background,Low vegetation,573639
+DINOv3 corrects PSPNet,Clutter/background,Tree,46028
+DINOv3 corrects PSPNet,Clutter/background,Car,57105
+PSPNet corrects DINOv3,Impervious surfaces,Building,520682
+PSPNet corrects DINOv3,Impervious surfaces,Low vegetation,855380
+PSPNet corrects DINOv3,Impervious surfaces,Tree,454336
+PSPNet corrects DINOv3,Impervious surfaces,Car,30986
+PSPNet corrects DINOv3,Impervious surfaces,Clutter/background,939252
+PSPNet corrects DINOv3,Building,Impervious surfaces,501605
+PSPNet corrects DINOv3,Building,Low vegetation,88907
+PSPNet corrects DINOv3,Building,Tree,94638
+PSPNet corrects DINOv3,Building,Car,4384
+PSPNet corrects DINOv3,Building,Clutter/background,415085
+PSPNet corrects DINOv3,Low vegetation,Impervious surfaces,675554
+PSPNet corrects DINOv3,Low vegetation,Building,48385
+PSPNet corrects DINOv3,Low vegetation,Tree,1596518
+PSPNet corrects DINOv3,Low vegetation,Car,249
+PSPNet corrects DINOv3,Low vegetation,Clutter/background,300368
+PSPNet corrects DINOv3,Tree,Impervious surfaces,465373
+PSPNet corrects DINOv3,Tree,Building,55254
+PSPNet corrects DINOv3,Tree,Low vegetation,1413298
+PSPNet corrects DINOv3,Tree,Car,33089
+PSPNet corrects DINOv3,Tree,Clutter/background,70319
+PSPNet corrects DINOv3,Car,Impervious surfaces,10263
+PSPNet corrects DINOv3,Car,Building,327
+PSPNet corrects DINOv3,Car,Low vegetation,262
+PSPNet corrects DINOv3,Car,Tree,10760
+PSPNet corrects DINOv3,Car,Clutter/background,23575
+PSPNet corrects DINOv3,Clutter/background,Impervious surfaces,372838
+PSPNet corrects DINOv3,Clutter/background,Building,135326
+PSPNet corrects DINOv3,Clutter/background,Low vegetation,476521
+PSPNet corrects DINOv3,Clutter/background,Tree,45412
+PSPNet corrects DINOv3,Clutter/background,Car,56297

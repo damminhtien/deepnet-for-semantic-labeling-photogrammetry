@@ -1,0 +1,527 @@
+{
+  "analysis_script": {
+    "path": "/Users/macbook/Desktop/workspace/deepnet-for-semantic-labeling-photogrammetry/scripts/research/potsdam_empirical.py",
+    "sha256": "51edb3664cdfd326102f4c1c62d9b2481d8cc0d74fd9c48b7b71822429afb4c9"
+  },
+  "audit_summary": {
+    "DINOv2_metrics_sha256": "4cc143c900038ceefc4d9d1a55d8b04d6326467d513d412aa87842054e6cc883",
+    "DINOv2_reference_hash_verified": true,
+    "DINOv3_attempt": {
+      "cache_hash": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4",
+      "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+      "evaluation_count": 1,
+      "inference": "identity",
+      "protocol_hash": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+    },
+    "DINOv3_metrics_sha256": "4e16ca2760b3fc0bae940e76d68b15b9ca0adec5857a2030e2c7d37430309aa7",
+    "DINOv3_review_files_verified": [
+      "analysis.json",
+      "confusion.csv",
+      "per-class.csv",
+      "per-scene.csv"
+    ],
+    "PSPNet_metrics_sha256": "408226584ec6df031d012e47f10feae7f672a0660f258f966a1197990ed8c83a",
+    "PSPNet_review_status": "verified"
+  },
+  "benchmark_scope": "Historical, previously observed Potsdam 14-scene cohort; not a newly sampled independent test set.",
+  "classes": [
+    "Impervious surfaces",
+    "Building",
+    "Low vegetation",
+    "Tree",
+    "Car",
+    "Clutter/background"
+  ],
+  "error_decomposition": {
+    "DINOv2_errors": 39868882,
+    "DINOv3_errors": 37243220,
+    "OA_delta_pp": 0.5612033466516619,
+    "mIoU_delta_pp": 1.481029153983604,
+    "major_pair_reductions": {
+      "clutter_to_impervious": 1248458,
+      "combined_tree_low_vegetation": 501204,
+      "low_vegetation_to_tree": -425001,
+      "tree_to_low_vegetation": 926205
+    },
+    "net_error_reduction": 2625662,
+    "pixels_scored": 467862855
+  },
+  "generated_at": "runtime-generated; see file modification time",
+  "inputs": {
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov2-coverage-refit-v1/kaggle/preflight-v2-evidence/outputs/study/heldout/metrics.json": {
+      "bytes": 27567,
+      "sha256": "4cc143c900038ceefc4d9d1a55d8b04d6326467d513d412aa87842054e6cc883"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov2-coverage-refit-v1/review-final-20261105/analysis.json": {
+      "bytes": 13295,
+      "sha256": "bbb81c7225c17404bd096a7a133050315b712feefcc3dc4c5a4da01810c43beb"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov2-coverage-refit-v1/review-final-20261105/sha256.json": {
+      "bytes": 9712,
+      "sha256": "7f244f7f908bf0903a82aed111da77f04b874cf0578ba1015663876e5d45167a"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/A/audit.json": {
+      "bytes": 374,
+      "sha256": "302fedf19ac1175f8620939a1d9caa4132da0ce69f8c9b05a9edb5a363294ece"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/B/audit.json": {
+      "bytes": 374,
+      "sha256": "314bcecbb68ead9b50d97f458436d83f70210471e9066e7fc1e2aad15be41e8b"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/C/audit.json": {
+      "bytes": 372,
+      "sha256": "bfb9476212cbdbd3504ef9fc5a172379e39e01f8c7acf356e53a4fc15b0a4f2d"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/D/audit.json": {
+      "bytes": 373,
+      "sha256": "2ef299928c00fc2262b3fdf7a645968862264f38ab39fa3f31e0e8a71c733dd3"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/heldout/audit.json": {
+      "bytes": 382,
+      "sha256": "f4ff920b98ac69515e9fb1283a9fed7d26fb35a0df1b45194704e29f9d3acf11"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/preflight/audit.json": {
+      "bytes": 385,
+      "sha256": "ea69a103a2f4ce49442d1ca404c32cbaad5d31a5623e8bfc25644070b51fbcba"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/kaggle/refit/audit.json": {
+      "bytes": 379,
+      "sha256": "9f9b8bb343752391efbd1bc2a37c506bba829d8ed3f4da6483569028ffdab6ea"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/review-confirmation-20261106/TTA-comparison.csv": {
+      "bytes": 253,
+      "sha256": "aac74639c76b2269875e8cc6d9827611e4745c4353693618e907881f53c1bc3e"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/review-final-20261106/analysis-inventory.json": {
+      "bytes": 1899,
+      "sha256": "7b0bb76570f87c010f981d0ef1b9deda32ed787caa08c6ea4bc876ff2464ea2f"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/review-selection-abc-20261106/ABC-analysis.json": {
+      "bytes": 3898,
+      "sha256": "b03a0df22fe4fd4342678b5d12c9ecf2154f43033e2c3569fb920496213ca00b"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/study/A/manifest.json": {
+      "bytes": 87945,
+      "sha256": "9f844091a55cc8f011cf0d9a33cffedc5b89b32ca08fbf53a57e51961ddd7e62"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/study/B/manifest.json": {
+      "bytes": 87927,
+      "sha256": "eb04f44c8d507ba05edab54a7bfd32bd37fe1085ccf6f23b673e49f8540c7adf"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/study/C/manifest.json": {
+      "bytes": 87903,
+      "sha256": "368ec7c9a8ee56c5558afa99471d85d8e06c12589c1153b83d2e0696c59bc6e0"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/study/D/manifest.json": {
+      "bytes": 87947,
+      "sha256": "a0f7dae40e32a088824bd01af77b396f1c12c50d8261e983b1478c70f3907ebf"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/study/heldout/attempt.json": {
+      "bytes": 317,
+      "sha256": "273f6c4641f432c737f5ec34db25dd64b5ceafaec607e323f96ecff36fb8d913"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/study/heldout/metrics.json": {
+      "bytes": 32871,
+      "sha256": "4e16ca2760b3fc0bae940e76d68b15b9ca0adec5857a2030e2c7d37430309aa7"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-pspnet-rgb-v1/benchmark/audit.json": {
+      "bytes": 343,
+      "sha256": "d2debcaace6f53854a6f6dbe5bafac05dbc50dac707db523cbf557a63611f49d"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-pspnet-rgb-v1/benchmark/outputs/output-index.json": {
+      "bytes": 414,
+      "sha256": "7b38849c06820d0c62f3d1514d3168467ca0369e535db69e64289ddc52f8da75"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-pspnet-rgb-v1/benchmark/outputs/study/benchmark/metrics.json": {
+      "bytes": 32764,
+      "sha256": "408226584ec6df031d012e47f10feae7f672a0660f258f966a1197990ed8c83a"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-pspnet-rgb-v1/refit/audit.json": {
+      "bytes": 429,
+      "sha256": "19695d8ac6b794963aae04e5dae81f45d4aff1e69a1086048456fb0eb2d26535"
+    },
+    "/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-pspnet-rgb-v1/selection/audit.json": {
+      "bytes": 431,
+      "sha256": "8ad0f0924d54ca6f19e822e951f08cc28783524a4f9aa04f25ea52c6cf1dd760"
+    },
+    "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/paired-predictions.json": {
+      "bytes": 66607,
+      "sha256": "d0232174ead70293802b18f957099893c29e098c683b3af1117e3b7aa15f8222"
+    }
+  },
+  "negative_results": {
+    "arms": [
+      {
+        "Building_IoU_percent": 95.75872470194248,
+        "Car_IoU_percent": 93.95523591606518,
+        "Clutter/background_IoU_percent": 43.83391489227172,
+        "Impervious surfaces_IoU_percent": 88.76679756717556,
+        "Low vegetation_IoU_percent": 80.30201856649626,
+        "OA_percent": 93.04408660853905,
+        "Tree_IoU_percent": 81.88195076898809,
+        "arm": "A",
+        "auxiliary_features": false,
+        "enhanced_augmentation": false,
+        "error_pixels": 13870767,
+        "mIoU_percent": 80.74977373548987,
+        "seed": 42,
+        "update": 6912
+      },
+      {
+        "Building_IoU_percent": 95.67582174384751,
+        "Car_IoU_percent": 93.91801692380584,
+        "Clutter/background_IoU_percent": 43.46703129045738,
+        "Impervious surfaces_IoU_percent": 88.75229700217892,
+        "Low vegetation_IoU_percent": 80.14130607548341,
+        "OA_percent": 92.99234038317712,
+        "Tree_IoU_percent": 81.70355411657232,
+        "arm": "B",
+        "auxiliary_features": true,
+        "enhanced_augmentation": false,
+        "error_pixels": 13973954,
+        "mIoU_percent": 80.60967119205756,
+        "seed": 42,
+        "update": 6912
+      },
+      {
+        "Building_IoU_percent": 95.6582750910949,
+        "Car_IoU_percent": 94.0595100963081,
+        "Clutter/background_IoU_percent": 42.642619788179445,
+        "Impervious surfaces_IoU_percent": 88.65841469694415,
+        "Low vegetation_IoU_percent": 80.29752697299868,
+        "OA_percent": 92.96904011406384,
+        "Tree_IoU_percent": 81.75286766664227,
+        "arm": "C",
+        "auxiliary_features": false,
+        "enhanced_augmentation": true,
+        "error_pixels": 14020417,
+        "mIoU_percent": 80.51153571869459,
+        "seed": 42,
+        "update": 6912
+      },
+      {
+        "Building_IoU_percent": 95.62293965174868,
+        "Car_IoU_percent": 93.79068579753795,
+        "Clutter/background_IoU_percent": 42.866384496870246,
+        "Impervious surfaces_IoU_percent": 88.61671983323845,
+        "Low vegetation_IoU_percent": 80.04658081535314,
+        "OA_percent": 92.94770614835744,
+        "Tree_IoU_percent": 81.81413284105805,
+        "arm": "D",
+        "auxiliary_features": false,
+        "enhanced_augmentation": false,
+        "error_pixels": 14062959,
+        "mIoU_percent": 80.45957390596776,
+        "seed": 43,
+        "update": 6912
+      }
+    ],
+    "contrasts": [
+      {
+        "Building_IoU_delta_pp": -0.08290295809497694,
+        "Car_IoU_delta_pp": -0.037218992259346884,
+        "Clutter/background_IoU_delta_pp": -0.366883601814344,
+        "Impervious surfaces_IoU_delta_pp": -0.014500564996633436,
+        "Low vegetation_IoU_delta_pp": -0.1607124910128488,
+        "OA_delta_pp": -0.05174622536192608,
+        "Tree_IoU_delta_pp": -0.17839665241576874,
+        "car_IoU_delta_pp": -0.037218992259346884,
+        "clutter_IoU_delta_pp": -0.366883601814344,
+        "contrast": "B minus A",
+        "description": "Bundled IR/index/relief/mask features",
+        "error_count_delta": 103187,
+        "mIoU_delta_pp": -0.14010254343230777
+      },
+      {
+        "Building_IoU_delta_pp": -0.10044961084758608,
+        "Car_IoU_delta_pp": 0.10427418024291368,
+        "Clutter/background_IoU_delta_pp": -1.191295104092277,
+        "Impervious surfaces_IoU_delta_pp": -0.10838287023140492,
+        "Low vegetation_IoU_delta_pp": -0.004491593497579771,
+        "OA_delta_pp": -0.07504649447519496,
+        "Tree_IoU_delta_pp": -0.1290831023458172,
+        "car_IoU_delta_pp": 0.10427418024291368,
+        "clutter_IoU_delta_pp": -1.191295104092277,
+        "contrast": "C minus A",
+        "description": "Enhanced augmentation",
+        "error_count_delta": 149650,
+        "mIoU_delta_pp": -0.238238016795278
+      },
+      {
+        "Building_IoU_delta_pp": -0.13578505019379294,
+        "Car_IoU_delta_pp": -0.16455011852724022,
+        "Clutter/background_IoU_delta_pp": -0.967530395401478,
+        "Impervious surfaces_IoU_delta_pp": -0.1500777339371151,
+        "Low vegetation_IoU_delta_pp": -0.2554377511431172,
+        "OA_delta_pp": -0.09638046018159985,
+        "Tree_IoU_delta_pp": -0.06781792793003616,
+        "car_IoU_delta_pp": -0.16455011852724022,
+        "clutter_IoU_delta_pp": -0.967530395401478,
+        "contrast": "D minus A",
+        "description": "A recipe, seed 43",
+        "error_count_delta": 192192,
+        "mIoU_delta_pp": -0.29019982952211976
+      }
+    ],
+    "interpretation": "One seed per A/B/C configuration plus one A-recipe confirmation seed cannot estimate expected treatment effects or isolate individual auxiliary modalities.",
+    "tta": [
+      {
+        "base_oa": "0.9304408660853905",
+        "gain_gate_passed": "False",
+        "hflip_oa": "0.931226665316816",
+        "oa_gain_pp": "0.07857992314255213",
+        "other_metrics_preserved": "True",
+        "policy": "identity",
+        "seed": "seed42"
+      },
+      {
+        "base_oa": "0.9294770614835745",
+        "gain_gate_passed": "False",
+        "hflip_oa": "0.9301670078118662",
+        "oa_gain_pp": "0.06899463282917795",
+        "other_metrics_preserved": "True",
+        "policy": "identity",
+        "seed": "seed43"
+      }
+    ]
+  },
+  "paired_predictions": {
+    "manifest": "/Users/macbook/Desktop/workspace/deepnet-for-semantic-labeling-photogrammetry/data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/paired-predictions.json",
+    "models": {
+      "dinov3": {
+        "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+        "peak_cuda_allocated_bytes": 724431360,
+        "peak_cuda_reserved_bytes": 1077936128
+      },
+      "pspnet": {
+        "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+        "peak_cuda_allocated_bytes": 442729984,
+        "peak_cuda_reserved_bytes": 528482304
+      }
+    },
+    "paired_pixel_counts": {
+      "DINOv3_OA_percent": 92.03971428764099,
+      "DINOv3_mIoU_percent": 81.09317958878492,
+      "PSPNet_OA_percent": 91.28337662112543,
+      "PSPNet_mIoU_percent": 79.42347812930267,
+      "analysis_script_sha256": "7838e0bd007c584a89fd5d533583e40c14605d4b5055092288670d388e5c29f9",
+      "both_correct": 417385769,
+      "both_wrong": 27547977,
+      "cache_hash": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4",
+      "dinov3_only_correct": 13233866,
+      "inference_source_sha256": "7548aae4b32270c95f310c7b26a840e2a9cf7a5f34e7301a366cb074e3ffdad1",
+      "model_confusion_matrices_reproduced": true,
+      "net_DINOv3_correct_pixels": 3538623,
+      "paired_inference_attempt_gpu_hours": 0.5477517194894446,
+      "paired_inference_failed_attempts": [
+        "attempt-1",
+        "attempt-2"
+      ],
+      "paired_inference_failed_bootstrap_gpu_hours": 0.07369862324777779,
+      "paired_inference_successful_gpu_hours": 0.47405309624166675,
+      "paired_models": {
+        "dinov3": {
+          "peak_cuda_allocated_bytes": 724431360,
+          "peak_cuda_reserved_bytes": 1077936128
+        },
+        "pspnet": {
+          "peak_cuda_allocated_bytes": 442729984,
+          "peak_cuda_reserved_bytes": 528482304
+        }
+      },
+      "prediction_agreement": 442185032,
+      "prediction_disagreement": 25677823,
+      "pspnet_only_correct": 9695243,
+      "reference": "14 historical benchmark scenes with eroded labels",
+      "shared_wrong_different_prediction": 2748714,
+      "shared_wrong_same_prediction": 24799263,
+      "training_performed": false,
+      "valid": 467862855
+    },
+    "status": "verified-exact-confusion-reproduction"
+  },
+  "quality_cost": {
+    "DINOv3_forward_time_seconds": 278.33107705899914,
+    "DINOv3_mIoU_gain_pp": 1.6697014594822424,
+    "PSPNet_forward_time_seconds": 110.00740049300092,
+    "PSPNet_scoring_time_reduction_percent_vs_DINOv3": 37.11576375075112,
+    "frontier": [
+      "DINOv3-B RGB refit",
+      "PSPNet RGB refit"
+    ],
+    "full_scene_time_difference_percent_DINOv3_over_PSPNet": 59.02236548383688,
+    "inference_protocol": {
+      "batch_size": 4,
+      "cache_hash": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4",
+      "inference": "identity",
+      "pixels_scored": 467862855,
+      "scene_count": 14,
+      "stride": [
+        256,
+        256
+      ],
+      "window_size": [
+        512,
+        512
+      ]
+    },
+    "models": [
+      {
+        "OA_percent": 92.03971428764099,
+        "benchmark_gpu_hours": 0.29268076128055553,
+        "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+        "full_campaign_gpu_hours": 13.440711779010556,
+        "full_scene_scoring_seconds": 405.23396257999997,
+        "mIoU_percent": 81.09317958878492,
+        "model": "DINOv3-B RGB refit",
+        "model_forward_seconds": 278.33107705899914,
+        "peak_inference_cuda_allocated_bytes": 724431360,
+        "peak_inference_cuda_reserved_bytes": 1077936128,
+        "pixels_scored": 467862855,
+        "preflight_gpu_hours": 0.37750717181444443,
+        "selection_refit_benchmark_gpu_hours": 13.063204607196111,
+        "training_gpu_hours": 12.770523845915555,
+        "training_refit_gpu_hours": 0.5955537623088888,
+        "training_selection_gpu_hours": 12.174970083606667,
+        "winner_arm_plus_refit_gpu_hours": 3.529089577122222,
+        "winner_arm_selection_gpu_hours": 2.9335358148133333
+      },
+      {
+        "OA_percent": 91.28337662112543,
+        "benchmark_gpu_hours": 0.18308969212444443,
+        "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+        "full_campaign_gpu_hours": 1.9065937223272222,
+        "full_scene_scoring_seconds": 254.828282391,
+        "mIoU_percent": 79.42347812930267,
+        "model": "PSPNet RGB refit",
+        "model_forward_seconds": 110.00740049300092,
+        "peak_inference_cuda_allocated_bytes": 442729984,
+        "peak_inference_cuda_reserved_bytes": 528482304,
+        "pixels_scored": 467862855,
+        "preflight_gpu_hours": 0.0,
+        "selection_refit_benchmark_gpu_hours": 1.9065937223272222,
+        "training_gpu_hours": 1.7235040302027778,
+        "training_refit_gpu_hours": 0.28356745254666665,
+        "training_selection_gpu_hours": 1.439936577656111,
+        "winner_arm_plus_refit_gpu_hours": 1.7235040302027778,
+        "winner_arm_selection_gpu_hours": 1.439936577656111
+      }
+    ],
+    "peak_vram_scope": "Read from the supplemental, exact-matrix-reproduction inference run.",
+    "scope_limit": "Pareto frontier is only for these two matched RGB recipes; it is not a frontier over all segmentation systems or deployment hardware."
+  },
+  "scene_ids": [
+    "2_13",
+    "2_14",
+    "3_13",
+    "3_14",
+    "4_13",
+    "4_14",
+    "4_15",
+    "5_13",
+    "5_14",
+    "5_15",
+    "6_13",
+    "6_14",
+    "6_15",
+    "7_13"
+  ],
+  "scene_robustness": {
+    "bootstrap_replicates": 20000,
+    "bootstrap_seed": 42,
+    "leave_one_out_mIoU_delta_range_pp": [
+      1.2635765888549977,
+      1.6525741858239074
+    ],
+    "leave_one_out_sign_changes": false,
+    "macro_vs_global": {
+      "DINOv2_global_OA_percent": 91.47851094098932,
+      "DINOv2_global_mIoU_percent": 79.61215043480131,
+      "DINOv2_macro_scene_OA_percent": 91.47455917766057,
+      "DINOv2_macro_scene_mIoU_percent": 78.44604283756567,
+      "DINOv3_global_OA_percent": 92.03971428764099,
+      "DINOv3_global_mIoU_percent": 81.09317958878492,
+      "DINOv3_macro_scene_OA_percent": 92.03405976435974,
+      "DINOv3_macro_scene_mIoU_percent": 79.89510651668249,
+      "global_OA_delta_pp": 0.5612033466516619,
+      "global_mIoU_delta_pp": 1.481029153983604,
+      "macro_scene_OA_delta_pp": 0.5595005866991631,
+      "macro_scene_mIoU_delta_pp": 1.449063679116811
+    },
+    "negative_OA_scenes": 2,
+    "negative_mIoU_scenes": 2,
+    "positive_OA_scenes": 12,
+    "positive_mIoU_scenes": 12,
+    "scene_OA_delta_range_pp": [
+      -0.10796025772368267,
+      1.6061316214107335
+    ],
+    "scene_cluster_bootstrap_95_percentile_interval": {
+      "global_miou_delta_pp": [
+        0.7439176261798008,
+        1.4700465936132168,
+        2.253762966525512
+      ],
+      "global_oa_delta_pp": [
+        0.2955215490368257,
+        0.5584577882404074,
+        0.8457568342015592
+      ]
+    },
+    "scene_mIoU_delta_range_pp": [
+      -0.38035580986687245,
+      5.102238782092716
+    ],
+    "support_correlations": [
+      {
+        "class": "Impervious surfaces",
+        "prevalence_vs_same_class_IoU_delta_pearson_r": -0.18072438183108142,
+        "prevalence_vs_same_class_IoU_delta_spearman_rho": -0.015384615384615385,
+        "prevalence_vs_scene_OA_delta_pearson_r": -0.13138851585998723,
+        "prevalence_vs_scene_OA_delta_spearman_rho": 0.015384615384615385,
+        "scene_count": 14
+      },
+      {
+        "class": "Building",
+        "prevalence_vs_same_class_IoU_delta_pearson_r": -0.1681882804827083,
+        "prevalence_vs_same_class_IoU_delta_spearman_rho": -0.14285714285714285,
+        "prevalence_vs_scene_OA_delta_pearson_r": -0.5551002822202588,
+        "prevalence_vs_scene_OA_delta_spearman_rho": -0.410989010989011,
+        "scene_count": 14
+      },
+      {
+        "class": "Low vegetation",
+        "prevalence_vs_same_class_IoU_delta_pearson_r": 0.11203352082252763,
+        "prevalence_vs_same_class_IoU_delta_spearman_rho": 0.09010989010989012,
+        "prevalence_vs_scene_OA_delta_pearson_r": 0.3842782333290835,
+        "prevalence_vs_scene_OA_delta_spearman_rho": 0.21318681318681318,
+        "scene_count": 14
+      },
+      {
+        "class": "Tree",
+        "prevalence_vs_same_class_IoU_delta_pearson_r": 0.6809185696275624,
+        "prevalence_vs_same_class_IoU_delta_spearman_rho": 0.389010989010989,
+        "prevalence_vs_scene_OA_delta_pearson_r": 0.254034869823068,
+        "prevalence_vs_scene_OA_delta_spearman_rho": 0.002197802197802198,
+        "scene_count": 14
+      },
+      {
+        "class": "Car",
+        "prevalence_vs_same_class_IoU_delta_pearson_r": -0.2703337996223829,
+        "prevalence_vs_same_class_IoU_delta_spearman_rho": -0.26593406593406593,
+        "prevalence_vs_scene_OA_delta_pearson_r": -0.26766607628747363,
+        "prevalence_vs_scene_OA_delta_spearman_rho": -0.23076923076923075,
+        "scene_count": 14
+      },
+      {
+        "class": "Clutter/background",
+        "prevalence_vs_same_class_IoU_delta_pearson_r": 0.0336815037020564,
+        "prevalence_vs_same_class_IoU_delta_spearman_rho": 0.2923076923076923,
+        "prevalence_vs_scene_OA_delta_pearson_r": 0.004174685705674262,
+        "prevalence_vs_scene_OA_delta_spearman_rho": -0.1824175824175824,
+        "scene_count": 14
+      }
+    ]
+  },
+  "status": "verified-from-archived-metrics"
+}

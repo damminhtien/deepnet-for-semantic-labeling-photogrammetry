@@ -1,0 +1,5 @@
+model,OA_percent,mIoU_percent,pixels_scored,full_scene_scoring_seconds,training_gpu_hours,interpretation_scope
+Historical SAM ViT-B + LoRA,87.81423051847106,73.70240197180031,467862855,not comparable or not recorded,not harmonized,historical complete-recipe reference
+DINOv2 ViT-B/14 refit,91.47851094098932,79.61215043480131,467862855,not comparable or not recorded,not harmonized,historical complete-recipe reference
+DINOv3-B RGB refit,92.03971428764099,81.09317958878492,467862855,405.23396257999997,12.770523845915555,matched RGB recipe comparison
+PSPNet RGB refit,91.28337662112543,79.42347812930267,467862855,254.828282391,1.7235040302027778,matched RGB recipe comparison

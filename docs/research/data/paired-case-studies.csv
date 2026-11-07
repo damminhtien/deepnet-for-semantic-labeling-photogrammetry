@@ -1,0 +1,21 @@
+scene,row,col,height,width,valid_pixels,dinov3_only_correct,pspnet_only_correct,both_wrong,prediction_disagreement,car_clutter_disagreement,vegetation_disagreement,case_group,case_group_title,selection_score
+6_14,2560,1536,512,512,241743,148625,811,29531,170891,105718,6177,dinov3_only_correct,DINOv3 corrects PSPNet,148625
+4_15,2048,5120,512,512,250280,111790,7761,6335,121358,91,1807,dinov3_only_correct,DINOv3 corrects PSPNet,111790
+2_13,2048,512,512,512,258255,92938,976,4047,93914,0,93914,dinov3_only_correct,DINOv3 corrects PSPNet,92938
+6_13,4608,5120,512,512,251663,89697,1316,4157,91226,89680,926,dinov3_only_correct,DINOv3 corrects PSPNet,89697
+7_13,5120,3072,512,512,257636,7567,79348,4226,87281,83879,366,pspnet_only_correct,PSPNet corrects DINOv3,79348
+5_14,4608,4608,512,512,235522,5534,72038,32485,80893,2108,74230,pspnet_only_correct,PSPNet corrects DINOv3,72038
+5_15,5632,5120,368,512,185310,0,66004,1983,66004,0,0,pspnet_only_correct,PSPNet corrects DINOv3,66004
+4_14,0,3584,512,512,244482,8812,62911,22035,79787,1953,20169,pspnet_only_correct,PSPNet corrects DINOv3,62911
+4_14,2560,2048,512,512,258486,34017,1048,209788,36102,36102,0,shared_errors,Both models are wrong,209788
+4_14,2048,2048,512,512,262144,40958,5315,207296,46379,46379,0,shared_errors,Both models are wrong,207296
+4_14,1536,3072,512,512,258396,1030,54724,162229,122794,121145,1649,shared_errors,Both models are wrong,162229
+4_14,2048,2560,512,512,262144,3009,49565,157873,54709,54709,0,shared_errors,Both models are wrong,157873
+4_14,2048,3072,512,512,262144,68381,28675,129704,187082,187082,0,car_clutter_disagreement,Car / clutter disagreement,187082
+4_14,2048,3584,512,512,248761,9392,3087,92886,76255,72094,4161,car_clutter_disagreement,Car / clutter disagreement,72094
+4_13,2048,4096,512,512,234162,9093,5105,98386,70907,63468,1441,car_clutter_disagreement,Car / clutter disagreement,63468
+7_13,5632,1536,368,512,184427,28960,37885,20203,67979,61548,0,car_clutter_disagreement,Car / clutter disagreement,61548
+4_14,4608,3584,512,512,252851,64716,3712,10808,70058,1493,66991,vegetation_disagreement,Tree / low-vegetation disagreement,66991
+4_14,4096,3072,512,512,240783,20126,40929,39412,81266,17580,62709,vegetation_disagreement,Tree / low-vegetation disagreement,62709
+4_14,0,2560,512,512,241304,61906,3569,47189,67119,689,61538,vegetation_disagreement,Tree / low-vegetation disagreement,61538
+2_13,1536,512,512,512,258108,57297,889,2707,58324,0,58324,vegetation_disagreement,Tree / low-vegetation disagreement,58324

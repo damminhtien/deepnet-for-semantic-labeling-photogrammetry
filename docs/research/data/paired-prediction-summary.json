@@ -1,0 +1,39 @@
+{
+  "valid": 467862855,
+  "both_correct": 417385769,
+  "both_wrong": 27547977,
+  "dinov3_only_correct": 13233866,
+  "pspnet_only_correct": 9695243,
+  "shared_wrong_same_prediction": 24799263,
+  "shared_wrong_different_prediction": 2748714,
+  "prediction_agreement": 442185032,
+  "prediction_disagreement": 25677823,
+  "DINOv3_OA_percent": 92.03971428764099,
+  "PSPNet_OA_percent": 91.28337662112543,
+  "DINOv3_mIoU_percent": 81.09317958878492,
+  "PSPNet_mIoU_percent": 79.42347812930267,
+  "net_DINOv3_correct_pixels": 3538623,
+  "paired_inference_successful_gpu_hours": 0.47405309624166675,
+  "paired_inference_attempt_gpu_hours": 0.5477517194894446,
+  "paired_inference_failed_bootstrap_gpu_hours": 0.07369862324777779,
+  "paired_inference_failed_attempts": [
+    "attempt-1",
+    "attempt-2"
+  ],
+  "paired_models": {
+    "dinov3": {
+      "peak_cuda_allocated_bytes": 724431360,
+      "peak_cuda_reserved_bytes": 1077936128
+    },
+    "pspnet": {
+      "peak_cuda_allocated_bytes": 442729984,
+      "peak_cuda_reserved_bytes": 528482304
+    }
+  },
+  "reference": "14 historical benchmark scenes with eroded labels",
+  "cache_hash": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4",
+  "inference_source_sha256": "7548aae4b32270c95f310c7b26a840e2a9cf7a5f34e7301a366cb074e3ffdad1",
+  "analysis_script_sha256": "7838e0bd007c584a89fd5d533583e40c14605d4b5055092288670d388e5c29f9",
+  "training_performed": false,
+  "model_confusion_matrices_reproduced": true
+}
