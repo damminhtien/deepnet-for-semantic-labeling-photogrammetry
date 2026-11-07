@@ -1,3 +1,11 @@
+# Potsdam PSPNet RGB milestones
+
+1. [x] Bind the comparison to the audited DINOv3 caches, schedule and metrics.
+2. [x] Verify pretrained PSPNet locally and package the private Kaggle phases.
+3. [ ] Pass CUDA fit/timing gates and complete eight-pass selection.
+4. [ ] Refit the selected PSPNet for 1,152 updates using the 24-scene cache.
+5. [ ] Audit one final benchmark, recompute metrics, and report versus DINOv3.
+
 # DINOv3 documentation and integration milestones
 
 1. [x] Reconcile current documentation with the audited final artifacts and

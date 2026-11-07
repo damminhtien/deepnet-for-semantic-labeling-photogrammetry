@@ -909,3 +909,26 @@ Document verified segmentation evaluations and research, then push the resulting
   Only task-owned closure changes are staged; keep the PSPNet hunk uncommitted.
 - This final task-state commit records completed integration. No further
   campaign action is pending; preserve the one-attempt benchmark artifacts.
+
+## Potsdam PSPNet RGB campaign — 2026-11-07
+
+- New branch dev/potsdam-pspnet-rgb-v1. The comparison reuses the locked
+  DINOv3 A RGB recipe, eight selection passes and 1,152-update 24-scene refit.
+  Train PSPNet from the verified TorchVision ResNet101 V2 snapshot. Single
+  seed 42; rank its own validation checkpoints by OA, mIoU, earlier update.
+  Test the final refit once on the same historical 14 scenes.
+- All three existing private cache datasets report ready; the local hashes
+  match the audited DINOv3 phase manifests. Real 512-pixel Potsdam RGB patch
+  completed an accumulated CPU update with finite loss and gradients in
+  the encoder and head. The two checkpoint-gate checks and 19 RGBIR tests pass.
+- Kaggle accepted damminhtien/potsdam-pspnet-rgb-v1-selection-run version 1 at
+  15:24:48 Singapore time; fresh status RUNNING. Only the train/validation
+  cache is attached. CUDA small-fit/timing and actual validation are pending.
+- External run directory: runs/potsdam-pspnet-rgb-v1 under the project Data root.
+  The launchd coordinator local.deepnet.potsdam-pspnet-rgb-v1 follows the accepted
+  receipt from a source snapshot verified against the submitted package. It
+  submits refit only after selection audit and benchmark only after final
+  refit audit, then writes comparison.json from the saved matrices.
+- Next: inspect pilot and selection progress, never duplicate an accepted
+  receipt, and report measured results only after the benchmark audit. The
+  legacy PSPNet Colab run and completed DINOv3 evidence remain unchanged.

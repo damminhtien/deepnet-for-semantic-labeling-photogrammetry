@@ -1,3 +1,12 @@
+# Potsdam PSPNet RGB comparison on Kaggle
+
+Implement and run `potsdam-pspnet-rgb-v1` using the winning DINOv3 data and
+training protocol as a fixed comparison. Keep the 18/6/14 roles, use verified
+RGB and baseline augmentation, refit the selected PSPNet weights on 24
+participant-label scenes, then score the same historical benchmark once.
+Use private Kaggle jobs. The canceled PSPNet Colab campaign and the completed
+DINOv3 benchmark remain unchanged. Keep model weights, data and logs outside Git.
+
 # DINOv3 documentation and default-branch integration
 
 Completed on 2026-11-06: documentation and all 19 campaign-branch commits were
