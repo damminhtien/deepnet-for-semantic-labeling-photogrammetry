@@ -886,19 +886,26 @@ Document verified segmentation evaluations and research, then push the resulting
   bands, independent DSM masks, selection/refit boundaries and final-only
   scoring. The unexecuted joint DINOv3 plan is explicitly separated from the
   completed Potsdam campaign. Historical source files and metrics are unchanged.
-- The unrelated PSPNet edit is temporarily isolated in a path-specific stash.
+- The unrelated PSPNet edit was isolated during integration in a path-specific stash.
   Its backup patch SHA-256 is
   6baf8f455587fe3e8071f3566eb0b92736f4f3350d95d1b7c4b0bbe461633890.
-  Restore it after integration and exclude it from all task commits.
+  The edit is excluded from all task commits.
 - Documentation validation passes on ten files: 60 local links, 215 numeric and
   binding checks, ten Pandoc parses and all 12 derived artifact inventory files.
   The saved benchmark matrices still sum to exactly 467,862,855 pixels and
   recompute the reported OA/mIoU; the attempt count remains one. Source and
-  protocol hashes remain frozen. Receipt and checker are in /private/tmp under
-  deepnet-dinov3-integration-doc-checks.json and its matching Python script.
+  protocol hashes match the frozen artifacts.
 - All 85 unit tests pass in 17.66 seconds. Ruff check and format pass on 50 files;
   git diff --check passes. Fresh code-only Graphify update completes with 1,530
   nodes / 4,544 edges; generated graph files remain ignored. No new test, GPU
   training or benchmark inference was needed for the documentation changes.
-- Next: commit the focused documentation, fast-forward master, verify the remote
-  ref and restore the saved unrelated edit.
+- Integration complete: documentation commit 42c7736 and all 18 preceding
+  campaign commits were fast-forwarded into master from 07c20b3. A non-force
+  push succeeded; git ls-remote confirms remote HEAD and refs/heads/master at
+  42c77367ff956e35416fcb5c005cb0b9dadcbf44. No branch rename was needed.
+- The unrelated PSPNet edit was restored from the saved stash and verified by
+  exact hunk comparison. Its hunk SHA-256 is
+  2719c4abde1362fb7022a0104b91fc1076accceb77baec8ba8b7d93fa841691b.
+  Only task-owned closure changes are staged; keep the PSPNet hunk uncommitted.
+- This final task-state commit records completed integration. No further
+  campaign action is pending; preserve the one-attempt benchmark artifacts.

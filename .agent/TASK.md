@@ -1,5 +1,11 @@
 # DINOv3 documentation and default-branch integration
 
+Completed on 2026-11-06: documentation and all 19 campaign-branch commits were
+fast-forwarded into the existing default `master`. Origin was verified at
+`42c77367ff956e35416fcb5c005cb0b9dadcbf44`. All 85 unit tests and documentation
+checks pass. The unrelated PSPNet edit was restored unchanged and is excluded
+from integration commits. The following task-state commit records this closure.
+
 The user requested documentation updates and a merge into the main branch on
 2026-11-06. The repository's existing default branch is `master`; there is no
 `main` branch locally or on origin. Deliver the completed campaign on that
