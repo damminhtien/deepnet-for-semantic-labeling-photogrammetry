@@ -29,8 +29,10 @@ reference map. These are local project scores, not an ISPRS leaderboard submissi
 ![Class IoU and per-scene OA differences](figures/potsdam-dinov3-rgbir-v2-final-2026-11-06.png)
 
 The figure compares aggregate class IoUs and each scene's OA difference from the
-previous DINOv2 refit. It uses saved confusion matrices without additional
-inference. The new policy is identity with 512x512 windows and stride 256;
+previous DINOv2 refit. The [SciencePlots rendering](../figures.md#dinov3-reports)
+uses the audited tables derived from saved confusion matrices. The original
+PNG/PDF remains in the external review. The new policy is identity with 512x512
+windows and stride 256;
 the DINOv2 reference retains its original 504/252 policy. SAM uses its historical
 recipe and tiling. Differences compare complete systems; they do not isolate
 the backbone, RGB input, augmentation or continuation effect.

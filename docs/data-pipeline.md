@@ -182,7 +182,9 @@ uv run python -m ipykernel install --user \
 
 The committed notebook contains source cells without generated outputs. Run all
 cells from the top; result tables, figures, and provenance are saved outside Git
-under `DEEPNET_ARTIFACT_ROOT`. To regenerate the notebook from the companion source,
+under `DEEPNET_ARTIFACT_ROOT`. To redraw the seven charts from existing CSVs
+without rescanning rasters, see [Reproduce the figures](figures.md#eda-and-legacy-notebooks).
+To regenerate the notebook from the companion source,
 run:
 
 ```bash

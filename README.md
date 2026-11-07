@@ -30,6 +30,8 @@ cache, one-time evaluation and full 13.4557 GPU-hour allocation ledger.
 
 ![Final DINOv3 benchmark comparison](docs/experiments/figures/potsdam-dinov3-rgbir-v2-final-2026-11-06.png)
 
+The charts are [reproducible from saved metrics](docs/figures.md).
+
 OA improves on 12 of 14 scenes and IoU on five of six classes. Clutter IoU gains
 6.0635 points to 48.4383%; car IoU falls 0.2816 point to 92.4418%. The final model
 makes 2,625,662 fewer errors than the DINOv2 refit, a 6.59% reduction. Reaching
