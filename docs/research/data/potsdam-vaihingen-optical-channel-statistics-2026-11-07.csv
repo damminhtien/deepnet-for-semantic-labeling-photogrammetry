@@ -1,0 +1,15 @@
+dataset,role,channel,scenes,pixels,min,p01,p05,p50,p95,p99,max,mean_dn,std_dn,scene_median_min,scene_median_max,mapping
+Potsdam,train,red,18,648000000,3,33,42,79,159,201,255,86.50770211419753,35.74866250457083,70,84,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,train,green,18,648000000,1,38,48,85,161,207,255,92.57050783179012,35.25412040173428,78,91,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,train,blue,18,648000000,1,32,41,77,156,210,255,85.5482335617284,36.64679238016616,71,86,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,train,nir,18,648000000,0,33,44,95,165,203,255,98.70774460185186,37.158613588954594,79,119,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,validation,red,6,216000000,6,32,41,76,158,203,253,83.86233815277778,35.811925184167,72,81,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,validation,green,6,216000000,4,36,46,82,154,207,253,89.39473076388889,34.65291800575897,78,86,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,validation,blue,6,216000000,4,31,40,75,151,206,253,83.32752491666666,36.056989763676214,71,80,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Potsdam,validation,nir,6,216000000,3,33,46,88,161,205,254,92.97991574537038,35.55746138148594,80,95,RGBIR source bands 1/2/3/4 = red/green/blue/NIR
+Vaihingen,train,nir,12,58554459,0,31,41,121,216,238,255,121.3898076148223,54.96181689019394,98,150,official image bands 1/2/3 = NIR/red/green
+Vaihingen,train,red,12,58554459,0,31,36,72,160,212,255,82.00663537852856,40.306125816147684,58,101,official image bands 1/2/3 = NIR/red/green
+Vaihingen,train,green,12,58554459,0,29,35,76,149,217,255,80.8622482192176,38.45451696991612,61,97,official image bands 1/2/3 = NIR/red/green
+Vaihingen,validation,nir,4,19533347,0,35,41,112,214,239,255,114.82206490265084,54.55004727977327,101,118,official image bands 1/2/3 = NIR/red/green
+Vaihingen,validation,red,4,19533347,0,37,40,71,146,201,255,79.61147513531603,36.517806575501154,64,73,official image bands 1/2/3 = NIR/red/green
+Vaihingen,validation,green,4,19533347,0,35,39,74,135,194,255,78.70337315975598,34.86008853801617,70,76,official image bands 1/2/3 = NIR/red/green
