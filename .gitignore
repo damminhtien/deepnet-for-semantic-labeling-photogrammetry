@@ -1,5 +1,11 @@
 /graphify-out/
 
+# Local agent instructions, state, and skills
+/AGENTS.md
+/.agent/
+/.codex/
+/docs/AGENT_WORKFLOW.md
+
 # Local Jupyter state and generated checkpoints
 /.jupyter/
 /.jupyter_ystore.db

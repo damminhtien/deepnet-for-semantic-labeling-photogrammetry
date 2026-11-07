@@ -107,11 +107,10 @@ residual adapter. Validation took 24.28% of timed training plus validation for A
 36.51% for B, 24.37% for C and 24.30% for D, versus 92.83% in the older joint run.
 
 The table above describes validation before the 24-scene continuation. The former
-validation scenes then entered the train-only refit bundle with participant
-labels. Refit completed exactly 1,152 updates without validation or checkpoint
-selection; its final weights were scored once on held-out. The
-[run record](.agent/STATE.md#potsdam-final-refit-and-held-out-audit--2026-11-05)
-records completion and audit evidence.
+validation scenes entered the train-only refit bundle with participant labels.
+Refit completed 1,152 updates; its final weights were scored once on held-out.
+See the [artifact review](docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md)
+for completion and audit evidence.
 
 ### Full-scene results
 
