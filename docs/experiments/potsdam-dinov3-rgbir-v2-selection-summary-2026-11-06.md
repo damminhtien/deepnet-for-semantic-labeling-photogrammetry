@@ -1,25 +1,19 @@
 # DINOv3 RGB selection and seed-43 confirmation
 
-All three seed-42 runs have completed eight passes and 6,912 optimizer updates.
-**A, the RGB baseline, wins the declared ranking.** A/B/C each pass all four
-historical C floors on exactly 199,409,714 validation pixels. **D confirms A's
-recipe with seed 43**, also passing all four floors. D started once on 2026-11-06
-at 14:55:24 Singapore time, and its terminal artifacts were audited at 16:33:38.
-The inference policy is locked to identity: both horizontal-flip OA gains are
-below the declared 0.1-point requirement. The coordinator is preparing the
-24-scene refit cache; the new benchmark remains closed at this review.
+**RGB baseline A won**, and **D confirmed A with seed 43**. Each arm ran eight
+passes (6,912 updates) and cleared the four historical C floors on 199,409,714
+validation pixels. Horizontal flips fell short of the 0.1-point OA gain required
+for both seeds. The selection lock kept identity inference.
 
-The [campaign protocol](potsdam-dinov3-rgbir-v2.md) and
-[preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md) retain the frozen
-schedule and model roster. The earlier [A review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-05.md)
-and [A/B review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md) preserve
-the preceding measurements and recovery evidence.
+See the [protocol](potsdam-dinov3-rgbir-v2.md),
+[preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md), [A
+review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-05.md) and [A/B
+review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md).
 
 ## Results and interpretation
 
-The table reports each arm's selected update-6,912 checkpoint. Full-scene
-validation uses 512x512 windows, stride 256 and eroded labels. The fixed probes
-cannot choose a checkpoint.
+The table uses selected checkpoints at update 6,912. Full-scene validation uses
+512 × 512 windows, stride 256 and eroded labels.
 
 | Configuration | OA | Six-class mIoU | Car IoU | Clutter IoU |
 | --- | ---: | ---: | ---: | ---: |
@@ -32,40 +26,29 @@ cannot choose a checkpoint.
 
 ![Seed-42 full validation and IoU differences from A](figures/potsdam-dinov3-rgbir-v2-abc-2026-11-06.png)
 
-The left panel contains only the two scheduled full validations, passes 4 and 8;
-the lines connect measured checkpoints. All pass-four OAs are below the floor,
-and all pass-eight OAs exceed it. The right panel shows class IoU changes from
-A. The PNG was visually inspected; its source PNG/PDF and input hashes remain
-with the external review artifacts.
+The left panel connects full validations at passes 4 and 8. All arms rose from
+below the OA floor at pass 4 to above it at pass 8. The right panel shows class
+IoU differences from A.
 
-C improves car IoU by 0.1043 point but loses 1.1913 clutter IoU points. It makes
-14,020,417 validation errors, versus 13,870,767 for A: **149,650 more errors**.
-Its full pass-four checkpoint also fails the OA floor (92.4244%). Under the
-locked eight-pass budget, the enhanced augmentation recipe does not improve
-OA or mIoU in seed 42. This does not identify an individual augmentation as the
-cause or establish the effect across seeds.
+C gains 0.1043 point in car IoU and loses 1.1913 points in clutter IoU. It makes
+14,020,417 validation errors versus A's 13,870,767 (**149,650 more**). Under the
+eight-pass schedule, the enhanced recipe scored lower in seed-42 OA and mIoU.
 
-C's pass-eight train mIoU is 83.0787%, compared with 83.1445% for A, and its
-mean training loss is 0.2344 versus 0.2329. These train quantities are measured
-under each augmentation recipe and sampled class mix; they are not measurements
-on a common unaugmented training panel. They do not alone explain the validation
-difference or prove that more optimization would reverse it.
+At pass eight, C's train mIoU is 83.0787% versus A's 83.1445%. Mean training
+losses are 0.2344 and 0.2329 respectively. These measurements use each recipe's
+own augmented batches.
 
-All arms cover the same 2,592 base windows and 432+432 rare draws per pass.
-C records 6,991,404,308 actual valid-pixel presentations, versus 6,993,985,512
-for A/B. The 2,581,204 difference is less than 0.04% and reflects the changed
-augmentation path; C does not omit a train scene or a base coverage window.
+All arms cover 2,592 base windows plus 432 draws per rare class each pass.
+Augmentation yields 6,991,404,308 valid pixel presentations for C, 2,581,204
+fewer (under 0.04%) than A/B.
 
-A remains 5.9559 validation OA percentage points below 99%. These validation
-scores cannot be compared directly with the previous post-refit 91.4785%
-benchmark OA on different scenes. No new benchmark result exists yet.
+A's validation OA is 5.9559 points below 99%.
 
 ## Confirmation and scoring gates
 
-D repeats A from pretrained with the same eight-pass schedule. Its selected
-checkpoint is update 6,912, with 14,062,959 validation errors. Compared with A,
-OA is lower by 0.0964 point and mIoU by 0.2902 point. Both seeds clear the
-predeclared floors; two seeds do not establish the full seed-to-seed variance.
+D repeats A from pretrained for eight passes. At the selected update 6,912, D
+makes 14,062,959 validation errors. OA falls 0.0964 point and mIoU falls 0.2902
+point versus A; both seeds clear all four floors.
 
 Horizontal-flip TTA improves all four metrics for both checkpoints, but fails
 the minimum OA-gain rule:
@@ -96,16 +79,10 @@ threshold or schedule was changed after observing the results.
 | Validation / (train + validation) | 11.19% | 9.25% | 8.30% | 9.80% |
 | Full allocated GPU-hours | 2.9335358 | 3.2024464 | 2.8305651 | 3.2084227 |
 
-Both allocated T4s count. The completed preflight attempts and A/B/C/D total
-**12.5675127 allocated GPU-hours**, including the failed first preflight and
-D's TTA. The TTA inner ledger records 0.3278253 GPU-hours, already contained in
-D's full execution cost; it must not be added again.
-C's worker-only scope is 2.8271300 GPU-hours and its inner runner records
-2.8209043. These are execution-ledger scopes, not provider billing exports.
-Validation now occupies a much smaller share than the old 92.83% joint-run
-measurement, with the changed schedules and denominators recorded here. The
-validation timer includes probes, full-scene scoring, the fixed input diagnostics
-and selected-checkpoint writes; it is broader than model-forward latency.
+Preflight and A/B/C/D used **12.5675127 allocated GPU-hours** across both T4s.
+D's total includes the 0.3278253 GPU-hour TTA run. C used 2.8271300 GPU-hours in
+the worker and 2.8209043 in the inner runner. Validation timing includes probes,
+full-scene scoring, input diagnostics and checkpoint writes.
 
 The independent review verifies all four phase artifact inventories and
 checkpoint hashes, all **134 saved train/probe/full-scene, TTA and per-scene

@@ -1,7 +1,4 @@
-"""Historical patch coordinates used by pre-pipeline experiments.
-
-New patch and grid strategies belong in ``deepnet.data.sampling``.
-"""
+"""Patch coordinates for the original Potsdam experiments."""
 
 import random
 from itertools import islice

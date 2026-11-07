@@ -1,8 +1,6 @@
-"""Build a private Kaggle-installable wheel for the shared project package.
+"""Build the project wheel for a private Kaggle dataset.
 
-The resulting wheel contains the data API and default contracts. Attach it as a
-Kaggle input and install it with ``pip install --no-deps`` so Kaggle's preinstalled
-Torch build is left intact.
+Install it with pip install --no-deps to retain Kaggle's Torch build.
 """
 
 from __future__ import annotations

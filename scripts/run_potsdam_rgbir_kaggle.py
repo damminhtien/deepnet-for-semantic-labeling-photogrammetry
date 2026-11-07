@@ -1,8 +1,4 @@
-"""Package, submit once, retrieve, and audit private RGBIR Kaggle phases.
-
-Run from the repository with ``python -m scripts.run_potsdam_rgbir_kaggle``.
-All receipts, inputs, source payloads, and GPU artifacts live outside Git.
-"""
+"""Package private Kaggle inputs, submit RGBIR phases and audit their outputs."""
 
 from __future__ import annotations
 

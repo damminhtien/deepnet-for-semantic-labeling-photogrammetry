@@ -1,5 +1,3 @@
-"""Regression witnesses for RGBIR masks, reproducibility, and experiment gates."""
-
 import io
 import runpy
 import subprocess

@@ -1,6 +1,6 @@
 # Long-running coding-agent workflow
 
-The repository is the durable record for a task. Keep the goal, plan, observed progress, decisions, and next action in files so a new Codex thread can resume without replaying the conversation.
+Record the task and its next step in `.agent/` so another chat can resume it.
 
 ## State files
 
@@ -9,17 +9,20 @@ The repository is the durable record for a task. Keep the goal, plan, observed p
 - .agent/STATE.md records completed work, current work, the exact next action, known issues, validation results, and the latest checkpoint.
 - .agent/DECISIONS.md records decisions for the active task, including the reason and any consequence.
 
-Keep durable repository rules in AGENTS.md or docs/. Keep task-specific state in .agent/. When a new task starts, replace the active task and plan, carry forward only unresolved state, and start a new decision log. Git history preserves completed task records.
+Keep repository rules in `AGENTS.md` or `docs/`. For a new task, start a plan
+and decision log and carry forward unresolved state. Completed tasks are in Git
+history.
 
 ## Verification boundaries
 
-Split work by independently verifiable outcomes, not by arbitrary amounts of coding. A milestone should state:
+Give each milestone:
 
 1. the behavior or artifact that will exist when it is done;
 2. the smallest relevant validation command or observable result;
 3. any dependency on earlier milestones.
 
-For each milestone, implement, validate, inspect the result, update PLAN.md and STATE.md, then create a commit or another recoverable checkpoint when appropriate. Repair failed validation before moving on. Keep acceptance criteria specific to the task; do not copy generic commands such as pytest or mypy unless this repository and the changed code support them.
+After verifying each milestone, update `PLAN.md` and `STATE.md` and checkpoint
+the work when appropriate. Fix failures before continuing.
 
 ## Context handoff
 
@@ -32,18 +35,29 @@ Use this prompt for the new thread:
     Continue the current task from STATE.md.
     Inspect only additional files required for the next unfinished item.
 
-Read PLAN.md and DECISIONS.md only as needed for the next unfinished item. Do not treat a successful local check as evidence of an experiment, deployment, or benchmark result unless that result was actually observed.
+Read `PLAN.md` and `DECISIONS.md` as needed for the next unfinished item.
 
 ## Google authentication boundaries
 
-Use the connected Google Drive integration for Drive file operations such as listing, uploading, downloading, and verifying files. Do not use gcloud Application Default Credentials (ADC) as a substitute for the Drive connection: ADC and Drive OAuth are separate credentials, and a successful Google login does not imply that an ADC token contains Drive API scopes.
+Use the connected Google Drive integration to list, upload, download and verify
+Drive files. Drive OAuth and gcloud Application Default Credentials (ADC) have
+separate scopes.
 
-Use gcloud ADC only for Google Cloud APIs that accept the scopes on that ADC token. If a Drive API request made with ADC returns `403 ACCESS_TOKEN_SCOPE_INSUFFICIENT`, treat it as a credential-scope mismatch in the selected tool path, not as evidence that the user failed to log in. Switch to the connected Drive integration and verify the resulting files there. Do not ask the user to repeat OAuth when the Drive integration is already authorized, and never inspect or print credential contents.
+Use ADC for Google Cloud APIs that accept its scopes. If the Drive API returns
+`403 ACCESS_TOKEN_SCOPE_INSUFFICIENT` with ADC, switch to the Drive integration
+and verify the files there. Reuse the authorized connection and keep credential
+contents private.
 
-Mounting Drive inside Colab is a separate runtime action: use `google.colab.drive.mount()` in that Colab session when it needs access. Do not route that step through local gcloud ADC.
+To mount Drive in a Colab VM, call `google.colab.drive.mount()` in that session.
 
 ## Colab CLI authentication
 
-The Colab CLI's API authentication is separate from the Colab website session and from credentials injected into a running VM by `colab auth`. On this Mac, `/Users/macbook/.local/bin/colab` defaults commands to the existing gcloud ADC unless `--auth` is explicitly supplied. Use this wrapper rather than invoking the Python 3.14 entry point directly. On another machine without this wrapper, pass `--auth=adc` before the subcommand when using ADC. A successful `colab sessions` request with an empty assignment list means authentication succeeded but the account has no active CLI-listed sessions; it does not mean the browser notebook is signed in or running.
+The Colab CLI, website and VM have separate authentication. Use
+`/Users/macbook/.local/bin/colab`, which defaults to gcloud ADC unless given
+`--auth`. On machines without the wrapper, pass `--auth=adc` before the
+subcommand to use ADC. An empty `colab sessions` response means there are no
+active CLI-listed sessions for that account.
 
-The installed upstream CLI writes DEBUG request headers to `~/.config/colab-cli/colab.log`, including authorization headers. The local wrapper redacts bearer and token-like values before log records reach any handler. Keep using the wrapper, and do not print credential contents or raw debug logs.
+The upstream CLI writes request headers to `~/.config/colab-cli/colab.log` at
+DEBUG level. The local wrapper redacts authorization values before logging. Use
+the wrapper and keep raw debug logs private.

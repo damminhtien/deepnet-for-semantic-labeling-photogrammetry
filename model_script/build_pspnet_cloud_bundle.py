@@ -1,9 +1,4 @@
-"""Export a contract-driven cloud bundle through the shared data CLI.
-
-Use the JSON dataset, split, preprocessing, and model-input contracts rather than
-model-specific path templates. Example arguments are available from
-``python -m deepnet.data export-bundle --help``.
-"""
+"""Export a model-view bundle. See python -m deepnet.data export-bundle --help."""
 
 from __future__ import annotations
 

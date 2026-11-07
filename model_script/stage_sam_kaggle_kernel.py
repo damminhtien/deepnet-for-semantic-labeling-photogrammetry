@@ -1,8 +1,4 @@
-"""Stage a caller-selected Python script and metadata for Kaggle.
-
-This utility only creates a local directory. It does not upload, publish, or run a
-Kaggle kernel.
-"""
+"""Stage a script and its Kaggle metadata in a local directory."""
 
 from __future__ import annotations
 

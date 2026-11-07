@@ -1,7 +1,6 @@
-"""Correct the archived foundation report from immutable local metric records.
+"""Recompute published macro-F1 from archived confusion counts.
 
-Run with the original model_results directory as --source-dir. This rewrites only
-the public aggregate JSON; source records, predictions, and model weights are read-only.
+Pass the original model_results directory to --source-dir.
 """
 
 from __future__ import annotations

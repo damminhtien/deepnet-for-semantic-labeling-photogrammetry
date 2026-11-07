@@ -114,7 +114,7 @@ class TransformerFeatureBackbone(nn.Module):
     def from_pretrained(
         cls, spec: BackboneSpec, *, pretrained_path: Path | None = None
     ) -> TransformerFeatureBackbone:
-        """Load configured weights only when explicitly requested by a caller."""
+        """Load the configured pretrained weights."""
         if spec.backend != "huggingface":
             raise ValueError("Only Hugging Face specs can load pretrained weights")
         try:

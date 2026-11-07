@@ -1,4 +1,4 @@
-"""Small, deterministic helpers for inspecting segmentation augmentations."""
+"""Segmentation augmentation diagnostics."""
 
 from __future__ import annotations
 
@@ -13,11 +13,8 @@ def semantic_boundary_mask(
     *,
     num_classes: int,
 ) -> np.ndarray:
-    """Mark both sides of 4-neighbor transitions between valid semantic classes.
-
-    Ignore labels and invalid pixels do not create class boundaries. The result
-    measures semantic class edges; it cannot separate adjacent objects that share
-    the same class because the ISPRS labels do not contain instance IDs.
+    """Mark both sides of 4-neighbor transitions between valid semantic classes. Exclude
+    ignore labels and invalid pixels.
     """
     labels = np.asarray(labels)
     valid = np.asarray(valid_mask, dtype=bool)

@@ -1,9 +1,4 @@
-"""Run common windowed quality checks before exporting a cloud bundle.
-
-This entry point is retained for discoverability. Data preparation, palette
-validation, alignment checks, and quality reports are handled by ``deepnet.data``.
-Use ``python -m deepnet.data quality-report --help`` for the contract-driven CLI.
-"""
+"""Check source rasters with deepnet.data quality-report before exporting a bundle."""
 
 from __future__ import annotations
 

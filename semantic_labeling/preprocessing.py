@@ -1,8 +1,4 @@
-"""Historical input assembly used by pre-pipeline experiments.
-
-New model views are declared with ``ModelInputSpec`` and transformed by
-``deepnet.data.preprocessing``.
-"""
+"""Input assembly for the original Potsdam experiments."""
 
 import numpy as np
 

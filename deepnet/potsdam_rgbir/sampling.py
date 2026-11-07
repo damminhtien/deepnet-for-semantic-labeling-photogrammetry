@@ -30,7 +30,7 @@ class Draw:
 
 
 def training_index(access) -> dict:
-    """Count every train pixel; index rare pixels by tile without subsampling."""
+    """Count training pixels and index rare-class counts by tile."""
     base, support, rare = [], np.zeros(6, dtype=np.int64), {}
     for scene, shape in access.scene_shapes.items():
         tiles = {str(c): [] for c in (4, 5)}

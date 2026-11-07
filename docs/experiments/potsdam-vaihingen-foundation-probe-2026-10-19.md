@@ -1,14 +1,10 @@
 # Potsdam and Vaihingen foundation encoder evaluation
 
-> **Historical results — rerun required.** These experiments predate the
-> contract-driven data pipeline. Their metrics remain archived evidence and have
-> not been reproduced through the current catalog, preprocessing, or evaluation
-> contracts.
-
 Date: 2026-10-19
 Environment: Python 3.14.8, PyTorch 2.14.1, Apple MPS.
 
-This deeper evaluation compares three frozen pretrained encoders with one supervised linear segmentation head. It is not end-to-end fine-tuning and is not an ISPRS leaderboard submission. Scores use a coarse grid of approximately 5 m per cell; label ID 6 is ignored.
+The evaluation compares three frozen encoders with a supervised linear head.
+Scores use grids of about 5 m per cell and ignore label ID 6.
 
 ## Primary results
 
@@ -24,13 +20,11 @@ The Potsdam 5 m validation probe preceding this run measured mIoU of 23.75% for 
 
 ### Macro-F1 correction, 2026-10-28
 
-The archived evaluator treated zero-true-positive classes as undefined F1 and
-excluded them from the macro average. The corrected JSON uses
-`F1 = 2*TP / (truth_count + prediction_count)`: classes with a nonzero denominator
-and no true positives contribute zero. Only classes absent from both truth and
-prediction are undefined. This corrects 33 published macro-F1 values, including
-folds and majority baselines. Overall accuracy, IoU, splits, and predictions are
-unchanged; no training or inference was rerun.
+The archived evaluator excluded zero-true-positive classes from macro-F1. The
+corrected JSON uses `F1 = 2*TP / (truth_count + prediction_count)`. Classes with
+a positive denominator and zero true positives contribute zero; classes absent
+from truth and predictions are undefined. The correction recomputes 33 macro-F1
+values from the original counts.
 
 | Encoder | Previous Vaihingen OOF macro-F1 | Corrected Vaihingen OOF macro-F1 |
 |---|---:|---:|
@@ -38,9 +32,8 @@ unchanged; no training or inference was rerun.
 | AnySat | 49.1835% | 32.7890% |
 | TerraMind | 47.8839% | 31.9226% |
 
-The JSON retains the confusion counts supporting its macro-F1 fields, corrected
-per-class F1, and SHA-256 hashes of the original metric files. Original local
-artifacts remain unchanged. Reproduce the correction with:
+The JSON includes the confusion counts, corrected per-class F1 and SHA-256
+hashes of the source metrics. Reproduce the correction with:
 
 ```bash
 python scripts/correct_foundation_metrics.py --source-dir /path/to/model_results
@@ -74,7 +67,7 @@ python scripts/correct_foundation_metrics.py --source-dir /path/to/model_results
 | Cars | 2.35% | 1.52% | 2.21% |
 | Clutter/background | 8.49% | 9.03% | 2.84% |
 
-Cars score poorly for every encoder at this grid size. Majority reduction to approximately 5 m removes much of their small-object detail, so this result does not establish full-resolution car performance.
+Cars score poorly at 5 m, where majority reduction removes much of their detail.
 
 ## Protocol
 
@@ -89,9 +82,15 @@ Cars score poorly for every encoder at this grid size. Majority reduction to app
 
 UniverSat has the strongest Vaihingen OOF and held-out mIoU and the strongest Vaihingen per-class scores overall. TerraMind has the highest Potsdam held-out OA and impervious-surface IoU, while UniverSat has slightly higher Potsdam mIoU. None of the encoders dominates every dataset and metric.
 
-The measured cross-domain mIoUs are all below 12%. The RGB probes in [frozen-encoder-probes-2026-10-19.md](frozen-encoder-probes-2026-10-19.md) favor TerraMind on sampled LandCover.ai and LoveDA data, while this deeper urban benchmark favors UniverSat on Vaihingen. These are reasons to keep both in the candidate set; they do not settle a single flagship choice for a multi-source online pipeline.
+Cross-domain mIoU is below 12% for all encoders. Keep TerraMind and UniverSat
+for full-resolution evaluation: the [RGB
+probes](frozen-encoder-probes-2026-10-19.md) favor TerraMind, while Vaihingen
+favors UniverSat.
 
-Evaluation elapsed time after model/data preload was 124.1 s for UniverSat, 118.7 s for AnySat, and 112.2 s for TerraMind. Each time includes four-fold OOF probes, final in-domain fits/evaluations, and both cross-domain evaluations. These are not per-tile inference latencies and must not be used as an online throughput comparison. TerraTorch emitted a Python 3.14 `torch.jit.script` warning; TerraMind inference completed.
+After preload, evaluation took 124.1 s for UniverSat, 118.7 s for AnySat and
+112.2 s for TerraMind. These timings include four-fold probes, final in-domain
+fits and scores, and both cross-domain evaluations. TerraTorch emitted a Python
+3.14 `torch.jit.script` warning; TerraMind inference completed.
 
 ## Data and provenance
 

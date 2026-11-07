@@ -155,7 +155,7 @@ class CacheBundle:
 
 
 class CacheAccess:
-    """Duck-type SceneAccess for the shared evaluator; open arrays lazily per worker."""
+    """Expose SceneAccess methods and open arrays lazily per worker."""
 
     def __init__(self, bundle: CacheBundle, role: str, *, auxiliary: bool):
         self.bundle = bundle

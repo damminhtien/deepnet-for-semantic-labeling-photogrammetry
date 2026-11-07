@@ -1,4 +1,4 @@
-"""Run one frozen RGBIR campaign phase with explicit, role-scoped inputs."""
+"""Run one phase of the Potsdam RGBIR study."""
 
 from __future__ import annotations
 

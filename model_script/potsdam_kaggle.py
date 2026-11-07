@@ -174,7 +174,7 @@ def main():
             check=True,
         )
     finally:
-        # Keep only this phase in the output; previous phases stay in their own jobs.
+        # Remove inputs from earlier jobs before publishing this phase's output.
         for previous in SETTINGS["expected_phases"]:
             if previous != "preflight":
                 shutil.rmtree(study / previous)

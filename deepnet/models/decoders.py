@@ -11,7 +11,7 @@ from torch.nn import functional as functional
 
 
 def _conv_refinement(channels: int, groups: int) -> nn.Sequential:
-    """Build a compact spatial refinement block without batch-statistics state."""
+    """Build a convolutional refinement block with optional GroupNorm."""
     layers = []
     for _ in range(2):
         layers.append(nn.Conv2d(channels, channels, 3, padding=1))

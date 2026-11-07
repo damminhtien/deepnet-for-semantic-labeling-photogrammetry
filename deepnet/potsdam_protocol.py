@@ -150,8 +150,7 @@ class Budget:
     def __enter__(self):
         self.directory.mkdir(parents=True, exist_ok=True)
         self.path = self.directory / "budget.json"
-        # Reserve the full remaining phase budget until a normal process exit.
-        # A hard kill cannot leave an unaccounted retry.
+        # Reserve the remaining budget so a killed attempt stays charged.
         self.previous = (
             read_json(self.path)["gpu_seconds"] if self.path.exists() else 0.0
         )

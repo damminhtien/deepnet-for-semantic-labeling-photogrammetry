@@ -1,4 +1,4 @@
-"""Versioned, dependency-light specifications for configurable segmentation models."""
+"""Versioned segmentation model specs."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ DEFAULT_MODEL_CONFIG_DIR = _model_config_dir()
 
 @dataclass(frozen=True, slots=True)
 class LoRASpec:
-    """LoRA settings whose target module names remain model-configuration data."""
+    """LoRA settings and target module names."""
 
     rank: int
     alpha: int

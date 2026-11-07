@@ -1,16 +1,12 @@
 # %% [markdown]
 # # ISPRS data EDA and augmentation review
 #
-# This reproducible, cell-oriented analysis reads the DVC-prepared catalogs and
-# train/validation quality reports. It scans full-scene IRRG in raster blocks and
-# optionally audits Potsdam DSM/nDSM files from a configured auxiliary root. It
-# never modifies source rasters, fits normalization on validation data, or reads
-# the Vaihingen post-selection scenes.
+# Scan the train and validation catalogs for IRRG distributions, optional
+# Potsdam DSM/nDSM metadata and augmentation effects.
 #
-# Before running, prepare the DVC inputs and run `dvc repro`. Set
-# `DEEPNET_DATA_ROOT` to the materialized DVC input directory. Set
-# `DEEPNET_AUX_DATA_ROOT` to the directory containing the Potsdam DSM/nDSM source
-# folders when those assets are available. Set `DEEPNET_ARTIFACT_ROOT` outside Git.
+# Run `dvc repro` first. Set `DEEPNET_DATA_ROOT` to the materialized inputs,
+# `DEEPNET_AUX_DATA_ROOT` to the optional DSM/nDSM root and
+# `DEEPNET_ARTIFACT_ROOT` to an output directory outside Git.
 
 # %%
 from __future__ import annotations
@@ -106,12 +102,8 @@ ARTIFACT_ROOT.mkdir(parents=True, exist_ok=False)
 # %% [markdown]
 # ## Load versioned catalogs and split contracts
 #
-# Catalog hashes and DVC quality reports provide the data provenance for this
-# notebook. Potsdam follows the benchmark-aligned 18/6/14 split. Its 14
-# challenge-heldout scenes are excluded from this analysis and stay closed until
-# selection. The 17 official Vaihingen scenes remain closed until the DINOv3 config
-# and selected checkpoint are frozen. A versioned evaluation
-# protocol checks both split hashes before analysis begins.
+# Check the Potsdam and Vaihingen split hashes against the evaluation protocol.
+# This analysis uses the train and validation roles.
 
 # %%
 DATASET_CONFIGS = {
@@ -289,11 +281,8 @@ display(
 # %% [markdown]
 # ## Asset inventory, metadata, and alignment
 #
-# Review band order, shapes, data types, NoData metadata, CRS/affine availability,
-# checksums, and source-backed alignment records. The report distinguishes a
-# pixel-local pairing from geographic registration. The configured DINOv3 view uses
-# IRRG only; the optional Potsdam DSM/nDSM audit below does not add those assets to
-# the model input.
+# Review band order, shape, dtype, NoData, checksums and alignment evidence.
+# The DINOv3 view for this analysis uses IRRG.
 
 # %%
 asset_rows = []
@@ -419,11 +408,8 @@ plt.show()
 # %% [markdown]
 # ## Label balance, ignore pixels, and scene variability
 #
-# Counts come from the full-scene, windowed DVC quality scan. The six semantic
-# classes are normalized separately from class 6, which is the ignore/boundary ID.
-# Per-scene proportions expose whether pooled class frequency hides spatial
-# variation; they should guide train-only sampling, not be used to rebalance
-# validation.
+# Use full-scene counts from the DVC quality scan. Compute class shares over
+# the six semantic IDs and track ignore ID 6 separately.
 
 # %%
 CLASS_NAMES = {
@@ -528,10 +514,8 @@ plt.show()
 # %% [markdown]
 # ## Full-scene IRRG value distributions
 #
-# Every pixel in every train and validation IRRG raster is scanned using native
-# raster blocks. Histograms and quantiles are exact for the declared uint8 bands.
-# The 17 Vaihingen post-selection scenes are excluded. These diagnostics compare
-# distributions; fitted normalization statistics still come from train only.
+# Scan train and validation rasters in native blocks. Histograms and quantiles
+# are exact for the uint8 bands.
 
 
 # %%
@@ -774,12 +758,9 @@ plt.show()
 # %% [markdown]
 # ## Potsdam DSM and nDSM source audit
 #
-# These optional assets are read from `DEEPNET_AUX_DATA_ROOT`. The current DVC
-# snapshot does not contain them, so each source file is SHA-256 recorded in the
-# output manifest. Only train and validation scenes are scanned. DSM alignment is
-# accepted only when CRS and affine metadata match the IRRG reference grid. Equal
-# nDSM/JPEG dimensions do not establish registration; nDSM remains excluded from
-# the model input until independent coregistration evidence is supplied.
+# Read optional rasters from `DEEPNET_AUX_DATA_ROOT` and record their SHA-256
+# hashes. Check DSM CRS and affine metadata against the IRRG grid. nDSM
+# requires a co-registration record before use as a model input.
 
 # %%
 POTSDAM_SOURCE_CONFIG = json.loads(
@@ -1172,12 +1153,9 @@ if not auxiliary_statistics.empty:
 # %% [markdown]
 # ## Synchronized augmentation examples and checks
 #
-# A deterministic search over candidate training windows chooses a patch with
-# useful class coverage. Augmentation is demonstrated only on train patches; both
-# validation roles remain untouched. The same seed is replayed twice; image,
-# labels, and validity must match. The plotted IRRG pseudocolor maps red to red,
-# green to green, and blue to NIR. Affine-created borders use ignore ID 6 and do
-# not become supervised pixels.
+# Choose a training crop by class coverage and replay one seed twice. Compare
+# the resulting images, labels and masks. The plot uses R/G/NIR as pseudocolor;
+# affine padding uses ignore ID 6.
 
 # %%
 LABEL_COLORS = (
@@ -1299,12 +1277,9 @@ def _channel_summary(values: np.ndarray) -> dict[str, float]:
 # %% [markdown]
 # ## Quantify augmentation across training scenes
 #
-# One deterministic training crop is sampled from each train scene, then replayed
-# with three independent augmentation seeds. The geometry-only policy shares the
-# exact geometric transform seed with the full policy. Labels and validity masks
-# must therefore match pixel-for-pixel; the image difference between those outputs
-# measures optical augmentation after the same resampling. These samples are an
-# audit of the configured policy, not an estimate of validation performance.
+# Replay one crop per training scene with three seeds. Share geometry between
+# the geometry-only and full policies. Their labels and masks should match;
+# image differences measure the optical transforms.
 
 # %%
 AUDIT_REPEATS_PER_SCENE = 3
@@ -1680,16 +1655,11 @@ plt.show()
 # %% [markdown]
 # ## Rare classes, semantic edges, and padding audit
 #
-# The audit scans overlapping candidate windows across every training scene and
-# reports crop-level rare-class coverage and semantic boundary density. A class is
-# rare when it occupies at most 6% of train semantic pixels or occurs in at most
-# half of train scenes. The held-out test split is never read. Boundary metrics use
-# 4-neighbor semantic class transitions; same-class object boundaries are not
-# observable because the labels have no instance IDs. Affine padding is measured
-# separately from source
-# NoData, label ignore pixels, and model patch-stride padding. A class is considered
-# rare when it occupies at most 6% of train semantic pixels or occurs in at most half
-# of train scenes. Candidate windows overlap at half the configured crop size.
+# Scan training windows at half-window stride. A class is rare if it occupies
+# at most 6% of training pixels or occurs in at most half the training scenes.
+#
+# Count semantic edges using valid 4-neighbor class transitions. Track affine
+# padding, source NoData, ignored labels and model padding separately.
 
 # %%
 MODEL_CONFIG_PATH = CONFIG_ROOT / "models" / f"{TRAINING_CONFIG['model_id']}-v1.json"
@@ -1961,10 +1931,9 @@ display(
 # %% [markdown]
 # ## Select dense, sparse, and boundary-rich train crops
 #
-# For each rare class, keep one crop at the highest observed density and one near
-# the 10th percentile of positive crop densities. Add a distinct crop with the most
-# semantic class transitions. This exposes both class-rich and fragile low-pixel
-# examples while keeping crop choice deterministic and train-only.
+# For each rare class, select the densest crop and the crop nearest the 10th
+# percentile of positive densities. Add a distinct crop with the most semantic
+# class transitions.
 
 # %%
 selected_focus_examples: dict[tuple[str, str, int, int], dict[str, Any]] = {}
@@ -2056,10 +2025,9 @@ rare_boundary_manifest = pd.DataFrame(selected_focus_examples.values())
 # %% [markdown]
 # ## Replay rare-class and boundary crops
 #
-# Each selected training crop is replayed with eight deterministic seeds. The audit
-# checks class-pixel retention, class-boundary density, affine support masks, label
-# ignore fill, radiometric changes inside padding, and model patch-stride padding.
-# The visualization shows one affine-padded example per selected crop when available.
+# Replay each crop with eight seeds. Measure class retention, semantic edges
+# and padding in the labels, masks and image. Plot one affine-padded example
+# per crop when available.
 
 # %%
 rare_boundary_audit_rows: list[dict[str, Any]] = []
@@ -2490,9 +2458,8 @@ plt.show()
 # %% [markdown]
 # ## Save tables, figures, and provenance
 #
-# These artifacts are outside the Git checkout. Provenance records DVC, catalog,
-# split, protocol, quality-report, analysis-source, and auxiliary-file hashes, plus
-# runtime versions and full-scene scan policies.
+# Save results to `DEEPNET_ARTIFACT_ROOT`. Record source and config hashes,
+# runtime versions and scan settings.
 
 # %%
 asset_metadata.to_csv(ARTIFACT_ROOT / "asset-metadata.csv", index=False)

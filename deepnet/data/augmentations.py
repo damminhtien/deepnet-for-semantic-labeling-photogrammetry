@@ -132,11 +132,10 @@ register_transform("horizontal_flip", _horizontal_flip)
 
 
 class AlbumentationsAugmenter:
-    """Apply shared geometry and optical-only radiometry to one training sample.
+    """Apply shared geometry and optical transforms to raw, aligned bands.
 
-    Inputs are raw, aligned channel arrays. Model-view normalization is applied by
-    the data reader after this callable returns. The Compose instances are reseeded
-    for each sample so worker scheduling cannot affect augmentation results.
+    The reader normalizes the result. Per-sample seeds make replay independent
+    of worker order.
     """
 
     def __init__(

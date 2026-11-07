@@ -1,26 +1,17 @@
 # Potsdam DINOv3 RGBIR v2
 
-This campaign implements the protocol approved on 2026-11-05. It has a new
-24 allocated-GPU-hour Kaggle budget. The previous final DINOv2 model scored
-91.4785% OA and 79.6122% six-class mIoU. Reaching 99% OA on that support would
-require about 88.26% fewer errors. This is a research target, not an acceptance
-claim about the new code.
+The Potsdam DINOv3 campaign targeted 99% OA with 24 allocated GPU-hours on
+Kaggle. The previous DINOv2 refit scored 91.4785% OA and 79.6122% six-class
+mIoU.
 
-The implementation, offline checks, [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md),
-selection, confirmation, refit and single benchmark are complete. The frozen
-schedule uses ViT-B for eight passes per run; L passes the quality gate but
-exceeds the six-pass cost limit. A wins and seed 43 confirms RGB with baseline
-augmentation. Horizontal-flip TTA fails the declared gain threshold, so identity
-inference stays locked. The
-[selection summary](potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md)
-retains the pre-refit decisions; the
-[final artifact review](potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md)
-verifies the exact update-1,152 checkpoint and benchmark OA **92.0397%** /
-mIoU **81.0932%** on 467,862,855 pixels. The OA 99% goal remains
-unmet by 6.9603 points. Full recorded execution cost is
-13.4557472 allocated GPU-hours. Historical artifacts and the earlier
-[A/B review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md) are preserved.
-Offline smoke and small-fit tests establish no validation or benchmark accuracy.
+The [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md) set an
+eight-pass ViT-B schedule. Satellite ViT-L exceeded the six-pass cost limit. A
+won with RGB and baseline augmentation, and seed 43 confirmed it. The [selection
+summary](potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md) records why
+identity inference won over flips. The [final
+review](potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md) reports **92.0397%
+OA / 81.0932% mIoU** on 467,862,855 pixels after the 1,152-update refit. Total
+allocation was 13.4557472 GPU-hours.
 
 ## Sources and the historical channel discrepancy
 
@@ -32,21 +23,16 @@ uint8 band layout, CRS, affine, extent, mask coverage and scene IDs. It compares
 every RGB pixel with the independent `2_Ortho_RGB.zip` reference before accepting
 the four-band source.
 
-On the present source files, all 38 historical three-band IRRG rasters match
-RGBIR bands **4/2/3**, whereas the previously declared IR/red/green order would
-require **4/1/2**. The new RGBIR manifest records this measured correspondence.
-Historical source files, catalogs, trained weights and scores are preserved.
-Interpret historical IRRG and spectral-index experiments with this discrepancy
-in mind; their configured channel names do not establish the measured band order.
-The new encoder receives verified R/G/B and its auxiliary index uses bands 4/1.
+All 38 historical three-band rasters match RGBIR bands **4/2/3** (IR/G/B). Their
+configured IR/red/green names imply **4/1/2**. The RGBIR manifest records the
+match. The encoder uses bands 1/2/3 and the auxiliary index uses bands 4/1.
 
-DSM uses the [existing verified snapshot](../../data/auxiliary/potsdam-dsm-v1.dvc)
-and `valid-box-101-p99abs-stride16-v1` relief recipe. Relief subtracts the valid
-101x101 local mean. Its absolute p99 scale is fitted on the original 18 training
-scenes, then applied unchanged to every role and clipped to [-1,1]. Scene `3_13`
-retains its missing last DSM column with zero relief and availability. DSM
-availability never intersects the image/label scoring mask. JPEG nDSM stays
-blocked pending registration and encoding evidence.
+DSM uses the [verified snapshot](../../data/auxiliary/potsdam-dsm-v1.dvc) and
+`valid-box-101-p99abs-stride16-v1`. Relief subtracts the valid 101 × 101 local
+mean, divides by the absolute p99 fitted on the original 18 training scenes, and
+clips to [-1,1]. The missing DSM column in `3_13` gets zero relief and
+availability; the image/label masks determine scoring. JPEG nDSM requires
+registration and encoding evidence.
 
 ## Caches and augmentation
 
@@ -64,14 +50,13 @@ image/label/mask equality with Rasterio on 12 fixed reference windows. The GPU
 pilot additionally requires identical full-scene confusion matrices for cached
 and Rasterio inference on scene `4_12`.
 
-Each pass covers all 2,592 original 512x512 windows, including padded edge
-windows. It adds 432 car and 432 clutter windows. Rare sampling first chooses an
-eligible training scene, then uniformly selects a target-class pixel from all
-its training pixels using tile counts, then jitters the center by at most 96
-pixels. There is no rare-pixel reservoir. Four microbatches give 864 optimizer
-updates. The index records original source coverage and class support; training
-records actual valid pixel presentations after augmentation. The 24-scene refit
-uses 3,456 base windows plus 576+576 rare draws, or 1,152 updates.
+Each pass covers 2,592 base windows (512 × 512), including padded edges, and
+adds 432 car and 432 clutter windows. For each rare draw, choose an eligible
+training scene, then sample a target-class pixel uniformly within that scene
+using tile counts and jitter the center by up to 96 pixels. Four microbatches
+give 864 updates. Record source coverage in the index and valid pixel
+presentations after augmentation in the training log. Refit uses 3,456 base
+windows plus 576 draws per rare class for 1,152 updates.
 
 Two loader workers prefetch two batches with persistent workers and CUDA pinned
 memory. Per-draw seeds bind study seed, pass and draw ordinal. A separate loader
@@ -87,9 +72,9 @@ disabled for rare draws. The model computes IR/red NDVI after optical augmentati
 
 ## Models and frozen selection
 
-The [study config](../../configs/training/potsdam-dinov3-rgbir-v2.json) owns the
-models, feature/augmentation recipes, window/stride, schedules, metrics reference
-and budgets. It does not reuse DINOv2 campaign constants for those settings.
+The [study config](../../configs/training/potsdam-dinov3-rgbir-v2.json) defines
+the models, features, augmentation, windows, stride, schedules, reference
+metrics and GPU budgets.
 
 | Backbone | Revision | Blocks | Weight SHA-256 |
 | --- | --- | --- | --- |
@@ -137,17 +122,13 @@ and inference fits the budget. TTA averages logits after undoing the flip.
 The selection lock binds configuration/source hashes, seed-42 checkpoint, seed-43
 confirmation, feature statistics, inference policy and exact refit schedule.
 Refit continues seed-42 weights with new AdamW/scaler, half learning rates and
-one complete 24-scene pass. Its final checkpoint is update 1,152. Training loss
-and mIoU in this phase are train metrics; the former validation scenes cannot
-choose checkpoints, stop early or change hyperparameters.
+one complete 24-scene pass. The recipe stays fixed through update 1,152, which
+provides the final checkpoint. Refit reports training loss and mIoU.
 
-Only a verified complete refit checkpoint can open the benchmark cache. A
-single-attempt marker binds its checksum and inference policy before scoring
-14 scenes and exactly 467,862,855 eroded-label pixels. Reports recompute aggregate
-and per-scene OA/mIoU/class IoU/F1 from confusion matrices, remaining errors,
-distance to 99%, latency and actual allocated GPU-hours. These 14 scenes were
-observed in earlier campaigns, so this is a historical benchmark comparison.
-It cannot isolate the benefit of adding the six refit scenes.
+The single-attempt marker records the final refit checkpoint hash and inference
+policy before scoring 467,862,855 pixels on the 14 historical benchmark scenes.
+Recompute OA, mIoU, class IoU and F1 from saved confusion matrices; report
+timing and allocated GPU-hours from the logs.
 
 | Phase | Allocated GPU-hours |
 | --- | ---: |
@@ -158,12 +139,9 @@ It cannot isolate the benefit of adding the six refit scenes.
 | Reserve | 2 |
 | Total | 24 |
 
-All visible allocated devices count, even when one performs model computation.
-Worker execution accounting starts before dependency installation; retries retain
-their prior charges. These logs are execution accounting, not provider billing
-exports. An interrupted in-progress budget fails closed until its remote duration
-is reconciled. A completed phase cannot be resubmitted through the normal runner.
-Historical experiments are not charged against this new budget.
+Count every allocated device from worker startup, including dependency
+installation, and include earlier attempts. Reconcile remote durations before
+continuing from an interrupted run. The runner skips completed phases.
 
 ## Commands and artifacts
 
@@ -178,12 +156,10 @@ python -m scripts.run_potsdam_rgbir_kaggle --help
 pytest tests/unit
 ```
 
-Keep an external `RUN` directory containing `selection-cache`, `calibration` and
-private Kaggle input packages. The packager embeds an allowlisted source archive;
-it never uploads the worktree, credentials or old refit checkpoint for selection.
-Every phase has a submission receipt, immutable input bindings, remote logs,
-output hash inventory and a local audit. Recover the existing receipt after a
-monitor disconnect; do not submit the phase again.
+Keep `selection-cache`, `calibration` and private Kaggle packages in an external
+`RUN` directory. The packager includes allowlisted source files. Each phase
+records input hashes, the submission receipt, logs, output hashes and a local
+audit. After a monitor disconnect, recover the existing receipt.
 
 ```bash
 python -m scripts.run_potsdam_rgbir_kaggle package \
@@ -191,22 +167,16 @@ python -m scripts.run_potsdam_rgbir_kaggle package \
 python -m scripts.run_potsdam_rgbir_kaggle campaign --data "$DATA_ROOT" --run "$RUN"
 ```
 
-The coordinator resumes already audited phases, follows the frozen roster,
-stops on quality/confirmation failures, and creates role-specific private refit
-and benchmark inputs only after their gates. A submission/upload with an
-unconfirmed receipt requires remote reconciliation before another attempt.
-An accepted upload must match the cache hash and reach Kaggle's `ready` status
-before a kernel is submitted. Dataset processing errors or a 30-minute timeout
-stop this CPU-side wait; they do not start a GPU job or trigger another upload.
-Refit/benchmark notebooks use `-refit-run` and `-heldout-run`; their input datasets
-keep `-refit` and `-heldout`. Kaggle rejects a notebook name already occupied by
-a dataset, so these identifiers must remain distinct. Selection notebook IDs
-and all frozen study bindings are unchanged.
-Read-only status calls retry after a transport timeout, preserving the accepted
-receipt and notebook version. Uploads and submissions never use this retry path;
-an unconfirmed mutation still requires reconciliation.
-The benchmark source is the repository's DVC-managed
-`data/prepared/potsdam/post-selection-test-bundle`. The external data root holds
-raw snapshots, model weights, caches and logs; it does not contain that bundle.
-Dataset/cache/checkpoint/log files stay outside Git; only DVC pointers, source,
-tests, configuration and documentation are committed.
+The coordinator skips audited phases and stages private refit and benchmark
+inputs after their gates pass.
+
+Reconcile unconfirmed uploads and submissions with Kaggle before retrying.
+Submit a kernel after the accepted upload matches
+the cache hash and reaches `ready`. A processing error or a 30-minute timeout
+ends the wait. Use notebook suffixes `-refit-run` and `-heldout-run` to keep
+them distinct from the `-refit` and `-heldout` datasets. Read-only status
+requests can retry against the same receipt after a timeout.
+
+Build the benchmark cache from the repository's
+`data/prepared/potsdam/post-selection-test-bundle`.
+Keep datasets, caches, checkpoints and logs outside Git.

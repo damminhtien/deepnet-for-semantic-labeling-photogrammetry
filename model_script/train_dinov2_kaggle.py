@@ -54,8 +54,7 @@ def verify_expanded(root: Path, records: list[dict]) -> None:
 
 
 def prepare_lora_runtime() -> str | None:
-    # This run uses ordinary floating-point LoRA, without torchao quantization.
-    # PEFT probes installed optional backends even when their layers are unused.
+    # PEFT probes torchao even for floating-point LoRA.
     try:
         version = importlib.metadata.version("torchao")
     except importlib.metadata.PackageNotFoundError:

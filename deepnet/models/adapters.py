@@ -13,7 +13,7 @@ from .specs import InputAdapterSpec
 def _spatial_branch(
     input_channels: int, output_channels: int, groups: int = 0
 ) -> nn.Sequential:
-    """Create a stride-four convolutional branch without batch-size assumptions."""
+    """Create a stride-four convolutional branch with optional GroupNorm."""
     hidden_channels = max(output_channels // 2, 2)
     layers = []
     for source, target in (
@@ -152,7 +152,6 @@ class MultimodalInputAdapter(nn.Module):
 
     @staticmethod
     def _initialize_projection(projection: nn.Conv2d, initializer: str) -> None:
-        """Initialize a configurable channel projection without naming sensors."""
         if initializer == "identity":
             with torch.no_grad():
                 projection.weight.zero_()

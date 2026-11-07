@@ -1,5 +1,3 @@
-"""Regression witnesses for Potsdam model and evaluation boundaries."""
-
 from dataclasses import replace
 
 import numpy as np

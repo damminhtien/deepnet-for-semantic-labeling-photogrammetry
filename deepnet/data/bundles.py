@@ -77,10 +77,9 @@ def export_model_bundle(
     include_splits: tuple[str, ...] | None = None,
     include_world_files: bool = False,
 ) -> dict[str, Any]:
-    """Copy only the view's assets and split-specific labels into an atomic bundle.
+    """Copy the view's raster assets and split labels into an atomic bundle.
 
-    The source tree is read-only from this operation. Files are copied, not linked,
-    so editing a bundle cannot mutate the original dataset through a hard link.
+    Copies keep bundle edits separate from the source files.
     """
     scene_records = tuple(scenes)
     by_id = {scene.scene_id: scene for scene in scene_records}

@@ -25,11 +25,10 @@ def decode_rgb_labels(
     *,
     valid_mask: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Map the declared RGB palette to IDs, rejecting unsupported valid colors.
+    """Decode valid RGB labels with the declared palette.
 
-    Optional tolerance uses Euclidean distance in RGB space to accommodate a
-    verified source color transform. Equal-distance matches and colors outside the
-    configured tolerance remain errors rather than being guessed.
+    Optional tolerance uses Euclidean RGB distance. Reject ties and colors beyond that
+    tolerance.
     """
     image = np.asarray(image)
     if image.ndim != 3 or image.shape[-1] != 3:
