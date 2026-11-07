@@ -1,274 +1,224 @@
-# DeepNet: Semantic Labeling of Aerial Imagery
+# DeepNet: semantic segmentation of aerial imagery
 
-DeepNet studies semantic segmentation of aerial orthophotos with pretrained
-vision encoders. Its data pipeline checks raster alignment, splits data by scene
-before sampling patches, and exports bundles for local and Kaggle runs.
+**Research question.** How far can a scene-aware, auditable training pipeline improve
+semantic segmentation of high-resolution Potsdam orthophotos, and what accuracy–runtime
+trade-off does it show against a conventional convolutional model?
 
-[DINOv3 RGBIR protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md) ·
-[Completed DINOv2 protocol](docs/experiments/potsdam-dinov2-coverage-refit.md) ·
-[PSPNet comparison](docs/experiments/potsdam-pspnet-rgb-v1.md) ·
-[Data pipeline guide](docs/data-pipeline.md) · [Architecture](docs/architecture.md)
+**Current thesis.** On the 14-scene Potsdam benchmark cohort, the DINOv3-B RGB recipe is
+the strongest evaluated system so far (92.04% overall accuracy and 81.09% six-class
+mIoU). The matched PSPNet RGB recipe scores slightly lower but takes less time to score
+the full scenes. Neither reaches the 99% OA target. The largest remaining weakness is
+clutter/background, while low-vegetation and tree confusions also account for many
+errors. Adding the bundled IR/index/DSM features or stronger generic augmentation did
+not improve the DINOv3 selection result. These findings describe complete model recipes
+on a benchmark cohort whose scores were seen in earlier campaigns; they do not establish
+performance on a newly sampled city or untouched test set.
 
-## Results
+## The result in one view
 
-**DINOv3-B RGB reaches 92.0397% OA and 81.0932% six-class mIoU** on
-467,862,855 valid pixels from 14 Potsdam scenes. OA rises **0.5612 percentage
-points** and mIoU rises **1.4810 points** over the DINOv2 refit. OA is 6.9603
-points below the 99% target. The campaign used 13.4557 of 24 allocated GPU-hours.
-See the [final DINOv3 review](docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md)
-for per-scene scores and saved evidence.
+The figure puts four Potsdam systems on the same historical 14-scene, 467,862,855-pixel
+cohort. It brings together aggregate accuracy, class-level IoU, scene-to-scene
+differences, and the recorded full-scene scoring time.
 
-![Final DINOv3 benchmark comparison](docs/experiments/figures/potsdam-dinov3-rgbir-v2-final-2026-11-06.png)
+![SciencePlots comparison of SAM, DINOv2, DINOv3, and PSPNet on the Potsdam benchmark](docs/experiments/figures/potsdam-four-model-benchmark-scienceplots-2026-11-07.png)
 
-The charts are [reproducible from saved metrics](docs/figures.md).
+*Figure 1. Aggregate OA and six-class mIoU; IoU for impervious surfaces, buildings, low
+vegetation, trees, cars, and clutter/background; per-scene OA relative to DINOv3; and
+recorded full-scene scoring time, rather than model-forward-only time. The 99% reference
+applies to OA. PSPNet and DINOv3 share the RGB cache and 512×512 windows at stride 256.
+SAM and DINOv2 retain their historical inference recipes, so this is a recipe-level
+comparison rather than a controlled architecture-only study. The plotted data and figure
+command are documented in [Figure
+reproduction](docs/figures.md#consolidated-readme-benchmark).*
 
-OA improves on 12 of 14 scenes and IoU on five of six classes. Clutter IoU gains
-6.0635 points to 48.4383%; car IoU falls 0.2816 point to 92.4418%. The final model
-makes 2,625,662 fewer errors than the DINOv2 refit, a 6.59% reduction.
+| System | OA | Six-class mIoU | Incorrect pixels |
+| --- | ---: | ---: | ---: |
+| SAM ViT-B + LoRA | 87.8142% | 73.7024% | 57,012,689 |
+| DINOv2 refit | 91.4785% | 79.6122% | 39,868,882 |
+| PSPNet–ResNet101 RGB refit | 91.2834% | 79.4235% | 40,781,843 |
+| **DINOv3-B RGB refit** | **92.0397%** | **81.0932%** | **37,243,220** |
 
-The comparison uses 14 scenes scored in earlier campaigns. It compares complete
-recipes, including 512/256 inference windows and stride for DINOv3 versus 504/252
-for the [DINOv2 refit](docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md)
-(91.4785% OA / 79.6122% mIoU).
+The DINOv3 refit improves on DINOv2 by 0.5612 percentage points OA and 1.4810 mIoU
+points, reducing errors by 2,625,662 (6.59%). It improves OA on 12 of 14 scenes and
+raises IoU on five of six classes. Clutter IoU rises by 6.0635 points to 48.4383%; car
+IoU changes by −0.2816 point to 92.4418%. Even so, DINOv3 is 6.9603 OA points below 99%
+and would need 32,564,592 fewer errors on this cohort—an 87.44% reduction from its
+current error count. The [DINOv3 final
+review](docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md) contains
+the confusion matrices, per-scene scores, checkpoint audit, and limits of this
+comparison.
 
-The [DINOv3 GPU preflight](docs/experiments/potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
-verified gradient flow with pretrained B/L weights. ViT-B reached 95.39% train
-mIoU on eight patches. Cached full-scene inference matched Rasterio and ran
-3.17× as fast. Eight ViT-B passes fit the budget; satellite ViT-L exceeded its
-cost limit.
+PSPNet trails DINOv3 by 0.7563 OA points and 1.6697 mIoU points, with lower IoU in all
+six classes and lower OA on 13 of 14 scenes. Its recorded full-scene scoring time is
+254.83 seconds versus 405.23 seconds for DINOv3. Across their matched selection, refit,
+and benchmark phases, the campaigns used 1.9066 and 3.8218 allocated GPU-hours
+respectively. The time and GPU-hour results cover those recorded jobs and do not
+establish a general hardware-independent speed ratio. The [PSPNet
+report](docs/experiments/potsdam-pspnet-rgb-v1.md) documents its single-seed recipe,
+phase budgets, and benchmark audit.
 
-The [selection and confirmation review](docs/experiments/potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md)
-selected RGB-only A at **93.0441% validation OA / 80.7498% mIoU**, versus
-92.9923% / 80.6097% for B with auxiliary features and 92.9690% / 80.5115% for C
-with enhanced augmentation. Seed 43 confirmed A at **92.9477% / 80.4596%**,
-above all four historical C floors. Horizontal flips gained 0.0786 and 0.0690 OA
-points, below the 0.1-point threshold; the benchmark used identity inference.
+## How the evidence led here
 
-![DINOv3 seed-42 validation and class IoU differences](docs/experiments/figures/potsdam-dinov3-rgbir-v2-abc-2026-11-06.png)
+### 1. Validate the imagery before changing the model
 
-The [refit](https://www.kaggle.com/code/damminhtien/potsdam-dinov3-rgbir-v2-refit-run)
-continued A for 1,152 updates on 24 participant-labeled scenes. The final
-checkpoint was scored once against eroded references by the
-[benchmark job](https://www.kaggle.com/code/damminhtien/potsdam-dinov3-rgbir-v2-heldout-run).
+Potsdam's official RGBIR source is ordered red, green, blue, infrared. A source audit
+found that the historical three-band files correspond to RGBIR bands 4/2/3—near
+infrared, green, blue—even though older configurations named them IR/red/green. The
+winning DINOv3 encoder instead receives verified RGB bands 1/2/3. Vaihingen's official
+three-band order is near infrared, red, green. The full [Potsdam and Vaihingen data
+profile](docs/research/potsdam-vaihingen-data-profile-2026-11-07.md) records these
+mappings, current scene coverage, label composition, optical distributions, and DSM
+checks. Digital numbers are not calibrated reflectance.
 
-Across all 38 scenes, the historical three-band files match RGBIR bands 4/2/3
-(IR/G/B), labeled IR/red/green in the old configs. The RGBIR campaign verified
-RGB against the official RGB archive and used bands 4/1 for its IR/red index.
+All training and evaluation samples are assigned by scene before patches are drawn.
+Dataset catalogs bind source files to hashes, band roles, and raster grids; split
+manifests bind scene IDs to label roles. The DINOv3 campaign compared memory-mapped
+caches against Rasterio reads before use. Its winning A recipe uses RGB only.
+Configuration B bundled IR, a post-augmentation spectral index, and verified DSM relief,
+but did not beat A; because those signals were grouped, the result does not isolate
+their individual effects. JPEG nDSM remains excluded because registration and height
+encoding have not been established. See the [data pipeline
+guide](docs/data-pipeline.md), [DSM snapshot](data/auxiliary/potsdam-dsm-v1.dvc), and
+[model architecture](docs/architecture.md).
 
-### Matched PSPNet comparison
+### 2. Select a recipe on validation scenes, then refit
 
-[PSPNet–ResNet101 RGB](docs/experiments/potsdam-pspnet-rgb-v1.md) reached
-**91.2834% OA / 79.4235% six-class mIoU**, trailing DINOv3-B RGB by
-0.7563 and 1.6697 percentage points. The seed-42 comparison reused DINOv3 A's
-RGB caches, sampler, augmentation and update schedule. PSPNet completed the
-1,152-update refit on 24 scenes and its final checkpoint was scored once on
-the same 14 scenes and 467,862,855 pixels with 512×512 windows and stride 256.
+The Potsdam project split has 18 train, 6 validation, and 14 benchmark scenes. During
+selection, participant labels train on the first 18 scenes; the six validation scenes
+use eroded labels and remain reserved for model selection. After selection and seed
+confirmation, the winning checkpoint continues for exactly 1,152 updates on participant
+labels from all 24 train-plus-validation scenes. Only that final refit checkpoint opens
+the benchmark evaluation. This order prevents the refit from using the 14 benchmark
+scenes.
 
-DINOv3 led on 13 of 14 scenes. The largest class gap was clutter IoU
-(43.3019% vs 48.4383%). PSPNet took 254.83 s to score the scenes, versus 405.23 s
-for DINOv3. The matched selection, refit and benchmark jobs used 1.9066 and
-3.8218 allocated GPU-hours respectively, excluding the other DINOv3 arms,
-confirmation and separate preflight.
+The [DINOv2 coverage study](docs/experiments/potsdam-dinov2-coverage-refit.md)
+established the earlier pretrained baseline. Its winning C recipe used ViT-B/14 with the
+historical IRRG input, selected on six validation scenes, then reached 91.4785% OA /
+79.6122% mIoU on the benchmark after refit. The [artifact
+review](docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md)
+contains its refit and scoring audit. The DINOv3 campaign then tested pinned ViT-B/16
+with verified RGB against a larger satellite-pretrained ViT-L pilot. ViT-B fit the
+campaign budget; ViT-L exceeded its cost limit. On validation, RGB-only A won over B
+with bundled auxiliary features and C with stronger augmentation. Seed 43 confirmed A,
+and horizontal-flip test-time augmentation did not meet its predeclared gain threshold.
 
-### Potsdam DINOv2 coverage study
+| DINOv3 selection arm | Input and augmentation | Validation OA | Validation mIoU |
+| --- | --- | ---: | ---: |
+| A | RGB, baseline augmentation | **93.0441%** | **80.7498%** |
+| B | A plus IR, index, and DSM features | 92.9923% | 80.6097% |
+| C | A with stronger augmentation | 92.9690% | 80.5115% |
+| Seed-43 confirmation | A recipe, independent seed | 92.9477% | 80.4596% |
 
-The table reports the selected checkpoint from each configuration on the same
-**6 validation scenes and 199,409,714 scored pixels**. A, B and C use seed 42.
-D repeats C with seed 43. Each arm ran four passes with full-scene validation
-at updates 1,728 and 3,456. All checkpoints below are from update 3,456.
+Selection scores use six scenes and 199,409,714 scored pixels. The validation chart and
+full decision rule are in the [DINOv3 selection
+review](docs/experiments/potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md); the
+[preflight report](docs/experiments/potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
+records the real-backbone, small-fit, and throughput checks. The RGB-only result is
+evidence about these tested recipes, not proof that infrared or elevation cannot help
+under other fusion designs.
 
-| Configuration | OA | mIoU | Car IoU | Clutter IoU |
-| --- | ---: | ---: | ---: | ---: |
-| Historical SAM validation floors | 89.89% | 74.32% | 85.72% | 32.78% |
-| A: IRRG + D4 | 92.85% | 79.52% | 92.96% | 38.97% |
-| B: A + spectral index and DSM relief | 92.76% | 79.30% | 92.73% | 38.65% |
-| **C: A + affine and optical gain, seed 42** | **92.90%** | **79.56%** | **92.96%** | **38.98%** |
-| D: C recipe, seed 43 | 92.71% | 79.28% | 92.92% | 38.31% |
+### 3. Compare complete systems on the fixed cohort
 
-[C](https://www.kaggle.com/code/damminhtien/potsdam-dinov2-coverage-refit-v1-c)
-won the declared seed-42 ranking, and
-[D](https://www.kaggle.com/code/damminhtien/potsdam-dinov2-coverage-refit-v1-d)
-cleared all four confirmation floors. C gained 3.01 OA points and 5.24 mIoU points
-over SAM, and 0.04 points in each metric over A. B tested the spectral index and
-DSM together.
+All four rows in Figure 1 use the same 14 scene IDs, six class supports, and 467,862,855
+scored pixels. Validation and benchmark scoring use eroded references; participant
+labels are used for training. Aggregate OA, mIoU, class IoU, and F1 are recomputed from
+confusion matrices summed across scenes. The saved reviews confirm matching scene IDs,
+counts, and class supports; byte-for-byte equality of the reference rasters in the older
+SAM and DINOv2 runs was not re-established. The 14 benchmark scenes were evaluated in
+previous campaigns, so the scores are repeatable historical comparisons rather than a
+fresh blind test.
 
-The pilot reached **94.48% train mIoU** after 64 updates on eight fixed training
-patches. On a separate 36-patch input panel, the normalized third-channel median
-moved from −3.79 with the historical adapter to −0.51 at initialization with the
-residual adapter. Validation took 24.28% of timed training plus validation for A,
-36.51% for B, 24.37% for C and 24.30% for D, versus 92.83% in the older joint run.
+The DINOv3-B RGB model uses pinned pretrained weights, LoRA on attention projections,
+pretrained normalization at blocks 3/6/9/12, and a width-128 GroupNorm decoder with a
+stride-four detail branch. Its [model spec](configs/models/dinov3-vitb16-rgbir-v2.json)
+binds the named RGB inputs and training contract. The DINOv2 result uses a different
+encoder size, channel recipe, and inference tiling; the OA change cannot be attributed
+to the encoder version alone. PSPNet uses ImageNet-pretrained ResNet101 with pyramid
+pooling and a stride-four detail path. The [architecture guide](docs/architecture.md)
+and [PSPNet comparison report](docs/experiments/potsdam-pspnet-rgb-v1.md) describe the
+other model and protocol details. PSPNet is one seed; its result compares complete
+systems and does not isolate the backbone.
 
-The table above describes validation before the 24-scene continuation. The former
-validation scenes entered the train-only refit bundle with participant labels.
-Refit completed 1,152 updates; its final weights were scored once on held-out.
-See the [artifact review](docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md)
-for completion and audit evidence.
+The 99% target is still an open research goal. The current matrices place the most
+direct next questions around clutter/background, class-boundary ambiguity, and
+low-vegetation/tree confusions. The next improvement should be tested with per-class
+evidence and a held-out region not previously used to compare these recipes.
 
-### Full-scene results
+## Data and evaluation contract
 
-| Experiment | Dataset | Held-out scenes | Scored pixels | OA | mIoU |
-| --- | --- | ---: | ---: | ---: | ---: |
-| SAM ViT-B + LoRA | Potsdam | 14 | 467,862,855 | 87.81% | 73.70% |
-| Potsdam DINOv2 C + 24-scene refit | Potsdam | 14 | 467,862,855 | 91.48% | 79.61% |
-| Potsdam PSPNet–ResNet101 RGB + 24-scene refit | Potsdam | 14 | 467,862,855 | 91.28% | 79.42% |
-| **Potsdam DINOv3-B RGB + 24-scene refit** | **Potsdam** | **14** | **467,862,855** | **92.04%** | **81.09%** |
-| Joint DINOv2 ViT-B/14 + LoRA | Potsdam | 14 | 467,862,855 | 74.66% | 48.65% |
-| Joint DINOv2 ViT-B/14 + LoRA | Vaihingen | 17 | 81,991,943 | 78.30% | 49.18% |
+| Dataset | Scene roles | Training labels | Validation and benchmark labels |
+| --- | --- | --- | --- |
+| [ISPRS Potsdam](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx) | 18 train / 6 validation / 14 benchmark | Participant labels | Eroded labels |
+| [ISPRS Vaihingen](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-vaihingen.aspx) | 12 train / 4 validation / 17 benchmark | Participant labels | Eroded labels |
 
-The previous DINOv2 refit improves OA and mIoU over SAM on all 14 Potsdam scenes
-and IoU on all six classes. Building IoU is 94.66%, car IoU 92.72% and clutter
-IoU 42.37%. Clutter recall remains 51.33%, and tree/low-vegetation confusions
-account for 29.63% of all errors. The completed phases used 13.30 runner-accounted
-GPU-hours, charging both allocated T4s; execution logs including bootstrap and
-the failed initial preflight total about 13.47 allocated GPU-hours.
+These are project-defined scene splits. Each benchmark metric covers six classes:
+impervious surfaces, buildings, low vegetation, trees, cars, and clutter/background.
+Label ID 6 is ignored. OA is the share of valid pixels classified correctly; mIoU is the
+unweighted mean of the six class IoUs. Reported per-scene metrics are reduced from each
+scene's confusion matrix, and aggregate scores are recomputed after summing matrices.
+The [ISPRS Vaihingen
+page](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-vaihingen.aspx)
+and [data profile](docs/research/potsdam-vaihingen-data-profile-2026-11-07.md) describe
+its resolution and channel order.
 
-The [joint DINOv2 artifact review](docs/experiments/isprs-dinov2-joint-final-review-2026-11-01.md)
-records checkpoint hashes and confusion matrices. It compares complete recipes
-with different training schedules and inference tiling. The joint run trained on
-both datasets and scored held-out scenes from each.
+The older DINOv2 runs and the current RGB experiments do not use identical complete
+pipelines: DINOv2 uses 504×504 windows at stride 252, while PSPNet and DINOv3 use
+512×512 windows at stride 256. SAM retains its historical tiling. The DINOv3–PSPNet run
+shares the cache, RGB inputs, sampling schedule, and scoring geometry. The figure
+therefore supports an audited recipe comparison and a matched PSPNet–DINOv3 comparison,
+not a claim that architecture alone caused the differences.
 
-## Data and evaluation protocol
-
-| Dataset | Project scene split | Labels used by each role |
-| --- | --- | --- |
-| [ISPRS Potsdam](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx) | 18 train / 6 validation / 14 held-out | Participant labels for train; eroded labels for validation and held-out |
-| [ISPRS Vaihingen](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-vaihingen.aspx) | 12 train / 4 validation / 17 held-out | Participant labels for train; eroded labels for validation and held-out |
-
-The 18/6 partition within the 24 participant-labeled Potsdam scenes is a project
-choice. Patch sampling and fitted statistics use training scenes only during
-selection. Metrics cover six classes: impervious surfaces, buildings, low
-vegetation, trees, cars and clutter/background. Label ID 6 is ignored. OA is the
-fraction of valid pixels classified correctly; mIoU averages the six class IoUs.
-The evaluator sums per-scene confusion matrices before computing aggregate scores.
-Scores use local ISPRS references.
-
-The DINOv2 and DINOv3 studies retain the 18/6 selection roles, require seed-43
-confirmation, then continue seed 42 on all 24 participant-labeled scenes. The DINOv3
-campaign uses eight selection passes and 512/256 inference; see its
-[protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md). The matched PSPNet run uses
-the same DINOv3 schedule with a single seed and ranks its own validation checkpoints.
-
-In the completed DINOv2 study, each selection pass contains 2,592 base windows of
-**504 × 504 pixels**, plus
-432 car-prioritized and 432 clutter-prioritized draws. Four microbatches per
-optimizer step give **864 updates per pass**. A fixed 72-window validation probe
-tracks progress. Only full-scene validation at the prescribed checkpoints can
-select a model. Full-scene scoring uses **504 × 504 windows with stride 252**
-and weighted overlap.
+After refit, held-out scoring is gated on the final checkpoint and run manifest:
 
 ```mermaid
 flowchart LR
-    A["18 train / 6 validation<br/>Select A, B or C"] --> B["Repeat winner<br/>Seed 43"]
-    B -->|"Both seeds meet all four floors"| C["Resume seed-42 weights<br/>24 participant-labeled scenes"]
-    C -->|"Final update 1,152"| D["Score 14 held-out scenes once<br/>Eroded references"]
-    B -->|"Either seed misses a floor"| E["Stop before refit and held-out"]
+    A[18 train + 6 validation scenes] --> B[Select recipe and confirm seed]
+    B --> C[Refit winning checkpoint on 24 participant-labeled scenes]
+    C --> D[Score final checkpoint once on 14 benchmark scenes]
 ```
 
-Refit resets AdamW and the mixed-precision scaler and uses half the selection
-learning rates. It completes one pass on a separate train-only bundle of 24
-scenes using participant labels, including the six former validation scenes.
-Only the final checkpoint is scored on the benchmark.
+The implementation keeps train/validation bundles separate from the test-only evaluation
+pipeline. Cache and run manifests bind hashes, preprocessing, label roles, model inputs,
+checkpoints, and metrics. Persisted confusion matrices let reviews recompute scores
+without running model inference.
 
-## Data pipeline and model
+## Reproduce and explore
 
-1. **Catalog and split.** Dataset descriptors map assets to scenes. The catalog
-   records content hashes, band roles and raster grids. Split manifests bind
-   scene IDs to label sources. Georeferenced rasters are checked against CRS and
-   affine grids; pixel-local pairs require documented source alignment.
-2. **Sample and export.** Lazy Rasterio reads yield aligned windows, semantic
-   labels and valid-pixel masks. The DINOv3 campaign verifies role-specific
-   memory-mapped caches against those source reads before training. Bundles and
-   caches bind the split, preprocessing, label roles and file-level SHA-256
-   inventory; sampling and augmentation are deterministic by seed/pass/draw.
-3. **Adapt and segment.** The selected
-   [DINOv3-B model](configs/models/dinov3-vitb16-rgbir-v2.json)
-   takes named RGB bands through a residual identity adapter into ViT-B/16 with
-   LoRA. It applies pretrained normalization at blocks 3/6/9/12 and uses a
-   width-128 decoder with GroupNorm and a stride-four detail branch. The four
-   block features share the same ViT patch grid and are resized for fusion.
-4. **Record provenance.** Run manifests bind the source, data, runtime, training
-   protocol, checkpoint and metrics. Persisted confusion matrices allow scores
-   to be recomputed without model inference.
-
-The [separate Potsdam DSM snapshot](data/auxiliary/potsdam-dsm-v1.dvc) tracks the
-verified source TIFFs and world files. B uses local DSM relief and an availability
-mask. Scene `3_13` is one column short; missing DSM pixels retain their original
-scoring eligibility. The older five-channel DSM+nDSM view remains blocked
-because JPEG nDSM registration and height encoding have not been established.
-The historical DINOv2 winning C recipe uses IRRG without elevation or the spectral
-index. Its [model spec](configs/models/dinov2-vitb14-multimodal-v3.json) retains
-ViT-B/14, the residual IRRG adapter and its frozen training contract.
-
-In configuration B, IR, NDVI computed after augmentation, and DSM relief enter
-a separate branch with a gate initialized to zero. The winning A recipe uses
-RGB alone.
-
-The [joint DINOv3 configuration](configs/training/isprs-dinov3-joint-v2.json)
-is an unexecuted training plan for Potsdam and Vaihingen. Its offline smoke
-test verified gradient flow through 48 LoRA B tensors on a Potsdam patch.
-[DINOv3 weights](https://huggingface.co/facebook/dinov3-vitb16-pretrain-lvd1689m)
-require gated access; review the model's terms for the intended use.
-
-## Reproduce
-
-Use Python 3.10 or newer. Install the extras needed for training, data
-versioning and development:
+To recreate the README comparison figure from the saved audited run outputs, install the
+locked notebook extra and run the renderer. The external run roots contain the metric
+artifacts; training images, caches, checkpoints, and logs are not stored in Git.
 
 ```bash
-uv sync --extra dev --extra train --extra models --extra vision --extra data-versioning
-uv run deepnet-data --help
-uv run python -m deepnet.potsdam_study --help
-uv run python -m deepnet.potsdam_rgbir.study --help
+uv sync --locked --extra notebooks
+uv run --locked --extra notebooks python -m scripts.render_scienceplots model-comparison \
+  /path/to/runs/potsdam-pspnet-rgb-v1 \
+  docs/experiments/figures/potsdam-four-model-benchmark-scienceplots-2026-11-07.png \
+  --dinov3-run /path/to/runs/potsdam-dinov3-rgbir-v2
 ```
 
-Configure a DVC remote with the matching source objects or follow the
-[data pipeline guide](docs/data-pipeline.md) to stage permitted source files.
-The default DVC pipeline builds only train/validation bundles:
+For data preparation and new experiments, start with the [DINOv3 RGBIR
+protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md), [data pipeline
+guide](docs/data-pipeline.md), and [evaluation DVC
+pipeline](pipelines/evaluation/dvc.yaml). DINOv3 pretrained weights require gated
+Hugging Face access. The Kaggle selection, refit, and one-time benchmark jobs are linked
+in the [DINOv3 protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md); the separate
+[PSPNet runbook and result](docs/experiments/potsdam-pspnet-rgb-v1.md) reproduce that
+comparison. Figure commands for DINOv3 selection, EDA, and legacy notebooks are in
+[Figure reproduction](docs/figures.md).
 
-```bash
-uv run dvc pull
-uv run dvc repro
-uv run deepnet-data verify-bundle --bundle data/prepared/potsdam/train-validation-bundle
-```
-
-Build test-only bundles through the [separate evaluation pipeline](pipelines/evaluation/dvc.yaml)
-and attach them only to the corresponding evaluation job. Follow the
-[DINOv3 RGBIR runbook](docs/experiments/potsdam-dinov3-rgbir-v2.md) to
-verify pretrained snapshots, run the CUDA pilot, package private Kaggle inputs
-and submit selection, refit and held-out jobs in order. Keep Kaggle's
-accelerator-specific Torch build. Store checkpoints, logs, rasters and
-credentials outside Git. For the historical joint run, use its
-[frozen training configuration](configs/training/isprs-dinov2-joint-v1.json)
-and [evaluation protocol](configs/evaluations/isprs-dinov2-v1.json).
-
-| Path | Start here for |
+| Project area | Purpose |
 | --- | --- |
-| [`configs/`](configs/) | Versioned datasets, splits, model inputs, model specs and experiment settings |
-| [`deepnet/data/`](deepnet/data/) | Raster, bundle, sampling and evaluation APIs |
-| [`deepnet/models/`](deepnet/models/) | Pretrained backbones, domain adapters and segmentation decoders |
-| [`deepnet/potsdam_rgbir/`](deepnet/potsdam_rgbir/) | Current DINOv3 RGBIR caches, model checks, study phases and protocol |
-| [`deepnet/potsdam_study.py`](deepnet/potsdam_study.py) | Historical DINOv2 coverage, continuation and held-out commands |
-| [EDA notebook](notebooks/data_eda_augmentation.ipynb) and [Jupytext source](notebooks_src/data_eda_augmentation.py) | Dataset inventory, label balance and augmentation audits |
-| [`docs/experiments/`](docs/experiments/) | Runbooks, historical metrics and artifact reviews |
+| [`configs/`](configs/) | Dataset splits, inputs, model specs, and experiment protocols |
+| [`deepnet/data/`](deepnet/data/) | Raster catalog, bundles, sampling, and evaluation |
+| [`deepnet/models/`](deepnet/models/) | Pretrained encoders, adapters, and segmentation decoders |
+| [`deepnet/potsdam_rgbir/`](deepnet/potsdam_rgbir/) | DINOv3 RGBIR cache, model checks, training phases, and protocol |
+| [`notebooks_src/`](notebooks_src/) | EDA and augmentation analyses paired with notebooks |
+| [`docs/experiments/`](docs/experiments/) | Frozen experiment protocols, results, and artifact reviews |
+| [`docs/research/`](docs/research/) | Potsdam/Vaihingen data and channel analysis |
 
-For development checks with the extras installed:
-
-```bash
-uv run ruff check \
-  deepnet scripts model_script semantic_labeling tests notebooks_src \
-  test_kernel/test.py
-uv run pytest tests/unit
-uv run pyright deepnet/potsdam_rgbir/types.py
-uv run pyright deepnet/potsdam_rgbir/protocol.py
-uv run pyright deepnet/potsdam_rgbir/model.py
-uv run pyright deepnet/potsdam_rgbir/sampling.py
-uv run pyright deepnet/potsdam_rgbir/engine.py
-uv run pyright deepnet/potsdam_rgbir/preflight.py
-uv run pyright deepnet/potsdam_rgbir/phases.py
-uv run pyright deepnet/potsdam_rgbir/study.py
-```
-
-The regular unit suite uses synthetic fixtures. Use
-`python -m deepnet.potsdam_rgbir.model smoke --help` for offline B/L checks on a real
-Potsdam patch with a verified pinned snapshot. The CUDA preflight repeats the
-pretrained integration checks before measuring small-fit quality and throughput.
+The archived joint DINOv2 study also evaluated Potsdam and Vaihingen. It reported 74.66%
+OA / 48.65% mIoU on Potsdam and 78.30% / 49.18% on Vaihingen, but used joint training
+and different inference recipes. Its 14 Potsdam and 17 Vaihingen scene results are
+reported separately in the [joint DINOv2 final
+review](docs/experiments/isprs-dinov2-joint-final-review-2026-11-01.md); do not rank
+those numbers directly against Figure 1.

@@ -161,6 +161,310 @@ def benchmark_figure(run):
     return fig
 
 
+@plt.style.context(eda_plots.STYLE)
+def model_comparison_figure(pspnet_run, dinov3_run):
+    """Compare audited Potsdam model scores without re-running inference."""
+    dino_review = dinov3_run / "review-final-20261106"
+    dino_analysis = json.loads(
+        indexed_file(
+            dino_review, "analysis-inventory.json", "analysis.json"
+        ).read_text()
+    )
+    dino_classes = pd.read_csv(
+        indexed_file(dino_review, "analysis-inventory.json", "per-class.csv")
+    )
+    dino_scenes = pd.read_csv(
+        indexed_file(dino_review, "analysis-inventory.json", "per-scene.csv"),
+        dtype={"scene_id": str},
+    )
+    if (
+        dino_analysis.get("status") != "verified-final-benchmark"
+        or dino_analysis.get("evaluation_count") != 1
+        or dino_analysis.get("pixels_scored") != 467_862_855
+        or dino_classes["class_id"].tolist() != list(range(6))
+        or dino_classes["truth_pixels"].sum() != 467_862_855
+        or len(dino_scenes) != 14
+        or not dino_scenes["scene_id"].is_unique
+        or dino_scenes["pixels_scored"].sum() != 467_862_855
+    ):
+        raise ValueError("Unexpected audited DINOv3 benchmark coverage")
+
+    psp_output = pspnet_run / "benchmark/outputs"
+    psp_metrics_path = indexed_file(
+        psp_output, "output-index.json", "study/benchmark/metrics.json"
+    )
+    psp_metrics = json.loads(psp_metrics_path.read_text())
+    psp_attempt = json.loads(
+        indexed_file(
+            psp_output, "output-index.json", "study/benchmark/attempt.json"
+        ).read_text()
+    )
+    psp_refit = json.loads((pspnet_run / "refit/audit.json").read_text())
+    psp_audit = json.loads((pspnet_run / "benchmark/audit.json").read_text())
+    comparison = json.loads((pspnet_run / "comparison.json").read_text())
+
+    dino_heldout = dinov3_run / "study/heldout"
+    dino_metrics_path = dino_heldout / "metrics.json"
+    dino_metrics = json.loads(dino_metrics_path.read_text())
+    dino_attempt = json.loads((dino_heldout / "attempt.json").read_text())
+    if (
+        psp_audit.get("status") != "verified"
+        or psp_refit.get("status") != "verified"
+        or psp_attempt.get("checkpoint_sha256") != psp_metrics.get("checkpoint_sha256")
+        or psp_attempt.get("inference") != psp_metrics.get("inference")
+        or psp_attempt.get("cache_hash") != psp_metrics.get("cache_hash")
+        or psp_attempt.get("reference_protocol")
+        != psp_metrics.get("reference_protocol")
+        or psp_attempt.get("heldout_evaluation_count") != 1
+        or psp_metrics.get("heldout_evaluation_count") != 1
+        or psp_metrics.get("checkpoint_sha256") != psp_refit.get("checkpoint_sha256")
+        or dino_attempt.get("evaluation_count") != 1
+        or dino_attempt.get("checkpoint_sha256")
+        != dino_metrics.get("checkpoint_sha256")
+        or dino_attempt.get("protocol_hash") != dino_metrics.get("protocol_hash")
+        or dino_attempt.get("inference") != dino_metrics.get("inference")
+        or dino_metrics.get("heldout_evaluation_count") != 1
+        or dino_metrics.get("checkpoint_sha256")
+        != dino_analysis.get("checkpoint_sha256")
+        or comparison.get("pspnet_checkpoint_sha256")
+        != psp_metrics.get("checkpoint_sha256")
+        or comparison.get("dinov3_checkpoint_sha256")
+        != dino_metrics.get("checkpoint_sha256")
+        or comparison.get("dinov3_metrics_sha256") != sha256(dino_metrics_path)
+        or psp_metrics.get("cache_hash") != dino_attempt.get("cache_hash")
+        or psp_metrics.get("scene_ids") != dino_metrics.get("scene_ids")
+        or psp_metrics.get("window_size") != dino_metrics.get("window_size")
+        or psp_metrics.get("stride") != dino_metrics.get("stride")
+        or psp_metrics.get("inference") != dino_metrics.get("inference")
+        or psp_metrics.get("pixels_scored") != 467_862_855
+        or dino_metrics.get("pixels_scored") != 467_862_855
+        or len(psp_metrics.get("scene_ids", [])) != 14
+        or len(psp_metrics.get("scenes", [])) != 14
+        or len(dino_metrics.get("scenes", [])) != 14
+        or psp_metrics.get("scene_ids") != dino_scenes["scene_id"].tolist()
+        or dino_metrics.get("scene_ids") != dino_scenes["scene_id"].tolist()
+    ):
+        raise ValueError("Model benchmark audit bindings differ")
+
+    model_names = ("SAM", "DINOv2 refit", "DINOv3 RGB refit", "PSPNet RGB refit")
+    model_labels = ("SAM", "DINOv2", "DINOv3", "PSPNet")
+    model_colors = ("#0072B2", "#E69F00", "#009E73", "#CC79A7")
+    colors_by_name = dict(zip(model_names, model_colors, strict=True))
+    metrics_by_name = {name: dino_analysis["metrics"][name] for name in model_names[:3]}
+    metrics_by_name[model_names[-1]] = psp_metrics
+    matrices_by_name = {
+        name: np.asarray(metrics["confusion_matrix"])
+        for name, metrics in metrics_by_name.items()
+    }
+    if not np.array_equal(
+        matrices_by_name["DINOv3 RGB refit"],
+        np.asarray(dino_metrics["confusion_matrix"]),
+    ):
+        raise ValueError("DINOv3 review matrix differs from its benchmark output")
+
+    for name, metrics in metrics_by_name.items():
+        matrix = matrices_by_name[name]
+        if matrix.shape != (6, 6):
+            raise ValueError(f"Expected a six-class confusion matrix for {name}")
+        intersection = np.diag(matrix)
+        union = matrix.sum(axis=1) + matrix.sum(axis=0) - intersection
+        iou = intersection / union
+        if (
+            matrix.sum() != 467_862_855
+            or not np.allclose(iou, metrics["per_class_iou"], rtol=0, atol=1e-12)
+            or not np.isclose(
+                np.trace(matrix) / matrix.sum(),
+                metrics["overall_accuracy"],
+                rtol=0,
+                atol=1e-12,
+            )
+            or not np.isclose(np.mean(iou), metrics["mean_iou"], rtol=0, atol=1e-12)
+        ):
+            raise ValueError(f"{name} metrics disagree with the saved matrix")
+
+    reference_support = matrices_by_name[model_names[0]].sum(axis=1)
+    if any(
+        not np.array_equal(matrix.sum(axis=1), reference_support)
+        for matrix in matrices_by_name.values()
+    ):
+        raise ValueError("Model class supports differ")
+
+    for name in model_names[:3]:
+        if not np.allclose(
+            dino_classes[f"{name} IoU percent"],
+            100 * np.asarray(metrics_by_name[name]["per_class_iou"]),
+            rtol=0,
+            atol=1e-10,
+        ):
+            raise ValueError(f"{name} class scores disagree with the audited matrix")
+
+    scene_ids = dino_scenes["scene_id"].tolist()
+    expected_pixels = dino_scenes["pixels_scored"].astype(int).tolist()
+    psp_scenes = psp_metrics["scenes"]
+    dino_scenes_output = dino_metrics["scenes"]
+    if any(
+        psp_scene["scene_id"] != scene_id
+        or dino_scene["scene_id"] != scene_id
+        or psp_scene["pixels_scored"] != pixels
+        or dino_scene["pixels_scored"] != pixels
+        for psp_scene, dino_scene, scene_id, pixels in zip(
+            psp_scenes,
+            dino_scenes_output,
+            scene_ids,
+            expected_pixels,
+            strict=True,
+        )
+    ):
+        raise ValueError("Per-scene model support differs")
+    for metrics, scene_results in (
+        (psp_metrics, psp_scenes),
+        (dino_metrics, dino_scenes_output),
+    ):
+        scene_matrices = np.sum(
+            [np.asarray(scene["confusion_matrix"]) for scene in scene_results], axis=0
+        )
+        if not np.array_equal(scene_matrices, np.asarray(metrics["confusion_matrix"])):
+            raise ValueError("Per-scene matrices do not sum to the aggregate")
+    if not np.allclose(
+        dino_scenes["DINOv3 RGB refit OA percent"],
+        100 * np.asarray([scene["overall_accuracy"] for scene in dino_scenes_output]),
+        rtol=0,
+        atol=1e-10,
+    ):
+        raise ValueError("DINOv3 per-scene scores disagree with the audit table")
+
+    if (
+        not np.isclose(
+            100 * (psp_metrics["overall_accuracy"] - dino_metrics["overall_accuracy"]),
+            comparison["pspnet_minus_dinov3_oa_pp"],
+            rtol=0,
+            atol=1e-10,
+        )
+        or not np.isclose(
+            100 * (psp_metrics["mean_iou"] - dino_metrics["mean_iou"]),
+            comparison["pspnet_minus_dinov3_miou_pp"],
+            rtol=0,
+            atol=1e-10,
+        )
+        or not np.isclose(
+            psp_metrics["inference_seconds"],
+            comparison["pspnet_inference_seconds"],
+            rtol=0,
+            atol=1e-10,
+        )
+        or not np.isclose(
+            dino_metrics["inference_seconds"],
+            comparison["dinov3_inference_seconds"],
+            rtol=0,
+            atol=1e-10,
+        )
+    ):
+        raise ValueError("Saved model comparison disagrees with audited metrics")
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8.2), layout="constrained")
+    score_ax, class_ax, scene_ax, time_ax = axes.flat
+
+    y = np.arange(len(model_names))
+    for index, name in enumerate(model_names):
+        metrics = metrics_by_name[name]
+        oa = 100 * metrics["overall_accuracy"]
+        miou = 100 * metrics["mean_iou"]
+        score_ax.scatter(
+            oa, y[index] - 0.13, marker="o", color=colors_by_name[name], zorder=3
+        )
+        score_ax.scatter(
+            miou, y[index] + 0.13, marker="^", color=colors_by_name[name], zorder=3
+        )
+        score_ax.annotate(
+            f"{oa:.2f}",
+            (oa, y[index] - 0.13),
+            xytext=(4, 0),
+            textcoords="offset points",
+            va="center",
+            fontsize=8,
+        )
+        score_ax.annotate(
+            f"{miou:.2f}",
+            (miou, y[index] + 0.13),
+            xytext=(4, 0),
+            textcoords="offset points",
+            va="center",
+            fontsize=8,
+        )
+    score_ax.axvline(99, color="0.3", linestyle="--")
+    score_ax.set(xlim=(70, 101), yticks=y, yticklabels=model_labels, xlabel="Score (%)")
+    score_ax.invert_yaxis()
+    score_ax.set_title("Overall accuracy and six-class mIoU", loc="left")
+    for tick, color in zip(score_ax.get_yticklabels(), model_colors, strict=True):
+        tick.set_color(color)
+        tick.set_fontweight("bold")
+    score_ax.legend(
+        handles=(
+            plt.Line2D([], [], marker="o", color="0.2", linestyle="", label="OA"),
+            plt.Line2D([], [], marker="^", color="0.2", linestyle="", label="mIoU"),
+            plt.Line2D([], [], color="0.3", linestyle="--", label="99% OA target"),
+        ),
+        loc="upper right",
+        fontsize=8,
+    )
+
+    x = np.arange(6)
+    width = 0.18
+    for index, name in enumerate(model_names):
+        values = 100 * np.asarray(metrics_by_name[name]["per_class_iou"])
+        class_ax.bar(
+            x + (index - 1.5) * width,
+            values,
+            width=width,
+            label=model_labels[index],
+            color=colors_by_name[name],
+        )
+    class_ax.set_xticks(x, CLASSES, rotation=28, ha="right")
+    class_ax.set(ylabel="Class IoU (%)", ylim=(0, 108))
+    class_ax.set_title("IoU by class", loc="left")
+    class_ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.02), ncol=2)
+
+    dino3_oa = dino_scenes["DINOv3 RGB refit OA percent"].to_numpy()
+    scene_oa = {
+        "SAM": dino_scenes["SAM OA percent"].to_numpy(),
+        "DINOv2": dino_scenes["DINOv2 refit OA percent"].to_numpy(),
+        "PSPNet": 100 * np.asarray([scene["overall_accuracy"] for scene in psp_scenes]),
+    }
+    for offset, name, model_name in (
+        (-0.13, "SAM", "SAM"),
+        (0, "DINOv2", "DINOv2 refit"),
+        (0.13, "PSPNet", "PSPNet RGB refit"),
+    ):
+        scene_ax.scatter(
+            scene_oa[name] - dino3_oa,
+            np.arange(len(scene_ids)) + offset,
+            color=colors_by_name[model_name],
+            label=f"{name} \N{MINUS SIGN} DINOv3",
+            s=22,
+        )
+    scene_ax.axvline(0, color="0.25", lw=0.8)
+    scene_ax.set_yticks(np.arange(len(scene_ids)), scene_ids)
+    scene_ax.invert_yaxis()
+    scene_ax.set(xlabel="OA difference (percentage points)")
+    scene_ax.set_title("Per-scene OA relative to DINOv3", loc="left")
+    scene_ax.legend(loc="upper left", fontsize=8)
+
+    times = (dino_metrics["inference_seconds"], psp_metrics["inference_seconds"])
+    time_bars = time_ax.bar(
+        model_labels[2:],
+        times,
+        color=(colors_by_name["DINOv3 RGB refit"], colors_by_name["PSPNet RGB refit"]),
+    )
+    time_ax.bar_label(
+        time_bars, labels=[f"{value:.1f} s" for value in times], padding=3
+    )
+    time_ax.set(ylabel="Full-scene scoring time (seconds)", ylim=(0, max(times) * 1.22))
+    time_ax.set_title("Recorded scoring time", loc="left")
+
+    fig.suptitle("Potsdam historical benchmark · 14 scenes · 467,862,855 pixels")
+    return fig
+
+
 def render_eda(source, output):
     def read(name):
         return pd.read_csv(source / f"{name}.csv", dtype={"scene_id": str})
@@ -243,9 +547,17 @@ def render_legacy(source, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("group", choices=("dinov3", "eda", "legacy-potsdam"))
+    parser.add_argument(
+        "group",
+        choices=("dinov3", "model-comparison", "eda", "legacy-potsdam"),
+    )
     parser.add_argument("source", type=Path, help="Run root, EDA CSV root or notebook")
-    parser.add_argument("output", type=Path, help="Output directory or legacy notebook")
+    parser.add_argument(
+        "output", type=Path, help="Output directory, PNG or legacy notebook"
+    )
+    parser.add_argument(
+        "--dinov3-run", type=Path, help="Audited DINOv3 RGBIR campaign run root"
+    )
     args = parser.parse_args()
     plt.switch_backend("Agg")
     if args.group == "dinov3":
@@ -255,6 +567,10 @@ def main():
             ("final", benchmark_figure(args.source)),
         ):
             save(fig, args.output / f"potsdam-dinov3-rgbir-v2-{name}-2026-11-06.png")
+    elif args.group == "model-comparison":
+        if args.dinov3_run is None:
+            parser.error("model-comparison rendering requires --dinov3-run")
+        save(model_comparison_figure(args.source, args.dinov3_run), args.output)
     elif args.group == "eda":
         render_eda(args.source, args.output)
     else:
