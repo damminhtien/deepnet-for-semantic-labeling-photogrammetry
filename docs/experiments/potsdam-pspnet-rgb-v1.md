@@ -39,3 +39,10 @@ resume the coordinator from those receipts after a monitoring interruption.
 An unconfirmed submission needs reconciliation before another push. Failed
 phases keep their output and do not open later caches. The final comparison
 is written to `comparison.json` after confusion matrix and artifact audits.
+
+On 2026-11-07, the [private selection job](https://www.kaggle.com/code/damminhtien/potsdam-pspnet-rgb-v1-selection-run)
+was accepted as version 1. The CUDA pilot reached 94.2980% train mIoU at update 64.
+With headroom, its forecasts were 1.8502 allocated GPU-hours for the remaining
+selection, 0.4157 for refit and 0.3454 for benchmark. The matched selection then
+reached update 128/6,912. These are pilot and training observations; the
+validation-selected checkpoint and final PSPNet benchmark score are pending.

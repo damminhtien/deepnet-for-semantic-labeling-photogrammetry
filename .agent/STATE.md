@@ -923,12 +923,16 @@ Document verified segmentation evaluations and research, then push the resulting
   the encoder and head. The two checkpoint-gate checks and 19 RGBIR tests pass.
 - Kaggle accepted damminhtien/potsdam-pspnet-rgb-v1-selection-run version 1 at
   15:24:48 Singapore time; fresh status RUNNING. Only the train/validation
-  cache is attached. CUDA small-fit/timing and actual validation are pending.
+  cache is attached. CUDA small fit passes at update 64 with 94.2980% train
+  mIoU. Pilot forecasts 1.8502 allocated GPU-hours for remaining selection,
+  0.4157 for refit and 0.3454 for benchmark, including headroom. Matched
+  selection reaches update 128/6,912 at 15:28:13 Singapore time; this is
+  verified training progress, not a validation or benchmark score.
 - External run directory: runs/potsdam-pspnet-rgb-v1 under the project Data root.
   The launchd coordinator local.deepnet.potsdam-pspnet-rgb-v1 follows the accepted
   receipt from a source snapshot verified against the submitted package. It
   submits refit only after selection audit and benchmark only after final
   refit audit, then writes comparison.json from the saved matrices.
-- Next: inspect pilot and selection progress, never duplicate an accepted
+- Next: audit completed selection, never duplicate an accepted
   receipt, and report measured results only after the benchmark audit. The
   legacy PSPNet Colab run and completed DINOv3 evidence remain unchanged.
