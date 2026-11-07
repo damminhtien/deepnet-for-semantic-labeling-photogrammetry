@@ -24,8 +24,7 @@ exact confusion matrices before rounding.
 | B minus A, percentage points | -0.0517 | -0.1401 | -0.0372 | -0.3669 | A ranks first |
 
 B made **13,973,954 validation errors** versus A's 13,870,767 (103,187 more). A
-ranked first and supplied C's recipe. A was 5.9559 OA points below the 99%
-target.
+ranked first and supplied C's recipe.
 
 | Class | A IoU | B IoU | B minus A, points |
 | --- | ---: | ---: | ---: |

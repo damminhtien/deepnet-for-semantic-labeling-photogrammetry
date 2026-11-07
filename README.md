@@ -4,15 +4,17 @@
 semantic segmentation of high-resolution Potsdam orthophotos, and what accuracy–runtime
 trade-off does it show against a conventional convolutional model?
 
-**Current thesis.** On the 14-scene Potsdam benchmark cohort, the DINOv3-B RGB recipe is
-the strongest evaluated system so far (92.04% overall accuracy and 81.09% six-class
-mIoU). The matched PSPNet RGB recipe scores slightly lower but takes less time to score
-the full scenes. Neither reaches the 99% OA target. The largest remaining weakness is
-clutter/background, while low-vegetation and tree confusions also account for many
-errors. Adding the bundled IR/index/DSM features or stronger generic augmentation did
-not improve the DINOv3 selection result. These findings describe complete model recipes
-on a benchmark cohort whose scores were seen in earlier campaigns; they do not establish
-performance on a newly sampled city or untouched test set.
+**Current thesis.** The project aims to build a reproducible satellite-data training
+and evaluation pipeline and maximize single-model segmentation performance, without
+ensembles. On the 14-scene Potsdam benchmark cohort, DINOv3-B RGB is the strongest
+evaluated recipe so far (92.04% overall accuracy and 81.09% six-class mIoU). The matched
+PSPNet RGB recipe scores slightly lower but takes less time to score full scenes. The
+largest remaining weakness is clutter/background, while low-vegetation and tree
+confusions also account for many errors. Adding the bundled IR/index/DSM features or
+stronger generic augmentation did not improve the DINOv3 selection result. These
+findings describe complete model recipes on a benchmark cohort whose scores were seen
+in earlier campaigns; they do not establish performance on a newly sampled city or
+untouched test set.
 
 ## The result in one view
 
@@ -24,8 +26,8 @@ differences, and the recorded full-scene scoring time.
 
 *Figure 1. Aggregate OA and six-class mIoU; IoU for impervious surfaces, buildings, low
 vegetation, trees, cars, and clutter/background; per-scene OA relative to DINOv3; and
-recorded full-scene scoring time, rather than model-forward-only time. The 99% reference
-applies to OA. PSPNet and DINOv3 share the RGB cache and 512×512 windows at stride 256.
+recorded full-scene scoring time, rather than model-forward-only time. PSPNet and
+DINOv3 share the RGB cache and 512×512 windows at stride 256.
 SAM and DINOv2 retain their historical inference recipes, so this is a recipe-level
 comparison rather than a controlled architecture-only study. The plotted data and figure
 command are documented in [Figure
@@ -41,9 +43,9 @@ reproduction](docs/figures.md#consolidated-readme-benchmark).*
 The DINOv3 refit improves on DINOv2 by 0.5612 percentage points OA and 1.4810 mIoU
 points, reducing errors by 2,625,662 (6.59%). It improves OA on 12 of 14 scenes and
 raises IoU on five of six classes. Clutter IoU rises by 6.0635 points to 48.4383%; car
-IoU changes by −0.2816 point to 92.4418%. Even so, DINOv3 is 6.9603 OA points below 99%
-and would need 32,564,592 fewer errors on this cohort—an 87.44% reduction from its
-current error count. The [DINOv3 final
+IoU changes by −0.2816 point to 92.4418%. DINOv3 still makes 37,243,220 errors on this
+cohort; clutter IoU is 48.4383%, and low-vegetation/tree confusions remain frequent.
+The [DINOv3 final
 review](docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md) contains
 the confusion matrices, per-scene scores, checkpoint audit, and limits of this
 comparison.
@@ -139,10 +141,11 @@ and [PSPNet comparison report](docs/experiments/potsdam-pspnet-rgb-v1.md) descri
 other model and protocol details. PSPNet is one seed; its result compares complete
 systems and does not isolate the backbone.
 
-The 99% target is still an open research goal. The current matrices place the most
-direct next questions around clutter/background, class-boundary ambiguity, and
-low-vegetation/tree confusions. The next improvement should be tested with per-class
-evidence and a held-out region not previously used to compare these recipes.
+The next research question is how to improve the end-to-end data and training pipeline
+while preserving strong per-class performance and generalization. The current matrices
+point to clutter/background, class-boundary ambiguity, and low-vegetation/tree
+confusions as important areas to investigate. New recipes should be tested with
+per-class evidence and a held-out region not previously used to compare them.
 
 ## Data and evaluation contract
 

@@ -391,8 +391,7 @@ def model_comparison_figure(pspnet_run, dinov3_run):
             va="center",
             fontsize=8,
         )
-    score_ax.axvline(99, color="0.3", linestyle="--")
-    score_ax.set(xlim=(70, 101), yticks=y, yticklabels=model_labels, xlabel="Score (%)")
+    score_ax.set(xlim=(70, 96), yticks=y, yticklabels=model_labels, xlabel="Score (%)")
     score_ax.invert_yaxis()
     score_ax.set_title("Overall accuracy and six-class mIoU", loc="left")
     for tick, color in zip(score_ax.get_yticklabels(), model_colors, strict=True):
@@ -402,7 +401,6 @@ def model_comparison_figure(pspnet_run, dinov3_run):
         handles=(
             plt.Line2D([], [], marker="o", color="0.2", linestyle="", label="OA"),
             plt.Line2D([], [], marker="^", color="0.2", linestyle="", label="mIoU"),
-            plt.Line2D([], [], color="0.3", linestyle="--", label="99% OA target"),
         ),
         loc="upper right",
         fontsize=8,

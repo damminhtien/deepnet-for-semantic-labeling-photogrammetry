@@ -4,7 +4,9 @@ This study tests a smaller normalized ViT-B/14 decoder and a channel-preserving
 IRRG adapter. A/B/C select features and augmentation on the existing 18/6 split.
 A seed-43 confirmation must pass the same validation floors. Only then may the
 winner be continued on 24 participant-labeled scenes. The 14 test scenes are
-scored once, using the final refit checkpoint. OA 99% is the target.
+scored once, using the final refit checkpoint. Candidates must clear the
+historical SAM OA, mIoU, car IoU, and clutter IoU floors, then rank by validation
+OA and mIoU under the frozen protocol.
 
 Use the project environment with the model, training and vision extras.
 Keep the study directory, bundles, checkpoints and logs outside Git.

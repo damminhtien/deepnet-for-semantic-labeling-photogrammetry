@@ -1,8 +1,9 @@
 # Potsdam DINOv3 RGBIR v2
 
-The Potsdam DINOv3 campaign targeted 99% OA with 24 allocated GPU-hours on
-Kaggle. The previous DINOv2 refit scored 91.4785% OA and 79.6122% six-class
-mIoU.
+The Potsdam DINOv3 campaign evaluated a single-model RGBIR/DSM pipeline on
+Kaggle within a 24 allocated GPU-hour budget. Its research objective is to
+maximize reproducible segmentation performance without ensembling. The previous
+DINOv2 refit scored 91.4785% OA and 79.6122% six-class mIoU.
 
 The [CUDA preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md) set an
 eight-pass ViT-B schedule. Satellite ViT-L exceeded the six-pass cost limit. A

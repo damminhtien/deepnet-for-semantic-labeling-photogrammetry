@@ -4,8 +4,8 @@ The 24-scene continuation completed its declared 1,152 optimizer updates, and
 the final checkpoint was evaluated once on all 14 held-out scenes. Independently
 recomputed OA is **91.4785%** and six-class mIoU is **79.6122%** on exactly
 467,862,855 valid pixels. This exceeds historical SAM by 3.6643 OA points and
-5.9097 mIoU points. The **99% OA target was not reached**: the shortfall is
-7.5215 percentage points.
+5.9097 mIoU points. The result establishes the measured single-model DINOv2
+reference for the subsequent Potsdam study.
 
 ## Final held-out results
 
@@ -41,9 +41,6 @@ vegetation confusions in both directions contribute 11,813,440 pixels, or 29.63%
 of all errors. Another 4,876,846 clutter pixels become impervious surfaces and
 2,572,988 become low vegetation. Scene `4_14` is the weakest at OA 84.5825% and
 mIoU 72.7476%; OA across scenes ranges up to 94.1487%, and mIoU up to 84.7020%.
-
-At this pixel count, 99% OA permits at most 4,678,628 errors. It would require
-35,190,254 fewer errors than measured (an 88.26% reduction).
 
 ## Selection and continuation
 

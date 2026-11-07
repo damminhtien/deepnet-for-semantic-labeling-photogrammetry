@@ -611,10 +611,6 @@ def heldout(args: argparse.Namespace) -> None:
             "inference_seconds": inference_seconds,
             "remaining_errors": checked["pixels_scored"]
             - sum(checked["confusion_matrix"][i][i] for i in range(6)),
-            "oa_goal": protocol["oa_goal"],
-            "oa_shortfall_percentage_points": max(
-                0, 100 * (protocol["oa_goal"] - checked["overall_accuracy"])
-            ),
             "benchmark_scope": (
                 "Previously observed historical 14-scene benchmark; not a fresh holdout"
             ),

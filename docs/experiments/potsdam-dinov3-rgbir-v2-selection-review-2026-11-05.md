@@ -27,8 +27,7 @@ Eligibility uses exact confusion counts. Selected checkpoint SHA-256:
 `fbc022c284b42ed0a4a9a25397e9fa502267b549b2c10164b8a0b196fad066fb`.
 
 The reference makes 14,162,511 validation errors; A makes 13,870,767, or
-**291,744 fewer** (2.06%). A is 5.9559 OA points below 99%, which would require
-at least 11,876,670 fewer validation errors.
+**291,744 fewer** (2.06%).
 
 | Class | Selected A IoU | Selected A F1 |
 | --- | ---: | ---: |

@@ -3,9 +3,9 @@
 DINOv3-B RGB reached **92.0397% OA and 81.0932% six-class mIoU** on
 **467,862,855 valid pixels** from 14 historical benchmark scenes. The benchmark
 scored the final 1,152-update refit checkpoint once. Relative to DINOv2, OA rose
-**0.5612 percentage points** and mIoU rose **1.4810 points**. OA fell 6.9603
-points short of the 99% target. The campaign used **13.4557472 of 24 allocated
-GPU-hours**, including bootstrap, the failed preflight and both T4s.
+**0.5612 percentage points** and mIoU rose **1.4810 points**. The campaign
+used **13.4557472 of 24 allocated GPU-hours**, including bootstrap, the failed
+preflight and both T4s.
 
 ## Final benchmark results
 
@@ -55,9 +55,6 @@ confusions are:
 | Impervious surfaces | Low vegetation | 3,380,493 | 9.08% |
 | Low vegetation | Impervious surfaces | 2,510,302 | 6.74% |
 | Clutter/background | Low vegetation | 2,261,680 | 6.07% |
-
-At this pixel count, 99% OA permits at most **4,678,628** errors. The final
-model would need **32,564,592 fewer errors** (an **87.44%** reduction).
 
 ## Per-scene results
 

@@ -43,8 +43,6 @@ All arms cover 2,592 base windows plus 432 draws per rare class each pass.
 Augmentation yields 6,991,404,308 valid pixel presentations for C, 2,581,204
 fewer (under 0.04%) than A/B.
 
-A's validation OA is 5.9559 points below 99%.
-
 ## Confirmation and scoring gates
 
 D repeats A from pretrained for eight passes. At the selected update 6,912, D

@@ -158,7 +158,6 @@ class ProtocolConfig(TypedDict):
     inference: InferenceConfig
     gpu_hours: GPUHours
     small_fit: SmallFitConfig
-    oa_goal: float
 
 
 class ModelTiming(TypedDict):

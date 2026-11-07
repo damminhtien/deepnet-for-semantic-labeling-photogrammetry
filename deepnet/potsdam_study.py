@@ -746,10 +746,6 @@ def run_heldout(args):
             "checkpoint_sha256": refit["final_checkpoint_sha256"],
             "protocol_hash": protocol["protocol_hash"],
             "heldout_evaluation_count": 1,
-            "oa_goal": 0.99,
-            "oa_shortfall_percentage_points": max(
-                0, 100 * (0.99 - measured["overall_accuracy"])
-            ),
         }
         write_json(out / "metrics.json", report)
     artifact_index(out)

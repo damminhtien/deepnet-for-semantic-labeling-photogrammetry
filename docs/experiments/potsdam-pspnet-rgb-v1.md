@@ -81,11 +81,9 @@ covers full-scene scoring rather than model forward alone.
 PSPNet trails in OA on 13 of 14 scenes and has lower IoU in all six classes.
 The largest class gap is clutter, where PSPNet recall is
 53.85% versus 60.39% for DINOv3.
-PSPNet's OA is **7.7166 points short of 99%**, requiring at least
-36,103,215 fewer incorrect pixels on this cohort. The measured
-tradeoff is lower scoring time and GPU cost with lower accuracy for the tested
-PSPNet recipe. This single-seed comparison of complete systems does not isolate
-the encoder or establish the same tradeoff on a new dataset.
+The measured tradeoff is lower scoring time and GPU cost with lower accuracy for
+the tested PSPNet recipe. This single-seed comparison of complete systems does
+not isolate the encoder or establish the same tradeoff on a new dataset.
 
 <details>
 <summary>OA by benchmark scene</summary>

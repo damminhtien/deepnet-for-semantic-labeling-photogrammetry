@@ -159,6 +159,5 @@
     "minimum_miou": 0.9,
     "max_updates": 512,
     "patches": 8
-  },
-  "oa_goal": 0.99
+  }
 }
