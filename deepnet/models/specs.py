@@ -246,6 +246,15 @@ class SegmentationModelSpec:
             self.decoder_norm_groups and self.decoder_width % self.decoder_norm_groups
         ):
             raise ValueError("Decoder width must be divisible by normalization groups")
+        head_width = max(self.decoder_width // 2, self.num_classes)
+        if (
+            self.normalize_fusion
+            and self.decoder_norm_groups
+            and head_width % self.decoder_norm_groups
+        ):
+            raise ValueError(
+                "Decoder head width must be divisible by normalization groups"
+            )
         if self.ignore_index < self.num_classes:
             raise ValueError("ignore_index must not overlap model output classes")
         if not self.label_ontology.strip() or not self.license_id.strip():

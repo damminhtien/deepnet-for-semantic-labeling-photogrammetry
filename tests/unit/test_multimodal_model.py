@@ -154,6 +154,16 @@ def test_dino_specs_target_huggingface_attention_projections(filename: str):
     )
 
 
+def test_model_spec_rejects_incompatible_normalized_decoder_head_width():
+    with pytest.raises(ValueError, match="Decoder head width"):
+        replace(
+            _model_spec(),
+            decoder_width=24,
+            decoder_norm_groups=8,
+            normalize_fusion=True,
+        )
+
+
 def test_rgb_uses_identity_while_irrg_uses_learnable_spectral_projection():
     rgb_domain = DomainSpec(
         "rgb",
