@@ -46,6 +46,16 @@ The default DVC train/validation export is a source bundle, not a replacement fo
 the separate RGBIR snapshot and role-scoped caches. The completed run's receipts
 and one-attempt marker remain immutable; do not resubmit it to refresh a report.
 
+## Completed Potsdam PSPNet comparison
+
+The [PSPNet RGB runbook and results](experiments/potsdam-pspnet-rgb-v1.md) document
+a single-seed comparison that reuses the winning DINOv3 recipe's role-scoped
+caches, sampler and baseline augmentation. PSPNet selects its own checkpoint
+on six validation scenes, refits for 1,152 updates on the 24-scene train-only
+cache, then scores that final checkpoint once on the same 14-scene benchmark.
+It reaches **91.2834% OA / 79.4235% mIoU** on **467,862,855 valid pixels**.
+Use the saved confusion matrices to review these results.
+
 ## Install
 
 The package requires Python 3.10 or newer. For local development, create an

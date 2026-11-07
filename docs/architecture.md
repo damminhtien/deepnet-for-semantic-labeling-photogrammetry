@@ -160,3 +160,14 @@ single historical benchmark evaluation, using 512x512 windows and stride 256.
 The joint Potsdam/Vaihingen DINOv3 configuration remains an unexecuted plan.
 Its split and ranking settings do not control the completed Potsdam-only
 campaign. See the [data pipeline guide](data-pipeline.md) for the two scopes.
+
+## Completed Potsdam PSPNet comparison
+
+[PSPNet RGB](experiments/potsdam-pspnet-rgb-v1.md) uses
+[`model_script/pspnet_rgb.py`](../model_script/pspnet_rgb.py) for the ResNet101
+encoder and pyramid pooling head. It shares the DINOv3 campaign's role-scoped
+caches, sampling and full-scene evaluator. The
+[Kaggle coordinator](../scripts/run_pspnet_rgb_kaggle.py) verifies the separate
+selection and 24-scene refit artifacts before opening the benchmark cache for
+one evaluation. This is the matched RGB comparison, separate from the older
+five-channel PSPNet runner and its historical outputs.

@@ -13,6 +13,7 @@ OA >=99% remains a research target; the measured results below retain the gap.
 
 [DINOv3 RGBIR protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md) ·
 [Completed DINOv2 protocol](docs/experiments/potsdam-dinov2-coverage-refit.md) ·
+[PSPNet comparison](docs/experiments/potsdam-pspnet-rgb-v1.md) ·
 [Data pipeline guide](docs/data-pipeline.md) · [Architecture](docs/architecture.md)
 
 ## Verified results
@@ -76,6 +77,21 @@ and spectral-index descriptions with this measured discrepancy. The new RGB
 path is byte-verified against the independent official RGB archive and its index
 uses the actual IR/red bands 4/1.
 
+### Matched PSPNet comparison
+
+[PSPNet–ResNet101 RGB](docs/experiments/potsdam-pspnet-rgb-v1.md) reached
+**91.2834% OA / 79.4235% six-class mIoU**, trailing DINOv3-B RGB by
+0.7563 and 1.6697 percentage points. The seed-42 comparison reused DINOv3 A's
+RGB caches, sampler, augmentation and update schedule. PSPNet completed the
+1,152-update refit on 24 scenes and its final checkpoint was scored once on
+the same 14 scenes and 467,862,855 pixels with 512×512 windows and stride 256.
+
+DINOv3 led on 13 of 14 scenes. The largest class gap was clutter IoU
+(43.3019% vs 48.4383%). PSPNet took 254.83 s to score the scenes, versus 405.23 s
+for DINOv3. The matched selection, refit and benchmark jobs used 1.9066 and
+3.8218 allocated GPU-hours respectively, excluding the other DINOv3 arms,
+confirmation and separate preflight.
+
 ### Potsdam DINOv2 coverage study
 
 The table reports the selected checkpoint from each configuration on the same
@@ -118,6 +134,7 @@ for completion and audit evidence.
 | --- | --- | ---: | ---: | ---: | ---: |
 | SAM ViT-B + LoRA | Potsdam | 14 | 467,862,855 | 87.81% | 73.70% |
 | Potsdam DINOv2 C + 24-scene refit | Potsdam | 14 | 467,862,855 | 91.48% | 79.61% |
+| Potsdam PSPNet–ResNet101 RGB + 24-scene refit | Potsdam | 14 | 467,862,855 | 91.28% | 79.42% |
 | **Potsdam DINOv3-B RGB + 24-scene refit** | **Potsdam** | **14** | **467,862,855** | **92.04%** | **81.09%** |
 | Joint DINOv2 ViT-B/14 + LoRA | Potsdam | 14 | 467,862,855 | 74.66% | 48.65% |
 | Joint DINOv2 ViT-B/14 + LoRA | Vaihingen | 17 | 81,991,943 | 78.30% | 49.18% |
@@ -151,10 +168,11 @@ The evaluator sums per-scene confusion matrices before computing aggregate score
 These are project scores against local references; they are not submissions to
 the ISPRS leaderboard.
 
-Both Potsdam studies retain the 18/6 selection roles, require seed-43 confirmation,
-then continue seed 42 on all 24 participant-labeled scenes. The DINOv3 campaign
-uses eight selection passes and 512/256 inference; details and timings are in its
-[protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md).
+The DINOv2 and DINOv3 studies retain the 18/6 selection roles, require seed-43
+confirmation, then continue seed 42 on all 24 participant-labeled scenes. The DINOv3
+campaign uses eight selection passes and 512/256 inference; see its
+[protocol](docs/experiments/potsdam-dinov3-rgbir-v2.md). The matched PSPNet run uses
+the same DINOv3 schedule with a single seed and ranks its own validation checkpoints.
 
 In the completed DINOv2 study, each selection pass contains 2,592 base windows of
 **504 × 504 pixels**, plus
