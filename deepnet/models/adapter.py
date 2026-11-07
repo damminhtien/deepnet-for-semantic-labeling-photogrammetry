@@ -1,4 +1,4 @@
-"""Framework-neutral boundary between a Torch model and the data pipeline."""
+"""Input and output checks for Torch segmentation models."""
 
 from __future__ import annotations
 
@@ -20,11 +20,7 @@ def _default_logits(output: Any) -> Any:
 
 @dataclass(slots=True)
 class TorchSegmentationAdapter:
-    """Apply one model-input contract to any compatible Torch segmentation model.
-
-    The adapter does not construct a model or select its architecture. Model
-    creation and unusual output structures remain injectable at the call site.
-    """
+    """Validate tensors for a caller-supplied segmentation model."""
 
     model: Any
     input_spec: ModelInputSpec

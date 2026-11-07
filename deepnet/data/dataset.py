@@ -398,11 +398,10 @@ def make_torch_dataloader(
     num_workers: int = 0,
     pin_memory: bool = False,
 ) -> Any:
-    """Build a deterministic map-style loader safe for local and CUDA workers.
+    """Build a deterministic map-style loader.
 
-    Persistent workers are disabled so dataset.set_epoch reaches worker copies
-    at the start of each epoch. Every sample's random stream is derived from its
-    seed, epoch, and index rather than worker scheduling.
+    Recreate workers each epoch so their copies see dataset.set_epoch(). Each sample is
+    seeded by dataset seed, epoch and index.
     """
     if batch_size <= 0 or num_workers < 0:
         raise ValueError("batch_size must be positive and num_workers non-negative")

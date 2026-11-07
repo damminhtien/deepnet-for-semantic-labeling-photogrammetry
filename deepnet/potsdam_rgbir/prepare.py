@@ -177,7 +177,7 @@ def _array(root: Path, name: str, dtype: str, shape: tuple):
 
 
 def build_cache(bundle_path: Path, rgbir: Path, dsm: Path, output: Path) -> dict:
-    """Create a new role-scoped cache without changing a source bundle or mask."""
+    """Write a scene cache for one study phase."""
     bundle = load_bundle(bundle_path)
     rgb = json.loads((rgbir / "rgbir_manifest.json").read_text())
     rgb_payload = {k: v for k, v in rgb.items() if k != "snapshot_hash"}

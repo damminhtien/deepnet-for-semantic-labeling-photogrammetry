@@ -1,9 +1,4 @@
-"""Historical PSPNet cloud trainer retained for audit of the earlier experiment.
-
-It consumes the old model-specific bundle and loader and is not an entry point for
-the contract-driven data pipeline. New training code should construct data through
-``deepnet.data`` and record its bundle/run manifests.
-"""
+"""Train PSPNet in Colab with the original PSPNet bundle."""
 
 # ruff: noqa: E402
 

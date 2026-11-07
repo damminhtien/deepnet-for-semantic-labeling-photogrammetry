@@ -17,7 +17,7 @@ from deepnet.data.raster import sha256_file
 
 
 def _safe_source_file(root: Path, uri: str) -> Path:
-    """Resolve a descriptor path without allowing it to escape its data root."""
+    """Resolve a descriptor path within its data root."""
     relative = PurePosixPath(uri)
     if relative.is_absolute() or ".." in relative.parts:
         raise ValueError(f"Unsafe dataset asset path: {uri}")
@@ -39,10 +39,9 @@ def stage_label_subset(
     *,
     dataset_config_dir: Path | None = None,
 ) -> dict[str, Any]:
-    """Stage only the label files assigned to one split role.
+    """Copy the split role's labels to the staging directory.
 
-    The source dataset remains read-only. Existing staged files are accepted only
-    when their bytes match; unexpected or changed files fail instead of overwriting.
+    Existing files must match the expected paths and bytes.
     """
     catalog = DatasetCatalog.load(
         dataset_config_dir

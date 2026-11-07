@@ -1,23 +1,20 @@
 # DINOv3 RGBIR selection: configuration A
 
-Configuration A completed all eight passes and 6,912 optimizer updates on
-2026-11-05. Its selected checkpoint reaches **93.0441% OA and 80.7498% six-class
-mIoU** on the six validation scenes and exactly **199,409,714 scored pixels**.
-It passes all four eligibility floors from historical C seed 42. Configuration
-B was submitted once at 19:15:43 Singapore time and is running; C and seed-43
-confirmation remain pending. No new benchmark evaluation has been opened.
+A completed eight passes and 6,912 updates on 2026-11-05. The selected
+checkpoint reached **93.0441% OA and 80.7498% six-class mIoU** on six validation
+scenes (199,409,714 scored pixels), above all four historical C floors. B
+started at 19:15:43 Singapore time.
 
-This is an intermediate review of the [frozen campaign](potsdam-dinov3-rgbir-v2.md),
-not a final experiment result. A uses DINOv3-B, verified RGB and baseline
-augmentation, initialized from pretrained weights. It has 3,635,730 trainable
-parameters. The [GPU preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md)
-records why the common eight-pass B schedule was admitted and satellite L excluded.
+A uses pretrained DINOv3-B with RGB and baseline augmentation (3,635,730
+trainable parameters). The [campaign protocol](potsdam-dinov3-rgbir-v2.md)
+defines selection; the [GPU
+preflight](potsdam-dinov3-rgbir-v2-preflight-2026-11-05.md) explains the ViT-B
+schedule.
 
 ## Validation and checkpoint selection
 
-Only the two predeclared full-scene validation points can choose a checkpoint.
-Both use 512x512 windows, 256x256 stride and eroded labels. The 72-window probes
-do not participate in checkpoint selection.
+The two selection points use full-scene validation with 512 × 512 windows,
+stride 256 and eroded labels.
 
 | Checkpoint | OA | Six-class mIoU | Car IoU | Clutter IoU | Eligible |
 | --- | ---: | ---: | ---: | ---: | --- |
@@ -26,16 +23,12 @@ do not participate in checkpoint selection.
 | **A, update 6,912** | **93.0441%** | **80.7498%** | **93.9552%** | **43.8339%** | **Yes** |
 | Selected A minus reference, percentage points | +0.1463 | +1.1854 | +0.9967 | +4.8588 | All floors passed |
 
-The eligibility decision uses exact confusion-matrix counts, not these rounded
-values. The selected checkpoint's SHA-256 is
+Eligibility uses exact confusion counts. Selected checkpoint SHA-256:
 `fbc022c284b42ed0a4a9a25397e9fa502267b549b2c10164b8a0b196fad066fb`.
 
-The reference makes 14,162,511 errors; A makes 13,870,767, or **291,744 fewer
-errors, a 2.06% reduction**. Its validation OA remains 5.9559 percentage points
-below 99%. On this validation support, reaching 99% would require at least
-11,876,670 additional corrections. These are validation quantities; the previous
-91.4785% post-refit benchmark OA uses a different scene set and is not a direct
-baseline for A's validation OA.
+The reference makes 14,162,511 validation errors; A makes 13,870,767, or
+**291,744 fewer** (2.06%). A is 5.9559 OA points below 99%, which would require
+at least 11,876,670 fewer validation errors.
 
 | Class | Selected A IoU | Selected A F1 |
 | --- | ---: | ---: |
@@ -46,12 +39,10 @@ baseline for A's validation OA.
 | Car | 93.9552% | 96.8834% |
 | Clutter/background | 43.8339% | 60.9507% |
 
-Low vegetation predicted as tree accounts for 2,859,673 errors, and the reverse
-for 1,393,983. Together they account for **30.67% of A's errors**. Clutter remains
-the weakest class. B will test the joint addition of IR, the spectral index,
-relief and DSM availability; it cannot isolate the contribution of each feature.
-The A/reference comparison also changes backbone, inputs, sampling and training
-budget, so it does not establish a backbone-only improvement.
+Low vegetation predicted as tree accounts for 2,859,673 errors and the reverse
+for 1,393,983 (**30.67%** combined). Clutter has the lowest IoU. B tests IR, the
+spectral index, relief and DSM availability together. A and the historical
+reference also differ in backbone, inputs, sampling and budget.
 
 ## Runtime and input diagnostics
 
@@ -61,12 +52,10 @@ and the inner training runner records 2.9199813. Including both preflight
 attempts, completed and verified phases total **3.3260785 GPU-hours**; the running
 B phase is additional consumption and is not included in that subtotal.
 
-Timed training takes 4,301.9162 seconds, and probes plus full validation take
-542.1253 seconds. Validation is therefore **11.19% of timed training plus
-validation**, compared with the historical 92.83% in the older joint run. Using
-the entire inner-runner duration as denominator gives 10.31%. These scopes and
-the changed training/validation schedules must accompany the comparison; the
-figures do not represent a controlled hardware speedup experiment.
+Training takes 4,301.9162 seconds. Probes and full validation take 542.1253
+seconds, **11.19%** of timed training plus validation or 10.31% of the full
+inner runner. The older joint run spent 92.83% on validation under a different
+schedule.
 
 All 2,592 base windows are visited in each pass, with 432 car and 432 clutter
 draws. Eight passes record **6,993,985,512 valid pixel presentations after
@@ -82,18 +71,13 @@ extrema and all requested percentiles before and after normalization.
 
 ## Execution continuity and evidence
 
-The earlier chat-owned local coordinator stopped while Kaggle A continued to
-completion. Its launch receipt and logs remain preserved. After a fresh remote
-COMPLETE check, the recovery downloaded A once, verified its artifact inventory,
-checkpoint progress/finite tensors, source/protocol binding and matrices, then
-continued with B. No completed training phase was resubmitted.
+The local coordinator stopped while A continued on Kaggle. After Kaggle reported
+COMPLETE, recovery downloaded A, checked the inventory, checkpoint,
+source/protocol hashes and matrices, then submitted B.
 
-The coordinator now runs as the user launchd job
-`local.deepnet.potsdam-dinov3-rgbir-v2`, with launchd as its parent. Its plist,
-stdout and stderr are outside Git in the campaign's `kaggle/` directory. The job
-does not restart itself after a failed gate. This separates coordinator lifetime
-from the chat's subprocess lifetime while preserving the existing submission
-receipts and budget checks.
+The recovered coordinator ran under launchd as
+`local.deepnet.potsdam-dinov3-rgbir-v2`. Its plist and logs are in the
+campaign's `kaggle/` directory. A failed gate stops the job.
 
 Primary artifacts and the derived review live under
 `/Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/`:
@@ -104,9 +88,7 @@ Primary artifacts and the derived review live under
 - `kaggle/campaign-launchd.plist`, `campaign-launchd.log` and
   `campaign-launchd.err`.
 
-The frozen protocol hash remains
-`db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d`,
-and the runner source hash remains
+Protocol SHA-256:
+`db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d`. Runner
+source SHA-256:
 `050ba61e3d018f643bf5c463e605f551da093f13172f287dba587a1d7c04d466`.
-Refit still requires an eligible winner and eligible seed 43. Benchmark scoring
-still requires the complete update-1,152 refit checkpoint and its locked hash.

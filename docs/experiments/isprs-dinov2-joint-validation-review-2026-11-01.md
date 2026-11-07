@@ -1,15 +1,11 @@
 # DINOv2 joint-run validation review, 2026-11-01
 
-Final checkpoint/test artifacts have since been retrieved and verified. See the
-[final artifact review](isprs-dinov2-joint-final-review-2026-11-01.md). The values
-and pending status below preserve the earlier observation time.
+See the [final review](isprs-dinov2-joint-final-review-2026-11-01.md) for saved
+checkpoints and test scores.
 
-The first successful DINOv2 joint training attempt has completed 20 epochs and
-1,280 optimizer updates. Its selected epoch 15 is substantially weaker on Potsdam
-validation than the audited historical SAM candidate. This establishes a gap
-between the two complete training recipes, not an isolated backbone comparison.
-Held-out scoring is still running at this review's 16:35 SGT observation; no
-DINOv2 test metric or per-class diagnosis is claimed here.
+The joint DINOv2 run completed 20 epochs and 1,280 optimizer updates. Epoch 15
+won on validation. This snapshot uses live logs from 16:35 SGT, during held-out
+scoring.
 
 ## Measured comparison
 
@@ -36,12 +32,10 @@ truth supports exactly, for classes 0 through 5:
 56,474,309  67,405,057  38,412,461  29,005,158  3,090,146  5,022,583
 ```
 
-These checks support comparison of the observed Potsdam task scores. They do not
-prove bitwise equality of the historical and current label maps. The evaluation
-recipes also differ: historical SAM uses non-overlapping 512-pixel tiles; DINOv2
-uses 504-pixel tiles, stride 252, with weighted overlap. A controlled architecture
-comparison would require the same evaluation implementation and frozen protocol.
-The six-class, ignore-ID-6 mIoU gap is not explained by the earlier macro-F1 fix.
+The two runs match in validation scene IDs and truth counts; label-map byte
+equality is unverified. SAM scores non-overlapping 512-pixel tiles; DINOv2 uses
+504-pixel tiles at stride 252 with weighted overlap. Both mIoU scores cover six
+classes and ignore label 6.
 
 ## Training budget and learning curve
 
@@ -55,17 +49,14 @@ The six-class, ignore-ID-6 mIoU gap is not explained by the earlier macro-F1 fix
 | Potsdam input pixel presentations | 2,012,774,400 | 650,280,960 |
 | Total trainable parameters | 618,182 | 11,777,170 |
 
-DINOv2 has 10.66 times fewer global optimizer updates, but accumulation differs.
-The more useful exposure measures are 5.33 times fewer Potsdam patches and
-3.10 times fewer Potsdam input pixel presentations. Presentations include repeated
-and augmented pixels; they are not distinct data coverage or equal information.
-The trainable-parameter ratio is 19.05 across the entire model, including LoRA,
-adapter and decoder; it is not the decoder-only ratio.
+DINOv2 ran 10.66× fewer optimizer updates with different accumulation, 5.33×
+fewer Potsdam patches and 3.10× fewer Potsdam pixel presentations, counting
+repeated and augmented samples. It trains 19.05× as many parameters across LoRA,
+adapter and decoder.
 
-Budget is an incomplete explanation. At approximately matched Potsdam exposure,
-SAM epoch 10 reached **68.8812%** validation mIoU after 670,924,800 input pixel
-presentations. DINOv2 epoch 20 reached **50.9364%** after 650,280,960. Other recipe
-differences remain confounded, including the additional Vaihingen exposure.
+At similar Potsdam exposure, SAM epoch 10 reached **68.8812%** validation mIoU
+after 670,924,800 pixel presentations. DINOv2 epoch 20 reached **50.9364%**
+after 650,280,960. DINOv2 also trained on Vaihingen.
 
 | DINOv2 epoch | Potsdam mIoU | Vaihingen mIoU | Selection mean |
 | --- | ---: | ---: | ---: |
@@ -74,45 +65,32 @@ differences remain confounded, including the additional Vaihingen exposure.
 | 15, selected | 51.0339% | 47.6903% | 49.3621% |
 | 20 | 50.9364% | 47.3334% | 49.1349% |
 
-Early validation is unstable, followed by improvement around epochs 10--15 and a
-plateau through epoch 20. A cosine schedule approaching zero learning rate makes
-simply extending the same schedule an untested remedy. No full-training-set mIoU
-was measured, so these curves alone do not establish overfitting. Sparse losses
-from different training patches cannot establish a train/validation accuracy gap.
+Validation improves around epochs 10–15 and plateaus through epoch 20. The
+cosine schedule approaches zero learning rate; extending it is untested. The run
+logs patch losses but does not score mIoU on the full training set.
 
-The log contains 12,182.672 seconds of full-scene validation, 92.83% of the
-13,124.092 seconds from the first optimizer update through epoch-20 validation.
-The sum of first-to-last update intervals per epoch is 821.707 seconds; it excludes
-the first update of each epoch. Thus the run's elapsed hours mostly measure
-evaluation cost, not optimization effort. Overlapping inference, dense decoding
-and raster/memmap work are all involved; their individual costs were not profiled.
+Full-scene validation took 12,182.672 seconds (92.83%) of the 13,124.092 seconds
+from the first update through epoch-20 validation. First-to-last update
+intervals sum to 821.707 seconds, excluding each epoch's first update. The logs
+do not time raster reads, overlap and decoding separately.
 
 ## Implementation findings and hypotheses
 
-1. **Intermediate-feature normalization differs from the reference path.**
-   `TransformerFeatureBackbone.forward_features` directly selects
-   `hidden_states[3, 6, 9, 12]`. In installed Transformers 5.20.2,
-   `Dinov2Model.forward` normalizes `last_hidden_state`, while returning the
-   encoder's original `hidden_states`. The repo does not normalize those selected
-   feature tensors before decoding. Meta's reference
+1. **The decoder receives unnormalized intermediate features.**
+   `TransformerFeatureBackbone.forward_features` selects
+   `hidden_states[3, 6, 9, 12]` as returned by Transformers 5.20.2.
+   `Dinov2Model.forward` applies LayerNorm to `last_hidden_state`.
+   Meta's reference
    [`get_intermediate_layers`](https://github.com/facebookresearch/dinov2/blob/main/dinov2/models/vision_transformer.py#L278)
-   defaults to `norm=True` and applies its trained final LayerNorm to every
-   selected output. This is a concrete feature-interface difference and a strong
-   ablation candidate; its accuracy effect has not been measured.
+   applies the trained final LayerNorm to each selected output by default.
 2. **The IRRG spectral projection starts randomly.** The three optical channels
    pass through a learned 1x1 convolution with Kaiming-uniform initialization,
-   then ImageNet mean/std normalization. Input normalization exists. A random
-   spectral mixture can initially disrupt the pretrained encoder's expected
-   statistics and channel structure, especially with mostly frozen weights.
-   A deterministic IRRG channel-preserving initialization is a proposed control,
-   not an established physically correct conversion from IRRG to RGB.
-3. **Much more of the dense prediction path starts from scratch.** DINOv2's
-   custom multi-scale decoder and input adapter are randomly initialized. Its
-   refinement blocks use convolutions and GELU without normalization; the older
-   SAM path uses its pretrained neck and a smaller GroupNorm decoder. The whole
-   DINOv2 model trains 19.05 times as many parameters with less Potsdam exposure.
-   This raises an optimization concern; it does not prove a capacity problem or
-   prove that adding normalization will recover the observed gap.
+   then ImageNet mean/std normalization. Test channel-preserving IRRG
+   initialization to see whether the random mixture hurts a mostly frozen encoder.
+3. **The decoder and adapter start from random weights.** DINOv2 refinement blocks
+   use convolutions and GELU without normalization. SAM uses a pretrained neck
+   and a smaller GroupNorm decoder. DINOv2 trains 19.05 times as many parameters
+   with fewer Potsdam samples.
 4. **The joint objective and sampling differ.** DINOv2 averages two Potsdam and
    two Vaihingen microbatch losses per update. SAM optimizes Potsdam alone.
    Negative transfer is possible but requires a Potsdam-only control. Historical
@@ -121,32 +99,23 @@ and raster/memmap work are all involved; their individual costs were not profile
    LoRA rank, weight decay and the selection objective also changed. Both paths
    use the same weighted CE/macro-Dice implementation and 0.7/0.3 coefficients.
 
-The configured feature depths match the Hugging Face embedding-plus-block hidden
-state convention; this review found no evidence of an off-by-one block selection.
-Cloud input hashes and the actual LoRA preflight passed. Attempt 1's torchao
-compatibility failure happened before training and produced no model result;
-it cannot itself explain attempt 2's lower accuracy.
+Feature depths follow the Transformers embedding-plus-block convention. Cloud
+inputs and LoRA preflight passed. Attempt 1 stopped before training on a torchao
+compatibility error.
 
 ## Next decisions
 
-Finish the already-frozen held-out evaluation and audit its selected checkpoint,
-hashes and per-scene confusion counts. Use class IoU and prediction/truth support
-to identify which classes lose accuracy; no current class-collapse claim is yet
-supported. Do not change this run or choose a replacement using its test score.
+Finish scoring the frozen checkpoint and audit hashes and per-scene confusion
+counts. Compare class IoU and predicted versus actual pixel counts.
 
-For a new experiment, predeclare a Potsdam-only baseline with a simple dense head,
-the reference normalized features and deterministic IRRG initialization. Verify
-gradient flow and ability to fit a small training subset, then compare individual
-changes on validation with matched exposure, evaluation and schedule. Add
-Vaihingen only after that baseline is stable. A future budget can spend fewer
-full-scene validation passes and more optimizer updates, with its selection
-schedule declared before training. These are proposed experiments, not launched
-runs or proven fixes.
+Test a Potsdam-only baseline with a simple dense head, reference feature
+normalization and deterministic IRRG initialization. Verify gradients and
+small-subset fit, then vary one component at a time at matched exposure and
+scoring settings. Add Vaihingen after establishing the baseline. Budget
+full-scene validation and optimizer updates before training.
 
-The older UniverSat/AnySat/TerraMind probes used coarse 5 m grids and frozen linear
-heads; their scores are not native-resolution architecture controls. The current
-DINOv2 score is not worse than every historical experiment. The strongest
-supported comparison is the substantial gap to the tuned SAM Potsdam recipe.
+The UniverSat, AnySat and TerraMind probes used frozen linear heads at 5 m
+resolution. The direct Potsdam comparison here is with the tuned SAM recipe.
 
 ## Evidence and reproducible figure
 

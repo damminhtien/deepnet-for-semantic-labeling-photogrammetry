@@ -12,7 +12,7 @@ import numpy as np
 
 
 def _torch() -> Any:
-    """Import Torch only when execution needs it; data inspection stays lightweight."""
+    """Import Torch on demand."""
     import torch
 
     return torch
@@ -47,10 +47,9 @@ class TorchRuntime:
 
 
 def resolve_device(requested: str | None = None) -> Any:
-    """Choose an available accelerator, preferring CUDA, then Apple MPS, then CPU.
+    """Choose CUDA, MPS or CPU in that order.
 
-    An explicitly requested but unavailable accelerator raises an error instead
-    of silently moving a run to a different device.
+    If a device was requested, require it to be available.
     """
     torch = _torch()
     if requested is not None:
@@ -71,7 +70,7 @@ def resolve_device(requested: str | None = None) -> Any:
 
 
 def _mps_available(torch: Any) -> bool:
-    """Check MPS defensively for Torch builds without an MPS backend."""
+    """Check MPS availability across Torch builds."""
     backend = getattr(getattr(torch, "backends", None), "mps", None)
     return backend is not None and backend.is_available()
 
@@ -81,11 +80,9 @@ def configure_torch_runtime(
     *,
     num_workers: int | None = None,
 ) -> TorchRuntime:
-    """Resolve device and safe default DataLoader settings for this host.
+    """Resolve the device and DataLoader settings.
 
-    CUDA hosts default to a small, configurable worker pool. CPU and MPS hosts
-    default to synchronous loading, which avoids process overhead for local
-    development and remains compatible with macOS multiprocessing semantics.
+    Default to a worker pool on CUDA and synchronous loading on CPU or MPS.
     """
     device = resolve_device(requested_device)
     if num_workers is None:

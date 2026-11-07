@@ -1,4 +1,4 @@
-"""Monitor a Kaggle run, retrieve terminal outputs, and audit their evidence."""
+"""Monitor a Kaggle run and verify its final artifacts."""
 
 from __future__ import annotations
 

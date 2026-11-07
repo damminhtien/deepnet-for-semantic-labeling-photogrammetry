@@ -1,26 +1,29 @@
 # 2D Semantic Labeling Contest - Potsdam
-The data set contains 38 patches (of the same size), each consisting of a true orthophoto (TOP) extracted from a larger TOP mosaic, see Figure below and a DSM. 
-
-An orthophoto (orthophotograph or orthoimage) is an aerial photograph or satellite imagery geometrically corrected ("orthorectified") such that the scale is uniform: the photo or image has follows a given map projection. Unlike an uncorrected aerial photograph, an orthophoto can be used to measure true distances, because it is an accurate representation of the Earth's surface, having been adjusted for topographic relief,lens distortion, and camera tilt.
+The dataset contains 38 equal-sized tiles. Each pairs a true orthophoto (TOP)
+from a larger mosaic with a digital surface model (DSM).
 
 ![potsdam_map](http://www2.isprs.org/tl_files/isprs/wg34/images/tile_overview.resized.png)
-*Outlines of all patches given in Tab.1 overlaid with the true orthophoto mosaic. Numbers refer to the individual patch numbers, encoded in the filenames as well*
+*Tile outlines on the orthophoto mosaic. The numbers match the filenames.*
 
-The ground sampling distance of both, the TOP and the DSM, is 5 cm. The DSM was generated via dense image matching with Trimble INPHO 5.6 software and Trimble INPHO OrthoVista was used to generate the TOP mosaic. In order to avoid areas without data (“holes”) in the TOP and the DSM, the patches were selected from the central part of the TOP mosaic and none at the boundaries. Remaining (very small) holes in the TOP and the DSM were interpolated.
+Both products have 5 cm ground sampling distance. Trimble INPHO 5.6 generated
+the DSM by dense image matching; OrthoVista generated the TOP mosaic. Tiles
+come from the center of the mosaic. Small remaining gaps were interpolated.
 
-The TOP come as TIFF files in different channel composistions, where each channel has a spectral resolution of 8bit:
-* IRRG: 3 channels (IR-R-G)
-* RGB: 3 channels (R-G-B)
-* RGBIR: 4 channels (R-G-B-IR)
+The dataset lists three TOP TIFF variants with 8-bit channels:
 
-In this way participants can pick the data needed conveniently.
+- IRRG: infrared, red, green
+- RGB: red, green, blue
+- RGBIR: red, green, blue, infrared
 
-The DSM are TIFF files with one band; the grey levels (corresponding to the DSM heights) are encoded as 32 bit float values. The TOP and the DSM are defined on the same grid (UTM WGS84). Each tile comes with an affine transformation file (tiff world file) in order to enable a re-composition of images to larger mosaics if desired.
+DSM TIFFs store height as a single 32-bit float band. The dataset defines a
+common WGS84/UTM grid for TOP and DSM. TIFF world files describe the affine
+transform for each tile.
 
-Normalised DSMs, that is, after ground filtering the ground height is removed for each pixel, leading to an representation of heights above the terrain. 
+Normalized DSMs store height above the estimated terrain.
 
 ![image_dsm_gt](http://www2.isprs.org/tl_files/isprs/wg34/images/potsdam_top_dsm_label.png)
 
-Labelled ground truth is provided for only one part of the data. The ground truth of the remaining scenes will remain unreleased and stays with the benchmark test organizers to be used for evaluation of submitted results. Participants shall use all data with ground truth for training (see Table) or internal evaluation of their method.
+The contest provides labels for 24 tiles for training and internal evaluation.
+The organizers use the remaining 14 tiles to score submissions.
 
 ![magevslabel](http://www2.isprs.org/tl_files/isprs/wg34/images/potsdam2D_table.png)

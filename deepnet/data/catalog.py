@@ -108,7 +108,7 @@ class DatasetDescriptor:
 
 
 class DatasetCatalog:
-    """Load stable dataset IDs from JSON descriptors, never trainer-local paths."""
+    """Load dataset descriptors by JSON ID."""
 
     def __init__(self, descriptors: dict[str, DatasetDescriptor]) -> None:
         if not descriptors:
@@ -359,7 +359,7 @@ def build_scene_catalog(
 
 
 def write_scene_catalog(value: dict[str, Any], path: Path) -> None:
-    """Atomically write a metadata catalog; the raw source tree remains untouched."""
+    """Write the catalog atomically."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")

@@ -1,8 +1,4 @@
-"""Export a portable Kaggle input bundle through the shared data CLI.
-
-The bundle view and split are supplied by versioned JSON contracts. The script
-does not copy model-specific subsets or define a split of its own.
-"""
+"""Export a Kaggle bundle from versioned view and split specs."""
 
 from __future__ import annotations
 

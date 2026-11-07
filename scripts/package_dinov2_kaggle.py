@@ -1,4 +1,4 @@
-"""Build verified private Kaggle inputs without changing source data."""
+"""Package and verify private Kaggle inputs for DINOv2."""
 
 from __future__ import annotations
 

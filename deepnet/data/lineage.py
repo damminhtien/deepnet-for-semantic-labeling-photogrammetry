@@ -1,4 +1,4 @@
-"""Run-manifest helpers that bind model runs to immutable data contracts."""
+"""Record data, configuration and runtime provenance for a run."""
 
 from __future__ import annotations
 

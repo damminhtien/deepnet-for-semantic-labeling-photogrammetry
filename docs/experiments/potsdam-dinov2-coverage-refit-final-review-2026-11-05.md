@@ -9,10 +9,9 @@ recomputed OA is **91.4785%** and six-class mIoU is **79.6122%** on exactly
 
 ## Final held-out results
 
-All three rows below use the same 14 scene IDs, scored counts and aggregate
-ground-truth class supports. Historical metric-file hashes were verified before
-the confusion matrices were recomputed. This audit establishes matching support;
-it does not establish byte-level identity of the historical reference maps.
+All three rows use the same 14 scene IDs, scored counts and aggregate class
+supports. The audit verified historical metrics-file hashes before recomputing
+scores. Byte equality of the historical reference maps remains unverified.
 
 | Experiment | OA | Six-class mIoU |
 | --- | ---: | ---: |
@@ -33,10 +32,9 @@ are 16.8209 OA points and 30.9599 mIoU points. These are complete-recipe compari
 | Car | 85.1687% | 92.7234% | +7.5546 pp | 96.2243% |
 | Clutter/background | 36.9718% | 42.3747% | +5.4029 pp | 59.5256% |
 
-Clutter remains the weakest class. Its precision improves from 53.4148% to
-70.8307%, but recall falls from 54.5667% to 51.3326%. Higher clutter IoU therefore
-does not mean that the model recovers more of its true pixels. Cars improve in
-both precision and recall, reaching 94.9827% and 97.4989% respectively.
+Clutter remains the weakest class. Its precision rises from 53.4148% to
+70.8307%, while recall falls from 54.5667% to 51.3326%. Cars reach 94.9827%
+precision and 97.4989% recall, up on both measures.
 
 The final confusion matrix contains 39,868,882 misclassified pixels. Tree/low
 vegetation confusions in both directions contribute 11,813,440 pixels, or 29.63%
@@ -44,10 +42,8 @@ of all errors. Another 4,876,846 clutter pixels become impervious surfaces and
 2,572,988 become low vegetation. Scene `4_14` is the weakest at OA 84.5825% and
 mIoU 72.7476%; OA across scenes ranges up to 94.1487%, and mIoU up to 84.7020%.
 
-At this fixed support, 99% OA permits at most 4,678,628 errors. It would require
-35,190,254 fewer errors than measured, a net reduction of 88.26%. The target gap
-is substantial despite the improvement over the historical recipes. These counts
-identify remaining error categories but do not isolate their architectural causes.
+At this pixel count, 99% OA permits at most 4,678,628 errors. It would require
+35,190,254 fewer errors than measured (an 88.26% reduction).
 
 ## Selection and continuation
 
@@ -59,13 +55,11 @@ and passed the same four historical SAM floors. C's advantage over A was only
 0.0434 OA points and 0.0436 mIoU points; the repeat validates eligibility but does
 not establish a statistically reliable augmentation gain.
 
-The selection lock binds C's checkpoint, SHA-256
-`953d91bf89cfdb1add0755659632bf2b427c127bba311e68ef8f8a10bca6cd54`,
-as the continuation's starting weights. The winning recipe uses IRRG, D4,
-the declared affine/optical augmentation and no spectral or elevation features.
-All four selection runs and refit use DINOv2 ViT-B/14 with a residual adapter
-and the normalized width-128 decoder. This study does not compare DINOv2 with
-a trained DINOv3 model.
+The selection lock records C's checkpoint SHA-256
+`953d91bf89cfdb1add0755659632bf2b427c127bba311e68ef8f8a10bca6cd54` as the
+starting point for refit. C uses IRRG, D4 and affine/optical augmentation. All
+four selection runs and refit use DINOv2 ViT-B/14 with a residual adapter and a
+normalized width-128 decoder.
 
 The final C-plus-refit path records 4,575,287,363 valid Potsdam pixel
 presentations, compared with 483,139,259 through the selected epoch 15 of the
@@ -75,12 +69,9 @@ parameters from 11,777,170 to 3,634,770 (69.14%). Exposure, decoder size,
 normalization, adapter initialization, sampling and dataset scope all changed;
 an accuracy difference cannot identify any one of them as its cause.
 
-Refit used a separate train-only bundle containing exactly the union of the
-original 18 training and six validation scenes. All 24 use participant labels;
-no held-out scene or eroded validation reference enters this bundle. Its
-fingerprint is
+Refit used a separate train-only bundle with participant labels for all 24
+scenes in the 18+6 union. Its fingerprint is
 `a32734f4410dc97fa19b91d68bc49f8643390d7d4fc573bfd1ec37f5e3ee0679`.
-The historical split and its evaluation labels remain unchanged.
 
 AdamW and the AMP scaler were reset for refit. Initial learning rates were
 5e-5 for LoRA and 1.5e-4 for the adapter/decoder, with 5% warmup and cosine
@@ -142,13 +133,10 @@ the source package SHA-256 is
 These identities were frozen by the pilot and retained through selection,
 confirmation, refit and evaluation.
 
-Validation values above belong to the selected pre-refit checkpoint. The former
-validation scenes are training data during refit and provide no new validation
-score. The study scores held-out only after continuation, so it cannot estimate
-the isolated held-out effect of adding those six scenes. Comparisons with older
-SAM and joint DINOv2 runs compare complete recipes, with different training
-schedules and, for SAM, different inference tiling. Historical use of the same
-local held-out cohort also limits claims of a fresh independent benchmark.
+Validation scores belong to the pre-refit checkpoint. The final checkpoint was
+scored on the same historical cohort as prior runs. Comparisons cover complete
+recipes with different training schedules and, for SAM, different inference
+tiling. The effect of adding six scenes was not measured separately.
 
 ## Runtime and budget
 
@@ -163,17 +151,12 @@ local held-out cohort also limits claims of a fresh independent benchmark.
 | Single held-out evaluation | 0.6442 |
 | **Total completed phases** | **13.2968** |
 
-The runner charges both allocated T4s. This total covers the measured phase
-budgets, rather than provider billing. The corresponding remote execution-log
-durations, including bootstrap outside those timers, total 13.4594 allocated
-GPU-hours. The preserved failed preflight log adds 0.0103 GPU-hours (18.461
-wall-seconds at two allocated T4s), giving 13.4696 GPU-hours across the observed
-execution logs. That attempt stopped at the allocation check before training.
-These log durations do not include every provider-side lifecycle overhead.
-The study stayed within the 24 GPU-hour plan, with substantial reserve.
-Validation occupied 24.28% of timed training plus validation for A, 36.51% for B,
-24.37% for C and 24.30% for D, compared with
-92.83% in the historical joint run.
+The remote execution logs, including bootstrap outside the phase timers, total
+13.4594 GPU-hours across both T4s. The failed preflight adds 0.0103 GPU-hours
+(18.461 wall-seconds), bringing the observed total to 13.4696 of 24. It stopped
+at the allocation check. Validation occupied 24.28% / 36.51% / 24.37% / 24.30%
+of timed training plus validation for A/B/C/D, versus 92.83% in the older joint
+run.
 
 ## Evidence
 

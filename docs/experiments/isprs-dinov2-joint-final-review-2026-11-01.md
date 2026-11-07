@@ -1,17 +1,14 @@
 # DINOv2 joint-run final artifact review, 2026-11-01
 
-The private Kaggle attempt completed successfully. Both checkpoints, all metrics
-and provenance are downloaded and independently verified. The selected DINOv2
-recipe substantially underperforms historical SAM on Potsdam: held-out mIoU is
-48.6523% versus 73.7024%, a 25.0501 percentage-point gap. Cars and clutter account
-for the largest losses, but all six classes and all 14 Potsdam test scenes regress.
-This is a comparison of full recipes, not an isolated backbone experiment.
+Potsdam held-out mIoU was **48.6523%** for joint DINOv2 versus **73.7024%** for
+historical SAM, a 25.0501-point gap. DINOv2 scored lower on all six classes and
+all 14 test scenes; cars and clutter had the largest losses. The comparison
+covers complete training and evaluation recipes.
 
 ## Completion and artifact integrity
 
 - Kernel: [damminhtien/dinov2-joint-irrg-segmentation-20261101](https://www.kaggle.com/code/damminhtien/dinov2-joint-irrg-segmentation-20261101), version 1, Tesla T4.
-- Kaggle status was freshly confirmed COMPLETE. Scientific evaluation completed
-  at 16:47:46 SGT; the enclosing flow exited successfully at 16:47:53 SGT.
+- Evaluation finished at 16:47:46 SGT; the Kaggle job exited at 16:47:53 SGT.
 - Downloaded 12 indexed artifacts totaling 882,900,091 bytes, plus the artifact
   index, bootstrap/runtime records, source manifest and remote execution log.
   Both the supplied watcher audit and independent audit report no errors.
@@ -21,22 +18,19 @@ This is a comparison of full recipes, not an isolated backbone experiment.
   mean validation mIoU across all 20 epochs.
 - `last.pt` contains epoch 20 / step 1,280, optimizer, AMP scaler and RNG state.
   The two checkpoints and manifest share the same data/model/configuration binding.
-- Both held-out datasets were evaluated once using the frozen selected checkpoint.
-  No local inference, test rerun, parameter change or new training was performed.
+- The frozen checkpoint was scored once on each held-out dataset.
 - Independently recomputed all 45 aggregate/per-scene confusion-matrix summaries:
   mIoU, OA, precision, recall and F1 match persisted values. Scene counts sum to
   each dataset's aggregate. Checkpoint, metric, configuration, protocol and source
   hashes match the saved launch identity; the frozen training config is unchanged.
 
-The previous local watcher stopped before completion. Retrieval was restarted
-after observing the remote terminal state; download and audit completed at
-17:03:45 SGT. The original launch record is preserved, including its historical
-RUNNING status; final reconciliation is stored separately.
+After the local watcher stopped, retrieval resumed from the remote terminal
+result. The download and audit finished at 17:03:45 SGT. The launch record and
+final reconciliation are stored separately.
 
 ## Final metrics
 
-All mIoUs below include six semantic classes, with label 6 ignored. Validation
-values belong to selected epoch 15, not the last epoch.
+All mIoUs cover six classes and ignore label 6. Validation scores use epoch 15.
 
 | Dataset / split | Scenes | Scored pixels | mIoU | OA |
 | --- | ---: | ---: | ---: | ---: |
@@ -45,10 +39,9 @@ values belong to selected epoch 15, not the last epoch.
 | Vaihingen validation | 4 | 17,591,104 | 47.6903% | 79.1191% |
 | Vaihingen test | 17 | 81,991,943 | 49.1788% | 78.3033% |
 
-The validation selection mean is 49.3620805891%. Potsdam loses only 2.3816 points
-from validation to test; its much larger gap to SAM is already present on
-validation. These observations do not establish overfitting or underfitting
-without training-set accuracy and controlled experiments.
+Mean validation mIoU across both datasets was 49.3620805891%. Potsdam drops
+2.3816 points from validation to test; most of its gap to SAM is already present
+on validation.
 
 ## Potsdam comparison with historical SAM
 
@@ -62,18 +55,15 @@ without training-set accuracy and controlled experiments.
 | Clutter/background | 36.9718% | 2.1195% | -34.8523 pp |
 | Six-class mean | 73.7024% | 48.6523% | -25.0501 pp |
 
-Historical SAM test OA is 87.8142%, versus 74.6576% now, a 13.1566-point gap.
-Cars and clutter contribute 13.3384 points, or 53.25%, of the total mIoU gap.
-Excluding clutter for diagnosis still leaves five-class mean IoU at 57.9588%
-versus SAM's 81.0485%; that diagnostic average does not replace the six-class score.
+SAM test OA was 87.8142% versus 74.6576% for DINOv2, a 13.1566-point gap. Cars
+and clutter account for 13.3384 points (53.25%) of the mIoU gap. Excluding
+clutter gives five-class diagnostic means of 57.9588% for DINOv2 and 81.0485%
+for SAM.
 
-Potsdam scene IDs, per-scene scored counts and aggregate ground-truth class
-supports exactly match SAM for both validation and test. DINOv2 is lower on every
-test scene, with scene mIoU ranging from 43.02% to 52.65%; the paired gaps range
-from 19.76 to 27.88 points. This is not one anomalous test tile. Historical and
-current label-map byte equality was not established. Historical SAM also used
-non-overlapping 512-pixel inference, while DINOv2 uses weighted-overlap 504-pixel
-inference, so the comparison does not isolate architecture effects.
+Potsdam validation and test scene IDs, scored counts and class supports match
+SAM; reference-map byte equality is unverified. DINOv2 test-scene mIoU ranges
+from 43.02% to 52.65%, with gaps of 19.76–27.88 points versus SAM. SAM scored
+non-overlapping 512-pixel tiles; DINOv2 used overlapping 504-pixel tiles.
 
 ## Failure modes supported by counts
 
@@ -87,16 +77,13 @@ inference, so the comparison does not isolate architecture effects.
   the regression extends beyond small or rare classes.
 - Vaihingen car is also weak: IoU 21.3713%, recall 40.7919%, precision 30.9818%.
   Clutter IoU is 11.2618%, with recall 13.6872%.
-- Vaihingen validation contains only 5,634 clutter truth pixels, versus 692,551
-  on test. Its clutter IoUs of 1.8781% and 11.2618% come from different class
-  supports; a higher test mIoU does not by itself establish stronger generalization.
+- Vaihingen clutter IoU is 1.8781% on 5,634 validation truth pixels and 11.2618%
+  on 692,551 test truth pixels.
 
-The epoch histograms rule out complete absence of these classes from training.
-Across all 20 epochs, Potsdam supplied 644,140,612 valid semantic pixel
-presentations out of 650,280,960 total. Cars contributed 12,450,606 pixels (1.93%)
-in 1,386/2,560 patches; clutter contributed 44,341,795 pixels (6.88%) in
-1,781/2,560 patches. These are presentations, including repeats, not unique pixels
-or complete spatial coverage. More augmentation alone is not an established fix.
+Across 20 epochs, Potsdam contributed 644,140,612 valid semantic pixel
+presentations out of 650,280,960 total, including repeats. Cars contributed
+12,450,606 pixels (1.93%) in 1,386/2,560 patches; clutter contributed 44,341,795
+pixels (6.88%) in 1,781/2,560 patches.
 
 ## Checkpoint findings and causal limits
 
@@ -104,33 +91,24 @@ All 48 LoRA B matrices are nonzero in the selected checkpoint, so adapter update
 occurred. No non-LoRA backbone tensor changes between best and last checkpoints.
 The audit found no mismatch in checkpoint selection or metric arithmetic.
 
-The selected spectral adapter exposes a concrete input-interface concern. Its
-third projected channel is approximately:
+The selected spectral adapter's third channel is approximately:
 
 ```text
 z3 = -0.43493 * IR - 0.45043 * R - 0.51341 * G + 0.00967
 ```
 
-For unaugmented IRRG inputs scaled to [0,1], its exact analytical output bounds
-are approximately [-1.3891, 0.0097]. After the configured mean/std normalization,
-the third encoder channel lies in [-7.9782, -1.7615]. These are bounds derived from
-weights, not a measured activation distribution. They demonstrate a strong shift
-from the intended unit-range optical input before normalization. Its accuracy
-effect still needs a controlled adapter-initialization experiment.
+The weights give analytical bounds of [-1.3891, 0.0097] for the third channel on
+IRRG inputs in [0,1], and [-7.9782, -1.7615] after mean/std normalization. Test
+the accuracy effect with a controlled adapter-initialization experiment.
 
-The earlier source review also found unnormalized intermediate hidden states,
-a larger randomly initialized convolutional decoder without refinement
-normalization, less Potsdam exposure and a different joint-domain objective.
-Those remain hypotheses rather than separately measured causes. The current
-evidence does not show that ViT-B/14 itself is the limiting choice.
+Other candidate explanations are unnormalized intermediate features, a larger
+random decoder without refinement normalization, less Potsdam exposure and the
+joint training objective.
 
-For a new validation-controlled experiment, first verify the encoder/adapter
-interface and small-training-subset fitting; establish a Potsdam-only baseline
-with reference feature normalization and deterministic channel-preserving
-initialization. Isolate individual changes, use a declared spatial-coverage and
-optimization budget, then measure the effect of adding Vaihingen. Increasing the
-backbone or adding more augmentations before these checks is not justified by
-the present evidence. Preserve this run and its test observations as history.
+Verify gradient flow and small-subset fit, then establish a Potsdam-only
+baseline with reference feature normalization and channel-preserving
+initialization. Match coverage and training budgets while varying one component
+at a time. Test the effect of adding Vaihingen after that baseline.
 
 ## Local evidence and figures
 
@@ -151,6 +129,6 @@ External run root:
   rendered outputs. Historical SAM metrics remain in the preserved
   `sam-vitb-lora-kaggle-output-20261020/snapshot-20261020-retrain-04/` tree.
 
-The [earlier validation review](isprs-dinov2-joint-validation-review-2026-11-01.md)
-remains an explicitly intermediate observation; the current document records the
-final held-out result and verified completion.
+See the [earlier validation
+review](isprs-dinov2-joint-validation-review-2026-11-01.md) for the learning
+curve and exposure comparison.

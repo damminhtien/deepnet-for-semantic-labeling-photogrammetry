@@ -218,7 +218,7 @@ class SceneRecord:
         *,
         allow_reprojection: bool = False,
     ) -> None:
-        """Check assets against the reference without shape-only inference."""
+        """Check asset alignment against the reference grid."""
         assets = self.asset_map()
         missing = sorted(set(asset_names) - assets.keys())
         if missing:
@@ -939,7 +939,7 @@ class TransformSpec:
 
 @dataclass(frozen=True, slots=True)
 class AugmentationSpec:
-    """Domain-scoped stochastic training transforms; validation stays deterministic."""
+    """Stochastic training transforms for a sensor domain."""
 
     augmentation_id: str
     version: int

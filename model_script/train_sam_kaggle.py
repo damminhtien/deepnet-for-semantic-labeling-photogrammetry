@@ -1,9 +1,4 @@
-"""Historical SAM LoRA trainer retained for audit of the earlier experiment.
-
-This script consumes the old model-specific bundle and patch dataset; it is not an
-entry point for the contract-driven data pipeline. New training code should
-construct data through ``deepnet.data`` and record its bundle/run manifests.
-"""
+"""Train SAM LoRA on Kaggle with the original SAM bundle."""
 
 # ruff: noqa: E402
 

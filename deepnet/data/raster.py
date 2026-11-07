@@ -24,7 +24,7 @@ def _rasterio() -> Any:
 
 
 def sha256_file(path: Path, chunk_size: int = 1024 * 1024) -> str:
-    """Stream a file hash during ingest; never hash per training step."""
+    """Compute a file's SHA-256 by streaming its contents."""
     digest = hashlib.sha256()
     with Path(path).open("rb") as source:
         for chunk in iter(lambda: source.read(chunk_size), b""):
@@ -273,7 +273,7 @@ class RasterioSceneReader:
         self.close()
 
     def __getstate__(self) -> dict[str, Any]:
-        """Do not pickle open GDAL handles into DataLoader worker processes."""
+        """Drop open GDAL handles when serializing for DataLoader workers."""
         state = self.__dict__.copy()
         state["_datasets"] = {}
         return state

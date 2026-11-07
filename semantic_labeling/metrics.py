@@ -1,7 +1,4 @@
-"""Historical pixel metrics used by pre-pipeline experiments.
-
-New scene-level evaluation and provenance belong in ``deepnet.data.evaluation``.
-"""
+"""Pixel metrics for the original Potsdam experiments."""
 
 import numpy as np
 from sklearn.metrics import confusion_matrix

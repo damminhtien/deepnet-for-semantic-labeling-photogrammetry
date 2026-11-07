@@ -1,4 +1,4 @@
-"""Contract-driven data access for geospatial semantic segmentation."""
+"""Data access for geospatial semantic segmentation."""
 
 from .bundles import BundleData, export_model_bundle, load_bundle, verify_bundle
 from .catalog import load_augmentation_spec, load_domain_spec

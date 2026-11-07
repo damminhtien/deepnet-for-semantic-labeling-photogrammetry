@@ -112,7 +112,7 @@ def dsm_model_view(model_input, enabled: bool):
 
 
 class DsmAccess:
-    """Append finite, aligned sidecar features without intersecting label validity."""
+    """Append finite, aligned features while preserving the label mask."""
 
     def __init__(self, access, root: Path, manifest: dict):
         self.access = access
@@ -162,7 +162,7 @@ def verify_dsm(root: Path, split: SplitManifest, scene_ids):
 
 
 def prepare_dsm(split, scenes, raw_root: Path, inventory: Path, output: Path):
-    """Derive relief from SHA-verified GeoTIFFs; do not read any label raster."""
+    """Derive relief from GeoTIFFs verified by SHA-256."""
     import cv2
     import rasterio
 

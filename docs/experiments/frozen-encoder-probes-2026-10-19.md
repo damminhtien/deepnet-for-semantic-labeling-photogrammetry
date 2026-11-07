@@ -1,18 +1,16 @@
 # Frozen encoder segmentation probes
 
-> **Historical results — rerun required.** These experiments predate the
-> contract-driven data pipeline. Their metrics remain archived evidence and have
-> not been reproduced through the current catalog, preprocessing, or evaluation
-> contracts.
-
 Date: 2026-10-19
 Environment: Python 3.14.8, PyTorch 2.14.1, torchvision 0.29.1, Apple MPS.
 
-These are small supervised linear-probe experiments. The pretrained encoders stay frozen; only one linear pixel classifier is trained for 100 epochs. Results are coarse-grid validation measurements, not full-resolution benchmark submissions.
+Each experiment trains a linear pixel classifier for 100 epochs with a frozen
+encoder. Scores use coarse validation grids.
 
 ## Potsdam validation
 
-The fixed split uses 18 labeled scenes for training and 6 scenes for validation. The 14 held-out scenes were not accessed in this pilot. Images use IR-R-G remapped to R-G-NIR-as-blue; DSM and nDSM are omitted. The feature grid is compared at approximately 5 m and 10 m per cell.
+Potsdam uses 18 training and six validation scenes. The probes map the
+historical IRRG inputs to R/G/NIR-as-blue and use no DSM or nDSM. They score
+grids at about 5 m and 10 m per cell.
 
 ### Approximately 5 m grid, six classes
 
@@ -32,7 +30,8 @@ The majority-class baseline is 30.39% OA and 5.07% mIoU. Cars have only 113 trai
 | AnySat | 53.46% | 27.71% |
 | TerraMind | 50.28% | 27.10% |
 
-Majority reduction at this scale removes cars from both training and validation. These are five-class scores and must not be compared with the six-class results above.
+Majority reduction removes cars from both splits at 10 m. These averages cover
+five classes; the 5 m averages cover six.
 
 ## RGB dataset probes
 
@@ -47,7 +46,7 @@ Each model uses a frozen encoder and the same 96 train plus 96 validation sample
 | LoveDA v1 | AnySat | 20.13% | 11.67% | 5.22% | 96,322 |
 | LoveDA v1 | TerraMind | 48.01% | 28.33% | 5.22% | 96,322 |
 
-TerraMind has the highest sampled mIoU on both RGB datasets. This is preliminary evidence for further evaluation, not enough to select a production model.
+TerraMind has the highest sampled mIoU on both RGB datasets.
 
 ### Per-class IoU
 

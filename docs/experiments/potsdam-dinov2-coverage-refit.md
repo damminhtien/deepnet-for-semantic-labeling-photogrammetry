@@ -38,12 +38,10 @@ python -m deepnet.potsdam_study prepare-dsm \
   --output "$DSM_FEATURES"
 ```
 
-The DSM inventory was obtained from `Potsdam/1_DSM.rar` inside the source
-`Potsdam.zip`; all 38 extracted TIFF hashes matched the pre-existing rasters.
-Only DSM and its world files are in this DVC snapshot. The feature manifest
-records the raw hashes, grids, extent, coverage and train-only scale. DSM
-availability is a feature; it never removes a pixel from scoring. The JPEG
-nDSM remains excluded. Kaggle input datasets must remain private.
+The DSM snapshot contains the TIFFs and world files from `Potsdam/1_DSM.rar`
+inside `Potsdam.zip`. The 38 TIFF hashes match the pre-existing rasters. The
+feature manifest records hashes, grids, extent, coverage and train-only scale.
+Use image/label validity for scoring and keep Kaggle input datasets private.
 
 The pilot writes the 36-patch backbone distribution before training, after
 the eight-patch fit and for the historical adapter. It also measures nine
@@ -114,7 +112,5 @@ wall-time limits. The phase caps total 23 GPU-hours; the remaining GPU-hour
 covers setup failures or other reserve use. Submit downstream jobs only
 after verifying their prerequisites.
 
-Report validation metrics for the pre-refit checkpoint. Report held-out
-metrics and the OA shortfall only from a complete run on 467,862,855
-pixels. This design does not measure the isolated held-out effect of
-adding the six scenes.
+Report validation metrics for the selected pre-refit checkpoint and held-out
+metrics for the final checkpoint on 467,862,855 pixels.
