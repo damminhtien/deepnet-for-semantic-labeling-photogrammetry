@@ -7,6 +7,7 @@ import importlib.metadata
 import json
 import logging
 import time
+from collections.abc import Mapping
 from contextlib import ExitStack
 from pathlib import Path
 from typing import Any
@@ -137,7 +138,7 @@ def _training_dataset(
     )
 
 
-def _autocast(device: torch.device, config: dict) -> Any:
+def _autocast(device: torch.device, config: Mapping[str, Any]) -> Any:
     return torch.autocast(
         device_type=device.type,
         dtype=torch.float16,

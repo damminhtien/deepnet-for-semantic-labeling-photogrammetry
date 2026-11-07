@@ -99,11 +99,14 @@ def load_label(path):
     if path.suffix.lower() == ".npz":
         with np.load(path, allow_pickle=False) as archive:
             if "labels" not in archive:
-                raise ValueError(f"Prepared label archive has no 'labels' array: {path}")
+                raise ValueError(
+                    f"Prepared label archive has no 'labels' array: {path}"
+                )
             labels = archive["labels"]
         if labels.ndim != 2 or not np.issubdtype(labels.dtype, np.integer):
             raise ValueError(
-                f"Prepared labels must be a 2D integer map, got {labels.shape} {labels.dtype}"
+                "Prepared labels must be a 2D integer map, "
+                f"got {labels.shape} {labels.dtype}"
             )
         if np.any((labels < 0) | (labels > IGNORE_LABEL)):
             unknown = np.unique(labels[(labels < 0) | (labels > IGNORE_LABEL)]).tolist()

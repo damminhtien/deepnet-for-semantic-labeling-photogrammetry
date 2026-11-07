@@ -273,8 +273,18 @@ and [evaluation protocol](configs/evaluations/isprs-dinov2-v1.json).
 For development checks with the extras installed:
 
 ```bash
-uv run ruff check deepnet tests/unit
+uv run ruff check \
+  deepnet scripts model_script semantic_labeling tests notebooks_src \
+  test_kernel/test.py
 uv run pytest tests/unit
+uv run pyright deepnet/potsdam_rgbir/types.py
+uv run pyright deepnet/potsdam_rgbir/protocol.py
+uv run pyright deepnet/potsdam_rgbir/model.py
+uv run pyright deepnet/potsdam_rgbir/sampling.py
+uv run pyright deepnet/potsdam_rgbir/engine.py
+uv run pyright deepnet/potsdam_rgbir/preflight.py
+uv run pyright deepnet/potsdam_rgbir/phases.py
+uv run pyright deepnet/potsdam_rgbir/study.py
 ```
 
 The regular unit suite uses synthetic fixtures. Use

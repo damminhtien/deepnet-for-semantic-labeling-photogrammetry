@@ -1,5 +1,7 @@
 """Compatibility entry point for the Potsdam evaluation pipeline."""
 
+# ruff: noqa: E402
+
 import sys
 from pathlib import Path
 
@@ -39,9 +41,18 @@ FOLDER = "../input/potsdamvaihingen/"
 MAIN_FOLDER = FOLDER
 DATA_FOLDER = MAIN_FOLDER + "3_ortho_irrg/3_Ortho_IRRG/top_potsdam_{}_IRRG.tif"
 DSM_FOLDER = MAIN_FOLDER + "1_dsm/1_DSM/dsm_potsdam_0{}.tif"
-NDSM_FOLDER = MAIN_FOLDER + "1_dsm_normalisation/1_DSM_normalisation/dsm_potsdam_0{}_normalized_lastools.jpg"
-LABEL_FOLDER = "../input/label-all-potsdam-vaihingen/5_labels_all/top_potsdam_{}_label.tif"
-ERODED_FOLDER = "../input/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_{}_label_noBoundary.tif"
+NDSM_FOLDER = (
+    MAIN_FOLDER
+    + "1_dsm_normalisation/1_DSM_normalisation/"
+    + "dsm_potsdam_0{}_normalized_lastools.jpg"
+)
+LABEL_FOLDER = (
+    "../input/label-all-potsdam-vaihingen/5_labels_all/top_potsdam_{}_label.tif"
+)
+ERODED_FOLDER = (
+    "../input/label-all-potsdam-vaihingen/5_labels_all_noboundary/"
+    "top_potsdam_{}_label_noBoundary.tif"
+)
 palette = PALETTE
 invert_palette = INVERT_PALETTE
 list_acc = []

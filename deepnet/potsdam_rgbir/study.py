@@ -11,7 +11,7 @@ from .preflight import preflight
 from .protocol import CONFIG
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="phase", required=True)
     common = argparse.ArgumentParser(add_help=False)

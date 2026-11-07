@@ -25,9 +25,7 @@ def _adaptive_avg_pool2d_mps(features, output_size):
     for index in range(output_width):
         start = index * input_width // output_width
         end = ((index + 1) * input_width + output_width - 1) // output_width
-        columns.append(
-            pooled_height[:, :, :, start:end].mean(dim=3, keepdim=True)
-        )
+        columns.append(pooled_height[:, :, :, start:end].mean(dim=3, keepdim=True))
 
     return torch.cat(columns, dim=3)
 
@@ -40,7 +38,9 @@ class _PyramidPoolingModule(nn.Module):
             [
                 nn.Sequential(
                     nn.AdaptiveAvgPool2d(bin_size),
-                    nn.Conv2d(in_channels, reduction_channels, kernel_size=1, bias=False),
+                    nn.Conv2d(
+                        in_channels, reduction_channels, kernel_size=1, bias=False
+                    ),
                     nn.BatchNorm2d(reduction_channels, momentum=0.95),
                     nn.ReLU(inplace=True),
                 )
@@ -51,7 +51,7 @@ class _PyramidPoolingModule(nn.Module):
     def forward(self, features):
         output_size = features.shape[-2:]
         pooled = [features]
-        for bin_size, branch in zip(self.bins, self.features):
+        for bin_size, branch in zip(self.bins, self.features, strict=True):
             if features.device.type == "mps":
                 pooled_features = _adaptive_avg_pool2d_mps(
                     features, (bin_size, bin_size)
@@ -131,7 +131,9 @@ class PSPNet(nn.Module):
         features = self.layer1(features)
         features = self.layer2(features)
         features = self.layer3(features)
-        auxiliary = self.aux_logits(features) if self.training and self.use_aux else None
+        auxiliary = (
+            self.aux_logits(features) if self.training and self.use_aux else None
+        )
         features = self.layer4(features)
         logits = self.final(self.ppm(features))
         logits = F.interpolate(

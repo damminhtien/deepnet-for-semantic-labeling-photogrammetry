@@ -6,7 +6,9 @@ import torch.nn.functional as F
 from .constants import IGNORE_LABEL
 
 
-def CrossEntropy2d(input, target, weight=None, size_average=True, ignore_index=IGNORE_LABEL):
+def CrossEntropy2d(
+    input, target, weight=None, size_average=True, ignore_index=IGNORE_LABEL
+):
     """Cross entropy for flat or NCHW logits, ignoring no-boundary pixels."""
     if input.dim() == 2:
         logits = input
@@ -16,7 +18,9 @@ def CrossEntropy2d(input, target, weight=None, size_average=True, ignore_index=I
         logits = input.permute(0, 2, 3, 1).reshape(-1, classes)
         targets = target.reshape(-1)
         if targets.numel() != logits.shape[0]:
-            raise ValueError("The target map must match the spatial dimensions of the logits")
+            raise ValueError(
+                "The target map must match the spatial dimensions of the logits"
+            )
     else:
         raise ValueError(f"Expected 2D or 4D logits, got {input.dim()} dimensions")
 
@@ -33,9 +37,7 @@ def CrossEntropy2d(input, target, weight=None, size_average=True, ignore_index=I
     )
 
 
-def inverse_sqrt_class_weights(
-    class_frequencies, *, min_weight=0.5, max_weight=2.0
-):
+def inverse_sqrt_class_weights(class_frequencies, *, min_weight=0.5, max_weight=2.0):
     """Return mean-one inverse-square-root weights bounded to a safe range."""
     frequencies = torch.as_tensor(class_frequencies, dtype=torch.float64)
     if frequencies.ndim != 1 or frequencies.numel() == 0:
@@ -48,9 +50,10 @@ def inverse_sqrt_class_weights(
     inverse_sqrt = frequencies.rsqrt()
     low_scale = 0.0
     high_scale = 1.0
-    while torch.clamp(
-        inverse_sqrt * high_scale, min=min_weight, max=max_weight
-    ).mean() < 1:
+    while (
+        torch.clamp(inverse_sqrt * high_scale, min=min_weight, max=max_weight).mean()
+        < 1
+    ):
         high_scale *= 2
 
     for _ in range(64):
@@ -85,7 +88,9 @@ def weighted_ce_macro_dice_loss(
     if logits.ndim != 4 or targets.ndim != 3:
         raise ValueError("Expected NCHW logits and NHW integer targets")
     if logits.shape[0] != targets.shape[0] or logits.shape[-2:] != targets.shape[-2:]:
-        raise ValueError("Logits and targets must have matching batch and spatial sizes")
+        raise ValueError(
+            "Logits and targets must have matching batch and spatial sizes"
+        )
     if ce_weight < 0 or dice_weight < 0 or ce_weight + dice_weight <= 0:
         raise ValueError("Loss weights must be non-negative with a positive sum")
     if epsilon <= 0:

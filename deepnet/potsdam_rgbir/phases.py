@@ -2,17 +2,20 @@
 
 from __future__ import annotations
 
+import argparse
 import gc
 import logging
 import time
+from typing import cast
 
 import numpy as np
 import torch
+from torch import nn
 
 from deepnet.data.contracts import canonical_hash
 from deepnet.data.evaluation import summarize_confusion
 from deepnet.data.raster import sha256_file
-from deepnet.runtime import configure_torch_runtime, seed_everything
+from deepnet.runtime import TorchRuntime, configure_torch_runtime, seed_everything
 from deepnet.training_utils import (
     artifact_index,
     load_checkpoint,
@@ -48,11 +51,28 @@ from .protocol import (
     winner,
 )
 from .sampling import loader, schedule, training_index
+from .types import (
+    BestCandidate,
+    CheckpointBinding,
+    EvaluationMetrics,
+    InferencePolicy,
+    ModelBinding,
+    PassRecord,
+    PhaseManifest,
+    PhaseState,
+    Protocol,
+    Recipe,
+    SelectionLock,
+    TrainingIndex,
+    TTAValidation,
+)
 
 LOGGER = logging.getLogger(__name__)
 
 
-def _bound_inputs(args, protocol, phase):
+def _bound_inputs(
+    args: argparse.Namespace, protocol: Protocol, phase: str
+) -> tuple[TorchRuntime, CacheBundle]:
     runtime = configure_torch_runtime(
         args.device, num_workers=protocol["execution"]["num_workers"]
     )
@@ -85,7 +105,12 @@ def _bound_inputs(args, protocol, phase):
     return runtime, cache
 
 
-def _model(args, recipe, protocol, runtime):
+def _model(
+    args: argparse.Namespace,
+    recipe: Recipe,
+    protocol: Protocol,
+    runtime: TorchRuntime,
+) -> tuple[nn.Module, ModelBinding]:
     size = recipe["backbone"]
     pretrained = args.pretrained_large if size == "L" else args.pretrained
     if pretrained is None:
@@ -101,7 +126,7 @@ def _model(args, recipe, protocol, runtime):
     return model, binding
 
 
-def check_refit_cache(cache, protocol):
+def check_refit_cache(cache: CacheBundle, protocol: Protocol) -> None:
     if cache.split.refit_parent_hash != protocol["selection_split_hash"]:
         raise ValueError("Refit cache does not derive from the selected split")
     actual = {f["path"]: f["sha256"] for f in cache.manifest["files"]}
@@ -119,7 +144,16 @@ def check_refit_cache(cache, protocol):
                 raise ValueError(f"Refit changed a locked cache array: {key}")
 
 
-def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=None):
+def _train(
+    args: argparse.Namespace,
+    protocol: Protocol,
+    runtime: TorchRuntime,
+    cache: CacheBundle,
+    recipe: Recipe,
+    budget: Budget,
+    *,
+    selection_lock: SelectionLock | None = None,
+) -> PhaseManifest:
     refit = selection_lock is not None
     arm = "refit" if refit else args.arm
     out = args.root / arm
@@ -127,21 +161,20 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
     seed = protocol["confirmation_seed"] if arm == "D" else protocol["seed"]
     seed_everything(seed)
     model, model_binding = _model(args, recipe, protocol, runtime)
-    binding = canonical_hash(
-        {
-            "protocol_hash": protocol["protocol_hash"],
-            "cache_hash": cache.manifest["cache_hash"],
-            "arm": arm,
-            "recipe": recipe,
-            "seed": seed,
-            "model": model_binding,
-            "selection_lock": selection_lock,
-        }
-    )
+    binding_fields: CheckpointBinding = {
+        "protocol_hash": protocol["protocol_hash"],
+        "cache_hash": cache.manifest["cache_hash"],
+        "arm": arm,
+        "recipe": recipe,
+        "seed": seed,
+        "model": model_binding,
+        "selection_lock": selection_lock,
+    }
+    binding = canonical_hash(binding_fields)
     optimizer, scaler = optimizer_and_scaler(
         model, runtime, protocol, 0.5 if refit else 1
     )
-    state = {
+    state: PhaseState = {
         "updates": 0,
         "completed_passes": 0,
         "history": [],
@@ -159,8 +192,8 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
         optimizer.load_state_dict(saved["optimizer"])
         scaler.load_state_dict(saved["scaler"])
         restore_rng(saved["rng"])
-        state = saved["progress"]
-    elif refit:
+        state = cast(PhaseState, saved["progress"])
+    elif selection_lock is not None:
         path = args.root / selection_lock["arm"] / "best.pt"
         if sha256_file(path) != selection_lock["selection_checkpoint_sha256"]:
             raise ValueError("Refit initial checkpoint differs from the selection lock")
@@ -176,10 +209,10 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
     passes, steps = (1, 1152) if refit else (protocol["passes"], 864)
     total = passes * steps
     with cache.access("train", auxiliary=recipe["auxiliary"]) as train:
-        if refit:
+        if selection_lock is not None:
             index = training_index(train)
         else:
-            index = read_json(args.root / "training-index.json")
+            index = cast(TrainingIndex, read_json(args.root / "training-index.json"))
             if canonical_hash(index) != protocol["training_index_hash"]:
                 raise ValueError("Train-only index differs from the preflight")
         if len(index["base"]) != (3456 if refit else 2592):
@@ -251,15 +284,18 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
                     save_last()
             del iterator, data
             save_last()
-            record = {
+            record: PassRecord = {
                 "pass": pass_number + 1,
                 "updates": state["updates"],
                 "train_loss": state["pass_loss"] / steps,
-                "train_metrics": summarize_confusion(
-                    np.asarray(state["pass_matrix"], dtype=np.int64)
+                "train_metrics": cast(
+                    EvaluationMetrics,
+                    summarize_confusion(
+                        np.asarray(state["pass_matrix"], dtype=np.int64)
+                    ),
                 ),
             }
-            if not refit:
+            if selection_lock is None:
                 tick = time.monotonic()
                 with cache.access("validation", auxiliary=recipe["auxiliary"]) as val:
                     record["probe"] = score_patches(
@@ -271,16 +307,19 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
                         budget,
                     )
                     if pass_number + 1 in protocol["full_validation_passes"]:
-                        metrics = score_scenes(
-                            model,
-                            val,
-                            runtime,
-                            protocol,
-                            budget,
-                            out / ".scratch",
-                            batch_size=protocol["timings"][recipe["backbone"]][
-                                "batch_size"
-                            ],
+                        metrics = cast(
+                            EvaluationMetrics,
+                            score_scenes(
+                                model,
+                                val,
+                                runtime,
+                                protocol,
+                                budget,
+                                out / ".scratch",
+                                batch_size=protocol["timings"][recipe["backbone"]][
+                                    "batch_size"
+                                ],
+                            ),
                         )
                         measured = candidate(metrics, protocol, arm, state["updates"])
                         record["full_validation"] = metrics
@@ -290,7 +329,10 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
                             digest = save_checkpoint(
                                 out / "best.pt", model, state, binding
                             )
-                            state["best"] = {**measured, "checkpoint_sha256": digest}
+                            state["best"] = cast(
+                                BestCandidate,
+                                {**measured, "checkpoint_sha256": digest},
+                            )
                             state["best_validation"] = metrics
                         record["backbone_inputs"] = distribution(
                             model, train, panel, runtime
@@ -301,7 +343,8 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
             state["pass_matrix"] = np.zeros((6, 6), dtype=np.int64).tolist()
             state["pass_loss"] = 0.0
             save_last()
-        manifest = {
+        elapsed = state["training_seconds"] + state["validation_seconds"]
+        manifest: PhaseManifest = {
             **state,
             "status": "complete",
             "arm": arm,
@@ -316,8 +359,9 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
             "trainable_parameters": sum(
                 p.numel() for p in model.parameters() if p.requires_grad
             ),
+            "validation_fraction": state["validation_seconds"] / max(elapsed, 1e-9),
         }
-        if refit:
+        if selection_lock is not None:
             manifest["backbone_inputs"] = distribution(model, train, panel, runtime)
             manifest["selection_checkpoint_sha256"] = selection_lock[
                 "selection_checkpoint_sha256"
@@ -327,21 +371,30 @@ def _train(args, protocol, runtime, cache, recipe, budget, *, selection_lock=Non
             manifest["final_checkpoint_sha256"] = save_checkpoint(
                 out / "final.pt", model, state, binding
             )
-        elapsed = state["training_seconds"] + state["validation_seconds"]
-        manifest["validation_fraction"] = state["validation_seconds"] / max(
-            elapsed, 1e-9
-        )
         budget.check()
         write_json(out / "manifest.json", manifest)
     return manifest
 
 
-def _tta(args, protocol, runtime, cache, budget):
+def _tta(
+    args: argparse.Namespace,
+    protocol: Protocol,
+    runtime: TorchRuntime,
+    cache: CacheBundle,
+    budget: Budget,
+) -> None:
     selected, confirmation = (
         winner(args.root, protocol),
         complete_arm(args.root, protocol, "D"),
     )
-    if not selected["best"]["eligible"] or not confirmation["best"]["eligible"]:
+    selected_best = selected["best"]
+    confirmation_best = confirmation["best"]
+    if (
+        selected_best is None
+        or confirmation_best is None
+        or not selected_best["eligible"]
+        or not confirmation_best["eligible"]
+    ):
         write_json(
             args.root / "D/gate.json",
             {"status": "validation-ineligible", "heldout_opened": False},
@@ -356,11 +409,11 @@ def _tta(args, protocol, runtime, cache, budget):
         * protocol["timings"][size]["tta_scene_seconds"]
         <= 2 * 3600
     )
-    tta = None
-    policy = "identity"
+    tta: TTAValidation | None = None
+    policy: InferencePolicy = "identity"
     if budget.remaining() >= predicted and final_fits:
         model, _ = _model(args, selected["recipe"], protocol, runtime)
-        tta = {}
+        tta_results: dict[str, EvaluationMetrics] = {}
         with cache.access(
             "validation", auxiliary=selected["recipe"]["auxiliary"]
         ) as val:
@@ -369,38 +422,52 @@ def _tta(args, protocol, runtime, cache, budget):
                 model.load_state_dict(
                     load_checkpoint(path, manifest["binding"])["model"]
                 )
-                tta[key] = score_scenes(
-                    model,
-                    val,
-                    runtime,
-                    protocol,
-                    budget,
-                    args.root / "D/.scratch",
-                    policy="hflip",
-                    batch_size=protocol["timings"][size]["batch_size"],
+                tta_results[key] = cast(
+                    EvaluationMetrics,
+                    score_scenes(
+                        model,
+                        val,
+                        runtime,
+                        protocol,
+                        budget,
+                        args.root / "D/.scratch",
+                        policy="hflip",
+                        batch_size=protocol["timings"][size]["batch_size"],
+                    ),
                 )
+        tta = {
+            "seed42": tta_results["seed42"],
+            "seed43": tta_results["seed43"],
+        }
+        selected_metrics = selected["best_validation"]
+        confirmation_metrics = confirmation["best_validation"]
+        if selected_metrics is None or confirmation_metrics is None:
+            raise ValueError("Validation metrics are required for TTA selection")
         policy = choose_tta(
-            selected["best_validation"],
+            selected_metrics,
             tta["seed42"],
-            confirmation["best_validation"],
+            confirmation_metrics,
             tta["seed43"],
             protocol,
         )
     lock_selection(args.root, protocol, policy, tta)
 
 
-def select(args):
+def select(args: argparse.Namespace) -> None:
     protocol = load_protocol(args.root)
     runtime, cache = _bound_inputs(args, protocol, args.arm)
     recipe = recipe_for(args.root, protocol, args.arm)
-    if args.arm == "D" and not winner(args.root, protocol)["best"]["eligible"]:
-        out = args.root / "D"
-        out.mkdir(exist_ok=True)
-        write_json(
-            out / "gate.json", {"status": "seed42-ineligible", "heldout_opened": False}
-        )
-        artifact_index(out)
-        return
+    if args.arm == "D":
+        selected_best = winner(args.root, protocol)["best"]
+        if selected_best is None or not selected_best["eligible"]:
+            out = args.root / "D"
+            out.mkdir(exist_ok=True)
+            write_json(
+                out / "gate.json",
+                {"status": "seed42-ineligible", "heldout_opened": False},
+            )
+            artifact_index(out)
+            return
     with Budget(
         args.root / args.arm,
         protocol["per_arm_gpu_hours"],
@@ -431,9 +498,9 @@ def select(args):
     artifact_index(args.root / args.arm)
 
 
-def refit(args):
+def refit(args: argparse.Namespace) -> None:
     protocol = load_protocol(args.root)
-    lock = read_json(args.root / "selection-lock.json")
+    lock = cast(SelectionLock, read_json(args.root / "selection-lock.json"))
     # Recompute the lock, including both seed gates, before touching refit data.
     lock_selection(args.root, protocol, lock["inference"], lock["tta_validation"])
     runtime, cache = _bound_inputs(args, protocol, "refit")
@@ -459,7 +526,7 @@ def refit(args):
     artifact_index(args.root / "refit")
 
 
-def validate_final(manifest, lock, digest):
+def validate_final(manifest: PhaseManifest, lock: SelectionLock, digest: str) -> None:
     if (
         manifest["status"] != "complete"
         or manifest["protocol_hash"] != lock["protocol_hash"]
@@ -467,18 +534,18 @@ def validate_final(manifest, lock, digest):
         or manifest["completed_passes"] != 1
         or manifest["arm"] != "refit"
         or manifest["recipe"] != lock["recipe"]
-        or manifest["selection_checkpoint_sha256"]
+        or manifest.get("selection_checkpoint_sha256")
         != lock["selection_checkpoint_sha256"]
-        or manifest["final_checkpoint_sha256"] != digest
+        or manifest.get("final_checkpoint_sha256") != digest
     ):
         raise ValueError("Benchmark requires the complete, locked update-1,152 refit")
 
 
-def heldout(args):
+def heldout(args: argparse.Namespace) -> None:
     protocol = load_protocol(args.root)
-    lock = read_json(args.root / "selection-lock.json")
+    lock = cast(SelectionLock, read_json(args.root / "selection-lock.json"))
     lock_selection(args.root, protocol, lock["inference"], lock["tta_validation"])
-    manifest = read_json(args.root / "refit/manifest.json")
+    manifest = cast(PhaseManifest, read_json(args.root / "refit/manifest.json"))
     path = args.root / "refit/final.pt"
     digest = sha256_file(path)
     validate_final(manifest, lock, digest)

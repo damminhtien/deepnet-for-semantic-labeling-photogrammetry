@@ -170,7 +170,7 @@ class CacheAccess:
         self.auxiliary = auxiliary
         _, self.model_input = model_view(auxiliary)
         self._maps = {}
-        self.profile_times = None
+        self.profile_times: dict[str, float] | None = None
 
     def __getstate__(self):
         return {**self.__dict__, "_maps": {}}

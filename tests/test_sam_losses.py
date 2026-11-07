@@ -13,9 +13,7 @@ from semantic_labeling.losses import (
 
 class InverseSqrtClassWeightsTests(unittest.TestCase):
     def test_weights_are_mean_one_and_clipped(self):
-        frequencies = torch.tensor(
-            [0.2847, 0.2488, 0.2478, 0.1464, 0.0161, 0.0561]
-        )
+        frequencies = torch.tensor([0.2847, 0.2488, 0.2478, 0.1464, 0.0161, 0.0561])
 
         weights = inverse_sqrt_class_weights(frequencies)
 
@@ -39,16 +37,12 @@ class WeightedCrossEntropyDiceLossTests(unittest.TestCase):
         torch.manual_seed(7)
         logits = torch.randn(1, N_CLASSES, 2, 2)
         targets = torch.tensor([[[0, 1], [2, 3]]])
-        extended_logits = torch.cat(
-            [logits, torch.randn(1, N_CLASSES, 2, 1)], dim=3
-        )
+        extended_logits = torch.cat([logits, torch.randn(1, N_CLASSES, 2, 1)], dim=3)
         extended_targets = torch.cat(
             [targets, torch.full((1, 2, 1), IGNORE_LABEL)], dim=2
         )
 
-        original_loss = weighted_ce_macro_dice_loss(
-            logits, targets, self.class_weights
-        )
+        original_loss = weighted_ce_macro_dice_loss(logits, targets, self.class_weights)
         extended_loss = weighted_ce_macro_dice_loss(
             extended_logits, extended_targets, self.class_weights
         )

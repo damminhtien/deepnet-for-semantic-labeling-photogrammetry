@@ -83,7 +83,9 @@ def run_inference(
                 outputs = outputs[0]
             outputs = outputs.detach().cpu().numpy()
 
-            for output, (top, left, height, width) in zip(outputs, coordinates):
+            for output, (top, left, height, width) in zip(
+                outputs, coordinates, strict=True
+            ):
                 score_map[top : top + height, left : left + width] += output.transpose(
                     1, 2, 0
                 )

@@ -27,7 +27,7 @@ notebooks = [
   "tifffile>=2024.2",
   "tqdm>=4.66",
 ]
-dev = ["pytest>=8.0", "ruff>=0.13"]
+dev = ["pytest>=8.0", "pyright>=1.1.404", "ruff>=0.13"]
 
 [project.scripts]
 deepnet-data = "deepnet.data.cli:main"
@@ -58,3 +58,19 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "PYI"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+include = [
+  "deepnet/potsdam_rgbir/types.py",
+  "deepnet/potsdam_rgbir/protocol.py",
+  "deepnet/potsdam_rgbir/model.py",
+  "deepnet/potsdam_rgbir/sampling.py",
+  "deepnet/potsdam_rgbir/engine.py",
+  "deepnet/potsdam_rgbir/preflight.py",
+  "deepnet/potsdam_rgbir/phases.py",
+  "deepnet/potsdam_rgbir/study.py",
+]

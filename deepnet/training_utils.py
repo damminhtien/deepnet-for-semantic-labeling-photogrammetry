@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import random
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
@@ -44,7 +45,7 @@ def restore_rng(state: dict[str, Any]) -> None:
 def save_checkpoint(
     path: Path,
     model: torch.nn.Module,
-    progress: dict[str, Any],
+    progress: Mapping[str, Any],
     binding: str,
     *,
     optimizer: torch.optim.Optimizer | None = None,
@@ -53,7 +54,7 @@ def save_checkpoint(
     payload = {
         "binding": binding,
         "model": model.state_dict(),
-        "progress": progress,
+        "progress": dict(progress),
         "rng": capture_rng(),
         "optimizer": optimizer.state_dict() if optimizer is not None else None,
         "scaler": scaler.state_dict() if scaler is not None else None,

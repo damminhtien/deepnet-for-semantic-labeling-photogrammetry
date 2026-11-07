@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
+import argparse
 import gc
 import logging
 import time
+from pathlib import Path
+from typing import Any, cast
 
 import numpy as np
 import torch
 
 from deepnet.data.contracts import WindowSpec, canonical_hash
-from deepnet.runtime import configure_torch_runtime, seed_everything
+from deepnet.runtime import TorchRuntime, configure_torch_runtime, seed_everything
 from deepnet.training_utils import artifact_index, write_json
 from semantic_labeling.losses import inverse_sqrt_class_weights
 
@@ -38,37 +41,49 @@ from .protocol import (
 )
 from .reference import RasterioReferenceAccess
 from .sampling import fixed_panel, loader, schedule, training_index
+from .types import (
+    BackboneSize,
+    DeviceBinding,
+    ModelBinding,
+    ModelTiming,
+    ProtocolConfig,
+    TrainingIndex,
+)
 
 LOGGER = logging.getLogger(__name__)
 
 
-def load_config(path):
-    config = read_json(path)
+def load_config(path: Path) -> ProtocolConfig:
+    config = cast(ProtocolConfig, read_json(path))
     if (
         config["schema_version"] != 2
         or config["window_size"] != [512, 512]
         or config["stride"] != [256, 256]
         or config["global_batch"] != 4
         or config["models"] != MODEL_SPECS
-        or sum(v for k, v in config["gpu_hours"].items() if k != "total") != 24
+        or sum(
+            config["gpu_hours"][key]
+            for key in ("preflight", "selection", "refit", "heldout", "reserve")
+        )
+        != 24
     ):
         raise ValueError("Unsupported RGBIR study configuration")
     return config
 
 
 def _profile(
-    model,
-    train,
-    val,
-    index,
-    panel,
-    runtime,
-    config,
-    budget,
-    scratch,
-    calibration,
-    setup_seconds,
-):
+    model: Any,
+    train: Any,
+    val: Any,
+    index: TrainingIndex,
+    panel: list[Any],
+    runtime: TorchRuntime,
+    config: ProtocolConfig,
+    budget: Budget,
+    scratch: Path,
+    calibration: Path | None,
+    setup_seconds: float,
+) -> ModelTiming:
     weights = torch.as_tensor(
         inverse_sqrt_class_weights(index["class_support"]), dtype=torch.float32
     )
@@ -140,7 +155,7 @@ def _profile(
         ),
         runtime,
     )
-    result = {
+    result: ModelTiming = {
         "update_seconds": float(np.median(durations[8:])),
         "update_samples": durations,
         "probe_seconds": probe_seconds,
@@ -212,14 +227,14 @@ def _profile(
     return result
 
 
-def preflight(args):
+def preflight(args: argparse.Namespace) -> dict[str, Any]:
     config = load_config(args.config)
     if (args.root / "protocol.json").exists():
         raise FileExistsError("Preflight protocol is already frozen")
     runtime = configure_torch_runtime(
         args.device, num_workers=config["execution"]["num_workers"]
     )
-    device = device_binding(runtime)
+    device: DeviceBinding = device_binding(runtime)
     out = args.root / "preflight"
     with Budget(
         out, config["gpu_hours"]["preflight"], device["allocated_devices"]
@@ -249,7 +264,7 @@ def preflight(args):
                 != config["validation_pixels"]
             ):
                 raise ValueError("Validation support differs from the locked reference")
-            freeze(args.root / "training-index.json", index)
+            freeze(args.root / "training-index.json", dict(index))
             train_panel, probe = fixed_panel(train, 2, 151), fixed_panel(val, 12, 271)
             weights = torch.as_tensor(
                 inverse_sqrt_class_weights(index["class_support"]), dtype=torch.float32
@@ -259,11 +274,13 @@ def preflight(args):
                 "models": {},
                 "cache_verify_seconds": cache_setup,
             }
-            timings, model_bindings = {}, {}
-            for size, pretrained in (
+            timings: dict[str, ModelTiming] = {}
+            model_bindings: dict[str, ModelBinding] = {}
+            models: list[tuple[BackboneSize, Path | None]] = [
                 ("B", args.pretrained),
                 ("L", args.pretrained_large),
-            ):
+            ]
+            for size, pretrained in models:
                 if pretrained is None:
                     report["models"][size] = {
                         "status": "skipped",

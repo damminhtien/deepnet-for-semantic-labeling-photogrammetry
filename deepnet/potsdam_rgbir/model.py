@@ -8,6 +8,7 @@ import importlib.metadata
 import json
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 import torch
 
@@ -18,6 +19,7 @@ from deepnet.models.specs import load_model_spec
 from deepnet.training_utils import verify_pretrained, write_json
 
 from .data import CacheBundle, model_view
+from .types import BackboneSize, ModelBinding
 
 MODEL_SPECS = {
     "B": "dinov3-vitb16-rgbir-v2",
@@ -33,7 +35,9 @@ CONFIG_HASHES = {
 }
 
 
-def prepare_weights(path: Path, size: str, *, download: bool = False) -> dict:
+def prepare_weights(
+    path: Path, size: BackboneSize, *, download: bool = False
+) -> dict[str, Any]:
     """Write a manifest only after pinned bytes have passed source checks."""
     spec = load_model_spec(MODEL_SPECS[size]).backbone
     if download:
@@ -47,7 +51,11 @@ def prepare_weights(path: Path, size: str, *, download: bool = False) -> dict:
         path.mkdir(parents=True, exist_ok=True)
         for name in ("config.json", "model.safetensors", "LICENSE.md"):
             hf_hub_download(spec.model_id, name, revision=spec.revision, local_dir=path)
-        config_record = next(f for f in info.siblings if f.rfilename == "config.json")
+        config_record = next(
+            (f for f in (info.siblings or []) if f.rfilename == "config.json"), None
+        )
+        if config_record is None:
+            raise ValueError("Pinned model metadata has no config.json")
         config_bytes = (path / "config.json").read_bytes()
         git_blob = hashlib.sha1(
             f"blob {len(config_bytes)}\0".encode() + config_bytes
@@ -83,8 +91,13 @@ def prepare_weights(path: Path, size: str, *, download: bool = False) -> dict:
 
 
 def load_model(
-    pretrained: Path, size: str, auxiliary: bool, device, *, checkpointing=False
-):
+    pretrained: Path,
+    size: BackboneSize,
+    auxiliary: bool,
+    device: Any,
+    *,
+    checkpointing: bool = False,
+) -> tuple[MultimodalSegmenter, ModelBinding]:
     spec = load_model_spec(MODEL_SPECS[size])
     spec = replace(
         spec,
@@ -109,30 +122,33 @@ def load_model(
         domain, view, spec, pretrained_path=pretrained
     ).to(device)
     if checkpointing:
-        model.backbone.model.gradient_checkpointing_enable(
+        encoder_model: Any = model.backbone.model
+        encoder_model.gradient_checkpointing_enable(
             gradient_checkpointing_kwargs={"use_reentrant": False}
         )
-    return model, {
+    binding: ModelBinding = {
         "model_spec_hash": spec.content_hash,
         "pretrained_hash": canonical_hash(manifest),
     }
+    return model, binding
 
 
-def real_smoke(model, sample) -> dict:
+def real_smoke(model: MultimodalSegmenter, sample: Any) -> dict[str, Any]:
     """Require real pretrained normalization, prefix removal, and LoRA gradients."""
     device = next(model.parameters()).device
     image = torch.from_numpy(sample.image[None]).to(device)
     labels = torch.from_numpy(sample.labels[None]).to(device)
-    base = model.backbone.model.get_base_model()
+    backbone: Any = model.backbone
+    base = backbone.model.get_base_model()
     if base.config.model_type != "dinov3_vit" or base.config.num_register_tokens != 4:
         raise ValueError("Smoke must load real pretrained DINOv3 with register tokens")
     model.eval()
     with torch.no_grad():
         encoder, _ = model.input_adapter(image)
         states = base(pixel_values=encoder, output_hidden_states=True).hidden_states
-        features = model.backbone.forward_features(encoder)
+        features = backbone.forward_features(encoder)
         h, w = encoder.shape[-2] // 16, encoder.shape[-1] // 16
-        for block, feature in zip(model.backbone.feature_blocks, features, strict=True):
+        for block, feature in zip(backbone.feature_blocks, features, strict=True):
             tokens = states[block]
             if tokens.shape[1] != 5 + h * w:
                 raise ValueError("Unexpected CLS/register/patch token layout")
@@ -145,7 +161,7 @@ def real_smoke(model, sample) -> dict:
         raise ValueError("Unexpected real DINOv3 segmentation logits")
     loss = torch.nn.functional.cross_entropy(logits, labels, ignore_index=6)
     loss.backward()
-    parameters = list(model.backbone.named_parameters())
+    parameters = list(backbone.named_parameters())
     lora = [p for n, p in parameters if ".lora_B." in n]
     expected_modules = 4 * base.config.num_hidden_layers
     if (
@@ -175,7 +191,7 @@ def real_smoke(model, sample) -> dict:
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     weights = commands.add_parser("weights")

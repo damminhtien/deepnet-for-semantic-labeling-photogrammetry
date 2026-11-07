@@ -52,7 +52,9 @@ def verify_and_assemble_archive() -> tuple[Path, dict]:
             for index, item in enumerate(manifest["parts"], start=1):
                 part = PARTS_DIR / item["name"]
                 if not part.is_file() or part.stat().st_size != item["size"]:
-                    raise RuntimeError(f"Missing or wrong-sized Drive chunk: {part.name}")
+                    raise RuntimeError(
+                        f"Missing or wrong-sized Drive chunk: {part.name}"
+                    )
                 part_digest = hashlib.sha256()
                 with part.open("rb") as source:
                     for chunk in iter(lambda: source.read(8 * 1024 * 1024), b""):
@@ -66,7 +68,9 @@ def verify_and_assemble_archive() -> tuple[Path, dict]:
             output.flush()
             os.fsync(output.fileno())
         if total_bytes != manifest["archive_size"]:
-            raise RuntimeError("Reconstructed PSPNet archive size does not match manifest")
+            raise RuntimeError(
+                "Reconstructed PSPNet archive size does not match manifest"
+            )
         if digest.hexdigest() != manifest["archive_sha256"]:
             raise RuntimeError("Reconstructed PSPNet archive SHA-256 does not match")
         os.replace(temporary, archive)
@@ -84,7 +88,9 @@ def main() -> None:
     if not RUNNER_PATH.is_file():
         raise FileNotFoundError(f"Missing uploaded Drive runner at {RUNNER_PATH}")
     if RUN_DIR.exists():
-        raise FileExistsError("This run ID already has a runtime directory; refusing reuse")
+        raise FileExistsError(
+            "This run ID already has a runtime directory; refusing reuse"
+        )
 
     import torch
     import torchvision
@@ -118,7 +124,9 @@ def main() -> None:
     if checkpoint_path.stat().st_size != checkpoint_record["bytes"]:
         raise RuntimeError("Source PSPNet checkpoint size does not match its manifest")
     if sha256_file(checkpoint_path) != checkpoint_record["sha256"]:
-        raise RuntimeError("Source PSPNet checkpoint SHA-256 does not match its manifest")
+        raise RuntimeError(
+            "Source PSPNet checkpoint SHA-256 does not match its manifest"
+        )
     trainer_path = BUNDLE_DIR / "source/model_script/train_pspnet_cloud.py"
     if not trainer_path.is_file():
         raise FileNotFoundError(f"Missing PSPNet trainer: {trainer_path}")
@@ -137,8 +145,7 @@ def main() -> None:
             preflight.get("run_id") != RUN_ID
             or preflight.get("status")
             not in {"preflight_verified", "drive_mount_verified"}
-            or preflight.get("data_archive", {}).get("sha256")
-            != expected_archive_hash
+            or preflight.get("data_archive", {}).get("sha256") != expected_archive_hash
         ):
             raise RuntimeError(
                 f"Existing Drive preflight manifest does not match {RUN_ID}"

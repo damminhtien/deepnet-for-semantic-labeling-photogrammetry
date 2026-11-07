@@ -17,8 +17,7 @@ from .sampling import get_random_pos
 
 DEFAULT_MAIN_FOLDER = "../input/potsdamvaihingen/"
 DEFAULT_DATA_FOLDER = (
-    DEFAULT_MAIN_FOLDER
-    + "3_ortho_irrg/3_Ortho_IRRG/top_potsdam_{}_IRRG.tif"
+    DEFAULT_MAIN_FOLDER + "3_ortho_irrg/3_Ortho_IRRG/top_potsdam_{}_IRRG.tif"
 )
 DEFAULT_DSM_FOLDER = DEFAULT_MAIN_FOLDER + "1_dsm/1_DSM/dsm_potsdam_0{}.tif"
 DEFAULT_NDSM_FOLDER = (
@@ -27,8 +26,7 @@ DEFAULT_NDSM_FOLDER = (
     + "dsm_potsdam_0{}_normalized_lastools.jpg"
 )
 DEFAULT_LABEL_FOLDER = (
-    "../input/label-all-potsdam-vaihingen/5_labels_all/"
-    + "top_potsdam_{}_label.tif"
+    "../input/label-all-potsdam-vaihingen/5_labels_all/" + "top_potsdam_{}_label.tif"
 )
 
 
@@ -52,7 +50,9 @@ class ISPRS_dataset(torch.utils.data.Dataset):
         if not train_ids:
             raise ValueError("At least one training tile is required")
         if len(train_ids) != len(dsm_ids):
-            raise ValueError("TOP/label and DSM/nDSM tile lists must have equal lengths")
+            raise ValueError(
+                "TOP/label and DSM/nDSM tile lists must have equal lengths"
+            )
         if epoch_size <= 0:
             raise ValueError(f"Epoch size must be positive, got {epoch_size}")
 
@@ -132,4 +132,6 @@ class ISPRS_dataset(torch.utils.data.Dataset):
             data_patch = np.ascontiguousarray(data_patch)
             label_patch = np.ascontiguousarray(label_patch)
 
-        return torch.from_numpy(data_patch), torch.from_numpy(label_patch.astype(np.int64, copy=False))
+        return torch.from_numpy(data_patch), torch.from_numpy(
+            label_patch.astype(np.int64, copy=False)
+        )

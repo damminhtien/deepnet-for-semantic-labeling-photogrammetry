@@ -5,6 +5,8 @@ entry point for the contract-driven data pipeline. New training code should
 construct data through ``deepnet.data`` and record its bundle/run manifests.
 """
 
+# ruff: noqa: E402
+
 import argparse
 import hashlib
 import importlib.util
@@ -36,12 +38,15 @@ def sha256_file(path):
 
 def ensure_runtime_dependencies():
     core_modules = ("numpy", "torch", "torchvision")
-    missing_core = [name for name in core_modules if importlib.util.find_spec(name) is None]
+    missing_core = [
+        name for name in core_modules if importlib.util.find_spec(name) is None
+    ]
     if missing_core:
         raise RuntimeError(
             "Kaggle GPU image is missing required core packages: "
             + ", ".join(missing_core)
-            + ". Select the standard Kaggle GPU image; torch is not installed from PyPI here."
+            + ". Select the standard Kaggle GPU image; torch is not installed "
+            "from PyPI here."
         )
 
     optional_packages = (
@@ -56,7 +61,9 @@ def ensure_runtime_dependencies():
 
     for module_name, package_name in optional_packages:
         if importlib.util.find_spec(module_name) is None:
-            print(f"Installing missing Kaggle runtime package: {package_name}", flush=True)
+            print(
+                f"Installing missing Kaggle runtime package: {package_name}", flush=True
+            )
             subprocess.run(
                 [sys.executable, "-m", "pip", "install", "--quiet", package_name],
                 check=True,
@@ -75,10 +82,14 @@ def verify_source_package(project_root, manifest_path=None):
     for record in records:
         relative_path = PurePosixPath(record["path"])
         if relative_path.is_absolute() or ".." in relative_path.parts:
-            raise RuntimeError(f"Unsafe path in Kaggle source manifest: {record['path']}")
+            raise RuntimeError(
+                f"Unsafe path in Kaggle source manifest: {record['path']}"
+            )
         source = (project_root / Path(*relative_path.parts)).resolve()
         if source != project_root and project_root not in source.parents:
-            raise RuntimeError(f"Unsafe path in Kaggle source manifest: {record['path']}")
+            raise RuntimeError(
+                f"Unsafe path in Kaggle source manifest: {record['path']}"
+            )
         if not source.is_file() or source.stat().st_size != record["bytes"]:
             raise RuntimeError(f"Missing or wrong-sized Kaggle source file: {source}")
         if sha256_file(source) != record["sha256"]:
@@ -126,7 +137,8 @@ def extract_source_archive(archive_path, destination_root):
                     continue
                 if file_type not in (0, stat.S_IFREG):
                     raise RuntimeError(
-                        f"Unexpected file type in Kaggle source archive: {member.filename}"
+                        "Unexpected file type in Kaggle source archive: "
+                        f"{member.filename}"
                     )
                 member_path.parent.mkdir(parents=True, exist_ok=True)
                 with archive.open(member) as source, member_path.open("wb") as target:
@@ -184,13 +196,12 @@ SOURCE_PACKAGE_MANIFEST_SHA256 = verify_source_package(
     PROJECT_ROOT, SOURCE_PACKAGE_MANIFEST_PATH
 )
 if (
-    (
-        PROJECT_ROOT.is_relative_to(KAGGLE_INPUT.resolve())
-        or PROJECT_ROOT in SOURCE_PACKAGE_MANIFEST_PATHS
+    PROJECT_ROOT.is_relative_to(KAGGLE_INPUT.resolve())
+    or PROJECT_ROOT in SOURCE_PACKAGE_MANIFEST_PATHS
+) and SOURCE_PACKAGE_MANIFEST_SHA256 is None:
+    raise RuntimeError(
+        "The attached SAM source package is missing its checksum manifest"
     )
-    and SOURCE_PACKAGE_MANIFEST_SHA256 is None
-):
-    raise RuntimeError("The attached SAM source package is missing its checksum manifest")
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -244,7 +255,10 @@ def find_data_root(requested_root):
 
     input_root = Path("/kaggle/input")
     roots = sorted(
-        {manifest.parent.resolve() for manifest in input_root.rglob("bundle_manifest.json")}
+        {
+            manifest.parent.resolve()
+            for manifest in input_root.rglob("bundle_manifest.json")
+        }
     )
     if len(roots) == 1:
         return roots[0]
@@ -327,7 +341,9 @@ def ensure_segment_anything():
     package_root = Path(tempfile.gettempdir()) / f"sam-source-{SAM_COMMIT}"
     package = package_root / "segment_anything" / "__init__.py"
     if not package.is_file():
-        print(f"Installing official Segment Anything source at {SAM_COMMIT}", flush=True)
+        print(
+            f"Installing official Segment Anything source at {SAM_COMMIT}", flush=True
+        )
         subprocess.run(
             [
                 sys.executable,
@@ -399,9 +415,7 @@ def compute_training_class_counts(data_root, scene_ids):
     """Count non-ignored pixels from the training scenes only."""
     counts = np.zeros(N_CLASSES, dtype=np.int64)
     for scene_id in scene_ids:
-        labels = read_class_map(
-            data_root / "labels" / "train" / f"{scene_id}.npz"
-        )
+        labels = read_class_map(data_root / "labels" / "train" / f"{scene_id}.npz")
         valid = (labels >= 0) & (labels < N_CLASSES)
         counts += np.bincount(
             labels[valid].astype(np.int64, copy=False), minlength=N_CLASSES
@@ -409,7 +423,9 @@ def compute_training_class_counts(data_root, scene_ids):
         del labels
     if np.any(counts == 0):
         missing = [LABELS[index] for index in np.flatnonzero(counts == 0)]
-        raise ValueError("Training split has no pixels for classes: " + ", ".join(missing))
+        raise ValueError(
+            "Training split has no pixels for classes: " + ", ".join(missing)
+        )
     return counts
 
 
@@ -476,12 +492,8 @@ class PotsdamPatchDataset(Dataset):
 
     def _load_scene(self, scene_id):
         if scene_id not in self.cache:
-            image_path = (
-                self.data_root / "images" / "train" / f"{scene_id}.tif"
-            )
-            label_path = (
-                self.data_root / "labels" / "train" / f"{scene_id}.npz"
-            )
+            image_path = self.data_root / "images" / "train" / f"{scene_id}.tif"
+            label_path = self.data_root / "labels" / "train" / f"{scene_id}.npz"
             image = read_tiff(image_path)
             labels = read_class_map(label_path)
             if image.ndim != 3 or image.shape[2] != 3:
@@ -599,7 +611,9 @@ def build_warmup_cosine_scheduler(
 
     def learning_rate_lambda(base_learning_rate):
         if min_learning_rate <= 0 or min_learning_rate >= base_learning_rate:
-            raise ValueError("min_learning_rate must be positive and below all base rates")
+            raise ValueError(
+                "min_learning_rate must be positive and below all base rates"
+            )
 
         def schedule(step):
             if warmup_steps and step < warmup_steps:
@@ -607,16 +621,14 @@ def build_warmup_cosine_scheduler(
             decay_steps = max(total_steps - warmup_steps - 1, 1)
             progress = min(max((step - warmup_steps) / decay_steps, 0.0), 1.0)
             cosine = 0.5 * (1.0 + math.cos(math.pi * progress))
-            learning_rate = min_learning_rate + (
-                base_learning_rate - min_learning_rate
-            ) * cosine
+            learning_rate = (
+                min_learning_rate + (base_learning_rate - min_learning_rate) * cosine
+            )
             return learning_rate / base_learning_rate
 
         return schedule
 
-    schedules = [
-        learning_rate_lambda(group["lr"]) for group in optimizer.param_groups
-    ]
+    schedules = [learning_rate_lambda(group["lr"]) for group in optimizer.param_groups]
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=schedules)
     return scheduler, warmup_steps
 
@@ -649,7 +661,9 @@ def cuda_smoke_test(model, dataset, class_weights, device):
     if not trainable_gradients or not all(
         torch.isfinite(gradient).all().item() for gradient in trainable_gradients
     ):
-        raise RuntimeError("SAM CUDA smoke run produced missing or non-finite gradients")
+        raise RuntimeError(
+            "SAM CUDA smoke run produced missing or non-finite gradients"
+        )
     smoke = {
         "input_shape": list(inputs.shape),
         "logit_shape": list(logits.shape),
@@ -740,9 +754,7 @@ def summarize_confusion(matrix):
         ),
         "per_class_iou_percent": {
             str(class_id): (
-                float(iou[class_id] * 100.0)
-                if np.isfinite(iou[class_id])
-                else None
+                float(iou[class_id] * 100.0) if np.isfinite(iou[class_id]) else None
             )
             for class_id in range(N_CLASSES)
         },
@@ -776,11 +788,15 @@ def save_preview(image, labels, predictions, output_path):
     overlay = np.clip(base * 0.55 + color_mask.astype(np.float32) * 0.45, 0, 255)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(overlay.astype(np.uint8)).save(output_path)
-    Image.fromarray(color_mask).save(output_path.with_name("prediction_" + output_path.name))
+    Image.fromarray(color_mask).save(
+        output_path.with_name("prediction_" + output_path.name)
+    )
     truth_mask = np.zeros_like(color_mask)
     valid = labels != IGNORE_LABEL
     truth_mask[valid] = palette[labels[valid].astype(np.int64)]
-    Image.fromarray(truth_mask).save(output_path.with_name("ground_truth_" + output_path.name))
+    Image.fromarray(truth_mask).save(
+        output_path.with_name("ground_truth_" + output_path.name)
+    )
 
 
 @torch.no_grad()
@@ -805,7 +821,9 @@ def evaluate_split(
         image = read_tiff(image_path)
         labels = read_class_map(label_path)
         if image.ndim != 3 or image.shape[2] != 3 or image.dtype != np.uint8:
-            raise ValueError(f"Invalid IRRG image for {scene_id}: {image.shape} {image.dtype}")
+            raise ValueError(
+                f"Invalid IRRG image for {scene_id}: {image.shape} {image.dtype}"
+            )
         if image.shape[:2] != labels.shape:
             raise ValueError(f"Image/label shape mismatch for {scene_id}")
 
@@ -813,13 +831,15 @@ def evaluate_split(
         height, width = labels.shape
         for top in range(0, height, patch_size):
             for left in range(0, width, patch_size):
-                input_patch = image[
-                    top : top + patch_size, left : left + patch_size
-                ]
+                input_patch = image[top : top + patch_size, left : left + patch_size]
                 input_patch = pad_image_patch(input_patch, patch_size)
-                inputs = torch.from_numpy(
-                    np.ascontiguousarray(input_patch.transpose(2, 0, 1))
-                ).unsqueeze(0).to(device=device, dtype=torch.float32)
+                inputs = (
+                    torch.from_numpy(
+                        np.ascontiguousarray(input_patch.transpose(2, 0, 1))
+                    )
+                    .unsqueeze(0)
+                    .to(device=device, dtype=torch.float32)
+                )
                 with torch.autocast("cuda", dtype=torch.float16):
                     logits = model(inputs)
                 predicted = logits.argmax(dim=1)[0].cpu().numpy()
@@ -947,13 +967,9 @@ def parse_args(argv=None):
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--resume-from", type=Path)
     parser.add_argument("--epochs", type=int, default=DEFAULT_EPOCHS)
-    parser.add_argument(
-        "--steps-per-epoch", type=int, default=DEFAULT_STEPS_PER_EPOCH
-    )
+    parser.add_argument("--steps-per-epoch", type=int, default=DEFAULT_STEPS_PER_EPOCH)
     parser.add_argument("--patch-size", type=int, default=DEFAULT_PATCH_SIZE)
-    parser.add_argument(
-        "--eval-patch-size", type=int, default=DEFAULT_EVAL_PATCH_SIZE
-    )
+    parser.add_argument("--eval-patch-size", type=int, default=DEFAULT_EVAL_PATCH_SIZE)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--rank", type=int, default=4)
     parser.add_argument("--alpha", type=int, default=8)
@@ -1117,8 +1133,14 @@ def run_sweep(args):
         raise ValueError("Expected the repository's fixed 18/6/14 scene split")
 
     sweep_dir = (
-        args.output_dir if args.output_dir is not None else DEFAULT_OUTPUT_ROOT / args.run_id
-    ).expanduser().resolve()
+        (
+            args.output_dir
+            if args.output_dir is not None
+            else DEFAULT_OUTPUT_ROOT / args.run_id
+        )
+        .expanduser()
+        .resolve()
+    )
     if sweep_dir.exists():
         raise FileExistsError(f"Refusing to overwrite sweep directory: {sweep_dir}")
     sweep_dir.mkdir(parents=True)
@@ -1230,16 +1252,14 @@ def run_sweep(args):
                 )
             best_path = candidate_dir / "best.pt"
             last_path = candidate_dir / "last.pt"
-            if (
-                not best_path.is_file()
-                or sha256_file(best_path) != run_manifest.get("best_checkpoint_sha256")
+            if not best_path.is_file() or sha256_file(best_path) != run_manifest.get(
+                "best_checkpoint_sha256"
             ):
                 raise RuntimeError(
                     f"Candidate {candidate['name']} best.pt hash is invalid"
                 )
-            if (
-                not last_path.is_file()
-                or sha256_file(last_path) != run_manifest.get("last_checkpoint_sha256")
+            if not last_path.is_file() or sha256_file(last_path) != run_manifest.get(
+                "last_checkpoint_sha256"
             ):
                 raise RuntimeError(
                     f"Candidate {candidate['name']} last.pt hash is invalid"
@@ -1263,9 +1283,7 @@ def run_sweep(args):
         winner = select_sweep_winner(summaries)
         manifest["selected_candidate"] = winner["name"]
         manifest["selected_candidate_run_id"] = winner["run_id"]
-        manifest["selected_validation_miou_percent"] = winner[
-            "validation_miou_percent"
-        ]
+        manifest["selected_validation_miou_percent"] = winner["validation_miou_percent"]
         manifest["validation_miou_delta_vs_run_03"] = (
             winner["validation_miou_percent"] - BASELINE_VALIDATION_MIOU
         )
@@ -1286,9 +1304,7 @@ def run_sweep(args):
             check=True,
         )
         winner_metrics = json.loads(
-            (sweep_dir / winner["name"] / "metrics.json").read_text(
-                encoding="utf-8"
-            )
+            (sweep_dir / winner["name"] / "metrics.json").read_text(encoding="utf-8")
         )
         if winner_metrics.get("held_out_test") is None:
             raise RuntimeError("Selected candidate has no heldout metrics")
@@ -1298,8 +1314,7 @@ def run_sweep(args):
         ]
         manifest["held_out_test"] = winner_metrics["held_out_test"]
         manifest["held_out_miou_delta_vs_run_03"] = (
-            winner_metrics["held_out_test"]["mean_iou_percent"]
-            - BASELINE_HELD_OUT_MIOU
+            winner_metrics["held_out_test"]["mean_iou_percent"] - BASELINE_HELD_OUT_MIOU
         )
         manifest["status"] = "complete"
         manifest["completed_utc"] = datetime.now(UTC).isoformat()
@@ -1326,7 +1341,9 @@ def evaluate_selected_held_out(
     metrics_path = output_dir / "metrics.json"
     best_checkpoint_path = output_dir / "best.pt"
     if not manifest_path.is_file() or not metrics_path.is_file():
-        raise FileNotFoundError("Heldout evaluation requires a completed validation run")
+        raise FileNotFoundError(
+            "Heldout evaluation requires a completed validation run"
+        )
     run_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
     if run_manifest.get("status") != "validation_complete":
@@ -1360,9 +1377,7 @@ def evaluate_selected_held_out(
         raise RuntimeError("Best checkpoint does not match the selected run manifest")
     if best_checkpoint.get("sam_checkpoint_sha256") != checkpoint_sha:
         raise RuntimeError("Best checkpoint uses a different SAM base checkpoint")
-    if best_checkpoint.get("dataset_bundle_sha256") != bundle_manifest[
-        "bundle_sha256"
-    ]:
+    if best_checkpoint.get("dataset_bundle_sha256") != bundle_manifest["bundle_sha256"]:
         raise RuntimeError("Best checkpoint uses a different Potsdam data bundle")
     selected_validation = metrics.get("validation")
     checkpoint_validation = best_checkpoint.get("best_validation_metrics")
@@ -1397,8 +1412,7 @@ def evaluate_selected_held_out(
                 "validation_miou_percent": BASELINE_VALIDATION_MIOU,
                 "held_out_miou_percent": BASELINE_HELD_OUT_MIOU,
                 "validation_miou_delta_percentage_points": (
-                    metrics["validation"]["mean_iou_percent"]
-                    - BASELINE_VALIDATION_MIOU
+                    metrics["validation"]["mean_iou_percent"] - BASELINE_VALIDATION_MIOU
                 ),
                 "held_out_miou_delta_percentage_points": (
                     held_out["mean_iou_percent"] - BASELINE_HELD_OUT_MIOU
@@ -1436,7 +1450,10 @@ def main():
         )
     ):
         args.sweep = True
-        print("Kaggle kernel entrypoint selected the predeclared three-run sweep", flush=True)
+        print(
+            "Kaggle kernel entrypoint selected the predeclared three-run sweep",
+            flush=True,
+        )
     import cv2
     import matplotlib
     import PIL
@@ -1533,10 +1550,14 @@ def main():
     run_manifest = None
     if not args.smoke_only:
         output_dir = (
-            args.output_dir
-            if args.output_dir is not None
-            else DEFAULT_OUTPUT_ROOT / args.run_id
-        ).expanduser().resolve()
+            (
+                args.output_dir
+                if args.output_dir is not None
+                else DEFAULT_OUTPUT_ROOT / args.run_id
+            )
+            .expanduser()
+            .resolve()
+        )
         manifest_path = output_dir / "run_manifest.json"
         if args.evaluate_held_out_only:
             if not output_dir.is_dir() or not manifest_path.is_file():
@@ -1647,7 +1668,9 @@ def main():
             "weighted_cross_entropy": CE_LOSS_WEIGHT,
             "macro_soft_dice": DICE_LOSS_WEIGHT,
         },
-        "class_weighting": "mean-one inverse-square-root frequency, clipped to [0.5, 2.0]",
+        "class_weighting": (
+            "mean-one inverse-square-root frequency, clipped to [0.5, 2.0]"
+        ),
         "class_counts_train": train_class_counts.tolist(),
         "class_frequencies_train": train_class_frequencies.tolist(),
         "class_weights": class_weights.tolist(),
@@ -1677,7 +1700,9 @@ def main():
         if saved.get("dataset_bundle_sha256") != bundle_manifest["bundle_sha256"]:
             raise RuntimeError("Resume checkpoint belongs to a different data bundle")
         if saved.get("training_config_sha256") != training_config_sha256:
-            raise RuntimeError("Resume checkpoint has a different training configuration")
+            raise RuntimeError(
+                "Resume checkpoint has a different training configuration"
+            )
         if saved.get("run_id") != args.run_id:
             raise RuntimeError("Resume checkpoint belongs to a different run ID")
         restore_trainable_state(model, saved["trainable_state_dict"])
@@ -1765,8 +1790,13 @@ def main():
                 "bands": "three-channel Potsdam IRRG TIFF, in stored channel order",
                 "uses_dsm": False,
                 "uses_ndsm": False,
-                "normalization": "official SAM ViT-B pixel_mean and pixel_std in 0..255 scale",
-                "note": "IRRG is not natural RGB; spectral domain differs from SAM pretraining",
+                "normalization": (
+                    "official SAM ViT-B pixel_mean and pixel_std in 0..255 scale"
+                ),
+                "note": (
+                    "IRRG is not natural RGB; spectral domain differs from SAM "
+                    "pretraining"
+                ),
             },
             "task": "supervised six-class semantic segmentation",
             "classes": N_CLASSES,
@@ -1868,8 +1898,7 @@ def main():
             validation_history.append(validation_record)
 
             improved = (
-                best_validation_miou is None
-                or validation_score > best_validation_miou
+                best_validation_miou is None or validation_score > best_validation_miou
             )
             if improved:
                 best_validation_miou = validation_score
@@ -1884,9 +1913,7 @@ def main():
                 save_checkpoint_atomic(output_dir / "best.pt", checkpoint)
             save_checkpoint_atomic(output_dir / "last.pt", checkpoint)
 
-            with (output_dir / "training_log.jsonl").open(
-                "a", encoding="utf-8"
-            ) as log:
+            with (output_dir / "training_log.jsonl").open("a", encoding="utf-8") as log:
                 log.write(json.dumps(epoch_record, sort_keys=True) + "\n")
             with (output_dir / "validation_log.jsonl").open(
                 "a", encoding="utf-8"
@@ -1944,8 +1971,7 @@ def main():
         selected_validation = best_checkpoint.get("best_validation_metrics")
         if (
             selected_validation is None
-            or validation["confusion_matrix"]
-            != selected_validation["confusion_matrix"]
+            or validation["confusion_matrix"] != selected_validation["confusion_matrix"]
         ):
             raise RuntimeError(
                 "Re-evaluated validation confusion matrix differs from best checkpoint"
@@ -1956,7 +1982,9 @@ def main():
             rel_tol=0,
             abs_tol=1e-5,
         ):
-            raise RuntimeError("Re-evaluated validation mIoU differs from best checkpoint")
+            raise RuntimeError(
+                "Re-evaluated validation mIoU differs from best checkpoint"
+            )
 
         held_out = None
         if not args.validation_only:
@@ -1982,8 +2010,7 @@ def main():
                 "validation_miou_percent": BASELINE_VALIDATION_MIOU,
                 "held_out_miou_percent": BASELINE_HELD_OUT_MIOU,
                 "validation_miou_delta_percentage_points": (
-                    validation["mean_iou_percent"]
-                    - BASELINE_VALIDATION_MIOU
+                    validation["mean_iou_percent"] - BASELINE_VALIDATION_MIOU
                 ),
                 "held_out_miou_delta_percentage_points": None
                 if held_out is None
@@ -1996,9 +2023,7 @@ def main():
         atomic_json_write(output_dir / "metrics.json", results)
         run_manifest.update(
             {
-                "status": "validation_complete"
-                if args.validation_only
-                else "complete",
+                "status": "validation_complete" if args.validation_only else "complete",
                 "held_out_evaluation_count": 0 if held_out is None else 1,
                 "best_epoch": best_checkpoint["best_epoch"],
                 "early_stopped": bool(run_manifest.get("early_stopped", False)),

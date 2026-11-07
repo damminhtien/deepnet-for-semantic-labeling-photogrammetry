@@ -71,12 +71,8 @@ class SAMViTSemanticSegmenter(nn.Module):
             raise ValueError(f"Expected {N_CLASSES} Potsdam classes, got {num_classes}")
         self.image_encoder = image_encoder
         self.gradient_checkpointing = gradient_checkpointing
-        self.register_buffer(
-            "pixel_mean", pixel_mean.detach().clone().view(1, 3, 1, 1)
-        )
-        self.register_buffer(
-            "pixel_std", pixel_std.detach().clone().view(1, 3, 1, 1)
-        )
+        self.register_buffer("pixel_mean", pixel_mean.detach().clone().view(1, 3, 1, 1))
+        self.register_buffer("pixel_std", pixel_std.detach().clone().view(1, 3, 1, 1))
 
         for parameter in self.image_encoder.parameters():
             parameter.requires_grad_(False)

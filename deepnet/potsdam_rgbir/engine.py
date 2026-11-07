@@ -5,11 +5,14 @@ from __future__ import annotations
 import logging
 import time
 from collections import deque
+from collections.abc import Mapping, Sequence
+from typing import Any
 
 import numpy as np
 import torch
 from torch import nn
 
+from deepnet.data.contracts import WindowSpec
 from deepnet.data.dataset import collate_torch_samples
 from deepnet.data.evaluation import (
     confusion_matrix,
@@ -21,31 +24,52 @@ from deepnet.training import _autocast, _optimizer_step
 from deepnet.training_utils import learning_rate_factor, make_optimizer
 
 from .sampling import Draw, fit_panel
+from .types import PanelRecord, TrainingIndex
 
 LOGGER = logging.getLogger(__name__)
 
 
-def pairs(panel):
+def pairs(panel: Sequence[Draw]) -> list[tuple[str, WindowSpec]]:
     return [(d.scene, d.window) for d in panel]
 
 
-def describe(panel):
-    return [{"scene": d.scene, "window": d.window.to_dict()} for d in panel]
+def _pair(values: Sequence[int]) -> tuple[int, int]:
+    if len(values) != 2:
+        raise ValueError("Spatial settings must contain two dimensions")
+    return values[0], values[1]
 
 
-def restore_panel(records):
+def describe(panel: Sequence[Draw]) -> list[PanelRecord]:
+    return [
+        {
+            "scene": draw.scene,
+            "window": {
+                "row": draw.window.row,
+                "col": draw.window.col,
+                "height": draw.window.height,
+                "width": draw.window.width,
+                "padding": draw.window.padding,
+            },
+        }
+        for draw in panel
+    ]
+
+
+def restore_panel(records: Sequence[PanelRecord]) -> list[Draw]:
     from deepnet.data.contracts import WindowSpec
 
     return [Draw(d["scene"], WindowSpec(**d["window"])) for d in records]
 
 
-def distribution(model, access, panel, runtime):
+def distribution(model: Any, access: Any, panel: Sequence[Draw], runtime: Any) -> dict:
     values = input_distribution(model, access, pairs(panel), runtime)
     require_finite_distribution(values)
     return values
 
 
-def optimizer_and_scaler(model, runtime, config, multiplier=1):
+def optimizer_and_scaler(
+    model: Any, runtime: Any, config: Mapping[str, Any], multiplier: float = 1
+):
     options = {
         **config["optimizer"],
         "learning_rates": {
@@ -58,8 +82,16 @@ def optimizer_and_scaler(model, runtime, config, multiplier=1):
 
 
 def train_step(
-    model, batches, optimizer, scaler, weights, runtime, config, step, total
-):
+    model: Any,
+    batches: list[dict[str, Any]],
+    optimizer: Any,
+    scaler: Any,
+    weights: torch.Tensor,
+    runtime: Any,
+    config: Mapping[str, Any],
+    step: int,
+    total: int,
+) -> tuple[float, np.ndarray]:
     """Use shared AMP retry logic and retain metrics from the successful attempt."""
     for group in optimizer.param_groups:
         group["lr"] = group["initial_lr"] * learning_rate_factor(step, total, 0.05)
@@ -99,7 +131,14 @@ def train_step(
 
 
 @torch.no_grad()
-def score_patches(model, access, panel, runtime, config, budget=None):
+def score_patches(
+    model: Any,
+    access: Any,
+    panel: Sequence[Draw],
+    runtime: Any,
+    config: Mapping[str, Any],
+    budget: Any | None = None,
+) -> dict[str, Any]:
     model.eval()
     matrix = np.zeros((6, 6), dtype=np.int64)
     for draw in panel:
@@ -137,26 +176,26 @@ class InferenceModel(nn.Module):
 
 
 def score_scenes(
-    model,
-    access,
-    runtime,
-    config,
-    budget,
-    scratch,
+    model: Any,
+    access: Any,
+    runtime: Any,
+    config: Mapping[str, Any],
+    budget: Any,
+    scratch: Any,
     *,
     scene_ids=None,
     policy="identity",
     profile=False,
     no_overlap=False,
-    batch_size=4,
-):
+    batch_size: int = 4,
+) -> dict[str, Any]:
     with _autocast(runtime.device, config):
         return evaluate_scenes(
             InferenceModel(model, policy),
             access,
             scene_ids or access.split.scenes_for(access.split_name),
-            window_size=tuple(config["window_size"]),
-            stride=None if no_overlap else tuple(config["stride"]),
+            window_size=_pair(config["window_size"]),
+            stride=None if no_overlap else _pair(config["stride"]),
             batch_size=batch_size,
             device=runtime.device,
             scratch_dir=scratch,
@@ -166,7 +205,15 @@ def score_scenes(
         )
 
 
-def fit_small(model, access, index, runtime, config, budget, weights):
+def fit_small(
+    model: Any,
+    access: Any,
+    index: TrainingIndex,
+    runtime: Any,
+    config: Mapping[str, Any],
+    budget: Any,
+    weights: torch.Tensor,
+) -> dict[str, Any]:
     panel = fit_panel(index)
     samples = [access.read_sample(d.scene, d.window) for d in panel]
     classes = set(
@@ -216,12 +263,12 @@ def fit_small(model, access, index, runtime, config, budget, weights):
     }
 
 
-def sync(runtime):
+def sync(runtime: Any) -> None:
     if runtime.device_type == "cuda":
         torch.cuda.synchronize(runtime.device)
 
 
-def timed(call, runtime):
+def timed(call: Any, runtime: Any) -> tuple[Any, float]:
     sync(runtime)
     begin = time.monotonic()
     result = call()

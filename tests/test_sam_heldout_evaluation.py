@@ -30,9 +30,7 @@ class SelectedHeldOutEvaluationTests(unittest.TestCase):
                 "mean_iou_percent": 75.0,
             }
             (output_dir / "metrics.json").write_text(
-                json.dumps(
-                    {"validation": validation_metrics, "held_out_test": None}
-                ),
+                json.dumps({"validation": validation_metrics, "held_out_test": None}),
                 encoding="utf-8",
             )
             (output_dir / "run_manifest.json").write_text(

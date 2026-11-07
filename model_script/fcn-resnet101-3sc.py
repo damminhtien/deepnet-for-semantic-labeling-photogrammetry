@@ -1,3 +1,5 @@
+# ruff: noqa: E402
+
 import sys
 from pathlib import Path
 
@@ -19,11 +21,18 @@ class Bottleneck(nn.Module):
         super().__init__()
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channels)
-        self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3,
-                               stride=stride, bias=False, padding=1)
+        self.conv2 = nn.Conv2d(
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            stride=stride,
+            bias=False,
+            padding=1,
+        )
         self.bn2 = nn.BatchNorm2d(out_channels)
-        self.conv3 = nn.Conv2d(out_channels, out_channels * self.expansion,
-                               kernel_size=1, bias=False)
+        self.conv3 = nn.Conv2d(
+            out_channels, out_channels * self.expansion, kernel_size=1, bias=False
+        )
         self.bn3 = nn.BatchNorm2d(out_channels * self.expansion)
         self.relu = nn.ReLU()
         self.downsample = downsample
@@ -51,6 +60,7 @@ class Bottleneck(nn.Module):
 
         return out
 
+
 class DeconvBottleneck(nn.Module):
     def __init__(self, in_channels, out_channels, expansion=2, stride=1, upsample=None):
         super().__init__()
@@ -58,17 +68,28 @@ class DeconvBottleneck(nn.Module):
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channels)
         if stride == 1:
-            self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3,
-                                   stride=stride, bias=False, padding=1)
+            self.conv2 = nn.Conv2d(
+                out_channels,
+                out_channels,
+                kernel_size=3,
+                stride=stride,
+                bias=False,
+                padding=1,
+            )
         else:
-            self.conv2 = nn.ConvTranspose2d(out_channels, out_channels,
-                                            kernel_size=3,
-                                            stride=stride, bias=False,
-                                            padding=1,
-                                            output_padding=1)
+            self.conv2 = nn.ConvTranspose2d(
+                out_channels,
+                out_channels,
+                kernel_size=3,
+                stride=stride,
+                bias=False,
+                padding=1,
+                output_padding=1,
+            )
         self.bn2 = nn.BatchNorm2d(out_channels)
-        self.conv3 = nn.Conv2d(out_channels, out_channels * self.expansion,
-                               kernel_size=1, bias=False)
+        self.conv3 = nn.Conv2d(
+            out_channels, out_channels * self.expansion, kernel_size=1, bias=False
+        )
         self.bn3 = nn.BatchNorm2d(out_channels * self.expansion)
         self.relu = nn.ReLU()
         self.upsample = upsample
@@ -96,25 +117,24 @@ class DeconvBottleneck(nn.Module):
 
         return out
 
+
 class ResNet(nn.Module):
     def __init__(self, downblock, upblock, num_layers, n_classes=N_CLASSES):
         super().__init__()
 
         self.in_channels = 64
 
-        self.conv1 = nn.Conv2d(IN_CHANNELS, 64, kernel_size=7, stride=2, padding=3,
-                               bias=False)
+        self.conv1 = nn.Conv2d(
+            IN_CHANNELS, 64, kernel_size=7, stride=2, padding=3, bias=False
+        )
         self.bn1 = nn.BatchNorm2d(64)
         self.relu = nn.ReLU()
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.dlayer1 = self._make_downlayer(downblock, 64, num_layers[0])
-        self.dlayer2 = self._make_downlayer(downblock, 128, num_layers[1],
-                                            stride=2)
-        self.dlayer3 = self._make_downlayer(downblock, 256, num_layers[2],
-                                            stride=2)
-        self.dlayer4 = self._make_downlayer(downblock, 512, num_layers[3],
-                                            stride=2)
+        self.dlayer2 = self._make_downlayer(downblock, 128, num_layers[1], stride=2)
+        self.dlayer3 = self._make_downlayer(downblock, 256, num_layers[2], stride=2)
+        self.dlayer4 = self._make_downlayer(downblock, 512, num_layers[3], stride=2)
 
         self.uplayer1 = self._make_up_block(upblock, 512, 1, stride=2)
         self.uplayer2 = self._make_up_block(upblock, 256, num_layers[2], stride=2)
@@ -122,29 +142,39 @@ class ResNet(nn.Module):
         self.uplayer4 = self._make_up_block(upblock, 64, 2, stride=2)
 
         upsample = nn.Sequential(
-            nn.ConvTranspose2d(self.in_channels,  # 256
-                               64,
-                               kernel_size=1, stride=2,
-                               bias=False, output_padding=1),
+            nn.ConvTranspose2d(
+                self.in_channels,  # 256
+                64,
+                kernel_size=1,
+                stride=2,
+                bias=False,
+                output_padding=1,
+            ),
             nn.BatchNorm2d(64),
         )
         self.uplayer_top = DeconvBottleneck(self.in_channels, 64, 1, 2, upsample)
 
-        self.conv1_1 = nn.ConvTranspose2d(64, n_classes, kernel_size=1, stride=1,
-                                 bias=False)
+        self.conv1_1 = nn.ConvTranspose2d(
+            64, n_classes, kernel_size=1, stride=1, bias=False
+        )
 
     def _make_downlayer(self, block, init_channels, num_layer, stride=1):
         downsample = None
         if stride != 1 or self.in_channels != init_channels * block.expansion:
             downsample = nn.Sequential(
-                nn.Conv2d(self.in_channels, init_channels*block.expansion,
-                          kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(init_channels*block.expansion),
+                nn.Conv2d(
+                    self.in_channels,
+                    init_channels * block.expansion,
+                    kernel_size=1,
+                    stride=stride,
+                    bias=False,
+                ),
+                nn.BatchNorm2d(init_channels * block.expansion),
             )
         layers = []
         layers.append(block(self.in_channels, init_channels, stride, downsample))
         self.in_channels = init_channels * block.expansion
-        for i in range(1, num_layer):
+        for _ in range(1, num_layer):
             layers.append(block(self.in_channels, init_channels))
 
         return nn.Sequential(*layers)
@@ -154,13 +184,18 @@ class ResNet(nn.Module):
         # expansion = block.expansion
         if stride != 1 or self.in_channels != init_channels * 2:
             upsample = nn.Sequential(
-                nn.ConvTranspose2d(self.in_channels, init_channels*2,
-                                   kernel_size=1, stride=stride,
-                                   bias=False, output_padding=1),
-                nn.BatchNorm2d(init_channels*2),
+                nn.ConvTranspose2d(
+                    self.in_channels,
+                    init_channels * 2,
+                    kernel_size=1,
+                    stride=stride,
+                    bias=False,
+                    output_padding=1,
+                ),
+                nn.BatchNorm2d(init_channels * 2),
             )
         layers = []
-        for i in range(1, num_layer):
+        for _ in range(1, num_layer):
             layers.append(block(self.in_channels, init_channels, 4))
         layers.append(block(self.in_channels, init_channels, 2, stride, upsample))
         self.in_channels = init_channels * 2
@@ -172,7 +207,7 @@ class ResNet(nn.Module):
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
-        
+
         x = self.dlayer1(x)
         x1 = x
         x = self.dlayer2(x)
@@ -180,25 +215,28 @@ class ResNet(nn.Module):
         x = self.dlayer3(x)
         x3 = x
         x = self.dlayer4(x)
-        
+
         x = self.uplayer1(x)
         x = x + x3
-        del(x3)
+        del x3
         x = self.uplayer2(x)
         x = x + x2
-        del(x2)
+        del x2
         x = self.uplayer3(x)
         x = x + x1
-        del(x1)
+        del x1
         x = self.uplayer4(x)
         x = self.uplayer_top(x)
-        
+
         x = self.conv1_1(x, output_size=img.size())
 
         return x
 
+
 def FCN8s_Rn101(n_classes=N_CLASSES, **kwargs):
-    return ResNet(Bottleneck, DeconvBottleneck, [3, 4, 23, 2], n_classes=n_classes, **kwargs)
+    return ResNet(
+        Bottleneck, DeconvBottleneck, [3, 4, 23, 2], n_classes=n_classes, **kwargs
+    )
 
 
 # In[7]:

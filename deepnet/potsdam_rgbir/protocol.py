@@ -5,21 +5,38 @@ from __future__ import annotations
 import importlib.metadata
 import os
 import time
+from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import Any, cast
 
 import torch
+from typing_extensions import Self
 
 from deepnet.data.contracts import canonical_hash
 from deepnet.data.raster import sha256_file
 from deepnet.potsdam_protocol import freeze, matrix_metrics, read_json
 from deepnet.training_utils import write_json
 
+from .types import (
+    Candidate,
+    DeviceBinding,
+    EvaluationMetrics,
+    InferencePolicy,
+    ModelTiming,
+    PhaseManifest,
+    Protocol,
+    Recipe,
+    Schedule,
+    SelectionLock,
+    TTAValidation,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = ROOT / "configs/training/potsdam-dinov3-rgbir-v2.json"
 ARM_ORDER = "ABCLD"
 
 
-def source_hash():
+def source_hash() -> str:
     files = [
         *sorted((ROOT / "deepnet").rglob("*.py")),
         ROOT / "semantic_labeling/__init__.py",
@@ -30,7 +47,7 @@ def source_hash():
     return canonical_hash({str(p.relative_to(ROOT)): sha256_file(p) for p in files})
 
 
-def device_binding(runtime):
+def device_binding(runtime: Any) -> DeviceBinding:
     if runtime.device_type != "cuda":
         raise ValueError("Campaign phases require CUDA; use the separate offline smoke")
     return {
@@ -49,21 +66,30 @@ def device_binding(runtime):
     }
 
 
-def scores(metrics):
+def scores(metrics: EvaluationMetrics) -> tuple[float, float, float, float]:
+    car_iou, clutter_iou = metrics["per_class_iou"][4:6]
+    if car_iou is None or clutter_iou is None:
+        raise ValueError("Car and clutter IoU must be defined for ranking")
     return (
         metrics["overall_accuracy"],
         metrics["mean_iou"],
-        metrics["per_class_iou"][4],
-        metrics["per_class_iou"][5],
+        car_iou,
+        clutter_iou,
     )
 
 
-def candidate(metrics, protocol, arm, step):
-    measured = matrix_metrics(
-        metrics["confusion_matrix"], protocol["validation_pixels"]
+def candidate(
+    metrics: EvaluationMetrics, protocol: Protocol, arm: str, step: int
+) -> Candidate:
+    measured = cast(
+        EvaluationMetrics,
+        matrix_metrics(metrics["confusion_matrix"], protocol["validation_pixels"]),
     )
-    reference = matrix_metrics(
-        protocol["reference_validation_confusion"], protocol["validation_pixels"]
+    reference = cast(
+        EvaluationMetrics,
+        matrix_metrics(
+            protocol["reference_validation_confusion"], protocol["validation_pixels"]
+        ),
     )
     current, floor = scores(measured), scores(reference)
     return {
@@ -78,7 +104,7 @@ def candidate(metrics, protocol, arm, step):
     }
 
 
-def ranking(record):
+def ranking(record: Candidate) -> tuple[bool, float, float, int, int]:
     primary = (
         (record["overall_accuracy"], record["mean_iou"])
         if record["eligible"]
@@ -92,34 +118,43 @@ def ranking(record):
     )
 
 
-def complete_arm(root, protocol, arm):
-    manifest = read_json(root / arm / "manifest.json")
+def complete_arm(root: Path, protocol: Protocol, arm: str) -> PhaseManifest:
+    manifest = cast(PhaseManifest, read_json(root / arm / "manifest.json"))
+    best = manifest["best"]
+    validation = manifest["best_validation"]
     if (
         manifest["status"] != "complete"
         or manifest["protocol_hash"] != protocol["protocol_hash"]
         or manifest["arm"] != arm
         or manifest["updates"] != protocol["passes"] * 864
         or manifest["completed_passes"] != protocol["passes"]
-        or sha256_file(root / arm / "best.pt") != manifest["best"]["checkpoint_sha256"]
+        or best is None
+        or validation is None
+        or sha256_file(root / arm / "best.pt") != best["checkpoint_sha256"]
     ):
         raise ValueError(f"Selection arm is not complete and verified: {arm}")
-    expected = candidate(
-        manifest["best_validation"], protocol, arm, manifest["best"]["step"]
-    )
-    if any(manifest["best"][key] != value for key, value in expected.items()):
+    expected = candidate(validation, protocol, arm, best["step"])
+    if any(best[key] != value for key, value in expected.items()):
         raise ValueError("Checkpoint eligibility differs from its confusion matrix")
     return manifest
 
 
-def winner(root, protocol, arms=None):
+def winner(
+    root: Path, protocol: Protocol, arms: Sequence[str] | None = None
+) -> PhaseManifest:
     arms = arms or protocol["arms"]
-    return max(
-        (complete_arm(root, protocol, a) for a in arms),
-        key=lambda m: ranking(m["best"]),
-    )
+    manifests = [complete_arm(root, protocol, arm) for arm in arms]
+
+    def rank_manifest(manifest: PhaseManifest) -> tuple[bool, float, float, int, int]:
+        best = manifest["best"]
+        if best is None:
+            raise ValueError("Complete selection manifest has no best checkpoint")
+        return ranking(best)
+
+    return max(manifests, key=rank_manifest)
 
 
-def recipe_for(root, protocol, arm):
+def recipe_for(root: Path, protocol: Protocol, arm: str) -> Recipe:
     if arm == "A":
         return {"backbone": "B", "auxiliary": False, "enhanced": False}
     if arm == "B":
@@ -133,13 +168,25 @@ def recipe_for(root, protocol, arm):
     raise ValueError(f"Unexpected study arm: {arm}")
 
 
-def choose_tta(base42, flip42, base43, flip43, protocol):
+def choose_tta(
+    base42: EvaluationMetrics,
+    flip42: EvaluationMetrics,
+    base43: EvaluationMetrics,
+    flip43: EvaluationMetrics,
+    protocol: Protocol,
+) -> InferencePolicy:
     for base, flip in ((base42, flip42), (base43, flip43)):
         b = scores(
-            matrix_metrics(base["confusion_matrix"], protocol["validation_pixels"])
+            cast(
+                EvaluationMetrics,
+                matrix_metrics(base["confusion_matrix"], protocol["validation_pixels"]),
+            )
         )
         f = scores(
-            matrix_metrics(flip["confusion_matrix"], protocol["validation_pixels"])
+            cast(
+                EvaluationMetrics,
+                matrix_metrics(flip["confusion_matrix"], protocol["validation_pixels"]),
+            )
         )
         if f[0] - b[0] < protocol["inference"]["minimum_tta_oa_gain"] or any(
             x < y for x, y in zip(f[1:], b[1:], strict=True)
@@ -148,11 +195,24 @@ def choose_tta(base42, flip42, base43, flip43, protocol):
     return "hflip"
 
 
-def lock_selection(root, protocol, inference, tta=None):
+def lock_selection(
+    root: Path,
+    protocol: Protocol,
+    inference: InferencePolicy,
+    tta: TTAValidation | None = None,
+) -> SelectionLock:
     selected, confirmation = winner(root, protocol), complete_arm(root, protocol, "D")
+    selected_best = selected["best"]
+    confirmation_best = confirmation["best"]
+    selected_validation = selected["best_validation"]
+    confirmation_validation = confirmation["best_validation"]
     if (
-        not selected["best"]["eligible"]
-        or not confirmation["best"]["eligible"]
+        selected_best is None
+        or confirmation_best is None
+        or selected_validation is None
+        or confirmation_validation is None
+        or not selected_best["eligible"]
+        or not confirmation_best["eligible"]
         or selected["recipe"] != confirmation["recipe"]
         or selected["seed"] != 42
         or confirmation["seed"] != 43
@@ -165,35 +225,35 @@ def lock_selection(root, protocol, inference, tta=None):
     if inference == "hflip" and (
         not tta
         or choose_tta(
-            selected["best_validation"],
+            selected_validation,
             tta["seed42"],
-            confirmation["best_validation"],
+            confirmation_validation,
             tta["seed43"],
             protocol,
         )
         != "hflip"
     ):
         raise ValueError("TTA did not pass both seed validation gates")
-    lock = {
+    lock: SelectionLock = {
         "protocol_hash": protocol["protocol_hash"],
         "arm": selected["arm"],
         "recipe": selected["recipe"],
         "selection_binding": selected["binding"],
-        "selection_checkpoint_sha256": selected["best"]["checkpoint_sha256"],
-        "confirmation_checkpoint_sha256": confirmation["best"]["checkpoint_sha256"],
-        "validation": selected["best_validation"],
+        "selection_checkpoint_sha256": selected_best["checkpoint_sha256"],
+        "confirmation_checkpoint_sha256": confirmation_best["checkpoint_sha256"],
+        "validation": selected_validation,
         "inference": inference,
         "tta_validation": tta,
         "refit_updates": 1152,
         "lr_multiplier": 0.5,
         "selection_cache_hash": protocol["selection_cache_hash"],
     }
-    freeze(root / "selection-lock.json", lock)
+    freeze(root / "selection-lock.json", dict(lock))
     return lock
 
 
-def load_protocol(root):
-    p = read_json(root / "protocol.json")
+def load_protocol(root: Path) -> Protocol:
+    p = cast(Protocol, read_json(root / "protocol.json"))
     payload = {k: v for k, v in p.items() if k != "protocol_hash"}
     if canonical_hash(payload) != p["protocol_hash"] or p["passes"] not in (6, 8, 12):
         raise ValueError("Frozen protocol hash/schedule mismatch")
@@ -202,16 +262,18 @@ def load_protocol(root):
     return p
 
 
-def freeze_protocol(root, payload):
+def freeze_protocol(root: Path, payload: Mapping[str, Any]) -> Protocol:
     value = {**payload, "protocol_hash": canonical_hash(payload)}
     freeze(root / "protocol.json", value)
-    return value
+    return cast(Protocol, value)
 
 
 class Budget:
     """Count all allocated GPUs, including this job's bootstrap and past attempts."""
 
-    def __init__(self, root, hours, devices, *, started=None):
+    def __init__(
+        self, root: Path, hours: float, devices: int, *, started: float | None = None
+    ) -> None:
         self.path = root / "budget.json"
         self.limit = hours * 3600
         self.devices = devices
@@ -222,7 +284,7 @@ class Budget:
         )
         self.previous = 0.0
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if self.path.exists():
             data = read_json(self.path)
@@ -236,24 +298,26 @@ class Budget:
         return self
 
     @property
-    def elapsed(self):
+    def elapsed(self) -> float:
         return self.devices * (time.monotonic() - self.started)
 
-    def remaining(self):
+    def remaining(self) -> float:
         return (self.limit - self.previous - self.elapsed) / self.devices
 
-    def check(self):
+    def check(self) -> None:
         if self.remaining() <= 0:
             raise TimeoutError("Allocated GPU budget reached")
 
-    def __exit__(self, *_):
+    def __exit__(self, *_: object) -> None:
         write_json(
             self.path,
             {"gpu_seconds": self.previous + self.elapsed, "in_progress": False},
         )
 
 
-def choose_schedule(timings, devices, *, include_large):
+def choose_schedule(
+    timings: Mapping[str, ModelTiming], devices: int, *, include_large: bool
+) -> Schedule:
     """Resolve the whole common schedule before any selectable training run."""
     arms = "ABCL" if include_large else "ABC"
     hours = 16 / (len(arms) + 1)

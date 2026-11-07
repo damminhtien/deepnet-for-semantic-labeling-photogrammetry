@@ -5,6 +5,8 @@ the contract-driven data pipeline. New training code should construct data throu
 ``deepnet.data`` and record its bundle/run manifests.
 """
 
+# ruff: noqa: E402
+
 import argparse
 import hashlib
 import json
@@ -64,7 +66,9 @@ def verify_bundle(data_root, bundle_manifest):
         if not path.is_relative_to(data_root):
             raise ValueError(f"Bundle path escapes its root: {relative_path}")
         if not path.is_file() or path.stat().st_size != record["bytes"]:
-            raise RuntimeError(f"Bundle file is missing or has the wrong size: {relative_path}")
+            raise RuntimeError(
+                f"Bundle file is missing or has the wrong size: {relative_path}"
+            )
         with path.open("rb") as file_handle:
             actual_sha256 = hashlib.file_digest(file_handle, "sha256").hexdigest()
         if actual_sha256 != record["sha256"]:
@@ -108,9 +112,7 @@ def checkpoint_rng_state(device):
         "mps_rng_state": None,
     }
     if device.type == "cuda":
-        state["cuda_rng_states"] = [
-            rng.cpu() for rng in torch.cuda.get_rng_state_all()
-        ]
+        state["cuda_rng_states"] = [rng.cpu() for rng in torch.cuda.get_rng_state_all()]
     elif device.type == "mps":
         state["mps_rng_state"] = torch.mps.get_rng_state().cpu()
     return state
@@ -133,8 +135,7 @@ def restore_rng_state(checkpoint, device, seed):
 def smoke_test(net, dataset, device, seed):
     rng_state = checkpoint_rng_state(device)
     weights = {
-        name: value.detach().cpu().clone()
-        for name, value in net.state_dict().items()
+        name: value.detach().cpu().clone() for name, value in net.state_dict().items()
     }
     batch = next(
         iter(
@@ -159,7 +160,9 @@ def smoke_test(net, dataset, device, seed):
     gradients = [
         parameter.grad for parameter in net.parameters() if parameter.grad is not None
     ]
-    if not gradients or not all(torch.isfinite(gradient).all() for gradient in gradients):
+    if not gradients or not all(
+        torch.isfinite(gradient).all() for gradient in gradients
+    ):
         raise RuntimeError("CUDA backward smoke produced no finite gradients")
     result = {
         "input_shape": list(inputs.shape),
@@ -199,7 +202,9 @@ def main():
     bundle_manifest = json.loads(bundle_manifest_path.read_text(encoding="utf-8"))
     checkpoint_record = bundle_manifest.get("checkpoint", {})
     if not bundle_manifest.get("bundle_sha256") or not checkpoint_record:
-        raise ValueError("Bundle manifest is missing its fingerprint or checkpoint record")
+        raise ValueError(
+            "Bundle manifest is missing its fingerprint or checkpoint record"
+        )
     verify_bundle(data_root, bundle_manifest)
 
     potsdam_root = data_root / "potsdamvaihingen"
@@ -209,8 +214,7 @@ def main():
     data_files = potsdam_root / "3_ortho_irrg/3_Ortho_IRRG/top_potsdam_{}_IRRG.tif"
     dsm_files = potsdam_root / "1_dsm/1_DSM/dsm_potsdam_0{}.tif"
     ndsm_files = (
-        potsdam_root
-        / "1_dsm_normalisation/1_DSM_normalisation/"
+        potsdam_root / "1_dsm_normalisation/1_DSM_normalisation/"
         "dsm_potsdam_0{}_normalized_lastools.jpg"
     )
 
@@ -244,13 +248,17 @@ def main():
         set(actual_split[key]) != set(expected_split.get(key, ()))
         for key in actual_split
     ):
-        raise RuntimeError("Prepared label files do not match the bundle split manifest")
+        raise RuntimeError(
+            "Prepared label files do not match the bundle split manifest"
+        )
 
     run_dir.mkdir(parents=True, exist_ok=True)
     manifest_path = run_dir / "run_manifest.json"
     checkpoint_path = run_dir / "last.pt"
     if any(run_dir.iterdir()) and not manifest_path.is_file():
-        raise FileExistsError(f"Refusing to reuse run directory without a manifest: {run_dir}")
+        raise FileExistsError(
+            f"Refusing to reuse run directory without a manifest: {run_dir}"
+        )
     if manifest_path.is_file():
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         if manifest.get("run_id") != args.run_id:
@@ -289,14 +297,20 @@ def main():
     net.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
     completed_epoch = int(checkpoint["epoch"])
-    if not checkpoint_path.is_file() and completed_epoch != checkpoint_record.get("epoch"):
+    if not checkpoint_path.is_file() and completed_epoch != checkpoint_record.get(
+        "epoch"
+    ):
         raise RuntimeError("Resume checkpoint epoch does not match the bundle manifest")
     if not 0 <= completed_epoch <= NUM_EPOCHS:
-        raise RuntimeError(f"Checkpoint epoch is outside the configured run: {completed_epoch}")
+        raise RuntimeError(
+            f"Checkpoint epoch is outside the configured run: {completed_epoch}"
+        )
     if manifest and checkpoint_path.is_file():
         manifest_epoch = int(manifest.get("last_completed_epoch", 0))
         if manifest_epoch > completed_epoch:
-            raise RuntimeError("Run manifest is ahead of the available cloud checkpoint")
+            raise RuntimeError(
+                "Run manifest is ahead of the available cloud checkpoint"
+            )
         if manifest_epoch < completed_epoch:
             manifest["last_completed_epoch"] = completed_epoch
             manifest["last_epoch_loss"] = checkpoint.get("epoch_loss")
@@ -343,7 +357,10 @@ def main():
             "bundle_sha256": bundle_manifest.get("bundle_sha256"),
             "source_git_revision": bundle_manifest.get("source_git_revision"),
             "seed": args.seed,
-            "initialization": "random at epoch 0; resumed from the saved MPS epoch-2 model and Adam state",
+            "initialization": (
+                "random at epoch 0; resumed from the saved MPS epoch-2 model and "
+                "Adam state"
+            ),
             "train_ids": train_ids,
             "validation_ids": VALID_IDS,
             "test_ids": test_ids,
@@ -359,28 +376,28 @@ def main():
             "weight_decay": WEIGHT_DECAY,
             "auxiliary_loss_weight": AUX_LOSS_WEIGHT,
             "input_scale": 255.0,
-            "augmentation": "independent random vertical flip and horizontal mirror, each p=0.5",
+            "augmentation": (
+                "independent random vertical flip and horizontal mirror, each p=0.5"
+            ),
             "cuda_smoke": smoke,
             "dataset_root": str(data_root),
             "run_directory": str(run_dir),
         }
 
     manifest["status"] = "running"
-    manifest["started_utc"] = manifest.get(
-        "started_utc", datetime.now(UTC).isoformat()
-    )
+    manifest["started_utc"] = manifest.get("started_utc", datetime.now(UTC).isoformat())
     manifest["batches_per_epoch"] = len(train_loader)
     manifest["optimizer_steps_planned"] = NUM_EPOCHS * len(train_loader)
     manifest.setdefault(
         "optimizer_steps_completed_before_cloud",
         checkpoint_record["epoch"] * len(train_loader),
     )
-    manifest["optimizer_steps_completed_at_resume"] = (
-        completed_epoch * len(train_loader)
+    manifest["optimizer_steps_completed_at_resume"] = completed_epoch * len(
+        train_loader
     )
-    manifest["optimizer_steps_remaining"] = (
-        NUM_EPOCHS - completed_epoch
-    ) * len(train_loader)
+    manifest["optimizer_steps_remaining"] = (NUM_EPOCHS - completed_epoch) * len(
+        train_loader
+    )
     atomic_json_write(manifest_path, manifest)
     print(
         f"backend={args.backend} device={device} gpu={manifest['gpu_name']} "

@@ -19,7 +19,9 @@ class SamSweepTests(unittest.TestCase):
         candidates = sweep_candidates("retrain-test")
         by_name = {candidate["name"]: candidate for candidate in candidates}
         baseline_pixels = 256 * 512**2
-        smaller_patch_pixels = by_name["candidate-b-r4-p384"]["steps_per_epoch"] * 384**2
+        smaller_patch_pixels = (
+            by_name["candidate-b-r4-p384"]["steps_per_epoch"] * 384**2
+        )
 
         self.assertEqual(len(candidates), 3)
         self.assertLessEqual(abs(smaller_patch_pixels - baseline_pixels), 384**2)
@@ -46,15 +48,28 @@ class SamSweepTests(unittest.TestCase):
         self.assertEqual(manifest["candidates"][1]["patch_size"], 384)
         self.assertEqual(manifest["candidates"][1]["steps_per_epoch"], 455)
         candidates[1]["validation_miou_percent"] = 74.3
-        self.assertEqual(
-            manifest["candidates"][1]["validation_miou_percent"], 74.3
-        )
+        self.assertEqual(manifest["candidates"][1]["validation_miou_percent"], 74.3)
 
     def test_rank4_patch512_wins_when_inside_tie_tolerance(self):
         candidates = [
-            {"name": "a", "rank": 4, "patch_size": 512, "validation_miou_percent": 74.0},
-            {"name": "b", "rank": 4, "patch_size": 384, "validation_miou_percent": 74.09},
-            {"name": "c", "rank": 8, "patch_size": 512, "validation_miou_percent": 73.2},
+            {
+                "name": "a",
+                "rank": 4,
+                "patch_size": 512,
+                "validation_miou_percent": 74.0,
+            },
+            {
+                "name": "b",
+                "rank": 4,
+                "patch_size": 384,
+                "validation_miou_percent": 74.09,
+            },
+            {
+                "name": "c",
+                "rank": 8,
+                "patch_size": 512,
+                "validation_miou_percent": 73.2,
+            },
         ]
 
         winner = select_sweep_winner(candidates)
@@ -63,8 +78,18 @@ class SamSweepTests(unittest.TestCase):
 
     def test_best_score_wins_when_outside_tie_tolerance(self):
         candidates = [
-            {"name": "a", "rank": 4, "patch_size": 512, "validation_miou_percent": 74.0},
-            {"name": "b", "rank": 4, "patch_size": 384, "validation_miou_percent": 74.11},
+            {
+                "name": "a",
+                "rank": 4,
+                "patch_size": 512,
+                "validation_miou_percent": 74.0,
+            },
+            {
+                "name": "b",
+                "rank": 4,
+                "patch_size": 384,
+                "validation_miou_percent": 74.11,
+            },
         ]
 
         self.assertEqual(select_sweep_winner(candidates)["name"], "b")

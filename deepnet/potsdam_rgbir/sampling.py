@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import random
+from collections.abc import Mapping
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 import torch
@@ -13,6 +15,8 @@ from torch.utils.data import DataLoader, Dataset
 from deepnet.data.contracts import WindowSpec
 from deepnet.data.dataset import collate_torch_samples
 from deepnet.data.sampling import grid_windows
+
+from .types import TrainingIndex
 
 WINDOW = (512, 512)
 
@@ -29,12 +33,12 @@ class Draw:
     rare_class: int | None = None
 
 
-def training_index(access) -> dict:
+def training_index(access: Any) -> TrainingIndex:
     """Count every train pixel; index rare pixels by tile without subsampling."""
     base, support, rare = [], np.zeros(6, dtype=np.int64), {}
     for scene, shape in access.scene_shapes.items():
         tiles = {str(c): [] for c in (4, 5)}
-        for window in grid_windows(*shape, WINDOW):
+        for window in grid_windows(shape[0], shape[1], WINDOW):
             labels, valid = access.read_labels(scene, window)
             valid &= labels < 6
             counts = np.bincount(labels[valid], minlength=6)
@@ -50,7 +54,12 @@ def training_index(access) -> dict:
 
 
 def schedule(
-    index: dict, access, seed: int, pass_number: int, *, jitter=96
+    index: TrainingIndex,
+    access: Any,
+    seed: int,
+    pass_number: int,
+    *,
+    jitter: int = 96,
 ) -> list[Draw]:
     rng = random.Random(f"{seed}/{pass_number}")
     draws = [Draw(scene, WindowSpec(**window)) for scene, window, _ in index["base"]]
@@ -85,16 +94,16 @@ def schedule(
     return draws
 
 
-def fixed_panel(access, per_scene: int, seed: int):
+def fixed_panel(access: Any, per_scene: int, seed: int) -> list[Draw]:
     rng = random.Random(seed)
     return [
         Draw(scene, window)
         for scene, shape in access.scene_shapes.items()
-        for window in rng.sample(grid_windows(*shape, WINDOW), per_scene)
+        for window in rng.sample(grid_windows(shape[0], shape[1], WINDOW), per_scene)
     ]
 
 
-def fit_panel(index):
+def fit_panel(index: TrainingIndex) -> list[Draw]:
     chosen = []
     for class_id in (4, 5, 0, 1, 2, 3, 4, 5):
         entry = max(
@@ -106,15 +115,23 @@ def fit_panel(index):
 
 
 class PatchDataset(Dataset):
-    def __init__(self, access, draws, seed, pass_number, augmentation, start=0):
+    def __init__(
+        self,
+        access: Any,
+        draws: list[Draw],
+        seed: int,
+        pass_number: int,
+        augmentation: Mapping[str, Any],
+        start: int = 0,
+    ) -> None:
         self.access, self.draws = access, draws
         self.seed, self.pass_number = seed, pass_number
         self.augmentation, self.start = augmentation, start
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.draws) - self.start
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> dict[str, Any]:
         from .augmentation import augment
 
         ordinal = self.start + index
@@ -122,13 +139,21 @@ class PatchDataset(Dataset):
             self.access,
             self.draws[ordinal],
             seed=draw_seed(self.seed, self.pass_number, ordinal),
-            recipe=self.augmentation,
+            recipe=dict(self.augmentation),
         )
 
 
 def loader(
-    access, draws, seed, pass_number, augmentation, start=0, *, workers=2, cuda=False
-):
+    access: Any,
+    draws: list[Draw],
+    seed: int,
+    pass_number: int,
+    augmentation: Mapping[str, Any],
+    start: int = 0,
+    *,
+    workers: int = 2,
+    cuda: bool = False,
+) -> DataLoader:
     dataset = PatchDataset(access, draws, seed, pass_number, augmentation, start)
     return DataLoader(
         dataset,
@@ -140,12 +165,12 @@ def loader(
         generator=torch.Generator().manual_seed(draw_seed(seed, pass_number, 0)),
         persistent_workers=workers > 0,
         worker_init_fn=_worker_init,
-        **({"prefetch_factor": 2} if workers else {}),
+        prefetch_factor=2 if workers else None,
     )
 
 
-def _worker_init(_worker):
-    import cv2
+def _worker_init(_worker: int) -> None:
+    import cv2  # pyright: ignore[reportMissingImports]
 
     cv2.setNumThreads(1)
     torch.set_num_threads(1)

@@ -79,7 +79,9 @@ def sync_artifacts(
 ) -> dict:
     copied = state.setdefault("files", {})
     for filename in SYNC_FILES:
-        source = stdout_path if filename == "training.stdout.log" else run_dir / filename
+        source = (
+            stdout_path if filename == "training.stdout.log" else run_dir / filename
+        )
         if not source.is_file():
             continue
         stat = source.stat()
