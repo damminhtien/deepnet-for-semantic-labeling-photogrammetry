@@ -1,5 +1,7 @@
 # DINOv3 RGBIR selection: A and B
 
+**Status: SUPERSEDED** — Selection outcome is finalized in the 2026-11-06 selection summary.
+
 After eight passes with seed 42, **RGB-only A outranked B with IR, NDVI, relief
 and DSM availability**. Both passed the four historical C floors on 199,409,714
 validation pixels. C started at 13:28:03 Singapore time on 2026-11-06 with A's

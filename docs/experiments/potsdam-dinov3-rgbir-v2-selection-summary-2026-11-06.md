@@ -1,5 +1,7 @@
 # DINOv3 RGB selection and seed-43 confirmation
 
+**Status: CURRENT** — Canonical configuration selection and seed-43 confirmation record.
+
 **RGB baseline A won**, and **D confirmed A with seed 43**. Each arm ran eight
 passes (6,912 updates) and cleared the four historical C floors on 199,409,714
 validation pixels. Horizontal flips fell short of the 0.1-point OA gain required

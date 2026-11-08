@@ -1,5 +1,7 @@
 # Potsdam DINOv3 RGBIR v2
 
+**Status: CURRENT** — Executed campaign protocol; final results are in the linked artifact review.
+
 The Potsdam DINOv3 campaign evaluated a single-model RGBIR/DSM pipeline on
 Kaggle within a 24 allocated GPU-hour budget. Its research objective is to
 maximize reproducible segmentation performance without ensembling. The previous

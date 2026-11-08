@@ -1,0 +1,954 @@
+{
+  "dataset_id": "isprs-potsdam",
+  "included_splits": [
+    "test"
+  ],
+  "preprocessing_hash": "cff11ea84b01b316ffeb5008cabba128979ddcf065910ce920258b7c7e1b9afe",
+  "preprocessing_id": "isprs-canonical",
+  "preprocessing_version": 2,
+  "schema_version": 1,
+  "split_hash": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd",
+  "split_id": "potsdam-dinov3",
+  "split_version": 2,
+  "splits": {
+    "test": {
+      "class_counts": {
+        "0": 147481039,
+        "1": 116645471,
+        "2": 96433432,
+        "3": 79936961,
+        "4": 7445584,
+        "5": 19920368,
+        "6": 36137145
+      },
+      "scene_ids": [
+        "2_13",
+        "2_14",
+        "3_13",
+        "3_14",
+        "4_13",
+        "4_14",
+        "4_15",
+        "5_13",
+        "5_14",
+        "5_15",
+        "6_13",
+        "6_14",
+        "6_15",
+        "7_13"
+      ],
+      "scenes": [
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367876.5,
+            0.0,
+            -0.05,
+            5808562.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_2_13_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_2_13_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8143285,
+            "1": 6366416,
+            "2": 10059413,
+            "3": 7754896,
+            "4": 314352,
+            "5": 473669,
+            "6": 2887969
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "2_13",
+          "scored_pixels": 33112031,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8143285,
+                "1": 6366416,
+                "2": 10059413,
+                "3": 7754896,
+                "4": 314352,
+                "5": 473669,
+                "6": 2887969
+              },
+              "scored_pixels": 33112031,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368176.5,
+            0.0,
+            -0.05,
+            5808562.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_2_14_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_2_14_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 5024844,
+            "1": 2354364,
+            "2": 14022466,
+            "3": 12191703,
+            "4": 160574,
+            "5": 86364,
+            "6": 2159685
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "2_14",
+          "scored_pixels": 33840315,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 5024844,
+                "1": 2354364,
+                "2": 14022466,
+                "3": 12191703,
+                "4": 160574,
+                "5": 86364,
+                "6": 2159685
+              },
+              "scored_pixels": 33840315,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367876.5,
+            0.0,
+            -0.05,
+            5808262.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_3_13_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_3_13_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8212557,
+            "1": 8524463,
+            "2": 7402728,
+            "3": 7764527,
+            "4": 455481,
+            "5": 606188,
+            "6": 3034056
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "3_13",
+          "scored_pixels": 32965944,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8212557,
+                "1": 8524463,
+                "2": 7402728,
+                "3": 7764527,
+                "4": 455481,
+                "5": 606188,
+                "6": 3034056
+              },
+              "scored_pixels": 32965944,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368176.5,
+            0.0,
+            -0.05,
+            5808262.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_3_14_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_3_14_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 6840973,
+            "1": 7617062,
+            "2": 8847185,
+            "3": 8723362,
+            "4": 315898,
+            "5": 845108,
+            "6": 2810412
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "3_14",
+          "scored_pixels": 33189588,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 6840973,
+                "1": 7617062,
+                "2": 8847185,
+                "3": 8723362,
+                "4": 315898,
+                "5": 845108,
+                "6": 2810412
+              },
+              "scored_pixels": 33189588,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367876.5,
+            0.0,
+            -0.05,
+            5807962.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_4_13_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_13_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 10070823,
+            "1": 11590321,
+            "2": 4593511,
+            "3": 4210889,
+            "4": 590723,
+            "5": 2016369,
+            "6": 2927364
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "4_13",
+          "scored_pixels": 33072636,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 10070823,
+                "1": 11590321,
+                "2": 4593511,
+                "3": 4210889,
+                "4": 590723,
+                "5": 2016369,
+                "6": 2927364
+              },
+              "scored_pixels": 33072636,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368176.5,
+            0.0,
+            -0.05,
+            5807962.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_4_14_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8400520,
+            "1": 7051104,
+            "2": 7471237,
+            "3": 6324812,
+            "4": 627111,
+            "5": 3353621,
+            "6": 2771595
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "4_14",
+          "scored_pixels": 33228405,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8400520,
+                "1": 7051104,
+                "2": 7471237,
+                "3": 6324812,
+                "4": 627111,
+                "5": 3353621,
+                "6": 2771595
+              },
+              "scored_pixels": 33228405,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368476.5,
+            0.0,
+            -0.05,
+            5807962.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_4_15_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_15_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11408861,
+            "1": 10843435,
+            "2": 5208323,
+            "3": 4233047,
+            "4": 636049,
+            "5": 796094,
+            "6": 2874191
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "4_15",
+          "scored_pixels": 33125809,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11408861,
+                "1": 10843435,
+                "2": 5208323,
+                "3": 4233047,
+                "4": 636049,
+                "5": 796094,
+                "6": 2874191
+              },
+              "scored_pixels": 33125809,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367876.5,
+            0.0,
+            -0.05,
+            5807662.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_5_13_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_5_13_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11274069,
+            "1": 10043222,
+            "2": 6479071,
+            "3": 4113814,
+            "4": 725252,
+            "5": 849116,
+            "6": 2515456
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "5_13",
+          "scored_pixels": 33484544,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11274069,
+                "1": 10043222,
+                "2": 6479071,
+                "3": 4113814,
+                "4": 725252,
+                "5": 849116,
+                "6": 2515456
+              },
+              "scored_pixels": 33484544,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368176.5,
+            0.0,
+            -0.05,
+            5807662.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_5_14_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_5_14_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8918286,
+            "1": 8814090,
+            "2": 6830736,
+            "3": 5966359,
+            "4": 537865,
+            "5": 2264710,
+            "6": 2667954
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "5_14",
+          "scored_pixels": 33332046,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8918286,
+                "1": 8814090,
+                "2": 6830736,
+                "3": 5966359,
+                "4": 537865,
+                "5": 2264710,
+                "6": 2667954
+              },
+              "scored_pixels": 33332046,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368476.5,
+            0.0,
+            -0.05,
+            5807662.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_5_15_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_5_15_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 13403506,
+            "1": 8555693,
+            "2": 4582308,
+            "3": 3873043,
+            "4": 710962,
+            "5": 2177487,
+            "6": 2697001
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "5_15",
+          "scored_pixels": 33302999,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 13403506,
+                "1": 8555693,
+                "2": 4582308,
+                "3": 3873043,
+                "4": 710962,
+                "5": 2177487,
+                "6": 2697001
+              },
+              "scored_pixels": 33302999,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367876.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_13_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_6_13_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 12744609,
+            "1": 8384896,
+            "2": 7962304,
+            "3": 3907748,
+            "4": 338888,
+            "5": 616456,
+            "6": 2045099
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_13",
+          "scored_pixels": 33954901,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 12744609,
+                "1": 8384896,
+                "2": 7962304,
+                "3": 3907748,
+                "4": 338888,
+                "5": 616456,
+                "6": 2045099
+              },
+              "scored_pixels": 33954901,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368176.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_14_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_6_14_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 13261083,
+            "1": 10580203,
+            "2": 5010222,
+            "3": 3175522,
+            "4": 839064,
+            "5": 700587,
+            "6": 2433319
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_14",
+          "scored_pixels": 33566681,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 13261083,
+                "1": 10580203,
+                "2": 5010222,
+                "3": 3175522,
+                "4": 839064,
+                "5": 700587,
+                "6": 2433319
+              },
+              "scored_pixels": 33566681,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            368476.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_15_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_6_15_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 12624158,
+            "1": 8063903,
+            "2": 4664719,
+            "3": 5184168,
+            "4": 825672,
+            "5": 1980910,
+            "6": 2656470
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_15",
+          "scored_pixels": 33343530,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 12624158,
+                "1": 8063903,
+                "2": 4664719,
+                "3": 5184168,
+                "4": 825672,
+                "5": 1980910,
+                "6": 2656470
+              },
+              "scored_pixels": 33343530,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367876.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_13_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_7_13_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 17153465,
+            "1": 7856299,
+            "2": 3299209,
+            "3": 2513071,
+            "4": 367693,
+            "5": 3153689,
+            "6": 1656574
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_13",
+          "scored_pixels": 34343426,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 17153465,
+                "1": 7856299,
+                "2": 3299209,
+                "3": 2513071,
+                "4": 367693,
+                "5": 3153689,
+                "6": 1656574
+              },
+              "scored_pixels": 34343426,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        }
+      ],
+      "scored_pixels": 467862855,
+      "total_pixels": 504000000,
+      "valid_pixel_fraction": 1.0,
+      "valid_pixels": 504000000,
+      "views": {
+        "irrg-view": {
+          "class_counts": {
+            "0": 147481039,
+            "1": 116645471,
+            "2": 96433432,
+            "3": 79936961,
+            "4": 7445584,
+            "5": 19920368,
+            "6": 36137145
+          },
+          "scored_pixels": 467862855,
+          "total_pixels": 504000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 504000000
+        }
+      }
+    }
+  },
+  "tile_size": 1024,
+  "validity_scope": "label mask intersected with all required view asset masks and finite image values; class_counts include the ignore label",
+  "view_asset_requirements": {
+    "irrg-view": [
+      "irrg"
+    ]
+  }
+}

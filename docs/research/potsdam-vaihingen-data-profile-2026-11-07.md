@@ -216,12 +216,12 @@ All seven visual figures were generated with Matplotlib using the **SciencePlots
 
 ### Local data and experiment evidence
 
-- [Potsdam train and validation quality manifest](../../data/prepared/potsdam/quality.json)
-- [Potsdam test quality manifest](../../data/prepared/potsdam/post-selection-test-quality.json)
-- [Vaihingen train and validation quality manifest](../../data/prepared/vaihingen/quality.json)
-- [Vaihingen test quality manifest](../../data/prepared/vaihingen/post-selection-test-quality.json)
-- [Potsdam verified RGBIR channel manifest](../../data/auxiliary/potsdam-rgbir-v2/rgbir_manifest.json)
-- [Potsdam DSM source inventory](../../data/auxiliary/potsdam-dsm-v1/inventory.json)
+- [Potsdam train and validation quality manifest](../../artifacts/public/data/potsdam-train-validation-quality.json)
+- [Potsdam benchmark quality manifest](../../artifacts/public/data/potsdam-benchmark-quality.json)
+- [Vaihingen train and validation quality manifest](../../artifacts/public/data/vaihingen-train-validation-quality.json)
+- [Vaihingen benchmark quality manifest](../../artifacts/public/data/vaihingen-benchmark-quality.json)
+- [Potsdam verified RGBIR channel manifest](../../artifacts/public/data/potsdam-rgbir-manifest.json)
+- [Potsdam DSM source inventory](../../artifacts/public/data/potsdam-dsm-inventory.json)
 - [Optical channel summary CSV](data/potsdam-vaihingen-optical-channel-statistics-2026-11-07.csv)
 - [Exact optical channel histogram CSV](data/potsdam-vaihingen-optical-channel-histograms-2026-11-07.csv)
 - [Potsdam train/validation DSM profile CSV](data/potsdam-dsm-train-validation-profile-2026-11-07.csv)

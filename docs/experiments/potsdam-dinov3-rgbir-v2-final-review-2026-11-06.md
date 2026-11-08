@@ -1,5 +1,7 @@
 # Potsdam DINOv3 RGBIR v2 final artifact review, 2026-11-06
 
+**Status: CURRENT** — Canonical final DINOv3 campaign record.
+
 DINOv3-B RGB reached **92.0397% OA and 81.0932% six-class mIoU** on
 **467,862,855 valid pixels** from 14 historical benchmark scenes. The benchmark
 scored the final 1,152-update refit checkpoint once. Relative to DINOv2, OA rose

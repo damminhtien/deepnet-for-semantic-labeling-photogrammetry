@@ -1,6 +1,8 @@
 # Research claims and evidence
 
-This ledger limits each claim to what the archived experiments support. The primary
+The [public evidence registry](../../artifacts/public/evidence-manifest.json) assigns
+stable IDs to headline claims and records artifact hashes. This detailed ledger limits
+each interpretation to what the archived experiments support. The primary
 benchmark contains 14 Potsdam scenes that were evaluated in earlier campaigns; this is
 a historical comparison, not a newly blind test set.
 

@@ -1,5 +1,7 @@
 # DINOv3 RGBIR: verified GPU preflight
 
+**Status: SUPERSEDED** — Preflight findings are closed by the final artifact review.
+
 The 2026-11-05 Kaggle preflight admitted **DINOv3-B for eight selection
 passes**. Satellite ViT-L passed the fit and model checks but exceeded its
 selection budget. See the [campaign protocol](potsdam-dinov3-rgbir-v2.md) for

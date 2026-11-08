@@ -1,5 +1,7 @@
 # Potsdam and Vaihingen foundation encoder evaluation
 
+**Status: HISTORICAL** — Earlier encoder probes; do not rank as matched trained systems.
+
 Date: 2026-10-19
 Environment: Python 3.14.8, PyTorch 2.14.1, Apple MPS.
 

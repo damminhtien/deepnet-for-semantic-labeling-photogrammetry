@@ -1,0 +1,1593 @@
+{
+  "dataset_id": "isprs-potsdam",
+  "included_splits": [
+    "train",
+    "validation"
+  ],
+  "preprocessing_hash": "cff11ea84b01b316ffeb5008cabba128979ddcf065910ce920258b7c7e1b9afe",
+  "preprocessing_id": "isprs-canonical",
+  "preprocessing_version": 2,
+  "schema_version": 1,
+  "split_hash": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd",
+  "split_id": "potsdam-dinov3",
+  "split_version": 2,
+  "splits": {
+    "train": {
+      "class_counts": {
+        "0": 184494091,
+        "1": 161240338,
+        "2": 160566251,
+        "3": 94889596,
+        "4": 10434763,
+        "5": 36374961
+      },
+      "scene_ids": [
+        "2_10",
+        "2_11",
+        "2_12",
+        "3_10",
+        "3_11",
+        "5_10",
+        "5_12",
+        "6_10",
+        "6_11",
+        "6_7",
+        "6_8",
+        "6_9",
+        "7_10",
+        "7_11",
+        "7_12",
+        "7_7",
+        "7_8",
+        "7_9"
+      ],
+      "scenes": [
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366976.5,
+            0.0,
+            -0.05,
+            5808562.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_2_10_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_2_10_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 7433797,
+            "1": 5447007,
+            "2": 15182061,
+            "3": 2679388,
+            "4": 313148,
+            "5": 4944599
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "2_10",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 7433797,
+                "1": 5447007,
+                "2": 15182061,
+                "3": 2679388,
+                "4": 313148,
+                "5": 4944599
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367276.5,
+            0.0,
+            -0.05,
+            5808562.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_2_11_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_2_11_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8179469,
+            "1": 3639401,
+            "2": 13233674,
+            "3": 7772916,
+            "4": 290622,
+            "5": 2883918
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "2_11",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8179469,
+                "1": 3639401,
+                "2": 13233674,
+                "3": 7772916,
+                "4": 290622,
+                "5": 2883918
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367576.5,
+            0.0,
+            -0.05,
+            5808562.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_2_12_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_2_12_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 6912828,
+            "1": 3571645,
+            "2": 18322600,
+            "3": 6633002,
+            "4": 326262,
+            "5": 233663
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "2_12",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 6912828,
+                "1": 3571645,
+                "2": 18322600,
+                "3": 6633002,
+                "4": 326262,
+                "5": 233663
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366976.5,
+            0.0,
+            -0.05,
+            5808262.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_3_10_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_3_10_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8338198,
+            "1": 5128149,
+            "2": 11428326,
+            "3": 8780245,
+            "4": 434615,
+            "5": 1890467
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "3_10",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8338198,
+                "1": 5128149,
+                "2": 11428326,
+                "3": 8780245,
+                "4": 434615,
+                "5": 1890467
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367276.5,
+            0.0,
+            -0.05,
+            5808262.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_3_11_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_3_11_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 9628526,
+            "1": 6346450,
+            "2": 11839249,
+            "3": 6359149,
+            "4": 410366,
+            "5": 1416260
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "3_11",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 9628526,
+                "1": 6346450,
+                "2": 11839249,
+                "3": 6359149,
+                "4": 410366,
+                "5": 1416260
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366976.5,
+            0.0,
+            -0.05,
+            5807662.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_5_10_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_5_10_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 9762272,
+            "1": 8142358,
+            "2": 8656839,
+            "3": 7788191,
+            "4": 384255,
+            "5": 1266085
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "5_10",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 9762272,
+                "1": 8142358,
+                "2": 8656839,
+                "3": 7788191,
+                "4": 384255,
+                "5": 1266085
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367576.5,
+            0.0,
+            -0.05,
+            5807662.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_5_12_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_5_12_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11242036,
+            "1": 17501421,
+            "2": 3210596,
+            "3": 2132368,
+            "4": 1101541,
+            "5": 812038
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "5_12",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11242036,
+                "1": 17501421,
+                "2": 3210596,
+                "3": 2132368,
+                "4": 1101541,
+                "5": 812038
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366976.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_10_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_6_10_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 15767533,
+            "1": 9786692,
+            "2": 4092068,
+            "3": 3962381,
+            "4": 725379,
+            "5": 1665947
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_10",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 15767533,
+                "1": 9786692,
+                "2": 4092068,
+                "3": 3962381,
+                "4": 725379,
+                "5": 1665947
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367276.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_11_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_6_11_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11770404,
+            "1": 16196954,
+            "2": 2850484,
+            "3": 2912497,
+            "4": 733766,
+            "5": 1535895
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_11",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11770404,
+                "1": 16196954,
+                "2": 2850484,
+                "3": 2912497,
+                "4": 733766,
+                "5": 1535895
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366076.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_7_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_6_7_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 4459505,
+            "1": 4857912,
+            "2": 19962121,
+            "3": 5669942,
+            "4": 253053,
+            "5": 797467
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_7",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 4459505,
+                "1": 4857912,
+                "2": 19962121,
+                "3": 5669942,
+                "4": 253053,
+                "5": 797467
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366376.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_8_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_6_8_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 7677438,
+            "1": 8798000,
+            "2": 9903886,
+            "3": 7794395,
+            "4": 429686,
+            "5": 1396595
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_8",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 7677438,
+                "1": 8798000,
+                "2": 9903886,
+                "3": 7794395,
+                "4": 429686,
+                "5": 1396595
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366676.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_9_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_6_9_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 9750018,
+            "1": 9517298,
+            "2": 7514183,
+            "3": 5904567,
+            "4": 706058,
+            "5": 2607876
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_9",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 9750018,
+                "1": 9517298,
+                "2": 7514183,
+                "3": 5904567,
+                "4": 706058,
+                "5": 2607876
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366976.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_10_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_7_10_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11414176,
+            "1": 7369861,
+            "2": 5198534,
+            "3": 4623375,
+            "4": 599769,
+            "5": 6794285
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_10",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11414176,
+                "1": 7369861,
+                "2": 5198534,
+                "3": 4623375,
+                "4": 599769,
+                "5": 6794285
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367276.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_11_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_7_11_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 16863196,
+            "1": 10296662,
+            "2": 4436000,
+            "3": 3022953,
+            "4": 807053,
+            "5": 574136
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_11",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 16863196,
+                "1": 10296662,
+                "2": 4436000,
+                "3": 3022953,
+                "4": 807053,
+                "5": 574136
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367576.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_12_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_7_12_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 19094140,
+            "1": 11126913,
+            "2": 2878181,
+            "3": 1577967,
+            "4": 858645,
+            "5": 464154
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_12",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 19094140,
+                "1": 11126913,
+                "2": 2878181,
+                "3": 1577967,
+                "4": 858645,
+                "5": 464154
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366076.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_7_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_7_7_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 6715809,
+            "1": 12422473,
+            "2": 8699455,
+            "3": 5845203,
+            "4": 691810,
+            "5": 1625250
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_7",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 6715809,
+                "1": 12422473,
+                "2": 8699455,
+                "3": 5845203,
+                "4": 691810,
+                "5": 1625250
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366376.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_8_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_7_8_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8486010,
+            "1": 13232859,
+            "2": 6722841,
+            "3": 6033533,
+            "4": 699300,
+            "5": 825457
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_8",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8486010,
+                "1": 13232859,
+                "2": 6722841,
+                "3": 6033533,
+                "4": 699300,
+                "5": 825457
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366676.5,
+            0.0,
+            -0.05,
+            5807062.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_7_9_IRRG.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "Official ISPRS participant label with the same Potsdam scene identifier; catalog checks matching dimensions before accepting this pixel-local pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/5_labels_for_participants/5_Labels_for_participants/top_potsdam_7_9_label.tif"
+            }
+          },
+          "class_counts": {
+            "0": 10998736,
+            "1": 7858283,
+            "2": 6435153,
+            "3": 5397524,
+            "4": 669435,
+            "5": 4640869
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "7_9",
+          "scored_pixels": 36000000,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 10998736,
+                "1": 7858283,
+                "2": 6435153,
+                "3": 5397524,
+                "4": 669435,
+                "5": 4640869
+              },
+              "scored_pixels": 36000000,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        }
+      ],
+      "scored_pixels": 648000000,
+      "total_pixels": 648000000,
+      "valid_pixel_fraction": 1.0,
+      "valid_pixels": 648000000,
+      "views": {
+        "irrg-view": {
+          "class_counts": {
+            "0": 184494091,
+            "1": 161240338,
+            "2": 160566251,
+            "3": 94889596,
+            "4": 10434763,
+            "5": 36374961
+          },
+          "scored_pixels": 648000000,
+          "total_pixels": 648000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 648000000
+        }
+      }
+    },
+    "validation": {
+      "class_counts": {
+        "0": 56474309,
+        "1": 67405057,
+        "2": 38412461,
+        "3": 29005158,
+        "4": 3090146,
+        "5": 5022583,
+        "6": 16590286
+      },
+      "scene_ids": [
+        "3_12",
+        "4_10",
+        "4_11",
+        "4_12",
+        "5_11",
+        "6_12"
+      ],
+      "scenes": [
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367576.5,
+            0.0,
+            -0.05,
+            5808262.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_3_12_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_3_12_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 9705255,
+            "1": 8463895,
+            "2": 6764020,
+            "3": 7073933,
+            "4": 476225,
+            "5": 673976,
+            "6": 2842696
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "3_12",
+          "scored_pixels": 33157304,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 9705255,
+                "1": 8463895,
+                "2": 6764020,
+                "3": 7073933,
+                "4": 476225,
+                "5": 673976,
+                "6": 2842696
+              },
+              "scored_pixels": 33157304,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            366976.5,
+            0.0,
+            -0.05,
+            5807962.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_4_10_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_10_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 6108168,
+            "1": 8316686,
+            "2": 9843971,
+            "3": 6572623,
+            "4": 350340,
+            "5": 1763405,
+            "6": 3044807
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "4_10",
+          "scored_pixels": 32955193,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 6108168,
+                "1": 8316686,
+                "2": 9843971,
+                "3": 6572623,
+                "4": 350340,
+                "5": 1763405,
+                "6": 3044807
+              },
+              "scored_pixels": 32955193,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367276.5,
+            0.0,
+            -0.05,
+            5807962.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_4_11_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_11_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 8075401,
+            "1": 10433235,
+            "2": 7430643,
+            "3": 6213971,
+            "4": 343466,
+            "5": 620813,
+            "6": 2882471
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "4_11",
+          "scored_pixels": 33117529,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 8075401,
+                "1": 10433235,
+                "2": 7430643,
+                "3": 6213971,
+                "4": 343466,
+                "5": 620813,
+                "6": 2882471
+              },
+              "scored_pixels": 33117529,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367576.5,
+            0.0,
+            -0.05,
+            5807962.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_4_12_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_12_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11140672,
+            "1": 11730518,
+            "2": 6652724,
+            "3": 2499663,
+            "4": 648479,
+            "5": 791404,
+            "6": 2536540
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "4_12",
+          "scored_pixels": 33463460,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11140672,
+                "1": 11730518,
+                "2": 6652724,
+                "3": 2499663,
+                "4": 648479,
+                "5": 791404,
+                "6": 2536540
+              },
+              "scored_pixels": 33463460,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367276.5,
+            0.0,
+            -0.05,
+            5807662.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_5_11_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_5_11_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 10382434,
+            "1": 13039888,
+            "2": 4066897,
+            "3": 4110822,
+            "4": 670255,
+            "5": 821334,
+            "6": 2908370
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "5_11",
+          "scored_pixels": 33091630,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 10382434,
+                "1": 13039888,
+                "2": 4066897,
+                "3": 4110822,
+                "4": 670255,
+                "5": 821334,
+                "6": 2908370
+              },
+              "scored_pixels": 33091630,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        },
+        {
+          "affine": [
+            0.05,
+            0.0,
+            367576.5,
+            0.0,
+            -0.05,
+            5807362.6
+          ],
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "potsdamvaihingen/3_ortho_irrg/3_Ortho_IRRG/top_potsdam_6_12_IRRG.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "Official scene-matched reference label; use only with the matching Potsdam scene and record this source pairing.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_6_12_label_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 11062379,
+            "1": 15420835,
+            "2": 3654206,
+            "3": 2534146,
+            "4": 601381,
+            "5": 351651,
+            "6": 2375402
+          },
+          "crs": "EPSG:32633",
+          "scene_id": "6_12",
+          "scored_pixels": 33624598,
+          "shape": [
+            6000,
+            6000
+          ],
+          "total_pixels": 36000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 36000000,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 11062379,
+                "1": 15420835,
+                "2": 3654206,
+                "3": 2534146,
+                "4": 601381,
+                "5": 351651,
+                "6": 2375402
+              },
+              "scored_pixels": 33624598,
+              "total_pixels": 36000000,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 36000000
+            }
+          }
+        }
+      ],
+      "scored_pixels": 199409714,
+      "total_pixels": 216000000,
+      "valid_pixel_fraction": 1.0,
+      "valid_pixels": 216000000,
+      "views": {
+        "irrg-view": {
+          "class_counts": {
+            "0": 56474309,
+            "1": 67405057,
+            "2": 38412461,
+            "3": 29005158,
+            "4": 3090146,
+            "5": 5022583,
+            "6": 16590286
+          },
+          "scored_pixels": 199409714,
+          "total_pixels": 216000000,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 216000000
+        }
+      }
+    }
+  },
+  "tile_size": 1024,
+  "validity_scope": "label mask intersected with all required view asset masks and finite image values; class_counts include the ignore label",
+  "view_asset_requirements": {
+    "irrg-view": [
+      "irrg"
+    ]
+  }
+}

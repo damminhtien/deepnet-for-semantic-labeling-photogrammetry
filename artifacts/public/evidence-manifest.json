@@ -1,0 +1,407 @@
+{
+  "schema_version": 1,
+  "registry_version": "2026-11-08",
+  "benchmark_metrics_artifact": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+  "artifacts": [
+    {
+      "path": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+      "sha256": "464a5d4fb237f5900eb9c29a1d8d2352c26c022e941e2ff82c41a5506c55bd20",
+      "size_bytes": 72587,
+      "kind": "aggregate_and_scene_confusion_matrices"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-train-validation-quality.json",
+      "sha256": "448ab1090a3501e108b17bea80e81826779961f2213cb8aac2985dd5b3069646",
+      "size_bytes": 48086,
+      "kind": "data_metadata_snapshot"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-benchmark-quality.json",
+      "sha256": "fc750476ff2fffdb05f178b942b9bcc52b7eeaaaf4e9d6eb3abd2d8ffc416be3",
+      "size_bytes": 28279,
+      "kind": "data_metadata_snapshot"
+    },
+    {
+      "path": "artifacts/public/data/vaihingen-train-validation-quality.json",
+      "sha256": "9992c16f12ad9298b08bd04969fd93b25c14300bbb45b7ec7364dd22676b472d",
+      "size_bytes": 29544,
+      "kind": "data_metadata_snapshot"
+    },
+    {
+      "path": "artifacts/public/data/vaihingen-benchmark-quality.json",
+      "sha256": "9971b38804f2ecb1c923d8f99e82497be5aad46238bf48fa82dffdfaf4a7cf33",
+      "size_bytes": 31202,
+      "kind": "data_metadata_snapshot"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-rgbir-manifest.json",
+      "sha256": "88f1caf46abccb3edc77c0c9c9a8754bea83969de6735fb4f325c6e63b7a0073",
+      "size_bytes": 37572,
+      "kind": "data_source_manifest"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-dsm-inventory.json",
+      "sha256": "5ef96b1a0ec8d4796c515914401125ae62e56ce730b8783492256df339c4899c",
+      "size_bytes": 3317,
+      "kind": "data_source_manifest"
+    },
+    {
+      "path": "docs/research/data/paired-prediction-summary.json",
+      "sha256": "7ce184f1d7835f9fc164c80be21b5588848055a36738318c84791bee7a69edcb",
+      "size_bytes": 1476,
+      "kind": "paired_prediction_summary"
+    },
+    {
+      "path": "docs/experiments/figures/potsdam-four-model-benchmark-scienceplots-2026-11-07.png",
+      "sha256": "3536d4b644e5490d63e1c895673313c5ba5da6d79909ea1588a2e22fdb45aa2b",
+      "size_bytes": 225218,
+      "kind": "aggregate_and_class_comparison_figure"
+    },
+    {
+      "path": "docs/research/figures/paired-cases-car_clutter_disagreement.png",
+      "sha256": "dcee8e583ea25b9e4241d0f3bc8dbde9309ec1e1cea26412953e393ef654ad79",
+      "size_bytes": 1568006,
+      "kind": "paired_failure_case_figure"
+    },
+    {
+      "path": "docs/research/figures/paired-cases-dinov3_only_correct.png",
+      "sha256": "f91bd34103b572387ecb901ff67e84e4f36b2ffb790250822742d11f082aad49",
+      "size_bytes": 1557678,
+      "kind": "paired_failure_case_figure"
+    },
+    {
+      "path": "docs/research/figures/paired-cases-overview.png",
+      "sha256": "9c675e6d9edb9df0f13e395e24a4c76cb301144194ba981540ca7747d3734c29",
+      "size_bytes": 1721899,
+      "kind": "paired_failure_case_figure"
+    },
+    {
+      "path": "docs/research/figures/paired-cases-pspnet_only_correct.png",
+      "sha256": "5d1ebd8c117b447d4610ee72dfeb742f93cda29753408b5ecbdb39f413732208",
+      "size_bytes": 1506858,
+      "kind": "paired_failure_case_figure"
+    },
+    {
+      "path": "docs/research/figures/paired-cases-shared_errors.png",
+      "sha256": "2caf3e2c04bae47e31136bb1c6e9de4bd7bed3a7b4b4971b011354d8f43031d3",
+      "size_bytes": 1288141,
+      "kind": "paired_failure_case_figure"
+    },
+    {
+      "path": "docs/research/figures/paired-cases-vegetation_disagreement.png",
+      "sha256": "3507b13cd12d3f77f4a99524dc9eacf0a07864afc0dc5f5c9d9bcca24bc058bd",
+      "size_bytes": 1621909,
+      "kind": "paired_failure_case_figure"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-selection-validation-arms.csv",
+      "sha256": "d2c5604d9f6ad223fd5e36b05d15c7933651ea850b981cded2f5b2c47c3b069c",
+      "size_bytes": 936,
+      "kind": "normalized_research_metric_or_case_table",
+      "source_path": "docs/research/data/potsdam-negative-results-arms.csv",
+      "source_git_blob_sha256": "d2c5604d9f6ad223fd5e36b05d15c7933651ea850b981cded2f5b2c47c3b069c",
+      "normalization": "CRLF/CR line endings normalized to LF; cell values unchanged"
+    },
+    {
+      "path": "artifacts/public/data/paired-case-studies.csv",
+      "sha256": "57f7e91f8f963f649839af8e628c100a81d587c58d04424121528fdc4357e1f8",
+      "size_bytes": 2509,
+      "kind": "normalized_research_metric_or_case_table",
+      "source_path": "docs/research/data/paired-case-studies.csv",
+      "source_git_blob_sha256": "57f7e91f8f963f649839af8e628c100a81d587c58d04424121528fdc4357e1f8",
+      "normalization": "CRLF/CR line endings normalized to LF; cell values unchanged"
+    },
+    {
+      "path": "artifacts/public/data/paired-case-confusions.csv",
+      "sha256": "592c9cbe8af60ebb1df7c7cd1e929e2fc5fe350ebf1eb1c3d367af345251f34c",
+      "size_bytes": 41435,
+      "kind": "normalized_research_metric_or_case_table",
+      "source_path": "docs/research/data/paired-case-confusions.csv",
+      "source_git_blob_sha256": "592c9cbe8af60ebb1df7c7cd1e929e2fc5fe350ebf1eb1c3d367af345251f34c",
+      "normalization": "CRLF/CR line endings normalized to LF; cell values unchanged"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-quality-cost-models.csv",
+      "sha256": "2207dc2395126529deb619aac576a6c375e0fda3080fcf0ac32fc5d77faef0f4",
+      "size_bytes": 1116,
+      "kind": "normalized_research_metric_or_case_table",
+      "source_path": "docs/research/data/potsdam-quality-cost-models.csv",
+      "source_git_blob_sha256": "2207dc2395126529deb619aac576a6c375e0fda3080fcf0ac32fc5d77faef0f4",
+      "normalization": "CRLF/CR line endings normalized to LF; cell values unchanged"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-scene-robustness.csv",
+      "sha256": "1192e1ee07df347fbfa20fbb4046cfe6c121f0ed10918f90d90498aa40c8038a",
+      "size_bytes": 5379,
+      "kind": "normalized_research_metric_or_case_table",
+      "source_path": "docs/research/data/potsdam-scene-robustness.csv",
+      "source_git_blob_sha256": "1192e1ee07df347fbfa20fbb4046cfe6c121f0ed10918f90d90498aa40c8038a",
+      "normalization": "CRLF/CR line endings normalized to LF; cell values unchanged"
+    },
+    {
+      "path": "artifacts/public/data/potsdam-leave-one-scene-out.csv",
+      "sha256": "1e164bdb6679bba1641bd1ddf392700ad1405fb5c2093fc17a607e920d28a685",
+      "size_bytes": 1868,
+      "kind": "normalized_research_metric_or_case_table",
+      "source_path": "docs/research/data/potsdam-leave-one-scene-out.csv",
+      "source_git_blob_sha256": "1e164bdb6679bba1641bd1ddf392700ad1405fb5c2093fc17a607e920d28a685",
+      "normalization": "CRLF/CR line endings normalized to LF; cell values unchanged"
+    }
+  ],
+  "claims": [
+    {
+      "claim_id": "CLAIM-001",
+      "evidence_level": "observed",
+      "statement": "DINOv3 ViT-B/16 RGB has the highest OA and six-class mIoU among the four recorded single-model recipes in this historical cohort.",
+      "experiment_id": "potsdam-dinov3-rgbir-v2",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels; 467862855 scored pixels",
+      "model_config": [
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md"
+      ],
+      "metrics_artifact": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "No Git commit was recorded in the run manifest; source snapshot digest is preserved in the metric bundle.",
+      "source_snapshot_sha256": "050ba61e3d018f643bf5c463e605f551da093f13172f287dba587a1d7c04d466",
+      "sha256": "464a5d4fb237f5900eb9c29a1d8d2352c26c022e941e2ff82c41a5506c55bd20",
+      "limitations": "Historical benchmark previously observed; one final checkpoint; no independent geographic evaluation.",
+      "related_models": [
+        "dinov3"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-002",
+      "evidence_level": "observed",
+      "statement": "PSPNet\u2013ResNet101 RGB achieved the recorded historical Potsdam benchmark score shown in the public matrix bundle.",
+      "experiment_id": "potsdam-pspnet-rgb-v1",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels; 467862855 scored pixels",
+      "model_config": [
+        "scripts/run_pspnet_rgb_kaggle.py",
+        "docs/experiments/potsdam-pspnet-rgb-v1.md"
+      ],
+      "metrics_artifact": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "No Git commit was recorded in the run manifest; source snapshot digest is preserved in the metric bundle.",
+      "source_snapshot_sha256": "6658cc87f67e70bcba9bb95669011e6d6cb8ca6fff157dc9ae67fcc34acb9f8b",
+      "sha256": "464a5d4fb237f5900eb9c29a1d8d2352c26c022e941e2ff82c41a5506c55bd20",
+      "limitations": "Historical benchmark previously observed; one final checkpoint; no independent geographic evaluation.",
+      "related_models": [
+        "pspnet"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-003",
+      "evidence_level": "observed",
+      "statement": "DINOv2 ViT-B/14 achieved the recorded historical Potsdam benchmark score shown in the public matrix bundle.",
+      "experiment_id": "potsdam-dinov2-coverage-refit-v1",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels; 467862855 scored pixels",
+      "model_config": [
+        "configs/models/dinov2-vitb14-multimodal-v3.json",
+        "configs/training/potsdam-dinov2-coverage-refit-v1.json",
+        "docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md"
+      ],
+      "metrics_artifact": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "The available refit manifest records the checkpoint and seed but no Git revision or source snapshot digest.",
+      "source_snapshot_sha256": null,
+      "sha256": "464a5d4fb237f5900eb9c29a1d8d2352c26c022e941e2ff82c41a5506c55bd20",
+      "limitations": "Historical benchmark previously observed; input, window geometry, decoder, and training recipe differ from DINOv3 RGB and PSPNet RGB.",
+      "related_models": [
+        "dinov2"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-004",
+      "evidence_level": "observed",
+      "statement": "SAM ViT-B + LoRA achieved the recorded historical Potsdam benchmark score shown in the public matrix bundle.",
+      "experiment_id": "sam-vitb-lora-potsdam-20261020-retrain-04",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels; 467862855 scored pixels",
+      "model_config": [
+        "configs/models/sam-vitb-injected-baseline-v1.json",
+        "docs/research/empirical-study.md"
+      ],
+      "metrics_artifact": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": "1f7cf56759dd8bcb671923444c44732b57e271ff",
+      "source_revision_note": "Recorded in SAM run manifest.",
+      "source_snapshot_sha256": null,
+      "sha256": "464a5d4fb237f5900eb9c29a1d8d2352c26c022e941e2ff82c41a5506c55bd20",
+      "limitations": "Historical benchmark previously observed; source export lacks the current split hash; complete recipe differs from the matched RGB pair.",
+      "related_models": [
+        "sam"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-005",
+      "evidence_level": "observed",
+      "statement": "Under the shared RGB evaluation setup, DINOv3 RGB recorded higher OA and mIoU and slower full-scene scoring than PSPNet RGB on the historical Potsdam cohort.",
+      "experiment_id": "potsdam-dinov3-rgbir-v2 + potsdam-pspnet-rgb-v1",
+      "dataset_split": "Shared scene IDs, split hash, eroded reference, and 467862855 scored pixels; historically observed cohort",
+      "model_config": [
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md",
+        "scripts/run_pspnet_rgb_kaggle.py",
+        "docs/experiments/potsdam-pspnet-rgb-v1.md"
+      ],
+      "metrics_artifact": "artifacts/public/metrics/potsdam-benchmark-confusions.json",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "The two run artifacts identify source snapshots by SHA-256, not Git commits.",
+      "source_snapshot_sha256": {
+        "dinov3": "050ba61e3d018f643bf5c463e605f551da093f13172f287dba587a1d7c04d466",
+        "pspnet": "6658cc87f67e70bcba9bb95669011e6d6cb8ca6fff157dc9ae67fcc34acb9f8b"
+      },
+      "sha256": "464a5d4fb237f5900eb9c29a1d8d2352c26c022e941e2ff82c41a5506c55bd20",
+      "limitations": "The comparison is between complete recipes and one measured hardware/profile setup; it does not isolate architecture effects or seed stability.",
+      "related_models": [
+        "dinov3",
+        "pspnet"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-006",
+      "evidence_level": "observed",
+      "statement": "Paired prediction maps show more DINOv3-only correct pixels than PSPNet-only correct pixels on the historical cohort.",
+      "experiment_id": "potsdam-paired-dinov3-pspnet-inference-v1",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels; 467862855 scored pixels",
+      "model_config": [
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md",
+        "scripts/run_pspnet_rgb_kaggle.py",
+        "docs/experiments/potsdam-pspnet-rgb-v1.md"
+      ],
+      "metrics_artifact": "docs/research/data/paired-prediction-summary.json",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "Paired inference source hash and analysis script hash are stored in the summary artifact.",
+      "source_snapshot_sha256": null,
+      "sha256": "7ce184f1d7835f9fc164c80be21b5588848055a36738318c84791bee7a69edcb",
+      "limitations": "Describes paired decisions under eroded labels; does not establish why the systems differ or generalization beyond this cohort.",
+      "related_models": [
+        "dinov3",
+        "pspnet"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-007",
+      "evidence_level": "observed",
+      "statement": "At the recorded full-validation step, the tested RGB-only A recipe exceeded the bundled auxiliary-feature B and stronger-augmentation C recipes in six-scene validation mIoU.",
+      "experiment_id": "potsdam-dinov3-rgbir-v2-selection",
+      "dataset_split": "Potsdam validation; six scenes; eroded labels; 199409714 scored pixels",
+      "model_config": [
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md"
+      ],
+      "metrics_artifact": "artifacts/public/data/potsdam-selection-validation-arms.csv",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "The selection CSV records metrics; the archived campaign reports provide protocol and phase provenance.",
+      "source_snapshot_sha256": null,
+      "sha256": "d2c5604d9f6ad223fd5e36b05d15c7933651ea850b981cded2f5b2c47c3b069c",
+      "limitations": "A/B/C do not isolate individual auxiliary signals; this is one seed-42 comparison plus a separate seed-43 confirmation and does not establish general modality or augmentation effects.",
+      "related_models": [
+        "dinov3"
+      ],
+      "source_artifact_path": "artifacts/public/data/potsdam-selection-validation-arms.csv",
+      "source_artifact_sha256": "d2c5604d9f6ad223fd5e36b05d15c7933651ea850b981cded2f5b2c47c3b069c"
+    },
+    {
+      "claim_id": "CLAIM-008",
+      "evidence_level": "observed",
+      "statement": "The displayed paired failure gallery uses deterministic, score-based crops from five predeclared disagreement/correctness groups.",
+      "experiment_id": "potsdam-paired-dinov3-pspnet-inference-v1",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels; 467862855 scored pixels",
+      "model_config": [
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md",
+        "scripts/run_pspnet_rgb_kaggle.py",
+        "docs/experiments/potsdam-pspnet-rgb-v1.md"
+      ],
+      "metrics_artifact": "artifacts/public/data/paired-case-studies.csv",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "The case index records crop coordinates, counts, and selection scores.",
+      "source_snapshot_sha256": null,
+      "sha256": "57f7e91f8f963f649839af8e628c100a81d587c58d04424121528fdc4357e1f8",
+      "limitations": "Targeted failure examples are descriptive and do not represent a random sample of all pixels or scenes.",
+      "related_models": [
+        "dinov3",
+        "pspnet"
+      ],
+      "source_artifact_path": "artifacts/public/data/paired-case-studies.csv",
+      "source_artifact_sha256": "57f7e91f8f963f649839af8e628c100a81d587c58d04424121528fdc4357e1f8",
+      "additional_evidence_artifacts": [
+        "artifacts/public/data/paired-case-confusions.csv"
+      ]
+    },
+    {
+      "claim_id": "CLAIM-009",
+      "evidence_level": "observed",
+      "statement": "The recorded DINOv3 selection-plus-refit phase used more allocated GPU-hours than PSPNet selection-plus-refit; accounting the complete candidate set increases the difference.",
+      "experiment_id": "potsdam-dinov3-rgbir-v2 + potsdam-pspnet-rgb-v1",
+      "dataset_split": "ISPRS Potsdam experiment phases and the historical 14-scene benchmark",
+      "model_config": [
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md",
+        "scripts/run_pspnet_rgb_kaggle.py",
+        "docs/experiments/potsdam-pspnet-rgb-v1.md"
+      ],
+      "metrics_artifact": "artifacts/public/data/potsdam-quality-cost-models.csv",
+      "protocol_version": "recorded-kaggle-gpu-hour-accounting-v1",
+      "source_revision": null,
+      "source_revision_note": "Source snapshots are identified by SHA-256; Git commits are not present for both run exports.",
+      "source_snapshot_sha256": {
+        "dinov3": "050ba61e3d018f643bf5c463e605f551da093f13172f287dba587a1d7c04d466",
+        "pspnet": "6658cc87f67e70bcba9bb95669011e6d6cb8ca6fff157dc9ae67fcc34acb9f8b"
+      },
+      "sha256": "2207dc2395126529deb619aac576a6c375e0fda3080fcf0ac32fc5d77faef0f4",
+      "limitations": "GPU-hours depend on the number of candidate recipes and logged startup phases; this is not intrinsic per-model training cost or a cross-hardware comparison.",
+      "related_models": [
+        "dinov3",
+        "pspnet"
+      ],
+      "source_artifact_path": "artifacts/public/data/potsdam-quality-cost-models.csv",
+      "source_artifact_sha256": "2207dc2395126529deb619aac576a6c375e0fda3080fcf0ac32fc5d77faef0f4"
+    },
+    {
+      "claim_id": "CLAIM-010",
+      "evidence_level": "observed",
+      "statement": "DINOv3 has higher OA than DINOv2 on 12 of the 14 previously observed Potsdam benchmark scenes.",
+      "experiment_id": "potsdam-dinov2-coverage-refit-v1 + potsdam-dinov3-rgbir-v2",
+      "dataset_split": "ISPRS Potsdam historical benchmark; 14 scenes; eroded labels",
+      "model_config": [
+        "configs/models/dinov2-vitb14-multimodal-v3.json",
+        "configs/training/potsdam-dinov2-coverage-refit-v1.json",
+        "docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md",
+        "configs/models/dinov3-vitb16-rgbir-v2.json",
+        "configs/training/potsdam-dinov3-rgbir-v2.json",
+        "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md"
+      ],
+      "metrics_artifact": "artifacts/public/data/potsdam-scene-robustness.csv",
+      "protocol_version": "potsdam-six-class-eroded-historical-v1",
+      "source_revision": null,
+      "source_revision_note": "Run exports do not preserve matching Git revisions; available source artifact hashes are recorded in the evidence bundle.",
+      "source_snapshot_sha256": {
+        "dinov2": null,
+        "dinov3": "050ba61e3d018f643bf5c463e605f551da093f13172f287dba587a1d7c04d466"
+      },
+      "sha256": "1192e1ee07df347fbfa20fbb4046cfe6c121f0ed10918f90d90498aa40c8038a",
+      "limitations": "Per-scene comparisons are descriptive for a small spatially related cohort and do not estimate generalization to new scenes or cities.",
+      "related_models": [
+        "dinov2",
+        "dinov3"
+      ],
+      "source_artifact_path": "artifacts/public/data/potsdam-scene-robustness.csv",
+      "source_artifact_sha256": "1192e1ee07df347fbfa20fbb4046cfe6c121f0ed10918f90d90498aa40c8038a"
+    }
+  ]
+}

@@ -6,6 +6,8 @@ DINOv3 improves OA over DINOv2 on 12 of 14 scenes and improves six-class mIoU on
 14. The OA regressions occur on `5_13` (−0.1080 percentage points) and `5_14`
 (−0.0695). The mIoU regressions occur on `5_13` (−0.3804) and `6_15` (−0.0118).
 Thus, the two models do not produce the same per-scene ordering for both metrics.
+This descriptive scene result is registered as
+[CLAIM-010](../../artifacts/public/evidence-manifest.json).
 
 Scene `4_14` is the lowest-scoring DINOv3 scene: OA 85.9410% and mIoU 75.6118%.
 `6_13` has the largest OA gain (+0.9443 points) and mIoU gain (+5.1022); `2_14` has the

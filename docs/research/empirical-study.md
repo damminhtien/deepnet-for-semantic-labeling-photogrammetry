@@ -1,5 +1,7 @@
 # Understanding accuracy, errors, and compute in Potsdam aerial segmentation
 
+**Status: CURRENT** — detailed supporting analysis; [`docs/results.md`](../results.md) is the canonical numerical summary.
+
 ## Abstract
 
 This empirical study revisits four single-model Potsdam segmentation systems—SAM,
@@ -10,7 +12,11 @@ architecture or claim a backbone-only causal effect. The 14-scene benchmark coho
 appeared in previous experiments, so the results are historical system comparisons, not
 a newly blind evaluation.
 
-## Research questions
+## Descriptive analysis questions
+
+These questions break down the system-level comparison defined in
+[`docs/research.md`](../research.md). They are descriptive subquestions; the separate
+causal pipeline question remains open.
 
 1. Which class confusions account for the recorded DINOv2-to-DINOv3 change?
 2. Does the aggregate DINOv3 advantage remain when scenes are inspected separately or
@@ -96,7 +102,8 @@ selection-plus-refit cost is 1.7235 allocated GPU-hours. DINOv3's winning arm A 
 refit is 3.5291 GPU-hours, while the full A/B/C/D selection and refit is 12.7705
 GPU-hours. The distinction is necessary because the DINOv3 campaign evaluated more
 candidate recipes. Peak VRAM is reported only after the supplemental paired inference
-reproduces both archived confusion matrices. See
+reproduces both archived confusion matrices. The campaign accounting scope is
+[CLAIM-009](../../artifacts/public/evidence-manifest.json). See
 [`quality-cost-analysis.md`](quality-cost-analysis.md).
 
 ### Paired decisions and failure examples

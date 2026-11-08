@@ -1,5 +1,7 @@
 # Potsdam PSPNet RGB comparison
 
+**Status: CURRENT** — Canonical PSPNet selection, refit, and benchmark record.
+
 This campaign compares PSPNet–ResNet101 with the winning DINOv3-B RGB recipe
 reported in the [DINOv3 final review](potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md).
 The DINOv3 reference is 92.0397% OA and 81.0932% six-class mIoU. The comparison

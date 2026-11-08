@@ -7,6 +7,8 @@ DINOv3-B RGB and PSPNet–ResNet101 RGB were scored on the same input cache and 
 256, batch size 4, identity inference, and the same recorded Kaggle T4 allocation. The
 two systems occupy different points in the measured quality–cost plane: DINOv3 has
 higher mIoU, and PSPNet has lower full-scene scoring time and training/selection cost.
+The GPU-hour accounting and its scope are registered as
+[CLAIM-009](../../artifacts/public/evidence-manifest.json).
 
 | Model | OA | mIoU | Full-scene scoring | Forward time | Peak allocated / reserved | Selection + refit GPU-h | Benchmark GPU-h |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |

@@ -1,0 +1,495 @@
+case_group,scene,row,col,true_class,dinov3_prediction,pspnet_prediction,pixels
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Impervious surfaces,Impervious surfaces,11512
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Impervious surfaces,Building,52891
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Impervious surfaces,Low vegetation,8
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Building,Impervious surfaces,46
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Building,Building,162
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Building,Low vegetation,11
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Low vegetation,Impervious surfaces,85
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Low vegetation,Building,23
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Low vegetation,Low vegetation,277
+dinov3_only_correct,6_14,2560,1536,Impervious surfaces,Clutter/background,Building,5784
+dinov3_only_correct,6_14,2560,1536,Building,Building,Impervious surfaces,148
+dinov3_only_correct,6_14,2560,1536,Building,Building,Building,6231
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Impervious surfaces,Impervious surfaces,91
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Impervious surfaces,Low vegetation,86
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Impervious surfaces,Tree,15
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Low vegetation,Impervious surfaces,45
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Low vegetation,Building,4716
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Low vegetation,Low vegetation,26746
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Low vegetation,Tree,506
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Tree,Low vegetation,272
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Tree,Tree,662
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Clutter/background,Impervious surfaces,16
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Clutter/background,Building,62
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Clutter/background,Low vegetation,319
+dinov3_only_correct,6_14,2560,1536,Low vegetation,Clutter/background,Clutter/background,1522
+dinov3_only_correct,6_14,2560,1536,Tree,Low vegetation,Low vegetation,257
+dinov3_only_correct,6_14,2560,1536,Tree,Low vegetation,Tree,2
+dinov3_only_correct,6_14,2560,1536,Tree,Tree,Low vegetation,138
+dinov3_only_correct,6_14,2560,1536,Tree,Tree,Tree,8426
+dinov3_only_correct,6_14,2560,1536,Car,Car,Car,117
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Impervious surfaces,Impervious surfaces,2852
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Impervious surfaces,Building,7748
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Impervious surfaces,Low vegetation,330
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Low vegetation,Impervious surfaces,2170
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Low vegetation,Building,5296
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Low vegetation,Low vegetation,2253
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Low vegetation,Clutter/background,1
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Clutter/background,Building,89887
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Clutter/background,Low vegetation,286
+dinov3_only_correct,6_14,2560,1536,Clutter/background,Clutter/background,Clutter/background,9744
+dinov3_only_correct,4_15,2048,5120,Impervious surfaces,Impervious surfaces,Building,111676
+dinov3_only_correct,4_15,2048,5120,Impervious surfaces,Building,Building,397
+dinov3_only_correct,4_15,2048,5120,Impervious surfaces,Clutter/background,Building,23
+dinov3_only_correct,4_15,2048,5120,Building,Impervious surfaces,Building,349
+dinov3_only_correct,4_15,2048,5120,Building,Building,Building,124394
+dinov3_only_correct,4_15,2048,5120,Building,Low vegetation,Building,7000
+dinov3_only_correct,4_15,2048,5120,Building,Low vegetation,Low vegetation,118
+dinov3_only_correct,4_15,2048,5120,Building,Clutter/background,Building,412
+dinov3_only_correct,4_15,2048,5120,Low vegetation,Low vegetation,Building,85
+dinov3_only_correct,4_15,2048,5120,Low vegetation,Clutter/background,Building,30
+dinov3_only_correct,4_15,2048,5120,Tree,Impervious surfaces,Building,77
+dinov3_only_correct,4_15,2048,5120,Tree,Low vegetation,Building,1615
+dinov3_only_correct,4_15,2048,5120,Tree,Low vegetation,Low vegetation,4013
+dinov3_only_correct,4_15,2048,5120,Clutter/background,Impervious surfaces,Building,62
+dinov3_only_correct,4_15,2048,5120,Clutter/background,Clutter/background,Building,29
+dinov3_only_correct,2_13,2048,512,Low vegetation,Low vegetation,Building,88854
+dinov3_only_correct,2_13,2048,512,Low vegetation,Low vegetation,Low vegetation,154142
+dinov3_only_correct,2_13,2048,512,Low vegetation,Low vegetation,Tree,4073
+dinov3_only_correct,2_13,2048,512,Low vegetation,Tree,Low vegetation,718
+dinov3_only_correct,2_13,2048,512,Low vegetation,Tree,Tree,3203
+dinov3_only_correct,2_13,2048,512,Tree,Low vegetation,Low vegetation,844
+dinov3_only_correct,2_13,2048,512,Tree,Low vegetation,Tree,258
+dinov3_only_correct,2_13,2048,512,Tree,Tree,Low vegetation,11
+dinov3_only_correct,2_13,2048,512,Tree,Tree,Tree,6152
+dinov3_only_correct,6_13,4608,5120,Impervious surfaces,Impervious surfaces,Impervious surfaces,44296
+dinov3_only_correct,6_13,4608,5120,Impervious surfaces,Clutter/background,Impervious surfaces,613
+dinov3_only_correct,6_13,4608,5120,Impervious surfaces,Clutter/background,Low vegetation,7
+dinov3_only_correct,6_13,4608,5120,Impervious surfaces,Clutter/background,Clutter/background,199
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Impervious surfaces,Impervious surfaces,40
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Low vegetation,Impervious surfaces,33
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Low vegetation,Low vegetation,110643
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Low vegetation,Clutter/background,2
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Clutter/background,Impervious surfaces,206
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Clutter/background,Low vegetation,685
+dinov3_only_correct,6_13,4608,5120,Low vegetation,Clutter/background,Clutter/background,201
+dinov3_only_correct,6_13,4608,5120,Clutter/background,Impervious surfaces,Impervious surfaces,3504
+dinov3_only_correct,6_13,4608,5120,Clutter/background,Impervious surfaces,Clutter/background,18
+dinov3_only_correct,6_13,4608,5120,Clutter/background,Clutter/background,Impervious surfaces,89657
+dinov3_only_correct,6_13,4608,5120,Clutter/background,Clutter/background,Low vegetation,5
+dinov3_only_correct,6_13,4608,5120,Clutter/background,Clutter/background,Clutter/background,1554
+pspnet_only_correct,7_13,5120,3072,Building,Building,Building,16803
+pspnet_only_correct,7_13,5120,3072,Building,Building,Clutter/background,70
+pspnet_only_correct,7_13,5120,3072,Building,Clutter/background,Building,2966
+pspnet_only_correct,7_13,5120,3072,Building,Clutter/background,Clutter/background,2788
+pspnet_only_correct,7_13,5120,3072,Low vegetation,Clutter/background,Impervious surfaces,366
+pspnet_only_correct,7_13,5120,3072,Low vegetation,Clutter/background,Clutter/background,1069
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Building,Clutter/background,7
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Low vegetation,Low vegetation,3
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Low vegetation,Clutter/background,76375
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Clutter/background,Impervious surfaces,216
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Clutter/background,Building,34
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Clutter/background,Low vegetation,7247
+pspnet_only_correct,7_13,5120,3072,Clutter/background,Clutter/background,Clutter/background,149692
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Impervious surfaces,Impervious surfaces,34859
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Impervious surfaces,Low vegetation,41
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Impervious surfaces,Clutter/background,4154
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Building,Impervious surfaces,123
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Low vegetation,Impervious surfaces,1
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Tree,Impervious surfaces,1
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Tree,Tree,13
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Tree,Clutter/background,17
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Clutter/background,Impervious surfaces,204
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Clutter/background,Low vegetation,14
+pspnet_only_correct,5_14,4608,4608,Impervious surfaces,Clutter/background,Clutter/background,369
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Impervious surfaces,Impervious surfaces,10305
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Impervious surfaces,Low vegetation,63072
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Impervious surfaces,Tree,994
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Impervious surfaces,Clutter/background,28
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Building,Impervious surfaces,1026
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Building,Low vegetation,2919
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Low vegetation,Impervious surfaces,599
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Low vegetation,Low vegetation,69122
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Low vegetation,Tree,133
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Low vegetation,Clutter/background,36
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Tree,Low vegetation,5012
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Tree,Tree,14666
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Clutter/background,Low vegetation,109
+pspnet_only_correct,5_14,4608,4608,Low vegetation,Clutter/background,Clutter/background,49
+pspnet_only_correct,5_14,4608,4608,Tree,Impervious surfaces,Impervious surfaces,66
+pspnet_only_correct,5_14,4608,4608,Tree,Impervious surfaces,Low vegetation,7
+pspnet_only_correct,5_14,4608,4608,Tree,Impervious surfaces,Tree,85
+pspnet_only_correct,5_14,4608,4608,Tree,Impervious surfaces,Clutter/background,4
+pspnet_only_correct,5_14,4608,4608,Tree,Tree,Low vegetation,203
+pspnet_only_correct,5_14,4608,4608,Tree,Tree,Tree,16372
+pspnet_only_correct,5_14,4608,4608,Tree,Clutter/background,Tree,3
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Impervious surfaces,Impervious surfaces,236
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Impervious surfaces,Low vegetation,1041
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Impervious surfaces,Clutter/background,509
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Low vegetation,Low vegetation,3457
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Tree,Low vegetation,190
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Tree,Tree,3
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Clutter/background,Impervious surfaces,104
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Clutter/background,Low vegetation,262
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Clutter/background,Tree,2
+pspnet_only_correct,5_14,4608,4608,Clutter/background,Clutter/background,Clutter/background,5112
+pspnet_only_correct,5_15,5632,5120,Impervious surfaces,Impervious surfaces,Impervious surfaces,90085
+pspnet_only_correct,5_15,5632,5120,Impervious surfaces,Building,Impervious surfaces,66004
+pspnet_only_correct,5_15,5632,5120,Impervious surfaces,Building,Building,1983
+pspnet_only_correct,5_15,5632,5120,Building,Building,Building,27238
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Impervious surfaces,Impervious surfaces,59642
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Impervious surfaces,Building,2
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Impervious surfaces,Clutter/background,67
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Building,Impervious surfaces,167
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Building,Building,471
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Building,Clutter/background,59
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Low vegetation,Impervious surfaces,31
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Car,Impervious surfaces,7
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Car,Car,13
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Clutter/background,Impervious surfaces,57285
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Clutter/background,Tree,47
+pspnet_only_correct,4_14,0,3584,Impervious surfaces,Clutter/background,Clutter/background,1016
+pspnet_only_correct,4_14,0,3584,Building,Building,Building,60320
+pspnet_only_correct,4_14,0,3584,Low vegetation,Impervious surfaces,Impervious surfaces,9727
+pspnet_only_correct,4_14,0,3584,Low vegetation,Impervious surfaces,Low vegetation,19
+pspnet_only_correct,4_14,0,3584,Low vegetation,Impervious surfaces,Car,4
+pspnet_only_correct,4_14,0,3584,Low vegetation,Impervious surfaces,Clutter/background,128
+pspnet_only_correct,4_14,0,3584,Low vegetation,Building,Impervious surfaces,35
+pspnet_only_correct,4_14,0,3584,Low vegetation,Building,Building,47
+pspnet_only_correct,4_14,0,3584,Low vegetation,Building,Clutter/background,17
+pspnet_only_correct,4_14,0,3584,Low vegetation,Low vegetation,Impervious surfaces,6712
+pspnet_only_correct,4_14,0,3584,Low vegetation,Low vegetation,Low vegetation,9837
+pspnet_only_correct,4_14,0,3584,Low vegetation,Low vegetation,Tree,34
+pspnet_only_correct,4_14,0,3584,Low vegetation,Low vegetation,Clutter/background,13
+pspnet_only_correct,4_14,0,3584,Low vegetation,Car,Impervious surfaces,1
+pspnet_only_correct,4_14,0,3584,Low vegetation,Car,Car,103
+pspnet_only_correct,4_14,0,3584,Low vegetation,Clutter/background,Impervious surfaces,7030
+pspnet_only_correct,4_14,0,3584,Low vegetation,Clutter/background,Low vegetation,3138
+pspnet_only_correct,4_14,0,3584,Low vegetation,Clutter/background,Tree,33
+pspnet_only_correct,4_14,0,3584,Low vegetation,Clutter/background,Car,23
+pspnet_only_correct,4_14,0,3584,Low vegetation,Clutter/background,Clutter/background,2502
+pspnet_only_correct,4_14,0,3584,Tree,Impervious surfaces,Impervious surfaces,92
+pspnet_only_correct,4_14,0,3584,Tree,Impervious surfaces,Tree,862
+pspnet_only_correct,4_14,0,3584,Tree,Low vegetation,Impervious surfaces,553
+pspnet_only_correct,4_14,0,3584,Tree,Low vegetation,Tree,794
+pspnet_only_correct,4_14,0,3584,Tree,Tree,Impervious surfaces,31
+pspnet_only_correct,4_14,0,3584,Tree,Tree,Tree,7941
+pspnet_only_correct,4_14,0,3584,Tree,Clutter/background,Impervious surfaces,130
+pspnet_only_correct,4_14,0,3584,Tree,Clutter/background,Tree,608
+pspnet_only_correct,4_14,0,3584,Tree,Clutter/background,Car,4
+pspnet_only_correct,4_14,0,3584,Car,Car,Car,2994
+pspnet_only_correct,4_14,0,3584,Clutter/background,Clutter/background,Impervious surfaces,1953
+pspnet_only_correct,4_14,0,3584,Clutter/background,Clutter/background,Clutter/background,9990
+shared_errors,4_14,2560,2048,Impervious surfaces,Impervious surfaces,Impervious surfaces,4588
+shared_errors,4_14,2560,2048,Low vegetation,Low vegetation,Low vegetation,4251
+shared_errors,4_14,2560,2048,Tree,Tree,Tree,239
+shared_errors,4_14,2560,2048,Clutter/background,Impervious surfaces,Impervious surfaces,202154
+shared_errors,4_14,2560,2048,Clutter/background,Impervious surfaces,Low vegetation,940
+shared_errors,4_14,2560,2048,Clutter/background,Impervious surfaces,Clutter/background,1013
+shared_errors,4_14,2560,2048,Clutter/background,Low vegetation,Impervious surfaces,97
+shared_errors,4_14,2560,2048,Clutter/background,Low vegetation,Low vegetation,6597
+shared_errors,4_14,2560,2048,Clutter/background,Low vegetation,Clutter/background,35
+shared_errors,4_14,2560,2048,Clutter/background,Clutter/background,Impervious surfaces,33530
+shared_errors,4_14,2560,2048,Clutter/background,Clutter/background,Low vegetation,487
+shared_errors,4_14,2560,2048,Clutter/background,Clutter/background,Clutter/background,4555
+shared_errors,4_14,2048,2048,Clutter/background,Impervious surfaces,Impervious surfaces,207190
+shared_errors,4_14,2048,2048,Clutter/background,Impervious surfaces,Low vegetation,106
+shared_errors,4_14,2048,2048,Clutter/background,Impervious surfaces,Clutter/background,2278
+shared_errors,4_14,2048,2048,Clutter/background,Low vegetation,Clutter/background,3037
+shared_errors,4_14,2048,2048,Clutter/background,Clutter/background,Impervious surfaces,40796
+shared_errors,4_14,2048,2048,Clutter/background,Clutter/background,Low vegetation,162
+shared_errors,4_14,2048,2048,Clutter/background,Clutter/background,Clutter/background,8575
+shared_errors,4_14,1536,3072,Tree,Impervious surfaces,Impervious surfaces,1076
+shared_errors,4_14,1536,3072,Tree,Impervious surfaces,Low vegetation,4
+shared_errors,4_14,1536,3072,Tree,Impervious surfaces,Tree,101
+shared_errors,4_14,1536,3072,Tree,Low vegetation,Impervious surfaces,2
+shared_errors,4_14,1536,3072,Tree,Low vegetation,Low vegetation,1089
+shared_errors,4_14,1536,3072,Tree,Low vegetation,Tree,623
+shared_errors,4_14,1536,3072,Tree,Tree,Impervious surfaces,112
+shared_errors,4_14,1536,3072,Tree,Tree,Low vegetation,770
+shared_errors,4_14,1536,3072,Tree,Tree,Tree,38866
+shared_errors,4_14,1536,3072,Tree,Tree,Clutter/background,37
+shared_errors,4_14,1536,3072,Clutter/background,Impervious surfaces,Impervious surfaces,63631
+shared_errors,4_14,1536,3072,Clutter/background,Impervious surfaces,Low vegetation,65254
+shared_errors,4_14,1536,3072,Clutter/background,Impervious surfaces,Tree,75
+shared_errors,4_14,1536,3072,Clutter/background,Impervious surfaces,Clutter/background,41729
+shared_errors,4_14,1536,3072,Clutter/background,Low vegetation,Impervious surfaces,572
+shared_errors,4_14,1536,3072,Clutter/background,Low vegetation,Low vegetation,29037
+shared_errors,4_14,1536,3072,Clutter/background,Low vegetation,Tree,700
+shared_errors,4_14,1536,3072,Clutter/background,Low vegetation,Clutter/background,12271
+shared_errors,4_14,1536,3072,Clutter/background,Tree,Impervious surfaces,96
+shared_errors,4_14,1536,3072,Clutter/background,Tree,Low vegetation,337
+shared_errors,4_14,1536,3072,Clutter/background,Tree,Tree,356
+shared_errors,4_14,1536,3072,Clutter/background,Clutter/background,Low vegetation,111
+shared_errors,4_14,1536,3072,Clutter/background,Clutter/background,Clutter/background,1547
+shared_errors,4_14,2048,2560,Clutter/background,Impervious surfaces,Impervious surfaces,4960
+shared_errors,4_14,2048,2560,Clutter/background,Impervious surfaces,Low vegetation,2135
+shared_errors,4_14,2048,2560,Clutter/background,Impervious surfaces,Clutter/background,28196
+shared_errors,4_14,2048,2560,Clutter/background,Low vegetation,Low vegetation,150778
+shared_errors,4_14,2048,2560,Clutter/background,Low vegetation,Clutter/background,21369
+shared_errors,4_14,2048,2560,Clutter/background,Clutter/background,Low vegetation,3009
+shared_errors,4_14,2048,2560,Clutter/background,Clutter/background,Clutter/background,51697
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Impervious surfaces,Impervious surfaces,3526
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Impervious surfaces,Low vegetation,90026
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Low vegetation,Low vegetation,36152
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Low vegetation,Clutter/background,28675
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Clutter/background,Impervious surfaces,2714
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Clutter/background,Low vegetation,65667
+car_clutter_disagreement,4_14,2048,3072,Clutter/background,Clutter/background,Clutter/background,35384
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Low vegetation,Impervious surfaces,785
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Low vegetation,Low vegetation,52313
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Low vegetation,Tree,244
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Low vegetation,Clutter/background,2
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Tree,Low vegetation,408
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Tree,Tree,1301
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Clutter/background,Low vegetation,63
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Clutter/background,Tree,30
+car_clutter_disagreement,4_14,2048,3584,Low vegetation,Clutter/background,Clutter/background,273
+car_clutter_disagreement,4_14,2048,3584,Tree,Low vegetation,Low vegetation,466
+car_clutter_disagreement,4_14,2048,3584,Tree,Low vegetation,Tree,502
+car_clutter_disagreement,4_14,2048,3584,Tree,Tree,Low vegetation,781
+car_clutter_disagreement,4_14,2048,3584,Tree,Tree,Tree,62327
+car_clutter_disagreement,4_14,2048,3584,Tree,Tree,Clutter/background,1313
+car_clutter_disagreement,4_14,2048,3584,Tree,Clutter/background,Tree,33
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Impervious surfaces,Impervious surfaces,23393
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Impervious surfaces,Low vegetation,60506
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Impervious surfaces,Tree,168
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Impervious surfaces,Clutter/background,2013
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Low vegetation,Impervious surfaces,2726
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Low vegetation,Low vegetation,3011
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Low vegetation,Tree,18
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Low vegetation,Clutter/background,53
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Tree,Impervious surfaces,51
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Tree,Low vegetation,277
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Tree,Tree,666
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Tree,Clutter/background,15
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Clutter/background,Impervious surfaces,6010
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Clutter/background,Low vegetation,2
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Clutter/background,Tree,255
+car_clutter_disagreement,4_14,2048,3584,Clutter/background,Clutter/background,Clutter/background,28756
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Impervious surfaces,Impervious surfaces,29402
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Impervious surfaces,Building,7
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Impervious surfaces,Low vegetation,3210
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Impervious surfaces,Tree,18
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Building,Impervious surfaces,2
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Low vegetation,Impervious surfaces,3
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Low vegetation,Low vegetation,57
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Tree,Impervious surfaces,124
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Tree,Tree,68
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Clutter/background,Impervious surfaces,708
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Clutter/background,Low vegetation,41
+car_clutter_disagreement,4_13,2048,4096,Impervious surfaces,Clutter/background,Clutter/background,63
+car_clutter_disagreement,4_13,2048,4096,Building,Building,Impervious surfaces,15
+car_clutter_disagreement,4_13,2048,4096,Building,Building,Building,39771
+car_clutter_disagreement,4_13,2048,4096,Building,Building,Low vegetation,1506
+car_clutter_disagreement,4_13,2048,4096,Building,Building,Clutter/background,5
+car_clutter_disagreement,4_13,2048,4096,Building,Low vegetation,Building,304
+car_clutter_disagreement,4_13,2048,4096,Building,Low vegetation,Low vegetation,8947
+car_clutter_disagreement,4_13,2048,4096,Building,Low vegetation,Clutter/background,26
+car_clutter_disagreement,4_13,2048,4096,Building,Tree,Low vegetation,22
+car_clutter_disagreement,4_13,2048,4096,Building,Tree,Tree,2
+car_clutter_disagreement,4_13,2048,4096,Building,Clutter/background,Low vegetation,7
+car_clutter_disagreement,4_13,2048,4096,Low vegetation,Low vegetation,Low vegetation,28421
+car_clutter_disagreement,4_13,2048,4096,Low vegetation,Low vegetation,Tree,228
+car_clutter_disagreement,4_13,2048,4096,Low vegetation,Tree,Low vegetation,1198
+car_clutter_disagreement,4_13,2048,4096,Low vegetation,Tree,Tree,1690
+car_clutter_disagreement,4_13,2048,4096,Low vegetation,Clutter/background,Low vegetation,12
+car_clutter_disagreement,4_13,2048,4096,Tree,Low vegetation,Tree,3
+car_clutter_disagreement,4_13,2048,4096,Tree,Tree,Tree,16035
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Impervious surfaces,Impervious surfaces,24193
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Impervious surfaces,Low vegetation,4
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Impervious surfaces,Tree,163
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Impervious surfaces,Clutter/background,2663
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Building,Impervious surfaces,40
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Building,Building,113
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Building,Clutter/background,6
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Low vegetation,Impervious surfaces,54812
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Low vegetation,Low vegetation,1460
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Low vegetation,Tree,1112
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Low vegetation,Clutter/background,68
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Tree,Impervious surfaces,474
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Tree,Low vegetation,8
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Tree,Tree,5084
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Tree,Clutter/background,14
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Clutter/background,Impervious surfaces,3433
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Clutter/background,Building,412
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Clutter/background,Low vegetation,95
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Clutter/background,Tree,164
+car_clutter_disagreement,4_13,2048,4096,Clutter/background,Clutter/background,Clutter/background,7949
+car_clutter_disagreement,7_13,5632,1536,Impervious surfaces,Impervious surfaces,Impervious surfaces,6337
+car_clutter_disagreement,7_13,5632,1536,Impervious surfaces,Impervious surfaces,Low vegetation,46
+car_clutter_disagreement,7_13,5632,1536,Impervious surfaces,Clutter/background,Impervious surfaces,205
+car_clutter_disagreement,7_13,5632,1536,Impervious surfaces,Clutter/background,Low vegetation,102
+car_clutter_disagreement,7_13,5632,1536,Impervious surfaces,Clutter/background,Clutter/background,10
+car_clutter_disagreement,7_13,5632,1536,Building,Impervious surfaces,Building,57
+car_clutter_disagreement,7_13,5632,1536,Building,Impervious surfaces,Clutter/background,1030
+car_clutter_disagreement,7_13,5632,1536,Building,Building,Building,12156
+car_clutter_disagreement,7_13,5632,1536,Building,Clutter/background,Impervious surfaces,2
+car_clutter_disagreement,7_13,5632,1536,Building,Clutter/background,Building,4989
+car_clutter_disagreement,7_13,5632,1536,Building,Clutter/background,Clutter/background,2170
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Impervious surfaces,Impervious surfaces,10791
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Impervious surfaces,Clutter/background,26662
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Low vegetation,Low vegetation,6098
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Low vegetation,Clutter/background,5972
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Clutter/background,Impervious surfaces,12482
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Clutter/background,Building,187
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Clutter/background,Low vegetation,16245
+car_clutter_disagreement,7_13,5632,1536,Clutter/background,Clutter/background,Clutter/background,78886
+vegetation_disagreement,4_14,4608,3584,Building,Building,Building,589
+vegetation_disagreement,4_14,4608,3584,Building,Building,Low vegetation,53
+vegetation_disagreement,4_14,4608,3584,Building,Building,Tree,1126
+vegetation_disagreement,4_14,4608,3584,Building,Building,Clutter/background,395
+vegetation_disagreement,4_14,4608,3584,Building,Tree,Tree,260
+vegetation_disagreement,4_14,4608,3584,Building,Clutter/background,Clutter/background,6
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Impervious surfaces,Low vegetation,98
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Impervious surfaces,Tree,31
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Impervious surfaces,Clutter/background,68
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Building,Clutter/background,1
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Low vegetation,Low vegetation,109954
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Low vegetation,Tree,3163
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Low vegetation,Clutter/background,55879
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Tree,Low vegetation,517
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Tree,Tree,2156
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Clutter/background,Low vegetation,33
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Clutter/background,Tree,79
+vegetation_disagreement,4_14,4608,3584,Low vegetation,Clutter/background,Clutter/background,4315
+vegetation_disagreement,4_14,4608,3584,Tree,Low vegetation,Low vegetation,1361
+vegetation_disagreement,4_14,4608,3584,Tree,Low vegetation,Tree,3017
+vegetation_disagreement,4_14,4608,3584,Tree,Low vegetation,Clutter/background,1381
+vegetation_disagreement,4_14,4608,3584,Tree,Tree,Low vegetation,920
+vegetation_disagreement,4_14,4608,3584,Tree,Tree,Tree,59307
+vegetation_disagreement,4_14,4608,3584,Tree,Tree,Clutter/background,1804
+vegetation_disagreement,4_14,4608,3584,Tree,Clutter/background,Clutter/background,157
+vegetation_disagreement,4_14,4608,3584,Clutter/background,Low vegetation,Tree,70
+vegetation_disagreement,4_14,4608,3584,Clutter/background,Low vegetation,Clutter/background,47
+vegetation_disagreement,4_14,4608,3584,Clutter/background,Tree,Tree,923
+vegetation_disagreement,4_14,4608,3584,Clutter/background,Clutter/background,Tree,1376
+vegetation_disagreement,4_14,4608,3584,Clutter/background,Clutter/background,Clutter/background,3765
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Impervious surfaces,Impervious surfaces,6576
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Impervious surfaces,Building,127
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Impervious surfaces,Low vegetation,4
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Building,Impervious surfaces,236
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Building,Building,81
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Low vegetation,Impervious surfaces,163
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Low vegetation,Low vegetation,64
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Clutter/background,Impervious surfaces,417
+vegetation_disagreement,4_14,4096,3072,Impervious surfaces,Clutter/background,Clutter/background,1687
+vegetation_disagreement,4_14,4096,3072,Building,Impervious surfaces,Impervious surfaces,5
+vegetation_disagreement,4_14,4096,3072,Building,Building,Building,30767
+vegetation_disagreement,4_14,4096,3072,Building,Tree,Building,30
+vegetation_disagreement,4_14,4096,3072,Building,Tree,Tree,8
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Building,Building,28
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Building,Clutter/background,16
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Low vegetation,Impervious surfaces,19
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Low vegetation,Building,19
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Low vegetation,Low vegetation,21931
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Low vegetation,Tree,2156
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Low vegetation,Clutter/background,11841
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Tree,Building,140
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Tree,Low vegetation,32083
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Tree,Tree,2509
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Tree,Clutter/background,7222
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Clutter/background,Impervious surfaces,34
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Clutter/background,Low vegetation,37
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Clutter/background,Tree,12
+vegetation_disagreement,4_14,4096,3072,Low vegetation,Clutter/background,Clutter/background,205
+vegetation_disagreement,4_14,4096,3072,Tree,Impervious surfaces,Impervious surfaces,185
+vegetation_disagreement,4_14,4096,3072,Tree,Building,Impervious surfaces,6
+vegetation_disagreement,4_14,4096,3072,Tree,Low vegetation,Impervious surfaces,65
+vegetation_disagreement,4_14,4096,3072,Tree,Low vegetation,Low vegetation,1088
+vegetation_disagreement,4_14,4096,3072,Tree,Low vegetation,Tree,1987
+vegetation_disagreement,4_14,4096,3072,Tree,Low vegetation,Clutter/background,1064
+vegetation_disagreement,4_14,4096,3072,Tree,Tree,Impervious surfaces,97
+vegetation_disagreement,4_14,4096,3072,Tree,Tree,Building,4
+vegetation_disagreement,4_14,4096,3072,Tree,Tree,Low vegetation,4654
+vegetation_disagreement,4_14,4096,3072,Tree,Tree,Tree,72907
+vegetation_disagreement,4_14,4096,3072,Tree,Tree,Clutter/background,677
+vegetation_disagreement,4_14,4096,3072,Tree,Clutter/background,Impervious surfaces,251
+vegetation_disagreement,4_14,4096,3072,Tree,Clutter/background,Low vegetation,158
+vegetation_disagreement,4_14,4096,3072,Tree,Clutter/background,Tree,167
+vegetation_disagreement,4_14,4096,3072,Tree,Clutter/background,Clutter/background,321
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Impervious surfaces,Impervious surfaces,12115
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Impervious surfaces,Low vegetation,1
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Impervious surfaces,Clutter/background,374
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Building,Impervious surfaces,1714
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Building,Building,2
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Building,Clutter/background,12
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Low vegetation,Impervious surfaces,9517
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Low vegetation,Building,1
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Low vegetation,Low vegetation,903
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Low vegetation,Clutter/background,5423
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Tree,Impervious surfaces,10
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Clutter/background,Impervious surfaces,528
+vegetation_disagreement,4_14,4096,3072,Clutter/background,Clutter/background,Clutter/background,8135
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Impervious surfaces,Impervious surfaces,49923
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Impervious surfaces,Building,81
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Impervious surfaces,Low vegetation,56
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Impervious surfaces,Tree,2
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Impervious surfaces,Car,1
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Impervious surfaces,Clutter/background,672
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Building,Impervious surfaces,7
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Building,Building,246
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Low vegetation,Impervious surfaces,715
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Low vegetation,Tree,25
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Low vegetation,Clutter/background,25
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Car,Car,5
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Car,Clutter/background,14
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Clutter/background,Impervious surfaces,48
+vegetation_disagreement,4_14,0,2560,Impervious surfaces,Clutter/background,Clutter/background,570
+vegetation_disagreement,4_14,0,2560,Building,Impervious surfaces,Impervious surfaces,13
+vegetation_disagreement,4_14,0,2560,Building,Impervious surfaces,Building,81
+vegetation_disagreement,4_14,0,2560,Building,Impervious surfaces,Clutter/background,2
+vegetation_disagreement,4_14,0,2560,Building,Building,Building,59064
+vegetation_disagreement,4_14,0,2560,Building,Building,Clutter/background,918
+vegetation_disagreement,4_14,0,2560,Building,Car,Building,13
+vegetation_disagreement,4_14,0,2560,Building,Car,Car,4
+vegetation_disagreement,4_14,0,2560,Building,Car,Clutter/background,514
+vegetation_disagreement,4_14,0,2560,Building,Clutter/background,Building,1701
+vegetation_disagreement,4_14,0,2560,Building,Clutter/background,Car,17
+vegetation_disagreement,4_14,0,2560,Building,Clutter/background,Clutter/background,1280
+vegetation_disagreement,4_14,0,2560,Low vegetation,Impervious surfaces,Impervious surfaces,38403
+vegetation_disagreement,4_14,0,2560,Low vegetation,Impervious surfaces,Building,43
+vegetation_disagreement,4_14,0,2560,Low vegetation,Impervious surfaces,Low vegetation,111
+vegetation_disagreement,4_14,0,2560,Low vegetation,Impervious surfaces,Clutter/background,1
+vegetation_disagreement,4_14,0,2560,Low vegetation,Building,Impervious surfaces,265
+vegetation_disagreement,4_14,0,2560,Low vegetation,Building,Building,1478
+vegetation_disagreement,4_14,0,2560,Low vegetation,Building,Low vegetation,384
+vegetation_disagreement,4_14,0,2560,Low vegetation,Low vegetation,Impervious surfaces,59402
+vegetation_disagreement,4_14,0,2560,Low vegetation,Low vegetation,Low vegetation,5367
+vegetation_disagreement,4_14,0,2560,Low vegetation,Low vegetation,Clutter/background,5
+vegetation_disagreement,4_14,0,2560,Low vegetation,Tree,Impervious surfaces,190
+vegetation_disagreement,4_14,0,2560,Low vegetation,Tree,Low vegetation,239
+vegetation_disagreement,4_14,0,2560,Low vegetation,Tree,Tree,375
+vegetation_disagreement,4_14,0,2560,Low vegetation,Clutter/background,Impervious surfaces,297
+vegetation_disagreement,4_14,0,2560,Low vegetation,Clutter/background,Building,58
+vegetation_disagreement,4_14,0,2560,Low vegetation,Clutter/background,Clutter/background,30
+vegetation_disagreement,4_14,0,2560,Tree,Impervious surfaces,Impervious surfaces,2
+vegetation_disagreement,4_14,0,2560,Tree,Low vegetation,Impervious surfaces,154
+vegetation_disagreement,4_14,0,2560,Tree,Low vegetation,Low vegetation,18
+vegetation_disagreement,4_14,0,2560,Tree,Low vegetation,Tree,226
+vegetation_disagreement,4_14,0,2560,Tree,Tree,Impervious surfaces,161
+vegetation_disagreement,4_14,0,2560,Tree,Tree,Low vegetation,2
+vegetation_disagreement,4_14,0,2560,Tree,Tree,Tree,10114
+vegetation_disagreement,4_14,0,2560,Car,Impervious surfaces,Impervious surfaces,3
+vegetation_disagreement,4_14,0,2560,Car,Impervious surfaces,Car,44
+vegetation_disagreement,4_14,0,2560,Car,Impervious surfaces,Clutter/background,39
+vegetation_disagreement,4_14,0,2560,Car,Car,Car,2686
+vegetation_disagreement,4_14,0,2560,Car,Car,Clutter/background,526
+vegetation_disagreement,4_14,0,2560,Car,Clutter/background,Clutter/background,3036
+vegetation_disagreement,4_14,0,2560,Clutter/background,Impervious surfaces,Impervious surfaces,43
+vegetation_disagreement,4_14,0,2560,Clutter/background,Building,Building,39
+vegetation_disagreement,4_14,0,2560,Clutter/background,Clutter/background,Building,80
+vegetation_disagreement,4_14,0,2560,Clutter/background,Clutter/background,Clutter/background,1486
+vegetation_disagreement,2_13,1536,512,Low vegetation,Low vegetation,Building,35397
+vegetation_disagreement,2_13,1536,512,Low vegetation,Low vegetation,Low vegetation,185132
+vegetation_disagreement,2_13,1536,512,Low vegetation,Low vegetation,Tree,1166
+vegetation_disagreement,2_13,1536,512,Low vegetation,Low vegetation,Clutter/background,19723
+vegetation_disagreement,2_13,1536,512,Low vegetation,Tree,Low vegetation,169
+vegetation_disagreement,2_13,1536,512,Low vegetation,Tree,Tree,1325
+vegetation_disagreement,2_13,1536,512,Tree,Low vegetation,Low vegetation,1244
+vegetation_disagreement,2_13,1536,512,Tree,Low vegetation,Tree,720
+vegetation_disagreement,2_13,1536,512,Tree,Low vegetation,Clutter/background,138
+vegetation_disagreement,2_13,1536,512,Tree,Tree,Low vegetation,662
+vegetation_disagreement,2_13,1536,512,Tree,Tree,Tree,12083
+vegetation_disagreement,2_13,1536,512,Tree,Tree,Clutter/background,349

@@ -1,5 +1,7 @@
 # Segmentation model and sidewalk research notes
 
+**Status: CONFIGURED_NOT_RUN** — this is a research direction, not a completed Potsdam experiment.
+
 Date checked: 2026-10-19.
 
 ## Potsdam leaderboard context

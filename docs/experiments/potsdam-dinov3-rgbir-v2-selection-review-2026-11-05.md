@@ -1,5 +1,7 @@
 # DINOv3 RGBIR selection: configuration A
 
+**Status: SUPERSEDED** — Selection outcome is finalized in the 2026-11-06 selection summary.
+
 A completed eight passes and 6,912 updates on 2026-11-05. The selected
 checkpoint reached **93.0441% OA and 80.7498% six-class mIoU** on six validation
 scenes (199,409,714 scored pixels), above all four historical C floors. B

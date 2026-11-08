@@ -1,5 +1,7 @@
 # Frozen encoder segmentation probes
 
+**Status: HISTORICAL** — Earlier frozen-representation probe; not a direct comparison to final trained recipes.
+
 Date: 2026-10-19
 Environment: Python 3.14.8, PyTorch 2.14.1, torchvision 0.29.1, Apple MPS.
 

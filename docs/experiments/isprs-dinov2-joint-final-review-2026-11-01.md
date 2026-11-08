@@ -1,5 +1,7 @@
 # DINOv2 joint-run final artifact review, 2026-11-01
 
+**Status: HISTORICAL** — Completed separate joint Potsdam/Vaihingen protocol.
+
 Potsdam held-out mIoU was **48.6523%** for joint DINOv2 versus **73.7024%** for
 historical SAM, a 25.0501-point gap. DINOv2 scored lower on all six classes and
 all 14 test scenes; cars and clutter had the largest losses. The comparison

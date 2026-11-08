@@ -1,0 +1,959 @@
+{
+  "dataset_id": "isprs-vaihingen",
+  "included_splits": [
+    "train",
+    "validation"
+  ],
+  "preprocessing_hash": "cff11ea84b01b316ffeb5008cabba128979ddcf065910ce920258b7c7e1b9afe",
+  "preprocessing_id": "isprs-canonical",
+  "preprocessing_version": 2,
+  "schema_version": 1,
+  "split_hash": "4c016ced70c4056c360a73df0268882b40361eaf6202341fcd5671386f94478a",
+  "split_id": "vaihingen-dinov3",
+  "split_version": 1,
+  "splits": {
+    "train": {
+      "class_counts": {
+        "0": 15714201,
+        "1": 14757436,
+        "2": 12997455,
+        "3": 13944875,
+        "4": 622817,
+        "5": 517675
+      },
+      "scene_ids": [
+        "3",
+        "5",
+        "13",
+        "15",
+        "17",
+        "21",
+        "23",
+        "26",
+        "30",
+        "32",
+        "34",
+        "37"
+      ],
+      "scenes": [
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area3.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area3.tif"
+            }
+          },
+          "class_counts": {
+            "0": 2059368,
+            "1": 1632260,
+            "2": 1157157,
+            "3": 1127394,
+            "4": 55863
+          },
+          "crs": null,
+          "scene_id": "3",
+          "scored_pixels": 6032042,
+          "shape": [
+            3007,
+            2006
+          ],
+          "total_pixels": 6032042,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 6032042,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 2059368,
+                "1": 1632260,
+                "2": 1157157,
+                "3": 1127394,
+                "4": 55863
+              },
+              "scored_pixels": 6032042,
+              "total_pixels": 6032042,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 6032042
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area5.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area5.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1684911,
+            "1": 2426970,
+            "2": 318578,
+            "3": 327258,
+            "4": 67342
+          },
+          "crs": null,
+          "scene_id": "5",
+          "scored_pixels": 4825059,
+          "shape": [
+            2557,
+            1887
+          ],
+          "total_pixels": 4825059,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4825059,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1684911,
+                "1": 2426970,
+                "2": 318578,
+                "3": 327258,
+                "4": 67342
+              },
+              "scored_pixels": 4825059,
+              "total_pixels": 4825059,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4825059
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area13.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area13.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1185224,
+            "1": 1302768,
+            "2": 2549104,
+            "3": 2144306,
+            "4": 27042
+          },
+          "crs": null,
+          "scene_id": "13",
+          "scored_pixels": 7208444,
+          "shape": [
+            2558,
+            2818
+          ],
+          "total_pixels": 7208444,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 7208444,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1185224,
+                "1": 1302768,
+                "2": 2549104,
+                "3": 2144306,
+                "4": 27042
+              },
+              "scored_pixels": 7208444,
+              "total_pixels": 7208444,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 7208444
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area15.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area15.tif"
+            }
+          },
+          "class_counts": {
+            "0": 855112,
+            "1": 1075170,
+            "2": 1309897,
+            "3": 1643189,
+            "4": 31684,
+            "5": 7183
+          },
+          "crs": null,
+          "scene_id": "15",
+          "scored_pixels": 4922235,
+          "shape": [
+            2565,
+            1919
+          ],
+          "total_pixels": 4922235,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4922235,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 855112,
+                "1": 1075170,
+                "2": 1309897,
+                "3": 1643189,
+                "4": 31684,
+                "5": 7183
+              },
+              "scored_pixels": 4922235,
+              "total_pixels": 4922235,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4922235
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area17.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area17.tif"
+            }
+          },
+          "class_counts": {
+            "0": 385227,
+            "1": 500562,
+            "2": 1328765,
+            "3": 769763,
+            "4": 8099
+          },
+          "crs": null,
+          "scene_id": "17",
+          "scored_pixels": 2992416,
+          "shape": [
+            1281,
+            2336
+          ],
+          "total_pixels": 2992416,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 2992416,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 385227,
+                "1": 500562,
+                "2": 1328765,
+                "3": 769763,
+                "4": 8099
+              },
+              "scored_pixels": 2992416,
+              "total_pixels": 2992416,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 2992416
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area21.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area21.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1382431,
+            "1": 989524,
+            "2": 630889,
+            "3": 1805045,
+            "4": 37149
+          },
+          "crs": null,
+          "scene_id": "21",
+          "scored_pixels": 4845038,
+          "shape": [
+            2546,
+            1903
+          ],
+          "total_pixels": 4845038,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4845038,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1382431,
+                "1": 989524,
+                "2": 630889,
+                "3": 1805045,
+                "4": 37149
+              },
+              "scored_pixels": 4845038,
+              "total_pixels": 4845038,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4845038
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area23.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area23.tif"
+            }
+          },
+          "class_counts": {
+            "0": 801652,
+            "1": 885284,
+            "2": 1345728,
+            "3": 1789171,
+            "4": 15447,
+            "5": 7756
+          },
+          "crs": null,
+          "scene_id": "23",
+          "scored_pixels": 4845038,
+          "shape": [
+            2546,
+            1903
+          ],
+          "total_pixels": 4845038,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4845038,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 801652,
+                "1": 885284,
+                "2": 1345728,
+                "3": 1789171,
+                "4": 15447,
+                "5": 7756
+              },
+              "scored_pixels": 4845038,
+              "total_pixels": 4845038,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4845038
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area26.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area26.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1650663,
+            "1": 1558464,
+            "2": 501956,
+            "3": 1085625,
+            "4": 96243,
+            "5": 447134
+          },
+          "crs": null,
+          "scene_id": "26",
+          "scored_pixels": 5340085,
+          "shape": [
+            1783,
+            2995
+          ],
+          "total_pixels": 5340085,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 5340085,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1650663,
+                "1": 1558464,
+                "2": 501956,
+                "3": 1085625,
+                "4": 96243,
+                "5": 447134
+              },
+              "scored_pixels": 5340085,
+              "total_pixels": 5340085,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 5340085
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area30.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area30.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1381149,
+            "1": 1289563,
+            "2": 1105366,
+            "3": 1098667,
+            "4": 82097
+          },
+          "crs": null,
+          "scene_id": "30",
+          "scored_pixels": 4956842,
+          "shape": [
+            2563,
+            1934
+          ],
+          "total_pixels": 4956842,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4956842,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1381149,
+                "1": 1289563,
+                "2": 1105366,
+                "3": 1098667,
+                "4": 82097
+              },
+              "scored_pixels": 4956842,
+              "total_pixels": 4956842,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4956842
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area32.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area32.tif"
+            }
+          },
+          "class_counts": {
+            "0": 2616688,
+            "1": 1270914,
+            "2": 362596,
+            "3": 596274,
+            "4": 156826,
+            "5": 55602
+          },
+          "crs": null,
+          "scene_id": "32",
+          "scored_pixels": 5058900,
+          "shape": [
+            2555,
+            1980
+          ],
+          "total_pixels": 5058900,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 5058900,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 2616688,
+                "1": 1270914,
+                "2": 362596,
+                "3": 596274,
+                "4": 156826,
+                "5": 55602
+              },
+              "scored_pixels": 5058900,
+              "total_pixels": 5058900,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 5058900
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area34.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area34.tif"
+            }
+          },
+          "class_counts": {
+            "0": 790660,
+            "1": 903378,
+            "2": 832872,
+            "3": 993049,
+            "4": 26381
+          },
+          "crs": null,
+          "scene_id": "34",
+          "scored_pixels": 3546340,
+          "shape": [
+            2555,
+            1388
+          ],
+          "total_pixels": 3546340,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 3546340,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 790660,
+                "1": 903378,
+                "2": 832872,
+                "3": 993049,
+                "4": 26381
+              },
+              "scored_pixels": 3546340,
+              "total_pixels": 3546340,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 3546340
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area37.tif"
+            },
+            "label_participant": {
+              "alignment_evidence": "ISPRS official image/participant-label pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_participant/top_mosaic_09cm_area37.tif"
+            }
+          },
+          "class_counts": {
+            "0": 921116,
+            "1": 922579,
+            "2": 1554547,
+            "3": 565134,
+            "4": 18644
+          },
+          "crs": null,
+          "scene_id": "37",
+          "scored_pixels": 3982020,
+          "shape": [
+            1995,
+            1996
+          ],
+          "total_pixels": 3982020,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 3982020,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 921116,
+                "1": 922579,
+                "2": 1554547,
+                "3": 565134,
+                "4": 18644
+              },
+              "scored_pixels": 3982020,
+              "total_pixels": 3982020,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 3982020
+            }
+          }
+        }
+      ],
+      "scored_pixels": 58554459,
+      "total_pixels": 58554459,
+      "valid_pixel_fraction": 1.0,
+      "valid_pixels": 58554459,
+      "views": {
+        "irrg-view": {
+          "class_counts": {
+            "0": 15714201,
+            "1": 14757436,
+            "2": 12997455,
+            "3": 13944875,
+            "4": 622817,
+            "5": 517675
+          },
+          "scored_pixels": 58554459,
+          "total_pixels": 58554459,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 58554459
+        }
+      }
+    },
+    "validation": {
+      "class_counts": {
+        "0": 5484597,
+        "1": 5292727,
+        "2": 2827055,
+        "3": 3764460,
+        "4": 216631,
+        "5": 5634,
+        "6": 1942243
+      },
+      "scene_ids": [
+        "1",
+        "7",
+        "11",
+        "28"
+      ],
+      "scenes": [
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area1.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "ISPRS official image/eroded-reference pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_eroded/top_mosaic_09cm_area1_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1568777,
+            "1": 1742633,
+            "2": 526994,
+            "3": 540881,
+            "4": 47304,
+            "6": 503322
+          },
+          "crs": null,
+          "scene_id": "1",
+          "scored_pixels": 4426589,
+          "shape": [
+            2569,
+            1919
+          ],
+          "total_pixels": 4929911,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4929911,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1568777,
+                "1": 1742633,
+                "2": 526994,
+                "3": 540881,
+                "4": 47304,
+                "6": 503322
+              },
+              "scored_pixels": 4426589,
+              "total_pixels": 4929911,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4929911
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area7.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "ISPRS official image/eroded-reference pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_eroded/top_mosaic_09cm_area7_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1346780,
+            "1": 1219556,
+            "2": 556899,
+            "3": 1194383,
+            "4": 75252,
+            "6": 432189
+          },
+          "crs": null,
+          "scene_id": "7",
+          "scored_pixels": 4392870,
+          "shape": [
+            2557,
+            1887
+          ],
+          "total_pixels": 4825059,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4825059,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1346780,
+                "1": 1219556,
+                "2": 556899,
+                "3": 1194383,
+                "4": 75252,
+                "6": 432189
+              },
+              "scored_pixels": 4392870,
+              "total_pixels": 4825059,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4825059
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area11.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "ISPRS official image/eroded-reference pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_eroded/top_mosaic_09cm_area11_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1476815,
+            "1": 844159,
+            "2": 697983,
+            "3": 1332332,
+            "4": 44675,
+            "6": 461474
+          },
+          "crs": null,
+          "scene_id": "11",
+          "scored_pixels": 4395964,
+          "shape": [
+            2566,
+            1893
+          ],
+          "total_pixels": 4857438,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4857438,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1476815,
+                "1": 844159,
+                "2": 697983,
+                "3": 1332332,
+                "4": 44675,
+                "6": 461474
+              },
+              "scored_pixels": 4395964,
+              "total_pixels": 4857438,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4857438
+            }
+          }
+        },
+        {
+          "affine": null,
+          "assets": {
+            "irrg": {
+              "alignment_evidence": null,
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/images/top_mosaic_09cm_area28.tif"
+            },
+            "label_eroded": {
+              "alignment_evidence": "ISPRS official image/eroded-reference pair with the same area identifier; both downloads are pixel-local and contain no CRS/affine metadata.",
+              "dtype": "uint8",
+              "sha256_present": true,
+              "uri": "vaihingen-isprs-official-20261019/labels_eroded/top_mosaic_09cm_area28_noBoundary.tif"
+            }
+          },
+          "class_counts": {
+            "0": 1092225,
+            "1": 1486379,
+            "2": 1045179,
+            "3": 696864,
+            "4": 49400,
+            "5": 5634,
+            "6": 545258
+          },
+          "crs": null,
+          "scene_id": "28",
+          "scored_pixels": 4375681,
+          "shape": [
+            2567,
+            1917
+          ],
+          "total_pixels": 4920939,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 4920939,
+          "view_alignment": {
+            "irrg-view": "passed"
+          },
+          "views": {
+            "irrg-view": {
+              "class_counts": {
+                "0": 1092225,
+                "1": 1486379,
+                "2": 1045179,
+                "3": 696864,
+                "4": 49400,
+                "5": 5634,
+                "6": 545258
+              },
+              "scored_pixels": 4375681,
+              "total_pixels": 4920939,
+              "valid_pixel_fraction": 1.0,
+              "valid_pixels": 4920939
+            }
+          }
+        }
+      ],
+      "scored_pixels": 17591104,
+      "total_pixels": 19533347,
+      "valid_pixel_fraction": 1.0,
+      "valid_pixels": 19533347,
+      "views": {
+        "irrg-view": {
+          "class_counts": {
+            "0": 5484597,
+            "1": 5292727,
+            "2": 2827055,
+            "3": 3764460,
+            "4": 216631,
+            "5": 5634,
+            "6": 1942243
+          },
+          "scored_pixels": 17591104,
+          "total_pixels": 19533347,
+          "valid_pixel_fraction": 1.0,
+          "valid_pixels": 19533347
+        }
+      }
+    }
+  },
+  "tile_size": 1024,
+  "validity_scope": "label mask intersected with all required view asset masks and finite image values; class_counts include the ignore label",
+  "view_asset_requirements": {
+    "irrg-view": [
+      "irrg"
+    ]
+  }
+}

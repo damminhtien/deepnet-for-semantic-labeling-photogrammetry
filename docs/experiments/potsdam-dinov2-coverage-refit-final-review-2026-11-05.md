@@ -1,5 +1,7 @@
 # Potsdam DINOv2 coverage and refit artifact review, 2026-11-05
 
+**Status: HISTORICAL** — Completed DINOv2 benchmark record retained for system-level context.
+
 The 24-scene continuation completed its declared 1,152 optimizer updates, and
 the final checkpoint was evaluated once on all 14 held-out scenes. Independently
 recomputed OA is **91.4785%** and six-class mIoU is **79.6122%** on exactly

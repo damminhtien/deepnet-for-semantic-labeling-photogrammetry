@@ -1,0 +1,1498 @@
+{
+  "schema_version": 1,
+  "source": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx",
+  "outer_sha256": "383b72f9d43f26cc54ffa92b3f3b879cd999ff29bf97a6a2e88cb40d1bd7ce49",
+  "archive_sha256": "9c03f39bda64bd3d727277501864abf444a13eea2341731e25394b6f6a72d288",
+  "bands": [
+    "red",
+    "green",
+    "blue",
+    "ir"
+  ],
+  "scenes": {
+    "2_10": {
+      "path": "4_Ortho_RGBIR/top_potsdam_2_10_RGBIR.tif",
+      "sha256": "84247a77c24ab096c173df99a407b78747f002e8f7dfb153e1cb9e902f8e3dde",
+      "irrg_sha256": "22694724de291a1ce9e365976e11efe0113d20c04b9b02b343502ff356235192",
+      "rgb_reference_sha256": "435f0ad43e66491c071de4f5a6c256334e573b3a2e4aec36716a12fe354c99bc",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366976.5,
+        0.0,
+        -0.05,
+        5808562.6
+      ],
+      "extent": [
+        366976.5,
+        5808262.6,
+        367276.5,
+        5808562.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69518300,
+        "max_abs_dn": 136,
+        "mean_abs_dn": 6.199031305555556
+      }
+    },
+    "2_11": {
+      "path": "4_Ortho_RGBIR/top_potsdam_2_11_RGBIR.tif",
+      "sha256": "84997e4337c8244cc4c0b41979631a8fdc3bc2215be35f34dd25f1e91037cbf1",
+      "irrg_sha256": "edd2d371b9be895a3eff398bbce00b2efae086f610bbdf7b9feb07e2a5c4c1b3",
+      "rgb_reference_sha256": "e2754ec39ffc2aca83ad19e400fa9de480372c0cab9e41272f0e743643672ce7",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367276.5,
+        0.0,
+        -0.05,
+        5808562.6
+      ],
+      "extent": [
+        367276.5,
+        5808262.6,
+        367576.5,
+        5808562.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69549125,
+        "max_abs_dn": 150,
+        "mean_abs_dn": 5.518727898148148
+      }
+    },
+    "2_12": {
+      "path": "4_Ortho_RGBIR/top_potsdam_2_12_RGBIR.tif",
+      "sha256": "efb090f3691aab732b0a56dda0a5a1b6640f7011aa439c27cbcf537ec6a11114",
+      "irrg_sha256": "5da46acef7824bfe872e294dd95b6a378955b00102f545302d721bb072c74a6a",
+      "rgb_reference_sha256": "ed3aea1e7b261b2bc10ddd7f5700720805e4864bc83271a32dcad49568d42581",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367576.5,
+        0.0,
+        -0.05,
+        5808562.6
+      ],
+      "extent": [
+        367576.5,
+        5808262.6,
+        367876.5,
+        5808562.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70014255,
+        "max_abs_dn": 156,
+        "mean_abs_dn": 6.320353907407408
+      }
+    },
+    "2_13": {
+      "path": "4_Ortho_RGBIR/top_potsdam_2_13_RGBIR.tif",
+      "sha256": "a8477f06d510a51856684830e0783c5e6d06fb7acac6994ab1c48020f6bcab44",
+      "irrg_sha256": "ba8e492a0d82232f68bfe8fca19da6b8e101ed2f37833943a507cb8937915893",
+      "rgb_reference_sha256": "9f7747527e6407fa8c1fcdbd5faffafa2c3e84edd6db61f3a5801671e3bdd200",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367876.5,
+        0.0,
+        -0.05,
+        5808562.6
+      ],
+      "extent": [
+        367876.5,
+        5808262.6,
+        368176.5,
+        5808562.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69474839,
+        "max_abs_dn": 155,
+        "mean_abs_dn": 5.793807972222222
+      }
+    },
+    "2_14": {
+      "path": "4_Ortho_RGBIR/top_potsdam_2_14_RGBIR.tif",
+      "sha256": "0f84a11e784a9ffaabb9f45aeb952bcd351c66152910e40131fa8cc07c4b07ca",
+      "irrg_sha256": "cb5d56b00aae54d9291cc69dbd732bd251362fb114c7518a164523d8b62102d0",
+      "rgb_reference_sha256": "abec2f2dba5e27c46590d8d02a3e2e1e3d3691766869e0ca0932b41754a7f3fc",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368176.5,
+        0.0,
+        -0.05,
+        5808562.6
+      ],
+      "extent": [
+        368176.5,
+        5808262.6,
+        368476.5,
+        5808562.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69366630,
+        "max_abs_dn": 128,
+        "mean_abs_dn": 5.9465109537037035
+      }
+    },
+    "3_10": {
+      "path": "4_Ortho_RGBIR/top_potsdam_3_10_RGBIR.tif",
+      "sha256": "a71860b0d2ff062c8e1337aa4c8b239c0ec8b6e4ef22a1e75bd2fbccdab9c865",
+      "irrg_sha256": "fdafc9090f94cfddceb8c7eca930cc758e494fe0c3a701f94a16f538635bdaf9",
+      "rgb_reference_sha256": "6767a5014c4193d5dbae562db7c447a0c0d493ff1d9e52f4a988dabcd4467673",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366976.5,
+        0.0,
+        -0.05,
+        5808262.6
+      ],
+      "extent": [
+        366976.5,
+        5807962.6,
+        367276.5,
+        5808262.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69704609,
+        "max_abs_dn": 159,
+        "mean_abs_dn": 6.091641731481482
+      }
+    },
+    "3_11": {
+      "path": "4_Ortho_RGBIR/top_potsdam_3_11_RGBIR.tif",
+      "sha256": "e1afda55cd55ad7b713f55c1106f984899dc972678bc2cd0ce34622e316369da",
+      "irrg_sha256": "9893b008ff789f8c4583c6db946a0801b601131ae71ba29df7ff5923fa38c9a6",
+      "rgb_reference_sha256": "88761e08e272daf9bf8d1bfc0c91a4aba5ec3605ef0d91f2e4fc12c40bcb37e7",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367276.5,
+        0.0,
+        -0.05,
+        5808262.6
+      ],
+      "extent": [
+        367276.5,
+        5807962.6,
+        367576.5,
+        5808262.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69919885,
+        "max_abs_dn": 155,
+        "mean_abs_dn": 6.042048305555555
+      }
+    },
+    "3_12": {
+      "path": "4_Ortho_RGBIR/top_potsdam_3_12_RGBIR.tif",
+      "sha256": "b5b52ca28e1985e0ee826ccefb0eba1ff8f8047f1c0dff8938654613eb78c113",
+      "irrg_sha256": "01123887df1c862534e7e65c1524e697d04753000d9fe89a79fd1d6cfe4987ca",
+      "rgb_reference_sha256": "7fbfee78d2d551fecdd2dabf74a9cbcd8e856b346f2bcde83121073e6b6159f6",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367576.5,
+        0.0,
+        -0.05,
+        5808262.6
+      ],
+      "extent": [
+        367576.5,
+        5807962.6,
+        367876.5,
+        5808262.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69383991,
+        "max_abs_dn": 156,
+        "mean_abs_dn": 5.820315287037037
+      }
+    },
+    "3_13": {
+      "path": "4_Ortho_RGBIR/top_potsdam_3_13_RGBIR.tif",
+      "sha256": "82accb5b8746ef4c9e205ea2b409a843879d279e156eefa9f2b388aaf1db7614",
+      "irrg_sha256": "a52f41f23cd61354bb0764e9fc43a5cf1c3ba733f4ac835ba8db74c9fe295617",
+      "rgb_reference_sha256": "b6546298800f12ff875da50f71f5d42ba55ab337c328dc16b480a202634bdeb1",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367876.5,
+        0.0,
+        -0.05,
+        5808262.6
+      ],
+      "extent": [
+        367876.5,
+        5807962.6,
+        368176.5,
+        5808262.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69316678,
+        "max_abs_dn": 141,
+        "mean_abs_dn": 5.893543166666666
+      }
+    },
+    "3_14": {
+      "path": "4_Ortho_RGBIR/top_potsdam_3_14_RGBIR.tif",
+      "sha256": "04be9e90bfeaf52261917610cccf6373fba49343fa3173505b4c655878d19a79",
+      "irrg_sha256": "9939a0744f5938e4155ae7572b7d490d2ca258ac5e7728ccb50568e5feac5eb6",
+      "rgb_reference_sha256": "a6a3842cce940f61f1ed0588c8f4ecdaeee13ad98a1322227d728550a6c9abd7",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368176.5,
+        0.0,
+        -0.05,
+        5808262.6
+      ],
+      "extent": [
+        368176.5,
+        5807962.6,
+        368476.5,
+        5808262.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69306390,
+        "max_abs_dn": 173,
+        "mean_abs_dn": 5.7689592129629625
+      }
+    },
+    "4_10": {
+      "path": "4_Ortho_RGBIR/top_potsdam_4_10_RGBIR.tif",
+      "sha256": "63bb1724648364e298ef81377a5ea3f90cd4334d6ff74a06064c04f6164d1575",
+      "irrg_sha256": "70e4a08368bb62511cd010d856e20711a2ee49c0a9cfccf67094eea89fadc541",
+      "rgb_reference_sha256": "15d17b9762cfc4eb6e5ac3b042cedff024eea4d6e6e80594817d02e96cc94484",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366976.5,
+        0.0,
+        -0.05,
+        5807962.6
+      ],
+      "extent": [
+        366976.5,
+        5807662.6,
+        367276.5,
+        5807962.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69454914,
+        "max_abs_dn": 154,
+        "mean_abs_dn": 6.098871888888889
+      }
+    },
+    "4_11": {
+      "path": "4_Ortho_RGBIR/top_potsdam_4_11_RGBIR.tif",
+      "sha256": "489ad2954f19f19d1ae610e7a04364c874090529044cc06fe6ab32455b9e33b1",
+      "irrg_sha256": "f475b5ce93cb383edd6bdb066945ca9fac2c05d04bf65fa0ac0bbeb32ae09049",
+      "rgb_reference_sha256": "92c53d4d74095220055b826b58786364a83c17f9950b9b3e2cbc0a777f2a4379",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367276.5,
+        0.0,
+        -0.05,
+        5807962.6
+      ],
+      "extent": [
+        367276.5,
+        5807662.6,
+        367576.5,
+        5807962.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69413728,
+        "max_abs_dn": 136,
+        "mean_abs_dn": 5.762919277777778
+      }
+    },
+    "4_12": {
+      "path": "4_Ortho_RGBIR/top_potsdam_4_12_RGBIR.tif",
+      "sha256": "fff19977bb2f10d445bf44a89e5a3c2a77a888d8a16949b4a42668735709bad2",
+      "irrg_sha256": "9d4bddffcd585c248008383a9ead9b5a84a40dcfab4dcd80bd443417dfe62229",
+      "rgb_reference_sha256": "e41d0e2f30d7875642975929ce143155c6a28e9eeb5db43f01a1023554a66501",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367576.5,
+        0.0,
+        -0.05,
+        5807962.6
+      ],
+      "extent": [
+        367576.5,
+        5807662.6,
+        367876.5,
+        5807962.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69740749,
+        "max_abs_dn": 131,
+        "mean_abs_dn": 7.2474342592592595
+      }
+    },
+    "4_13": {
+      "path": "4_Ortho_RGBIR/top_potsdam_4_13_RGBIR.tif",
+      "sha256": "e287a997e7cc0a83ef8429a174f35a93dac6273f4b1f1305d863f5f62445887d",
+      "irrg_sha256": "b29388c1c5d62f9b4d0384372bcbbd6a04a1126bda4516dc17b136df09a41a59",
+      "rgb_reference_sha256": "a113750a96ef8d9999f52da4aecb9aafeab68b396e6b17446accbdf766044a70",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367876.5,
+        0.0,
+        -0.05,
+        5807962.6
+      ],
+      "extent": [
+        367876.5,
+        5807662.6,
+        368176.5,
+        5807962.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69258332,
+        "max_abs_dn": 120,
+        "mean_abs_dn": 6.129184518518518
+      }
+    },
+    "4_14": {
+      "path": "4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+      "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083",
+      "irrg_sha256": "6c7192a5a973bc51b5809c1666fa0e41cd5f01bfec43dc48fe90670359b86258",
+      "rgb_reference_sha256": "218a2147ea74c2e540dc73339ef7eb836e3cd4663015f177ad64983ae24b88f9",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368176.5,
+        0.0,
+        -0.05,
+        5807962.6
+      ],
+      "extent": [
+        368176.5,
+        5807662.6,
+        368476.5,
+        5807962.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69242914,
+        "max_abs_dn": 154,
+        "mean_abs_dn": 6.008293907407407
+      }
+    },
+    "4_15": {
+      "path": "4_Ortho_RGBIR/top_potsdam_4_15_RGBIR.tif",
+      "sha256": "810f2390f22994d602303133c43c02e7297d563637f887533de0bea6f50bbfe2",
+      "irrg_sha256": "1258846db5a95bb62fe113818e66f458e5034022ec7122e28c852861002c1faa",
+      "rgb_reference_sha256": "f27587fca7781350e030b6b91682206060e25d81e5d7bc24e9b485e039871ffb",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368476.5,
+        0.0,
+        -0.05,
+        5807962.6
+      ],
+      "extent": [
+        368476.5,
+        5807662.6,
+        368776.5,
+        5807962.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 68889643,
+        "max_abs_dn": 153,
+        "mean_abs_dn": 5.3725826851851854
+      }
+    },
+    "5_10": {
+      "path": "4_Ortho_RGBIR/top_potsdam_5_10_RGBIR.tif",
+      "sha256": "b37a0fc4a24eaf9750847b7fd9f7eaf900c17a3169cf9a6deea0da335d6d550e",
+      "irrg_sha256": "a5ce554d85e0ecf7520a51f94001a376476512edd84380cdbe38b1800202e3db",
+      "rgb_reference_sha256": "5779fdbed51f9f0189d13b58be9324de81ea78ed679812a5bb859a11dfa2b054",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366976.5,
+        0.0,
+        -0.05,
+        5807662.6
+      ],
+      "extent": [
+        366976.5,
+        5807362.6,
+        367276.5,
+        5807662.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69555002,
+        "max_abs_dn": 153,
+        "mean_abs_dn": 6.119472166666666
+      }
+    },
+    "5_11": {
+      "path": "4_Ortho_RGBIR/top_potsdam_5_11_RGBIR.tif",
+      "sha256": "324facbab5ae15f52dea79ca654b64326d2af565e9d9bdfe0d5f46a3e8a8a28a",
+      "irrg_sha256": "a539889970472b6b8f70556568fae9c82bc49ae84d865fd1a145dc50e24efd14",
+      "rgb_reference_sha256": "2d4f33f6f570f361a06624488d7a5513a380e85b6f5d61e82e79131a5fdebbd3",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367276.5,
+        0.0,
+        -0.05,
+        5807662.6
+      ],
+      "extent": [
+        367276.5,
+        5807362.6,
+        367576.5,
+        5807662.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69766635,
+        "max_abs_dn": 122,
+        "mean_abs_dn": 6.668026972222222
+      }
+    },
+    "5_12": {
+      "path": "4_Ortho_RGBIR/top_potsdam_5_12_RGBIR.tif",
+      "sha256": "e9f09d7b0ca8c132b13bc6d008526fa3786a3a0e3f60d65a923a91f597f49cb0",
+      "irrg_sha256": "fb70c4596d557dc4bf443b04866f1126232670fa6732d66c69864c1ee59968dd",
+      "rgb_reference_sha256": "2abfb6cac3012fd5f985a340e9cfa349b71d805223d29eaec98826e0eb38fbdb",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367576.5,
+        0.0,
+        -0.05,
+        5807662.6
+      ],
+      "extent": [
+        367576.5,
+        5807362.6,
+        367876.5,
+        5807662.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69733872,
+        "max_abs_dn": 151,
+        "mean_abs_dn": 7.179450925925926
+      }
+    },
+    "5_13": {
+      "path": "4_Ortho_RGBIR/top_potsdam_5_13_RGBIR.tif",
+      "sha256": "2d223c6044eb17a64c1385cd7fb87de240bb883a103fa154ca3abb9372090a61",
+      "irrg_sha256": "5f1e4d79e8883832c2d60447082f03b6f6b796805e3cefa43ec43d0b1ccd6fd0",
+      "rgb_reference_sha256": "ba212c6fa0866af98dc782fa11bd08dbd62539383229a3b8bc17436b04356048",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367876.5,
+        0.0,
+        -0.05,
+        5807662.6
+      ],
+      "extent": [
+        367876.5,
+        5807362.6,
+        368176.5,
+        5807662.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70082412,
+        "max_abs_dn": 134,
+        "mean_abs_dn": 6.560014574074074
+      }
+    },
+    "5_14": {
+      "path": "4_Ortho_RGBIR/top_potsdam_5_14_RGBIR.tif",
+      "sha256": "3b9af7887f7241d1ae0ca4dae5538ed96a287c7e0379908a3caf68d1f117318d",
+      "irrg_sha256": "037cd4eedb987cf484474a68ce5f0b62866a89a0392a9ff5aa6cb56ae3f53aab",
+      "rgb_reference_sha256": "9885c9eaeecbb985c5f88e13eb6d62da231b7a284f4b91b3dc7645ff6b8e606a",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368176.5,
+        0.0,
+        -0.05,
+        5807662.6
+      ],
+      "extent": [
+        368176.5,
+        5807362.6,
+        368476.5,
+        5807662.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69681252,
+        "max_abs_dn": 150,
+        "mean_abs_dn": 6.128030444444445
+      }
+    },
+    "5_15": {
+      "path": "4_Ortho_RGBIR/top_potsdam_5_15_RGBIR.tif",
+      "sha256": "1e0af09efd929b234760e0145f1b79a7b4375952c8f7ba692949fe2c88cdb904",
+      "irrg_sha256": "647cc2384c2c2b44474fd057717268f1a48363f268de5f951b64b664010ef05c",
+      "rgb_reference_sha256": "303baf249635ee04b54ee6c543c35d3c058c10359d8ae8365e8ac2189c0f2289",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368476.5,
+        0.0,
+        -0.05,
+        5807662.6
+      ],
+      "extent": [
+        368476.5,
+        5807362.6,
+        368776.5,
+        5807662.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69095795,
+        "max_abs_dn": 161,
+        "mean_abs_dn": 5.465384944444445
+      }
+    },
+    "6_10": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_10_RGBIR.tif",
+      "sha256": "c40ff2536e4dbef4bb73653ab6107bd1e65b354b5f6ffe02356e33fca709a55c",
+      "irrg_sha256": "137dbf881af8cf6e4f69177c0fcf2885c18f7ac82df01eb911c8f8c8298c86a3",
+      "rgb_reference_sha256": "ab3c3d2ab0f6bf2b68551131cd2a0d8e675ab1521ee92b842e0161a8275a606c",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366976.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        366976.5,
+        5807062.6,
+        367276.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69977108,
+        "max_abs_dn": 146,
+        "mean_abs_dn": 6.680825666666666
+      }
+    },
+    "6_11": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_11_RGBIR.tif",
+      "sha256": "dee263a12473d6eb627bf0d1adc13b2762b3e09551beceeabce50ac66ce9e33a",
+      "irrg_sha256": "d9bf02509597905f60f15412866401344dc60dad139179e68f1c53529f9ae48b",
+      "rgb_reference_sha256": "f7abafb5a9c0e21d3b7457a846eefa42e71c882dc96d200d0493a4b86bae7e6c",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367276.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        367276.5,
+        5807062.6,
+        367576.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70271328,
+        "max_abs_dn": 139,
+        "mean_abs_dn": 8.085044
+      }
+    },
+    "6_12": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_12_RGBIR.tif",
+      "sha256": "bd0c438767921305cb1ba6bbfbcdcbe30e56617ee5b80bd3ef627b44eb2dba75",
+      "irrg_sha256": "8ac29ce373ce6bd26e3ba280448a8affeb1919bed2ab78a2ae3ba0139caf61c4",
+      "rgb_reference_sha256": "0563078c737b4c65f8d47eeef495c11435fd27c8011160bcaa8c20644cb8e7f1",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367576.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        367576.5,
+        5807062.6,
+        367876.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70467390,
+        "max_abs_dn": 143,
+        "mean_abs_dn": 7.951589601851852
+      }
+    },
+    "6_13": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_13_RGBIR.tif",
+      "sha256": "f310d1fdfda3dfc025355ef65debdbafa2723f4ba38333a210a7e6b859a8b13a",
+      "irrg_sha256": "af19fc262aad9af8af6ace814cd65c351ea4b6a813e7b2259f3c37a5db18e7ef",
+      "rgb_reference_sha256": "62a26c71e8882cff4cc91eae1e779915324d58489c37178102b119ad9cdb7339",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367876.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        367876.5,
+        5807062.6,
+        368176.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70767923,
+        "max_abs_dn": 131,
+        "mean_abs_dn": 7.117996277777777
+      }
+    },
+    "6_14": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_14_RGBIR.tif",
+      "sha256": "f8f537026ada796497b32ba49d1359e7dfc23d3cd0c363daa79c066842c02dfb",
+      "irrg_sha256": "5f5c7b182bb1a9100ecc8de236f17528975c97ba0008a8372d6b0a5cf87c04bb",
+      "rgb_reference_sha256": "6b70ff9d379361057f675bbf233f1246308c8974c47e40f0ef5d29acc0685f79",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368176.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        368176.5,
+        5807062.6,
+        368476.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70321130,
+        "max_abs_dn": 149,
+        "mean_abs_dn": 6.647532101851852
+      }
+    },
+    "6_15": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_15_RGBIR.tif",
+      "sha256": "511e7589e0d027887ef56454dc0c0ce4c096c24a1b0e280db2bf0ef2b1ed2466",
+      "irrg_sha256": "e3d87ad7be7e21977deef551d444f24d7aafd755bbede0646080e743839c7882",
+      "rgb_reference_sha256": "876397840341bbc37b57b574cff8e94275b1457388ecc83ad0a12e3516659f20",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        368476.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        368476.5,
+        5807062.6,
+        368776.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69934084,
+        "max_abs_dn": 157,
+        "mean_abs_dn": 6.8292761111111115
+      }
+    },
+    "6_7": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_7_RGBIR.tif",
+      "sha256": "0a055255de189357d8860a292fca4b35a0c44e3b822ed50c14c051178b37bb52",
+      "irrg_sha256": "49cfa99c0039cf6976bcc296fc8e14c51d064a9e262bf54a48d600476655f700",
+      "rgb_reference_sha256": "cecba8e1e06043d040745c8b375b4f6639b3f1402f4ac96d18b79e519aedf655",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366076.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        366076.5,
+        5807062.6,
+        366376.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69732248,
+        "max_abs_dn": 155,
+        "mean_abs_dn": 6.027256564814815
+      }
+    },
+    "6_8": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_8_RGBIR.tif",
+      "sha256": "907c6c0e9f8c33528ee01ee89ac9887b9ee99e590fec4c6e959842966b6db5e1",
+      "irrg_sha256": "4a30b2589b74557ce582398073bbf52e0e9f60cb160eeeaa16c1da8fa6462002",
+      "rgb_reference_sha256": "5b1db5625f4f933368cd6f3ed6e7c851508ed1d6dacee7a5568c95f1a97a9ce3",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366376.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        366376.5,
+        5807062.6,
+        366676.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69547165,
+        "max_abs_dn": 142,
+        "mean_abs_dn": 6.011960611111111
+      }
+    },
+    "6_9": {
+      "path": "4_Ortho_RGBIR/top_potsdam_6_9_RGBIR.tif",
+      "sha256": "7fee2b7ff12312e1c1060b58433affcd51b64782cdcd74c19172531869c465ab",
+      "irrg_sha256": "a9245e50ef69d64a77c429bc318d2dc3d9503709c9c2a036f14b778db963cb18",
+      "rgb_reference_sha256": "f93e6a27c88cd5f276bab4494c2fc2052538790aa6972ad9880f9c8dcd04805c",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366676.5,
+        0.0,
+        -0.05,
+        5807362.6
+      ],
+      "extent": [
+        366676.5,
+        5807062.6,
+        366976.5,
+        5807362.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69572483,
+        "max_abs_dn": 143,
+        "mean_abs_dn": 5.709628481481482
+      }
+    },
+    "7_10": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_10_RGBIR.tif",
+      "sha256": "ef672af5f0f7bc60866b9358732554822e1709754deb3dd2a6f92ba1cbe2d9b0",
+      "irrg_sha256": "d1dd5e5ea09d0000c1c5d8efb33b37a153ce9987f7cc7f1c7ba6eb6d5917aedc",
+      "rgb_reference_sha256": "ce3327ff3afdcf98e616800cb2bcc7ae8210703e3d5af882d4a47d51204dbb9a",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366976.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        366976.5,
+        5806762.6,
+        367276.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69994678,
+        "max_abs_dn": 156,
+        "mean_abs_dn": 5.945184305555555
+      }
+    },
+    "7_11": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_11_RGBIR.tif",
+      "sha256": "77b6675f94892373f64a23dd4a8feed997c14ec89fea3de4852f309830f59e56",
+      "irrg_sha256": "19d578ebed509ce0e9a39bf0dccfb8236bf07bc6a7bc5c2cec3ee35d97e0c9ab",
+      "rgb_reference_sha256": "ef8d2ec1fe3fbf726a49a1519f6bc6170dfb33161f7dfc42b5311371185c447e",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367276.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        367276.5,
+        5806762.6,
+        367576.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70277556,
+        "max_abs_dn": 158,
+        "mean_abs_dn": 7.629387037037037
+      }
+    },
+    "7_12": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_12_RGBIR.tif",
+      "sha256": "a7240b004bc8e57ec9f410e21d0e445ada12deb62aa863d1cfc6376e945d1987",
+      "irrg_sha256": "eaa1e4adb289cbf32bd8522e3d6fbade7e1d7df904a66a1519acea6862b8faad",
+      "rgb_reference_sha256": "be521345545078ce2ab144a4bc57f9b1fa05a907cdf7863bb96e0a3db62717fd",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367576.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        367576.5,
+        5806762.6,
+        367876.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70335741,
+        "max_abs_dn": 139,
+        "mean_abs_dn": 7.139372907407408
+      }
+    },
+    "7_13": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_13_RGBIR.tif",
+      "sha256": "016fe13e9146561ab21529f1c2ae4c7656b3dc94d9b6276c690a211a3fb6fd4d",
+      "irrg_sha256": "99d79e5f770b1eb1afd7850a62a580e1b38dd3f73847d40292fb0638ef7aa582",
+      "rgb_reference_sha256": "7e6dc728d9a298b4bf0cfd042df47f99cbf80d0f10b4c07123e2d00fe310e76d",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        367876.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        367876.5,
+        5806762.6,
+        368176.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 70181445,
+        "max_abs_dn": 150,
+        "mean_abs_dn": 5.9924456481481485
+      }
+    },
+    "7_7": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_7_RGBIR.tif",
+      "sha256": "8ed4c406c7a2084bd427723784750e89b9884de2471c7d43f4e4d329d6a21b14",
+      "irrg_sha256": "603dc29d7cdb4c145e2e328d0648a422aa74374eda5c93f0a890c330690ebb70",
+      "rgb_reference_sha256": "3b008121fd82f54ddad3112ee6841dc6ac7c159dc643b4cdf17398d5142ec71b",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366076.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        366076.5,
+        5806762.6,
+        366376.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69844293,
+        "max_abs_dn": 125,
+        "mean_abs_dn": 7.219069435185185
+      }
+    },
+    "7_8": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_8_RGBIR.tif",
+      "sha256": "777cd306ede22a6227568b110e61e7d7ea8836c441e70c80260d068f84ad79ab",
+      "irrg_sha256": "dd3d1679060be16121cff5929003954a4b2197e014bc1f5d1ed8ea3eabe33936",
+      "rgb_reference_sha256": "0f15551f15c35854625f476e3c3b229cd972be528a1c8132de1a945490c69aba",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366376.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        366376.5,
+        5806762.6,
+        366676.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69583874,
+        "max_abs_dn": 146,
+        "mean_abs_dn": 5.779959287037037
+      }
+    },
+    "7_9": {
+      "path": "4_Ortho_RGBIR/top_potsdam_7_9_RGBIR.tif",
+      "sha256": "446ae07bcfe9364e3a969606f3702df0e4fa1dc2e0e536df6ffa097c320f9d72",
+      "irrg_sha256": "3c64a4a50ac5b29b09a86b6cc0b3badddcf7c63a8dbf561327a7c14ffcc1888a",
+      "rgb_reference_sha256": "5b4992f7d3fa66bf568b693a58242da25021e6eca126e64fd17a0ef7032bc856",
+      "rgb_reference_exact": true,
+      "historical_irrg_rgbir_band_numbers": [
+        4,
+        2,
+        3
+      ],
+      "dtype": "uint8",
+      "shape": [
+        6000,
+        6000
+      ],
+      "crs": "EPSG:32633",
+      "affine": [
+        0.05,
+        0.0,
+        366676.5,
+        0.0,
+        -0.05,
+        5807062.6
+      ],
+      "extent": [
+        366676.5,
+        5806762.6,
+        366976.5,
+        5807062.6
+      ],
+      "coverage": 1.0,
+      "agreement": {
+        "values": 108000000,
+        "different": 69598330,
+        "max_abs_dn": 160,
+        "mean_abs_dn": 5.574494092592593
+      }
+    }
+  },
+  "rgb_reference_archive_sha256": "aa4b80a0a1668cfcf379ba9a1d8e63f5a6275a351834f112db755caaa564d41b",
+  "snapshot_hash": "e5b4975baafbbcdbcf751def28eb290220ebf010a69279dcec07566883f1a164"
+}

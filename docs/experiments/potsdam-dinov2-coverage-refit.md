@@ -1,5 +1,7 @@
 # Potsdam DINOv2: selection, refit, held-out evaluation
 
+**Status: HISTORICAL** — Completed DINOv2 protocol; use the final artifact review for its measured outcome.
+
 This study tests a smaller normalized ViT-B/14 decoder and a channel-preserving
 IRRG adapter. A/B/C select features and augmentation on the existing 18/6 split.
 A seed-43 confirmation must pass the same validation floors. Only then may the

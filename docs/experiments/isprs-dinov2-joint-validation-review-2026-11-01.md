@@ -1,5 +1,7 @@
 # DINOv2 joint-run validation review, 2026-11-01
 
+**Status: SUPERSEDED** — Final outcome is recorded in isprs-dinov2-joint-final-review-2026-11-01.md.
+
 See the [final review](isprs-dinov2-joint-final-review-2026-11-01.md) for saved
 checkpoints and test scores.
 
