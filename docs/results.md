@@ -4,6 +4,8 @@ This page is the canonical numerical summary. Its generated tables are recompute
 public, per-scene confusion matrices and the checksums in the evidence registry. The
 14-scene cohort has been examined in prior experiments; see the [study scope and
 limitations](limitations.md#benchmark-reuse-and-external-validity).
+Final model states for these four rows are downloadable from the pinned
+[weight release](model-weights.md).
 
 See the [benchmark metric formulas](benchmark-metrics.md) for the exact definitions.
 

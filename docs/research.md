@@ -32,9 +32,10 @@ a complete answer to this question. A proposed controlled study is recorded as
    and [pipeline guide](data-pipeline.md).
 2. **Experiment infrastructure.** The repository keeps scene splits, input views,
    preprocessing, sampling, evaluation, and run protocols in versioned configurations.
-   The public matrix bundle and evidence registry allow an outside reader to recompute
-   the headline Potsdam metrics without access to author-local runs. This currently
-   establishes metric reproduction (R1); see [reproducibility](reproducibility.md).
+   The public matrix bundle and evidence registry let readers recompute the headline
+   Potsdam metrics, and the final segmentation weights are released separately for reuse.
+   This supports metric reproduction (R1); full clean-clone inference remains unverified.
+   See [reproducibility](reproducibility.md) and the [weight release](model-weights.md).
 3. **Empirical system comparison.** The experiments document complete DINOv2, DINOv3,
    PSPNet, and SAM recipes, then analyze validation choices, per-class errors, scene
    variation, paired predictions, and recorded runtime. The [results page](results.md)

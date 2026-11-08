@@ -2,7 +2,7 @@
 
 **Research portfolio | Semantic segmentation of aerial imagery, from verified pixels to full-scene evaluation.**
 
-DeepNet studies Potsdam segmentation through source checks, scene-aware preparation, model experiments, and full-scene error analysis. Contributions are an auditable pipeline and recipe comparisons, not a new algorithm.
+DeepNet studies Potsdam segmentation through source-data checks, scene-aware preparation, model comparison, and full-scene error analysis. Its contributions are pipeline engineering and empirical recipe comparisons, not a new algorithm.
 
 ## Research question and headline result
 
@@ -12,15 +12,15 @@ We compare accuracy–compute trade-offs and errors under scene-aware evaluation
 | --- | ---: | ---: | --- |
 | **DINOv3-B/16 · verified RGB · single model** | **81.09%** | **92.04%** | 14 historical scenes · 467.9M pixels |
 
-> **Scope.** The 14-scene benchmark was examined in earlier campaigns. These scores are not a new blind test or a state-of-the-art claim. Comparisons describe complete experimental recipes.
+> **Scope.** The 14-scene cohort was used in earlier campaigns. These observed scores are not a new blind test or SOTA claim; comparisons describe complete recipes.
 
 ## Dataset and download
 
 **Potsdam:** 38 tiles ($6{,}000 \times 6{,}000$ pixels) at 5 cm ground sampling distance (GSD), with RGBIR (R/G/B/NIR), IRRG (NIR/R/G), DSM, and six-class labels. DINOv3 uses verified RGB from RGBIR; split: 18/6/14 train/validation/benchmark scenes.
 
-**Vaihingen:** 33 variable-size tiles (9 cm GSD) with NIR/red/green imagery, DSM, and labels. It is profiled here without a matched DINOv3 evaluation.
+**Vaihingen:** 33 variable-size 9 cm tiles with NIR/red/green imagery, DSM, and labels; profiled without matched DINOv3 evaluation.
 
-Download [Potsdam (13.3 GB)](https://seafile.projekt.uni-hannover.de/f/429be50cc79d423ab6c/) or [Vaihingen (16 GB)](https://seafile.projekt.uni-hannover.de/f/6a06a837b1f349cfa749/) via the [ISPRS portal](https://isprs.org/resources/datasets/benchmarks/UrbanSemLab/default.aspx); obtain the current password and terms there. Download one at a time and extract outside Git. With DVC remote access: `dvc pull data/auxiliary/potsdam-rgbir-v2.dvc`. For manual setup, preserve descriptor paths: generic Potsdam cataloging discovers IRRG, while DINOv3 uses RGBIR. See its [runbook](docs/experiments/potsdam-dinov3-rgbir-v2.md) and the [pipeline guide](docs/data-pipeline.md).
+Download [Potsdam (13.3 GB)](https://seafile.projekt.uni-hannover.de/f/429be50cc79d423ab6c/) or [Vaihingen (16 GB)](https://seafile.projekt.uni-hannover.de/f/6a06a837b1f349cfa749/) via the [ISPRS portal](https://isprs.org/resources/datasets/benchmarks/UrbanSemLab/default.aspx); get the current password and terms there. Download separately and extract outside Git. With DVC access: `dvc pull data/auxiliary/potsdam-rgbir-v2.dvc`. Preserve descriptor paths for manual setup: generic cataloging discovers IRRG; DINOv3 uses RGBIR. See the [runbook](docs/experiments/potsdam-dinov3-rgbir-v2.md) and [pipeline guide](docs/data-pipeline.md).
 
 ## Data integrity and scene-aware preparation
 
@@ -90,7 +90,7 @@ On six validation scenes (199,409,714 pixels), RGB baseline A outscored bundled 
 
 *A/B/C use seed 42; validation at passes 4/8 selected. D confirms A with seed 43. See [protocol](docs/experiments/potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md) ([CLAIM-007](artifacts/public/evidence-manifest.json)).*
 
-The tested auxiliary bundle and stronger augmentation did not improve on A; B does not isolate IR, index, or DSM. Flip TTA gains missed the predeclared 0.10-point OA threshold for both seeds, so inference remains identity. Individual features may still help.
+The auxiliary bundle and stronger augmentation did not beat A; B does not isolate IR, index, or DSM. Flip TTA missed the 0.10-point OA threshold for both seeds. Individual features may still help.
 
 ## Data pipeline and selected model
 
@@ -106,7 +106,7 @@ flowchart LR
     H --> I[Confusion matrices and analysis]
 ```
 
-The selected DINOv3 ViT-B/16 applies attention-projection LoRA. Blocks 3/6/9/12 share one patch grid; a normalized decoder fuses these features with stride-four detail. This is multi-level fusion, not a hierarchical pyramid.
+The DINOv3 ViT-B/16 uses attention LoRA. Blocks 3/6/9/12 share one patch grid; a normalized decoder fuses them with stride-four detail. This is multi-level, not hierarchical, fusion.
 
 ```mermaid
 flowchart LR
@@ -118,7 +118,7 @@ flowchart LR
     D --> F[Six-class logits]
 ```
 
-The seed-42 winner was refit for 1,152 updates on 24 participant-labeled scenes, then scored on the benchmark. See [architecture](docs/architecture.md) and the [DINOv3 campaign record](docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md).
+DINOv3's seed-42 winner was refit for 1,152 updates on 24 participant-labeled scenes before benchmark scoring. See [architecture](docs/architecture.md) and its [campaign record](docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md).
 
 ## Reproduction and further reading
 
@@ -129,6 +129,6 @@ python3 scripts/recompute_public_metrics.py --check
 python3 scripts/check_public_docs.py
 ```
 
-The checks verify matrices, hashes, links, claims, and report statuses. This is metric reproduction (R1); imagery, labels, predictions, and checkpoints are not public. See [reproducibility](docs/reproducibility.md), [figure provenance](docs/figures.md), [experiment index](docs/experiments/README.md), and the baseline papers: [DINOv2](https://arxiv.org/abs/2304.07193), [DINOv3](https://arxiv.org/abs/2508.10104), [PSPNet](https://openaccess.thecvf.com/content_cvpr_2017/html/Zhao_Pyramid_Scene_Parsing_CVPR_2017_paper.html), [SAM](https://arxiv.org/abs/2304.02643).
+Checks verify public metrics and evidence. Four final weights are [released on Hugging Face](https://huggingface.co/damminhtien/deepnet-potsdam-segmentation), with [hashes and reuse notes](docs/model-weights.md). Imagery, labels, and prediction maps are not included. See [reproducibility](docs/reproducibility.md), [figure provenance](docs/figures.md), [experiment index](docs/experiments/README.md), and baseline papers: [DINOv2](https://arxiv.org/abs/2304.07193), [DINOv3](https://arxiv.org/abs/2508.10104), [PSPNet](https://openaccess.thecvf.com/content_cvpr_2017/html/Zhao_Pyramid_Scene_Parsing_CVPR_2017_paper.html), [SAM](https://arxiv.org/abs/2304.02643).
 
 This historical, spatially limited benchmark lacks matched cross-city DINOv3 evaluation; controlled modality ablations and geographic evaluation remain [`CONFIGURED_NOT_RUN`](docs/experiments/future-study-design.md). Dataset imagery and pretrained weights retain their own terms; the repository does not declare a code license.

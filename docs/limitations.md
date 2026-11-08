@@ -52,14 +52,17 @@ they do not explain the cause of an error.
 
 Scoring times are measurements from specific Kaggle profiles and hardware, not portable
 latency guarantees. Total training GPU-hours depend on which configurations and failed
-starts are included. The public repository includes per-scene confusion matrices and
-selected metadata, but not checkpoints, prediction rasters, source imagery, or full
-Kaggle output bundles.
+starts are included. Per-scene confusion matrices and final weights for the four
+benchmark systems are public; prediction rasters, source imagery, labels, and full Kaggle
+output bundles are not. The SAM release contains only its trainable adapter and decoder;
+the upstream base checkpoint is separate.
 
 ## Licensing and use
 
 The repository does not currently include a code license, so code reuse terms are
-unspecified here. ISPRS imagery, labels, and pretrained DINOv3/SAM weights have their
-own source terms. The public evidence bundle does not redistribute those assets and does
-not change their terms. A citation file or code license should be added only after the
-relevant authorship and distribution rights have been confirmed.
+unspecified here. The public model bundle includes model-specific notices, including the
+DINOv3 License Agreement; there is no single license covering every weight in the bundle.
+ISPRS imagery and labels are not included and remain subject to the dataset provider's
+terms. Publishing trained weights does not grant rights to the underlying dataset or
+upstream models. See the [weight release record](model-weights.md#licenses-and-data-rights).
+A citation file or repository-wide code license remains a separate decision.

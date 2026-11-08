@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "hub_repository": "damminhtien/deepnet-potsdam-segmentation",
+  "hub_url": "https://huggingface.co/damminhtien/deepnet-potsdam-segmentation",
+  "hub_revision": "fc4e205b1d3a8338ad15d3a6dd659b6ddbf3797c",
+  "source_revision": "835fc1f",
+  "scope": "Final single-model state dictionaries for the four systems in the README benchmark table; no intermediate checkpoints or training state.",
+  "benchmark": {
+    "dataset": "ISPRS Potsdam",
+    "cohort": "historical 14-scene benchmark",
+    "pixels_scored": 467862855,
+    "metric_labels": "six-class eroded references; ignore label 6"
+  },
+  "models": [
+    {
+      "model_id": "dinov3-vitb16-rgb",
+      "file": "models/dinov3-vitb16-rgb/model.safetensors",
+      "bytes": 357239080,
+      "sha256": "3d8548f79099daf781db909e73b82399434fca8e0a710dc2413a9a175e7b3fcb",
+      "source_checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+      "state_scope": "full trained model state",
+      "evidence_claim": "CLAIM-001",
+      "oa_percent": 92.0397,
+      "six_class_miou_percent": 81.0932,
+      "experiment_report": "docs/experiments/potsdam-dinov3-rgbir-v2-final-review-2026-11-06.md"
+    },
+    {
+      "model_id": "dinov2-vitb14-irrg",
+      "file": "models/dinov2-vitb14-irrg/model.safetensors",
+      "bytes": 360916496,
+      "sha256": "9e489174a24474ac092a0c6d3b54ea4d1d4c76a5e2ffc891926cd1f5c92b05b6",
+      "source_checkpoint_sha256": "03af62b805bad33c3ba29746c17406daeb772469229cb61d04af0e76d263d33d",
+      "state_scope": "full trained model state",
+      "evidence_claim": "CLAIM-003",
+      "oa_percent": 91.4785,
+      "six_class_miou_percent": 79.6122,
+      "experiment_report": "docs/experiments/potsdam-dinov2-coverage-refit-final-review-2026-11-05.md"
+    },
+    {
+      "model_id": "pspnet-resnet101-rgb",
+      "file": "models/pspnet-resnet101-rgb/model.safetensors",
+      "bytes": 175985248,
+      "sha256": "44dccecb14a659c69893b5d800a5d368721654d9b49e0fc647a320af7d685100",
+      "source_checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+      "state_scope": "full trained model state",
+      "evidence_claim": "CLAIM-002",
+      "oa_percent": 91.2834,
+      "six_class_miou_percent": 79.4235,
+      "experiment_report": "docs/experiments/potsdam-pspnet-rgb-v1.md"
+    },
+    {
+      "model_id": "sam-vitb-lora-irrg",
+      "file": "models/sam-vitb-lora-irrg/model.safetensors",
+      "bytes": 2479192,
+      "sha256": "c84adc54dec3b18a9d3a8ddaebc7fa99e31bb95d36714d12edb70804f4e912a9",
+      "source_checkpoint_sha256": "3fa1c18da29140e3d0f11fa3657ef5934d10ebbe7f817362bb45b9bd0f4105bb",
+      "state_scope": "trainable LoRA and decoder tensors only; official SAM ViT-B base checkpoint required separately",
+      "evidence_claim": "CLAIM-004",
+      "oa_percent": 87.8142,
+      "six_class_miou_percent": 73.7024,
+      "experiment_report": "docs/experiments/isprs-dinov2-joint-validation-review-2026-11-01.md"
+    }
+  ]
+}
