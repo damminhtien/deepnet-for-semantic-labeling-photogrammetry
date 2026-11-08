@@ -1,0 +1,8 @@
+---
+const { index, category, title, description } = Astro.props;
+---
+<section class="wrap intro">
+  <p class="eyebrow"><span class="dot"></span> Exhibit {index} / {category}</p>
+  <h1>{title}</h1>
+  <p class="lede">{description}</p>
+</section>

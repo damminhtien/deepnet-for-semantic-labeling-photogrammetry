@@ -23,3 +23,8 @@ dist/
 # Python bytecode
 __pycache__/
 *.py[cod]
+
+# Research Atlas generated files and local dependencies
+/website/.astro/
+/website/node_modules/
+/website/src/generated/

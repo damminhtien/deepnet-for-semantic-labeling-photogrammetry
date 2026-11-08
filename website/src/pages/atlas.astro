@@ -1,0 +1,74 @@
+---
+import Atlas from '../layouts/Atlas.astro';
+import Intro from '../components/Intro.astro';
+import { route, source } from '../scripts/routes.mjs';
+import evidence from '../generated/evidence.json';
+---
+<Atlas title="Data Atlas" active="atlas">
+  <Intro index="01" category="Spectral microscope" title="The Data Atlas." description="Compare what a band was called with what the sensor actually measured. Browse the audited Potsdam footprint and inspect a source TIFF on your own device." />
+  <section class="wrap instrument lab" data-atlas>
+    <div class="controls">
+      <label>Dataset <select name="dataset" data-share><option>Potsdam</option><option>Vaihingen</option></select></label>
+      <label data-scene-control>Scene <select name="scene" data-share>{Object.keys(evidence.spectral.scenes).sort().map((scene) => <option selected={scene === '4_14'}>{scene}</option>)}</select></label>
+      <label>Spectral view <select name="mapping" data-share>
+        <option value="historical">Historical files · observed</option><option value="nominal">Historical names · implied</option><option value="compare">Swipe · observed vs implied</option><option value="rgb">Verified RGB encoder</option><option value="nir">Near infrared</option>
+      </select></label>
+    </div>
+    <div class="lab-grid">
+      <div class="stack">
+        <figure class="panel" data-footprint>
+          <p class="eyebrow">Potsdam tile index · UTM 33N</p>
+          <svg data-map viewBox="0 0 560 328" role="group" aria-label="Potsdam audited tile footprints"></svg>
+          <figcaption data-scene-meta></figcaption>
+        </figure>
+        <section class="panel stack" aria-labelledby="local-title">
+          <h3 id="local-title">Inspect a local TIFF</h3>
+          <p class="note" data-file-hint>Select the official four-band Potsdam RGBIR TIFF for this scene. Alternate display mappings are composed from the verified RGBIR source.</p>
+          <input type="file" aria-label="Local source TIFF" accept=".tif,.tiff,image/tiff" data-tiff />
+          <p class="note" data-status role="status">Files stay on this device.</p>
+          <div class="stack" data-viewer hidden>
+            <canvas class="raster" width="640" height="640" tabindex="0" aria-label="Local raster. Click to sample a pixel or use arrow keys to move the probe." data-raster></canvas>
+            <div class="controls">
+              <label>Zoom <input type="range" min="1" max="24" value="1" name="zoom" data-share /></label>
+              <button type="button" data-center>Center view on probe</button>
+            </div>
+            <label class="field" data-spectral-swipe hidden>Swipe: observed 4 / 2 / 3 ← → implied 4 / 1 / 2
+              <input type="range" min="0" max="100" value="50" name="swipe" data-share />
+            </label>
+            <p data-pixel class="number" role="status"></p>
+          </div>
+        </section>
+      </div>
+      <div class="stack">
+        <div>
+          <p class="eyebrow">Spectral identity detective</p>
+          <h2>Read beyond the band names.</h2>
+          <p data-finding></p>
+        </div>
+        <table class="lab-table">
+          <thead><tr><th scope="col">Display channel</th><th scope="col">Source band</th><th scope="col">Physical meaning</th></tr></thead>
+          <tbody data-band-table></tbody>
+        </table>
+        <label class="field">Histogram band <select name="band" data-share></select></label>
+        <figure>
+          <svg data-histogram viewBox="0 0 420 128" role="img" aria-label="Training pixel histogram"></svg>
+          <div class="axis"><span>0 DN</span><span>128</span><span>255 DN</span></div>
+          <figcaption class="note" data-hist-note></figcaption>
+        </figure>
+        <blockquote class="callout">A correct tensor shape does not guarantee correct spectral semantics.</blockquote>
+        <p class="note"><a href={source('artifacts/public/data/potsdam-rgbir-manifest.json')}>RGBIR audit ↗</a> · <a href={source(evidence.profile.path)}>Histogram counts ↗</a> · <a href={route('methods')}>Data terms ↗</a></p>
+      </div>
+    </div>
+  </section>
+</Atlas>
+<style>
+  [data-map] { width: 100%; height: auto; background: #0a2136; margin: .55rem 0; }
+  [data-map] :global(g) { cursor: pointer; }
+  [data-map] :global(g:hover rect), [data-map] :global(g:focus rect) { stroke: #f8e7c6; stroke-width: 2px; }
+  [data-map] :global(text) { pointer-events: none; }
+  .raster { width: min(100%, 640px); height: auto; cursor: crosshair; background: #081c2d; }
+  blockquote { margin-inline: 0; }
+</style>
+<script>
+  import '../scripts/data-atlas.mjs';
+</script>

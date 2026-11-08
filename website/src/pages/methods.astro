@@ -1,0 +1,77 @@
+---
+import Atlas from '../layouts/Atlas.astro';
+import Intro from '../components/Intro.astro';
+import evidence from '../generated/evidence.json';
+import { count } from '../scripts/metrics.mjs';
+import { route, source } from '../scripts/routes.mjs';
+const { benchmark, registry } = evidence;
+const ids = new Map(Object.entries(benchmark.models).map(([key, model]) => [model.experiment_id, key]));
+---
+<Atlas title="Evidence & Reproducibility" active="methods">
+  <Intro index="07" category="Evidence trail" title="Evidence & methods." description="Trace a claim back to the experiment, configuration, split and archived output that support it. Each record states how far the evidence can take you." />
+  <section class="wrap method-overview detail-grid">
+    <div class="panel stack">
+      <p class="eyebrow">Scoring protocol</p>
+      <h3>Count first. Then score.</h3>
+      <p>Rows represent reference labels and columns represent predictions. Overall accuracy is the diagonal sum divided by all scored pixels. Class IoU is TP / (TP + FP + FN); the mean gives the six classes equal weight. Aggregate scores use the sum of scene matrices.</p>
+      <p class="note">{benchmark.label_protocol} The historical cohort contains {benchmark.scene_ids.length} scenes and {count(benchmark.scored_pixels_expected)} scored pixels.</p>
+      <a class="text-link" href={route('evaluation')}>Explore the matrix ↗</a>
+    </div>
+    <div class="panel stack">
+      <p class="eyebrow">Comparison limits</p>
+      <h3>Which comparisons align?</h3>
+      <p>DINOv3 and PSPNet share the RGB cache, split, label reference, window geometry and identity inference. DINOv2 and SAM use historical recipes with different inputs or scoring geometry. Matching scene IDs and class supports does not establish byte identity of their reference maps.</p>
+      <a class="text-link" href={source('docs/reproducibility.md')}>Reproduction levels ↗</a>
+    </div>
+    <div class="panel stack">
+      <p class="eyebrow">Public and local evidence</p>
+      <h3>Where the pixels live.</h3>
+      <p>The site ships audited counts, metadata and schematic artwork. Local TIFFs and private crop packages are read by the browser. The Atlas does not host ISPRS imagery, labels, predictions, checkpoints or learned activations.</p>
+      <p class="note"><a href="https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx">ISPRS dataset documentation ↗</a> · <a href={source('artifacts/public/README.md')}>Public evidence scope ↗</a> · <a href={route() + 'font-licenses.txt'}>Font licenses ↗</a></p>
+    </div>
+  </section>
+  <section class="wrap claims stack">
+    <div class="section-heading">
+      <p class="eyebrow"><span class="dot"></span> Claim registry · {registry.registry_version}</p>
+      <h2>Open the evidence trail.</h2>
+      <p>Reproduce the published metrics with <code>python3 scripts/recompute_public_metrics.py --check</code>.</p>
+      <p><a class="text-link" href={route() + 'benchmark.json'} download>Download confusion counts ↓</a> · <a class="text-link" href={source('artifacts/public/evidence-manifest.json')}>Full registry ↗</a></p>
+    </div>
+    {registry.claims.map((claim) => {
+      const model = ids.get(claim.experiment_id);
+      return <article class="panel claim stack" id={claim.claim_id.toLowerCase()}>
+        <p class="eyebrow">{claim.claim_id} / {claim.evidence_level}</p>
+        <h3>{claim.statement}</h3>
+        <p class="note">{claim.limitations}</p>
+        {model && <a class="text-link" href={route('evaluation') + '?model=' + model}>Open this model in the observatory ↗</a>}
+        <details>
+          <summary>Protocol, artifacts and digests</summary>
+          <dl>
+            <dt>Experiment</dt><dd>{claim.experiment_id}</dd>
+            <dt>Dataset split</dt><dd>{claim.dataset_split}</dd>
+            <dt>Protocol</dt><dd><code>{claim.protocol_version}</code></dd>
+            <dt>Source revision</dt><dd>{claim.source_revision
+              ? <code>{claim.source_revision}</code> : claim.source_revision_note ?? 'Unavailable in the archived run record.'}</dd>
+            {claim.source_snapshot_sha256 && <><dt>Source snapshot SHA-256</dt><dd><code>{claim.source_snapshot_sha256}</code></dd></>}
+            {claim.checkpoint_sha256 && <><dt>Checkpoint SHA-256</dt><dd><code>{claim.checkpoint_sha256}</code></dd></>}
+            <dt>Configuration and reports</dt><dd>{claim.model_config.map((path) => <a href={source(path)}>{path} ↗</a>)}</dd>
+            <dt>Metrics artifact</dt><dd><a href={source(claim.metrics_artifact)}>{claim.metrics_artifact} ↗</a></dd>
+            <dt>Metrics SHA-256</dt><dd><code>{claim.sha256}</code></dd>
+          </dl>
+        </details>
+      </article>;
+    })}
+  </section>
+</Atlas>
+<style>
+  .method-overview { margin-bottom: clamp(28px, 5vw, 70px); }
+  .claims { margin-bottom: 4rem; }
+  .claim { scroll-margin-top: 1rem; }
+  .claim:target { border-left: 3px solid var(--amber); }
+  .claim h3 { max-width: 58ch; line-height: 1.16; }
+  .claim summary { cursor: pointer; color: #245f74; }
+  dl { display: grid; grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr); gap: .5rem 1rem; }
+  dt { font-weight: 600; } dd { margin: 0; overflow-wrap: anywhere; }
+  dd a { display: block; }
+  @media (max-width: 600px) { dl { grid-template-columns: 1fr; } dd { margin-bottom: .5rem; } }
+</style>

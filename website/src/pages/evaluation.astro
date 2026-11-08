@@ -1,0 +1,95 @@
+---
+import Atlas from '../layouts/Atlas.astro';
+import Intro from '../components/Intro.astro';
+import Legend from '../components/Legend.astro';
+import { route, source } from '../scripts/routes.mjs';
+import { metrics, modelKeys, percent } from '../scripts/metrics.mjs';
+import evidence from '../generated/evidence.json';
+const dino = evidence.benchmark.models.dinov3.aggregate_confusion_matrix;
+const vegetationShare = (dino[2][3] + dino[3][2]) / metrics(dino).errors;
+---
+<Atlas title="Evaluation Observatory" active="evaluation">
+  <Intro index="06" category="From metric to pixel" title="Evaluation observatory." description="Choose a reference-to-prediction pair to see its exact count, the scenes where it occurred and any documented paired crops that contain it." />
+  <section class="wrap instrument lab" data-evaluation>
+    <p class="note">In the historical DINOv3 RGB benchmark, tree ↔ low vegetation accounted for <strong>{percent(vegetationShare)}</strong> of all errors, counting both directions.</p>
+    <div class="controls">
+      <label>Model <select name="model" data-share>{modelKeys.map((key) => <option value={key}>{evidence.benchmark.models[key].display_name}</option>)}</select></label>
+      <label>Scene <select name="scene" data-share><option value="all">All {evidence.benchmark.scene_ids.length} benchmark scenes</option>{evidence.benchmark.scene_ids.map((id) => <option value={id}>{id}</option>)}</select></label>
+      <label>Matrix scale <select name="units" data-share><option value="row">Share of reference class</option><option value="count">Pixel counts</option></select></label>
+    </div>
+    <div class="lab-grid">
+      <div class="stack">
+        <div class="score-line" data-scores aria-label="Selected model metrics"></div>
+        <div class="table-scroll"><table class="matrix" aria-label="Confusion matrix, rows reference and columns prediction">
+          <caption>Reference ↓ / Predicted →</caption>
+          <thead data-head></thead><tbody data-matrix></tbody>
+        </table></div>
+        <Legend />
+        <p class="note">Diagonal cells are correct. Row percentages divide by all scored pixels for that reference class. Shading uses a fixed scale within each matrix mode.</p>
+      </div>
+      <div class="stack">
+        <div class="panel stack">
+          <p class="eyebrow">Selected class pair</p>
+          <h2 data-pair></h2>
+          <p class="number" data-pair-count role="status"></p>
+          <div data-scenes></div>
+          <p class="note" data-model-note></p>
+        </div>
+        <div class="panel stack">
+          <p class="eyebrow">Recorded paired crops</p>
+          <p class="note">Published crop counts from the matched RGB pair. These are targeted examples. Raw rasters are not bundled here.</p>
+          <div data-crops class="crop-list"></div>
+        </div>
+        <p class="note"><a href={route('methods') + '#claim-005'}>Evidence trail ↗</a> · <a href={source('artifacts/public/metrics/potsdam-benchmark-confusions.json')}>Original matrices ↗</a></p>
+      </div>
+    </div>
+    <section class="panel stack" data-local-comparison aria-labelledby="comparison-title">
+      <div>
+        <p class="eyebrow">Local raster comparison</p>
+        <h2 id="comparison-title">Swipe through a real crop.</h2>
+        <p class="note">Open an Atlas crop exported from the audited paired run. The file stays in your browser. <a href={source('website/README.md')}>Private export instructions ↗</a></p>
+      </div>
+      <input type="file" accept=".json,application/json" aria-label="Local Atlas crop package" data-crop-file />
+      <p class="note" role="status" data-local-status>No crop loaded.</p>
+      <div class="lab-grid" data-local-controls hidden>
+        <figure class="local-figure">
+          <canvas width="512" height="512" data-crop-canvas aria-label="Swipe comparison of aligned class ID maps"></canvas>
+          <figcaption class="note" data-local-caption></figcaption>
+        </figure>
+        <div class="stack">
+          <div class="controls">
+            <label>Left layer <select name="layer-left" data-share><option value="0">Eroded reference</option><option value="1">DINOv3 RGB</option><option value="2">PSPNet RGB</option></select></label>
+            <label>Right layer <select name="layer-right" data-share><option value="0">Eroded reference</option><option value="1" selected>DINOv3 RGB</option><option value="2">PSPNet RGB</option></select></label>
+          </div>
+          <label class="field">Swipe <input type="range" name="swipe" min="0" max="100" value="50" data-share /></label>
+          <label class="field">Zoom <input type="range" name="zoom" min="1" max="8" step="1" value="1" data-share /></label>
+          <label class="field">Error highlight opacity <input type="range" name="opacity" min="0" max="100" value="65" data-share /></label>
+          <p class="note">Amber marks the selected error. A scored pixel can border an ignored pixel; this indicates an edge of the scored mask and does not recover the original class boundary.</p>
+          <button type="button" data-save-crop>Save comparison PNG</button>
+          <Legend />
+        </div>
+      </div>
+    </section>
+  </section>
+</Atlas>
+<style>
+  [data-local-comparison] { margin-top: 1.5rem; }
+  .local-figure canvas { width: min(100%, 512px); height: auto; image-rendering: pixelated; background: #0b2239; }
+  .local-figure figcaption { margin-top: .55rem; }
+  .score-line { display: flex; flex-wrap: wrap; gap: .7rem 1.2rem; }
+  .score-line :global(span) { display: grid; color: var(--pale); font-size: .76rem; }
+  .score-line :global(strong) { color: #f8f5ed; font: 500 clamp(1.2rem, 2.5vw, 2.1rem) var(--serif); }
+  .matrix { width: 100%; min-width: 450px; border-collapse: separate; border-spacing: 3px; font-size: .75rem; }
+  .matrix caption { text-align: left; color: var(--pale); font-family: var(--mono); padding: .5rem 0; }
+  .matrix :global(th) { color: #c7dce4; font-weight: 400; text-align: center; }
+  .matrix :global(th[scope="row"]) { text-align: left; padding-right: .4rem; }
+  .matrix :global(td) { padding: 0; }
+  .matrix :global(button) { width: 100%; min-height: 2.55rem; padding: .15rem; border-color: transparent; font: 500 .67rem var(--mono); background: rgb(81 143 165 / var(--heat)); }
+  .matrix :global(button[aria-pressed="true"]) { outline: 2px solid #f5bd7b; outline-offset: -2px; background: #6a523c; }
+  .crop-list :global(details) { border-top: 1px solid var(--dark-rule); padding: .45rem 0; }
+  .crop-list :global(summary) { cursor: pointer; }
+  .crop-list :global(details > div) { margin: .4rem 0 .4rem .75rem; }
+</style>
+<script>
+  import '../scripts/evaluation.mjs';
+</script>

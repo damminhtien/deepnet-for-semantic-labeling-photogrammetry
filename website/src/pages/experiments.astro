@@ -1,0 +1,66 @@
+---
+import Atlas from '../layouts/Atlas.astro';
+import Intro from '../components/Intro.astro';
+import evidence from '../generated/evidence.json';
+import { source, route } from '../scripts/routes.mjs';
+---
+<Atlas title="Experiment Studio" active="experiments">
+  <Intro index="05" category="Recipe comparison" title="Experiment studio." description="Compare saved recipes at the recorded full validation step. The studio shows which settings changed and which measurements were actually made." />
+  <section class="wrap instrument lab" data-experiments>
+    <div class="lab-grid">
+      <div>
+        <p class="eyebrow">What changed?</p>
+        <h2>Compare two recipes.</h2>
+        <div class="controls">
+          <label>Left recipe <select name="left" data-share>{evidence.arms.map((row) => <option value={row.arm}>Arm {row.arm} · seed {row.seed}</option>)}</select></label>
+          <label>Right recipe <select name="right" data-share>{evidence.arms.map((row) => <option value={row.arm} selected={row.arm === 'B'}>Arm {row.arm} · seed {row.seed}</option>)}</select></label>
+          <label>Validation measure <select name="measure" data-share><option value="mIoU_percent">Mean IoU</option><option value="OA_percent">Overall accuracy</option>{evidence.benchmark.class_names.map((name) => <option value={name + '_IoU_percent'}>{name} IoU</option>)}</select></label>
+        </div>
+        <div class="table-scroll"><table class="lab-table">
+          <thead><tr><th scope="col">Setting</th><th scope="col" data-left></th><th scope="col" data-right></th></tr></thead>
+          <tbody data-recipe></tbody>
+        </table></div>
+        <p class="note">Highlighted rows changed. All comparisons use identity inference; the archived A/D flip check did not meet the {evidence.study.inference.minimum_tta_oa_gain * 100} pp OA gain gate.</p>
+      </div>
+      <div class="panel stack">
+        <p class="eyebrow">Measured validation · {Number(evidence.arms[0].update).toLocaleString('en-US')} updates</p>
+        <div data-arm-bars></div>
+        <div class="axis"><span>0%</span><span>50%</span><span>100%</span></div>
+        <p class="callout" data-delta role="status"></p>
+        <p class="note">{evidence.study.validation_pixels.toLocaleString('en-US')} validation pixels. These are saved outcomes, not predictions for untested combinations. Arm D repeats the A recipe at another seed.</p>
+        <p class="note"><a href={source('artifacts/public/data/potsdam-selection-validation-arms.csv')}>Validation table ↗</a> · <a href={source('docs/experiments/potsdam-dinov3-rgbir-v2-selection-summary-2026-11-06.md')}>Selection &amp; flip audit ↗</a> · <a href={route('methods') + '#claim-007'}>Claim record ↗</a></p>
+      </div>
+    </div>
+  </section>
+</Atlas>
+<style>
+  tbody :global(tr[data-changed]) { background: #d79b6222; }
+  tbody :global(tr[data-changed] th) { color: #f3bf86; }
+</style>
+<script>
+  import evidence from '../generated/evidence.json';
+  import { restore, share } from '../scripts/state.mjs';
+  const root = document.querySelector<HTMLElement>('[data-experiments]')!;
+  const fields = Array.from(root.querySelectorAll<HTMLSelectElement>('select'));
+  const [left, right, measure] = fields;
+  function render() {
+    const recipes = [left, right].map((field) => evidence.arms.find((row) => row.arm === field.value)!);
+    const profile = ({ seed, auxiliary_features, enhanced_augmentation, update }: typeof evidence.arms[number]) => [
+      seed, auxiliary_features === 'True' ? 'RGB + IR/index/DSM branch' : 'RGB', enhanced_augmentation === 'True' ? 'Enhanced' : 'Baseline', 'Identity', update,
+    ];
+    const values = recipes.map(profile);
+    root.querySelector('[data-left]')!.textContent = 'Arm ' + left.value;
+    root.querySelector('[data-right]')!.textContent = 'Arm ' + right.value;
+    root.querySelector('[data-recipe]')!.innerHTML = ['Seed', 'Input', 'Augmentation', 'Inference', 'Validation step'].map((label, i) =>
+      `<tr ${values[0][i] !== values[1][i] ? 'data-changed' : ''}><th scope="row">${label}</th><td>${values[0][i]}</td><td>${values[1][i]}</td></tr>`).join('');
+    const field = measure.value as keyof typeof evidence.arms[number];
+    const scores = recipes.map((row) => Number(row[field]));
+    root.querySelector('[data-arm-bars]')!.innerHTML = recipes.map((row, i) =>
+      `<div class="bar-row"><span>Arm ${row.arm}</span><strong>${scores[i].toFixed(4)}%</strong><div><i style="--value:${scores[i]}%"></i></div></div>`).join('');
+    const diff = scores[1] - scores[0];
+    root.querySelector('[data-delta]')!.textContent = `${measure.selectedOptions[0].text}: ${diff > 0 ? '+' : ''}${diff.toFixed(4)} pp (right minus left)`;
+  }
+  restore(root);
+  render();
+  for (const field of fields) field.addEventListener('change', () => { render(); share(root); });
+</script>

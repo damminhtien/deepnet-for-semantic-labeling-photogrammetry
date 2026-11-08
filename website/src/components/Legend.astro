@@ -1,0 +1,6 @@
+---
+import { colors, shortClasses } from '../scripts/metrics.mjs';
+---
+<ul class="legend" aria-label="Semantic classes">
+  {shortClasses.map((label, i) => <li><i style={`--swatch:${colors[i]}`}></i>{label}</li>)}
+</ul>

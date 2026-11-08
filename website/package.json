@@ -1,0 +1,24 @@
+{
+  "name": "deepnet-research-atlas",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "preview": "astro preview",
+    "predev": "python3 scripts/export_evidence.py",
+    "prebuild": "python3 scripts/export_evidence.py",
+    "build": "astro build",
+    "test": "python3 scripts/export_evidence.py && node --test"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/source-serif-4": "5.3.1",
+    "astro": "7.4.7",
+    "geotiff": "3.0.5",
+    "typescript": "7.0.2"
+  }
+}

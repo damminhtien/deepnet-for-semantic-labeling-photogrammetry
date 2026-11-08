@@ -1,0 +1,165 @@
+---
+import Atlas from '../layouts/Atlas.astro';
+import Legend from '../components/Legend.astro';
+import evidence from '../generated/evidence.json';
+import { route } from '../scripts/routes.mjs';
+import { count, metrics, modelKeys, percent } from '../scripts/metrics.mjs';
+const { benchmark } = evidence;
+const best = metrics(benchmark.models.dinov3.aggregate_confusion_matrix);
+const exhibits = [
+  ['01', 'Data Atlas', 'Check the physical identity behind each band name.', 'atlas'],
+  ['02', 'Data Pipeline', 'See which pixels enter a training window.', 'pipeline'],
+  ['03', 'Augmentation Theatre', 'Transform imagery, labels and validity together.', 'pipeline/#augmentation'],
+  ['04', 'Model Anatomy', 'Trace the tensor through DINOv3 and its decoder.', 'models'],
+  ['05', 'Experiment Studio', 'Compare the choices behind recipes A, B, C and D.', 'experiments'],
+  ['06', 'Evaluation Observatory', 'Follow a confusion cell to scenes and measured crops.', 'evaluation'],
+  ['07', 'Evidence & Reproducibility', 'Find the config, checkpoint digest and limits of a claim.', 'methods'],
+];
+const asset = (view: string) => `${route()}schematic/${view}.svg`;
+const chapters = [
+  ['Observe the scene', 'Aerial imagery comes as a stack of measurements on the same raster grid. A channel name is a claim about what that sensor measured.', 'atlas', 'Open the spectral inspector'],
+  ['Check the bands', 'In the audited Potsdam files, the historical three-band view was near infrared, green and blue. The RGB encoder instead reads verified source bands 1, 2 and 3.', 'atlas', 'Compare the band mappings'],
+  ['Cut a window', 'A 512 × 512 window carries image values, class IDs and a validity mask. The same coordinates must refer to the same pixel in every layer.', 'pipeline', 'Try the patch sampler'],
+  ['Tokenize the window', 'A ViT-B/16 divides the window into 16 × 16 patches. The 32 × 32 spatial tokens are then processed by the encoder.', 'models', 'Follow the tensor'],
+  ['Decode the classes', 'The decoder fuses four feature grids with a spatial branch and produces six class logits per pixel. The semantic layer here illustrates the class vocabulary.', 'models', 'Inspect the decoder'],
+  ['Measure the mistakes', 'Scored predictions and eroded references are counted by class pair. Use the real Potsdam matrix to locate scenes and documented crops with a selected error.', 'evaluation', 'Open the real confusion matrix'],
+];
+---
+<Atlas>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot"></span> Field notes / DeepNet research atlas</p>
+        <h1>From Pixels<br />to <em>Proof.</em></h1>
+        <p class="lede">Explore every decision behind a semantic segmentation model, from raw aerial imagery to measured performance.</p>
+        <div class="actions"><a class="button primary" href="#journey">Explore the story <span>↓</span></a><a class="button secondary" href={route('atlas')}>Open the Lab <span>↗</span></a></div>
+      </div>
+      <figure class="hero-plate">
+        <div class="plate-top"><span><i></i> PLATE 01 <b>/</b> URBAN RASTER</span><span>SCHEMATIC</span></div>
+        <div class="hero-image">
+          <img class="left-art" src={asset('image')} width="512" height="512" alt="Schematic overhead urban grid with buildings, roads, vegetation and a winding channel" fetchpriority="high" />
+          <img class="right-art" src={asset('labels')} width="512" height="512" alt="" fetchpriority="high" />
+          <div class="plate-grid"></div><div class="plate-divider"><span>↔</span></div>
+          <span class="image-tag left-tag">01 / OPTICAL VIEW</span><span class="image-tag right-tag">02 / SEMANTIC VIEW</span>
+          <label class="sr-only" for="hero-swipe">Optical and semantic schematic comparison</label>
+          <input id="hero-swipe" type="range" min="0" max="100" value="55" />
+        </div>
+        <figcaption><Legend /></figcaption>
+      </figure>
+    </div>
+  </section>
+  <section class="data-strip" aria-label="Potsdam benchmark at a glance">
+    <div class="wrap strip-grid">
+      <div class="strip-title"><span class="eyebrow"><span class="dot"></span> Evidence snapshot</span><strong>ISPRS Potsdam</strong><a href={route('methods') + '#claim-001'}>Historical benchmark ↗</a></div>
+      <div><strong>{benchmark.scene_ids.length}</strong><span>Benchmark scenes</span></div>
+      <div><strong>{(best.total / 1e6).toFixed(2)}M</strong><span>Scored pixels</span></div>
+      <div><strong>{percent(best.miou)}</strong><span>DINOv3 RGB · six-class mIoU</span></div>
+    </div>
+  </section>
+
+  <section class="wrap journey" id="journey">
+    <div class="section-heading"><p class="eyebrow"><span class="dot"></span> The research story / 01–06</p><h2>One scene, end to end.</h2><p>Follow an illustrative scene through the same kinds of decisions used in DeepNet. The measured results are linked at the final stage.</p></div>
+    <div class="story-grid">
+      <figure class="story-figure instrument" data-story>
+        <div class="plate-top"><span>PIPELINE / <b data-stage>01</b></span><span data-view>OPTICAL VIEW</span></div>
+        <div class="story-art" data-step="0">
+          <img src={asset('image')} width="512" height="512" alt="Illustrative scene used to explain the pipeline" loading="lazy" />
+          <img class="story-labels" src={asset('labels')} width="512" height="512" alt="" loading="lazy" />
+          <div class="story-gridlines"></div><div class="window-mark"><b>512 × 512</b></div>
+          <div class="band-mark">R <span>G</span> <b>B</b></div>
+          <div class="evidence-mark"><strong>{percent(best.miou)}</strong><small>BENCHMARK mIoU · DINOv3 RGB</small></div>
+        </div>
+        <figcaption><span data-caption>Schematic · no dataset pixels</span><div><button type="button" data-back aria-label="Previous stage">←</button><button type="button" data-next aria-label="Next stage">→</button></div></figcaption>
+      </figure>
+      <ol class="story-steps">
+        {chapters.map(([title, body, path, action], i) => <li data-chapter={i} id={`stage-${i + 1}`}>
+          <p class="eyebrow">Stage 0{i + 1}</p><h3>{title}</h3><p>{body}</p><a class="text-link" href={route(path)}>{action} ↗</a>
+        </li>)}
+      </ol>
+    </div>
+  </section>
+  <section class="benchmark-section">
+    <div class="wrap benchmark-grid">
+      <div class="section-heading"><p class="eyebrow"><span class="dot"></span> Measured evidence</p><h2>How the recipes scored.</h2><p>The matched RGB pair shares its evaluation setup. DINOv2 and SAM are historical recipe comparisons. All four entries use the same scene IDs and class supports.</p><a class="text-link" href={route('evaluation')}>Inspect the benchmark ↗</a></div>
+      <div class="instrument bars" data-benchmark>
+        <div class="segmented" aria-label="Benchmark metric"><button aria-pressed="true" data-metric="miou">Mean IoU</button><button aria-pressed="false" data-metric="oa">Overall accuracy</button></div>
+        {modelKeys.map((key) => { const model = benchmark.models[key]; const m = metrics(model.aggregate_confusion_matrix);
+          return <div class="bar-row" data-miou={m.miou} data-oa={m.oa}><span>{model.display_name}</span><strong>{percent(m.miou)}</strong><div><i style={`--value:${m.miou * 100}%`}></i></div></div>;
+        })}
+        <div class="axis"><span>0%</span><span>50%</span><span>100%</span></div>
+        <p class="note">{count(best.total)} scored pixels · Eroded reference · Six classes</p>
+      </div>
+    </div>
+  </section>
+  <section class="wrap exhibits">
+    <div class="section-heading"><p class="eyebrow"><span class="dot"></span> The research lab</p><h2>Choose an exhibit.</h2></div>
+    <div class="exhibit-list">{exhibits.map(([id, title, body, path]) =>
+      <a href={path.includes('/#') ? route('pipeline') + '#augmentation' : route(path)}><span class="mono">{id}</span><h3>{title}</h3><p>{body}</p><span aria-hidden="true">↗</span></a>
+    )}</div>
+  </section>
+</Atlas>
+<script>
+  import { percent } from '../scripts/metrics.mjs';
+  const swipe = document.querySelector<HTMLInputElement>('#hero-swipe')!;
+  const stage = document.querySelector<HTMLElement>('.hero-image')!;
+  const move = () => stage.style.setProperty('--split', swipe.value + '%');
+  const initial = new URLSearchParams(location.search).get('swipe');
+  if (initial !== null && Number.isFinite(Number(initial))) swipe.value = initial;
+  move();
+  swipe.addEventListener('input', move);
+  swipe.addEventListener('change', () => {
+    const url = new URL(location.href);
+    url.searchParams.set('swipe', swipe.value);
+    history.replaceState(null, '', url);
+  });
+
+  const chapters = Array.from(document.querySelectorAll<HTMLElement>('[data-chapter]'));
+  const story = document.querySelector<HTMLElement>('[data-story]')!;
+  const view = ['OPTICAL VIEW', 'RGB BANDS', 'PATCH WINDOW', 'PATCH TOKENS', 'CLASS LAYER', 'MEASURED SCORE'];
+  const back = story.querySelector<HTMLButtonElement>('[data-back]')!;
+  const next = story.querySelector<HTMLButtonElement>('[data-next]')!;
+  const art = story.querySelector<HTMLElement>('.story-art')!;
+  let step = 0;
+  function show(index: number) {
+    step = index;
+    art.dataset.step = String(index);
+    story.querySelector('[data-stage]')!.textContent = String(index + 1).padStart(2, '0');
+    story.querySelector('[data-view]')!.textContent = view[index];
+    story.querySelector('[data-caption]')!.textContent = index === 5 ? 'Verified benchmark · background is schematic' : 'Schematic · no dataset pixels';
+    back.disabled = index === 0;
+    next.disabled = index === chapters.length - 1;
+    chapters.forEach((chapter, i) => chapter.classList.toggle('current', i === index));
+  }
+  function updateStage() {
+    const middle = innerHeight * 0.55;
+    let index = 0;
+    chapters.forEach((chapter, i) => { if (chapter.getBoundingClientRect().top < middle) index = i; });
+    if (step !== index) show(index);
+  }
+  let frame = 0;
+  addEventListener('scroll', () => {
+    if (!frame) frame = requestAnimationFrame(() => { frame = 0; updateStage(); });
+  }, { passive: true });
+  function go(index: number) {
+    show(index);
+    chapters[index].scrollIntoView({ block: 'center', behavior: 'instant' });
+    const url = new URL(location.href);
+    url.hash = chapters[index].id;
+    history.replaceState(null, '', url);
+  }
+  back.addEventListener('click', () => go(step - 1));
+  next.addEventListener('click', () => go(step + 1));
+  show(0);
+  updateStage();
+
+  const chart = document.querySelector('[data-benchmark]')!;
+  const toggles = Array.from(chart.querySelectorAll<HTMLButtonElement>('[data-metric]'));
+  for (const button of toggles) button.addEventListener('click', () => {
+    for (const item of toggles) item.setAttribute('aria-pressed', String(item === button));
+    for (const bar of chart.querySelectorAll<HTMLElement>('.bar-row')) {
+      const value = Number(bar.dataset[button.dataset.metric!]);
+      bar.querySelector('strong')!.textContent = percent(value);
+      bar.querySelector('i')!.style.setProperty('--value', `${value * 100}%`);
+    }
+  });
+</script>

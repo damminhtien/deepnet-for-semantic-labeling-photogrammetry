@@ -1,0 +1,44 @@
+---
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-600.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/source-serif-4/latin-500.css';
+import '../styles/atlas.css';
+import { route, repo } from '../scripts/routes.mjs';
+const { title = 'From Pixels to Proof', active = '', description = 'An interactive research atlas for DeepNet aerial semantic segmentation.' } = Astro.props;
+const navigation = [['', 'Story'], ['atlas', 'Data'], ['pipeline', 'Pipeline'], ['models', 'Models'], ['experiments', 'Experiments'], ['evaluation', 'Evaluation'], ['methods', 'Methods']];
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#0b2239" />
+  <title>{title} · DeepNet Research Atlas</title>
+  <link rel="icon" type="image/svg+xml" href={route() + 'mark.svg'} />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-head">
+    <div class="wrap masthead">
+      <a class="brand" href={route()} aria-label="DeepNet Research Atlas, home">
+        <img src={route() + 'mark.svg'} alt="" width="30" height="30" />
+        <span>DeepNet <small>Research Atlas</small></span>
+      </a>
+      <nav aria-label="Main navigation">
+        {navigation.map(([path, label]) => <a href={route(path)} aria-current={path === active ? 'page' : undefined}>{label}</a>)}
+      </nav>
+      <a class="repository" href={repo}>GitHub ↗</a>
+    </div>
+  </header>
+  <main id="main"><slot /></main>
+  <footer>
+    <div class="wrap footer-inner">
+      <a class="brand" href={route()}><img src={route() + 'mark.svg'} alt="" width="25" height="25" /> DeepNet Research Atlas</a>
+      <span>ISPRS aerial semantic segmentation · Research evidence explorer</span>
+      <a href={route('methods')}>Methods &amp; provenance ↗</a>
+    </div>
+  </footer>
+</body>
+</html>

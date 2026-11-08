@@ -1,0 +1,69 @@
+name: Research Atlas
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/research-atlas.yml'
+      - 'website/**'
+      - 'artifacts/public/**'
+      - 'configs/**'
+      - 'docs/**'
+      - 'scripts/recompute_public_metrics.py'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/research-atlas.yml'
+      - 'website/**'
+      - 'artifacts/public/**'
+      - 'configs/**'
+      - 'docs/**'
+      - 'scripts/recompute_public_metrics.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - run: python3 scripts/recompute_public_metrics.py --check
+      - run: npm ci
+        working-directory: website
+      - run: npm test
+        working-directory: website
+      - run: npm run build
+        working-directory: website
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
+        with:
+          path: website/dist
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: research-atlas-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.publish.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: publish

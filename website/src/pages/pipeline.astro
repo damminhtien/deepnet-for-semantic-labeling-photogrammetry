@@ -1,0 +1,65 @@
+---
+import Atlas from '../layouts/Atlas.astro';
+import Intro from '../components/Intro.astro';
+import Legend from '../components/Legend.astro';
+import { route, source } from '../scripts/routes.mjs';
+---
+<Atlas title="Data Pipeline" active="pipeline">
+  <Intro index="02–03" category="Sampling & augmentation" title="Inside the pipeline." description="A window carries image data, class IDs and a validity mask. Change which windows are drawn, then see what happens when all three layers move together." />
+  <div class="wrap" data-pipeline>
+    <section class="instrument lab" aria-labelledby="sampling-title">
+      <div class="lab-grid">
+        <div>
+          <p class="eyebrow">02 / Patch sampler simulator</p>
+          <h2 id="sampling-title">Which pixels get seen?</h2>
+          <div class="controls">
+            <label>Schedule <select name="schedule" data-share><option value="grid">Coverage grid</option><option value="rare">Coverage + car/clutter draws</option></select></label>
+            <label>Draw seed <select name="draw" data-share><option>42</option><option>43</option><option>44</option></select></label>
+          </div>
+          <canvas width="512" height="512" data-sample aria-label="Schematic semantic scene with highlighted sampled windows"></canvas>
+          <Legend />
+        </div>
+        <div class="stack">
+          <p class="callout">The real Potsdam recipe covers its training grid, then adds one-sixth as many draws for car and another one-sixth for clutter. Rare draws start near a pixel of the target class.</p>
+          <p class="note">This simulator uses a synthetic grid with 24 base windows. Bars count all pixels presented, including repeated visits to overlapping windows.</p>
+          <p data-windows class="number" role="status"></p>
+          <div data-exposure aria-label="Class exposure percentages"></div>
+          <a href={source('deepnet/potsdam_rgbir/sampling.py')}>Read the training sampler ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="instrument lab" id="augmentation" aria-labelledby="augment-title">
+      <p class="eyebrow">03 / Augmentation theatre</p>
+      <h2 id="augment-title">One transform, three aligned layers.</h2>
+      <p class="note">Image values are interpolated; class IDs and validity use nearest neighbors. Gain changes valid image pixels only. Amber marks pixels outside the source window; their class is ignored (ID 6).</p>
+      <div class="controls transform-controls">
+        <label>Rotation <output for="rotation"></output><input id="rotation" type="range" name="rotation" min="-45" max="45" value="0" data-share /></label>
+        <label>Scale <output for="scale"></output><input id="scale" type="range" name="scale" min="60" max="140" value="100" data-share /></label>
+        <label>Translate X <output for="translation"></output><input id="translation" type="range" name="translation" min="-30" max="30" value="0" data-share /></label>
+        <label>Gain <output for="gain"></output><input id="gain" type="range" name="gain" min="60" max="150" value="100" data-share /></label>
+        <button type="button" data-reset>Reset</button>
+      </div>
+      <div class="raster-trio">
+        <figure><canvas width="256" height="256" data-image aria-label="Transformed synthetic optical image"></canvas><figcaption>01 / Image</figcaption></figure>
+        <figure><canvas width="256" height="256" data-labels aria-label="Transformed categorical label IDs"></canvas><figcaption>02 / Semantic labels</figcaption></figure>
+        <figure><canvas width="256" height="256" data-valid aria-label="Transformed validity mask"></canvas><figcaption>03 / Validity mask</figcaption></figure>
+      </div>
+      <Legend />
+      <p class="note" data-invalid role="status"></p>
+      <p class="note">Schematic transforms use wider ranges than the training policy to expose edge effects. <a href={source('deepnet/potsdam_rgbir/augmentation.py')}>Training implementation ↗</a> · <a href={route('experiments')}>Compare policies ↗</a></p>
+    </section>
+  </div>
+</Atlas>
+<style>
+  canvas { background: #102e45; height: auto; border: 1px solid #456175; }
+  [data-sample] { width: min(100%, 512px); }
+  .transform-controls label { flex: 1 1 7rem; }
+  output { color: var(--amber); font-family: var(--mono); }
+  .raster-trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; }
+  .raster-trio canvas { width: 100%; }
+  .raster-trio figcaption { font: 500 .7rem/1.4 var(--mono); padding-block: .4rem; }
+</style>
+<script>
+  import '../scripts/pipeline.mjs';
+</script>
