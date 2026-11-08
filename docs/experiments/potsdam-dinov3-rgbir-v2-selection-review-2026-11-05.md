@@ -15,7 +15,7 @@ schedule.
 
 ## Validation and checkpoint selection
 
-The two selection points use full-scene validation with 512 × 512 windows,
+The two selection points use full-scene validation with $512 \times 512$ windows,
 stride 256 and eroded labels.
 
 | Checkpoint | OA | Six-class mIoU | Car IoU | Clutter IoU | Eligible |

@@ -26,7 +26,7 @@
 - `DomainSpec` assigns each selected band an optical or auxiliary role. RGB reaches
   a pretrained encoder through a configured identity path only when channel names
   and order match. A configured residual adapter starts from channel identity
-  with a zero-initialized 1x1 residual; legacy projection behavior stays bound to
+  with a zero-initialized $1 \times 1$ residual; legacy projection behavior stays bound to
   its original model spec.
 - Auxiliary channels use a separate spatial branch and do not receive optical
   brightness or contrast transforms.
@@ -68,7 +68,7 @@
   the scaler, and runs 1,152 updates. Keep the recipe, feature statistics and
   inference policy fixed. Report metrics on those 24 scenes as training metrics.
 - The final checkpoint hash and completed refit audit gate one benchmark attempt.
-  The DINOv3 protocol scores exactly 467,862,855 pixels with 512x512 windows and
+  The DINOv3 protocol scores exactly 467,862,855 pixels with $512 \times 512$ windows and
   stride 256. Use the image and label masks to count scored pixels.
 - Recompute benchmark metrics from saved aggregate and per-scene confusion
   matrices. Report them as local scores on the historical benchmark.

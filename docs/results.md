@@ -5,11 +5,13 @@ public, per-scene confusion matrices and the checksums in the evidence registry.
 14-scene cohort has been examined in prior experiments; see the [study scope and
 limitations](limitations.md#benchmark-reuse-and-external-validity).
 
+See the [benchmark metric formulas](benchmark-metrics.md) for the exact definitions.
+
 <!-- BEGIN GENERATED METRICS -->
 
 ### Aggregate results
 
-Metrics are recomputed by summing the 14 per-scene confusion matrices for each model. Rows are complete recorded systems; only DINOv3 RGB and PSPNet RGB share the matched input, split, eroded reference, 512×512 windows, stride 256, batch size, and identity inference recipe. The benchmark was examined in earlier campaigns.
+Metrics are recomputed by summing the 14 per-scene confusion matrices for each model. Rows are complete recorded systems; only DINOv3 RGB and PSPNet RGB share the matched input, split, eroded reference, $512 \times 512$ windows, stride 256, batch size, and identity inference recipe. The benchmark was examined in earlier campaigns.
 
 | Model | OA | Six-class mIoU | Errors / scored pixels | Recorded full-scene scoring | Evidence |
 | --- | ---: | ---: | ---: | ---: | --- |

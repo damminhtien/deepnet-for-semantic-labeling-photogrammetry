@@ -13,7 +13,7 @@ review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-05.md).
 
 ## Selection results
 
-Full validation uses 512x512 windows, stride 256 and the same eroded labels.
+Full validation uses $512 \times 512$ windows, stride 256 and the same eroded labels.
 Only updates 3,456 and 6,912 can select a checkpoint. Eligibility and ordering use
 exact confusion matrices before rounding.
 

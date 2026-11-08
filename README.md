@@ -16,7 +16,7 @@ We compare accuracy–compute trade-offs and errors under scene-aware evaluation
 
 ## Dataset and download
 
-**Potsdam:** 38 tiles of 6,000 × 6,000 pixels at 5 cm ground sampling distance (GSD), with RGBIR (R/G/B/NIR), IRRG (NIR/R/G), DSM, and six-class labels. DINOv3 uses verified RGB from RGBIR; split: 18/6/14 train/validation/benchmark scenes.
+**Potsdam:** 38 tiles ($6{,}000 \times 6{,}000$ pixels) at 5 cm ground sampling distance (GSD), with RGBIR (R/G/B/NIR), IRRG (NIR/R/G), DSM, and six-class labels. DINOv3 uses verified RGB from RGBIR; split: 18/6/14 train/validation/benchmark scenes.
 
 **Vaihingen:** 33 variable-size tiles (9 cm GSD) with NIR/red/green imagery, DSM, and labels. It is profiled here without a matched DINOv3 evaluation.
 
@@ -48,7 +48,7 @@ Versioned contracts bind source hashes, bands, grids, labels, scene roles, prepr
 
 ## Benchmark findings: accuracy, cost, and error structure
 
-All systems scored 14 scenes and 467,862,855 pixels. Only DINOv3 RGB and PSPNet RGB share the current cache, split, labels, 512 × 512 windows, stride 256, and identity inference.
+All systems scored 14 scenes and 467,862,855 pixels. Only DINOv3 RGB and PSPNet RGB share the current cache, split, labels, $512 \times 512$ windows, stride 256, and identity inference.
 
 ![Aggregate and per-scene comparison of four Potsdam segmentation systems](docs/experiments/figures/potsdam-four-model-benchmark-scienceplots-2026-11-07.png)
 

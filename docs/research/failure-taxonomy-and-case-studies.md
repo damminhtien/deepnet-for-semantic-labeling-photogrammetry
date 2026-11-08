@@ -5,7 +5,7 @@
 The paired study reruns inference only with the archived DINOv3-B RGB and PSPNet RGB
 refit checkpoints. Both use the same test-only RGB cache (hash
 `a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4`), the same 14
-scene IDs, eroded labels, 512×512 windows, stride 256, identity inference, and batch
+scene IDs, eroded labels, $512 \times 512$ windows, stride 256, identity inference, and batch
 size 4. No optimizer or training data was used.
 
 The Kaggle job reproduced every archived per-scene confusion matrix for both models.
@@ -79,7 +79,7 @@ prediction maps.
 
 ## Deterministic visual cases
 
-Twenty non-overlapping grid crops, each at most 512×512 pixels, were selected by pixel
+Twenty non-overlapping grid crops, each at most $512 \times 512$ pixels, were selected by pixel
 counts before looking at the images: four crops with the largest DINOv3-only correctness, four with the
 largest PSPNet-only correctness, four with the most shared errors, four with the most
 car/clutter prediction disagreement, and four with the most tree/low-vegetation

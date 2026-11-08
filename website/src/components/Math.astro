@@ -1,0 +1,18 @@
+---
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+interface Props {
+  tex: string;
+  display?: boolean;
+}
+
+const { tex, display = false } = Astro.props;
+const html = katex.renderToString(tex, { displayMode: display });
+---
+{display ? <div class="math-display" set:html={html}></div> : <span set:html={html}></span>}
+
+<style>
+  .math-display { max-width: 100%; overflow-x: auto; }
+  .math-display :global(.katex-display) { margin: .4rem 0; }
+</style>

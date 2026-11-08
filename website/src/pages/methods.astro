@@ -1,11 +1,17 @@
 ---
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
+import Math from '../components/Math.astro';
+import metricDocument from '../../../docs/benchmark-metrics.md?raw';
 import evidence from '../generated/evidence.json';
 import { count } from '../scripts/metrics.mjs';
 import { route, source } from '../scripts/routes.mjs';
 const { benchmark, registry } = evidence;
 const ids = new Map(Object.entries(benchmark.models).map(([key, model]) => [model.experiment_id, key]));
+const formulas = Array.from(
+  metricDocument.matchAll(/^\$\$\r?\n([\s\S]+?)\r?\n\$\$\r?$/gm),
+  ([, tex]) => tex,
+);
 ---
 <Atlas title="Evidence & Reproducibility" active="methods">
   <Intro index="07" category="Evidence trail" title="Evidence & methods." description="Trace a claim back to the experiment, configuration, split and archived output that support it. Each record states how far the evidence can take you." />
@@ -13,9 +19,14 @@ const ids = new Map(Object.entries(benchmark.models).map(([key, model]) => [mode
     <div class="panel stack">
       <p class="eyebrow">Scoring protocol</p>
       <h3>Count first. Then score.</h3>
-      <p>Rows represent reference labels and columns represent predictions. Overall accuracy is the diagonal sum divided by all scored pixels. Class IoU is TP / (TP + FP + FN); the mean gives the six classes equal weight. Aggregate scores use the sum of scene matrices.</p>
+      <p>Rows represent reference labels and columns represent predictions. For class <Math tex="c" />, <Math tex={'\\mathrm{TP}_c'} />, <Math tex={'\\mathrm{FP}_c'} /> and <Math tex={'\\mathrm{FN}_c'} /> count true positives, false positives and false negatives. <Math tex="N" /> is the total scored pixel count.</p>
+      <div aria-label="Benchmark metric formulas">
+        {formulas.map((tex) => <Math tex={tex} display />)}
+      </div>
+      <p>Aggregate scores use the sum of scene matrices.</p>
       <p class="note">{benchmark.label_protocol} The historical cohort contains {benchmark.scene_ids.length} scenes and {count(benchmark.scored_pixels_expected)} scored pixels.</p>
       <a class="text-link" href={route('evaluation')}>Explore the matrix ↗</a>
+      <a class="text-link" href={source('docs/benchmark-metrics.md')}>Read the scoring definitions ↗</a>
     </div>
     <div class="panel stack">
       <p class="eyebrow">Comparison limits</p>

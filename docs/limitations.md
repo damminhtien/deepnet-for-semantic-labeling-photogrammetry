@@ -3,7 +3,7 @@
 ## Internal validity
 
 The DINOv3 RGB and PSPNet RGB runs share scene IDs, the recorded split hash, RGB cache,
-eroded references, 512×512 windows, 256-pixel stride, batch size, and identity inference.
+eroded references, $512 \times 512$ windows, 256-pixel stride, batch size, and identity inference.
 They still use different architectures, initialization, and training recipes. Their
 score difference therefore belongs to the complete runs; it is not an architecture-only
 effect. DINOv2 and SAM differ in additional input, decoder, training, and inference

@@ -26,7 +26,7 @@ of the underlying historical reference maps remains unverified.
 The figure compares aggregate class IoUs and per-scene OA differences using
 audited tables derived from saved confusion matrices. The
 [SciencePlots rendering](../figures.md#dinov3-reports) reproduces it. DINOv3 uses
-identity inference with 512 × 512 windows and stride 256; DINOv2 retains 504/252,
+identity inference with $512 \times 512$ windows and stride 256; DINOv2 retains 504/252,
 and SAM uses its historical tiling. Scores compare complete recipes.
 
 | Class | DINOv2 refit IoU | DINOv3 RGB refit IoU | Difference | DINOv3 F1 |
@@ -109,7 +109,7 @@ imply 4/1/2. The new encoder uses 1/2/3 and the auxiliary index uses IR/red 4/1.
 The selection lock records A's seed-42 checkpoint, recipe, fitted statistics,
 identity inference and continuation schedule. Refit uses a separate cache with
 participant labels for all 24 scenes in the 18+6 union. It resets AdamW and AMP,
-uses learning rates 5e-5 and 1.5e-4, and keeps 5% warmup with cosine decay. Its
+uses learning rates $5 \times 10^{-5}$ and $1.5 \times 10^{-4}$, and keeps 5% warmup with cosine decay. Its
 3,456 base windows plus 576 draws per rare class give 1,152 updates at
 accumulation 4. The checkpoint at the last update goes to the benchmark.
 
@@ -135,7 +135,7 @@ repeated and augmented draws.
 The initial 36-patch diagnostics exactly match A's selected checkpoint. The final
 panel has 9,068,544 valid samples per channel, with zero nonfinite values before
 and after normalization. Projected RGB means are 0.3353/0.3459/0.3191. The red
-channel has nine values beyond the identity bounds (fraction 9.9244e-7), while
+channel has nine values beyond the identity bounds (fraction $9.9244 \times 10^{-7}$), while
 green and blue have zero; this small learned residual is preserved in the audit.
 
 | Normalized channel | Mean | Std | Min | Max | p01 / p05 / p50 / p95 / p99 |

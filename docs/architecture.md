@@ -136,7 +136,7 @@ results.
 `deepnet/potsdam_rgbir/protocol.py` records selection rules, seeds, TTA, source
 hashes and GPU limits. `phases.py` continues the selected seed-42 checkpoint for
 1,152 updates on a separate cache with 24 participant-labeled scenes. It scores
-the final checkpoint once on the historical benchmark, using 512 × 512 windows
+the final checkpoint once on the historical benchmark, using $512 \times 512$ windows
 and stride 256.
 
 The joint Potsdam/Vaihingen DINOv3 plan is unexecuted. Its [splits and evaluation

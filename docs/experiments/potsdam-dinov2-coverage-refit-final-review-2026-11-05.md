@@ -73,11 +73,11 @@ scenes in the 18+6 union. Its fingerprint is
 `a32734f4410dc97fa19b91d68bc49f8643390d7d4fc573bfd1ec37f5e3ee0679`.
 
 AdamW and the AMP scaler were reset for refit. Initial learning rates were
-5e-5 for LoRA and 1.5e-4 for the adapter/decoder, with 5% warmup and cosine
+$5 \times 10^{-5}$ for LoRA and $1.5 \times 10^{-4}$ for the adapter/decoder, with 5% warmup and cosine
 decay. One complete pass contains 3,456 base windows and 576 prioritized draws
 for each of cars and clutter. Four microbatches per update yield 1,152 updates.
 An independent reconstruction from the locked bundle metadata confirms 144
-distinct base windows for each of the 24 scenes and complete 6,000 x 6,000
+distinct base windows for each of the 24 scenes and complete $6{,}000 \times 6{,}000$
 scene coverage; edge padding does not replace any interior pixel.
 No validation, early stopping or checkpoint ranking ran during this stage.
 The final weights at the declared final step are the evaluation model.
@@ -113,7 +113,7 @@ The final weights at the declared final step are the evaluation model.
 The held-out kernel was submitted once at 13:26:47 SGT on 2026-11-05, as version
 1 of [the private evaluation job](https://www.kaggle.com/code/damminhtien/potsdam-dinov2-coverage-refit-v1-heldout).
 The prelaunch checks verified the source package, protocol, selection lock,
-final refit checkpoint and unopened evaluation role. Inference uses 504 x 504
+final refit checkpoint and unopened evaluation role. Inference uses $504 \times 504$
 windows, stride 252 and weighted overlap on 14 scenes with eroded references.
 The required support is exactly 467,862,855 pixels.
 

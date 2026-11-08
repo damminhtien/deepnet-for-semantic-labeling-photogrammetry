@@ -84,14 +84,14 @@ Normalization is part of the model-input contract, not a universal preprocessing
 
 | Input type | Configured operation | Scope and note |
 | --- | --- | --- |
-| Generic IRRG optical bands | Divide uint8 source values by 255 | Produces `[0, 1]` inputs; the learned spectral adapter then maps sensor bands to the pretrained encoder's RGB space. |
-| A z-score view | Subtract training mean and divide by population standard deviation | Statistics are streamed over valid, finite pixels from training scenes only. The preprocessing artifact records fitted scene IDs and the exact split hash. |
+| Generic IRRG optical bands | $x_{\mathrm{scaled}} = x / 255$ for uint8 source values | Produces `[0, 1]` inputs; the learned spectral adapter then maps sensor bands to the pretrained encoder's RGB space. |
+| A z-score view | $z_c = (x_c - \mu_c) / \sigma_c$ | The mean $\mu_c$ and population standard deviation $\sigma_c$ use valid, finite pixels from training scenes only. The preprocessing artifact records fitted scene IDs and the exact split hash. |
 | Potsdam RGBIR optical cache | Convert the four uint8 bands to `[0, 1]` at sample-read time | The verified cache stores source RGBIR as uint8; the model view chooses RGB only or RGB plus infrared/features. |
 | Potsdam relief feature | Local DSM relief divided by a training-fitted absolute p99 scale and clipped to `[-1, 1]` | Separate from optical normalization. A DSM availability channel records missing elevation independently of image/label validity. |
 
 The statistics fitter uses valid pixels and rejects non-training scene IDs, empty channels, non-finite or zero standard deviations, mismatched grids, and missing channel sources. Refit phases must preserve their declared fit scope; for the RGBIR refit, the 24-scene train-only cache uses relief scale fitted on the original 18 training scenes rather than refitting on the former validation scenes. This keeps the feature scale fixed across selection and refit.
 
-Potsdam DSM preparation uses the versioned `valid-box-101-p99abs-stride16-v1` recipe: local relief is derived by subtracting a valid 101 × 101 neighborhood mean, scaled by the absolute p99 computed from original training scenes, and clipped. Missing DSM cells get zero relief and zero availability; they do not become invalid image pixels or disappear from the scoring mask. The JPEG nDSM is excluded because its decoding and co-registration are not verified. Source vertical units and datum also remain unconfirmed, so relief is a normalized local feature rather than a claim of verified absolute elevation.
+Potsdam DSM preparation uses the versioned `valid-box-101-p99abs-stride16-v1` recipe: local relief is derived by subtracting a valid $101 \times 101$ neighborhood mean, scaled by the absolute p99 computed from original training scenes, and clipped. Missing DSM cells get zero relief and zero availability; they do not become invalid image pixels or disappear from the scoring mask. The JPEG nDSM is excluded because its decoding and co-registration are not verified. Source vertical units and datum also remain unconfirmed, so relief is a normalized local feature rather than a claim of verified absolute elevation.
 
 ## 5. Patch construction and sampling
 
@@ -99,13 +99,13 @@ Potsdam DSM preparation uses the versioned `valid-box-101-p99abs-stride16-v1` re
 
 The generic `ScenePatchDataset` accepts training scenes only. It draws a scene and a fixed-size crop, then derives a deterministic sample RNG from `(seed, epoch, index)`. Uniform sampling chooses scenes and valid top-left crop positions. The optional class-aware index is built from training labels only, rejects any non-training scene, and selects a window containing a sampled class pixel.
 
-The joint IRRG configuration uses a 30% class-aware component and 70% uniform component. Class frequencies are converted into bounded inverse-square-root class weights (clamped to 0.5–2.0); class sampling and class weights are derived from training counts, never validation/test labels. Potsdam and Vaihingen receive equal domain sampling weight in the joint schedule. The effective crop size is model-patch aware: the DINOv2 config uses 504 × 504 for Potsdam and 280 × 280 for Vaihingen (multiples of ViT-B/14's 14-pixel patch); the configured DINOv3 joint recipe uses 512 × 512 and 288 × 288 (multiples of ViT-B/16's 16-pixel patch).
+The joint IRRG configuration uses a 30% class-aware component and 70% uniform component. Class frequencies are converted into bounded inverse-square-root class weights (clamped to 0.5–2.0); class sampling and class weights are derived from training counts, never validation/test labels. Potsdam and Vaihingen receive equal domain sampling weight in the joint schedule. The effective crop size is model-patch aware: the DINOv2 config uses $504 \times 504$ for Potsdam and $280 \times 280$ for Vaihingen (multiples of ViT-B/14's 14-pixel patch); the configured DINOv3 joint recipe uses $512 \times 512$ and $288 \times 288$ (multiples of ViT-B/16's 16-pixel patch).
 
 Validation uses deterministic full-grid windows with constant-padded edges and valid masks. It has no stochastic augmentation. Test scenes are held outside selection bundles and are only read after checkpoint selection under the relevant frozen evaluation protocol.
 
 ### 5.2 Specialized RGBIR training
 
-The Potsdam RGBIR study indexes the full training grid in 512 × 512 windows, then adds equal rare-class quotas for class 4 (car) and class 5 (clutter/background). In the documented selection pass, 2,592 base windows are supplemented by 432 car-centered and 432 clutter-centered windows. Each extra crop is centered near a sampled target-class pixel with up to 96 pixels of jitter. The draw list is deterministically shuffled, and each sample seed is derived from the study seed, pass number, and draw ordinal.
+The Potsdam RGBIR study indexes the full training grid in $512 \times 512$ windows, then adds equal rare-class quotas for class 4 (car) and class 5 (clutter/background). In the documented selection pass, 2,592 base windows are supplemented by 432 car-centered and 432 clutter-centered windows. Each extra crop is centered near a sampled target-class pixel with up to 96 pixels of jitter. The draw list is deterministically shuffled, and each sample seed is derived from the study seed, pass number, and draw ordinal.
 
 This policy increases rare-class exposure but does not make the training distribution naturally balanced. The training log should count the labels that actually reach the model after augmentation, separating semantic, ignored, and invalid pixels. The repository includes a histogram accumulator for this purpose. Keep source coverage statistics separate from post-augmentation presentation statistics.
 
@@ -121,12 +121,12 @@ Both recipes apply square symmetry (the eight rotations/reflections of a square)
 | --- | --- | --- |
 | Affine probability | 0.35 | 0.25 |
 | Scale | 0.90–1.10 | 0.95–1.05 |
-| Rotation | ±12° | ±6° |
-| Translation | ±4% of window | ±2% of window |
-| Brightness/contrast | p = 0.35; brightness ±0.08, contrast ±0.10 | Same |
-| Gamma | p = 0.20; 90–110% | p = 0.20; 90–110% |
-| Gaussian noise | p = 0.15; per-channel std 0.005–0.025, mean −0.005–0.005 on `[0,1]` scale | Same |
-| Gaussian blur | p = 0.10; 3–5 pixel kernel | Same |
+| Rotation | $\pm 12^\circ$ | $\pm 6^\circ$ |
+| Translation | $\pm 4\%$ of window | $\pm 2\%$ of window |
+| Brightness/contrast | $p = 0.35$; brightness $\pm 0.08$, contrast $\pm 0.10$ | Same |
+| Gamma | $p = 0.20$; 90–110% | $p = 0.20$; 90–110% |
+| Gaussian noise | $p = 0.15$; per-channel std 0.005–0.025, mean −0.005–0.005 on `[0,1]` scale | Same |
+| Gaussian blur | $p = 0.10$; 3–5 pixel kernel | Same |
 
 The generic augmenter receives aligned source values before model-view scaling. It temporarily maps optical values into their declared `[0, 1]` radiometric range for photometric transforms, clips there, and maps them back to the declared source range. Every transform has an independent deterministic random stream derived from the sample seed, so replay is stable and probability gates are not coupled to worker order.
 
@@ -136,9 +136,15 @@ The current joint DINOv3 JSON configurations still select the v2 augmentation an
 
 ### 6.2 Potsdam RGBIR custom recipes
 
-The RGBIR campaign uses a separate OpenCV augmenter rather than the generic Albumentations recipe. Every draw receives a random right-angle rotation and horizontal flip (D4 symmetry). Baseline affine probability is 0.25 with rotation ±6°, scale 0.95–1.05, translation ±2%, and a 96-pixel source halo. The augmenter reads context around each requested crop before affine warping. Optical values are already on a `[0, 1]` scale in the cache. Optical warps are normalized by warped valid support; labels and masks use nearest-neighbor; relief is warped only over available DSM support; unavailable relief stays zero.
+The RGBIR campaign uses a separate OpenCV augmenter rather than the generic Albumentations recipe. Every draw receives a random right-angle rotation and horizontal flip (D4 symmetry). Baseline affine probability is 0.25 with rotation $\pm 6^\circ$, scale 0.95–1.05, translation $\pm 2\%$, and a 96-pixel source halo. The augmenter reads context around each requested crop before affine warping. Optical values are already on a `[0, 1]` scale in the cache. Optical warps are normalized by warped valid support; labels and masks use nearest-neighbor; relief is warped only over available DSM support; unavailable relief stays zero.
 
-The baseline radiometric operation applies a shared gain to optical channels with p = 0.25 and range 0.95–1.05. Baseline gamma, Gaussian noise, and DSM dropout are disabled. The enhanced recipe increases affine/gain strength and optionally enables gamma, noise, and DSM dropout, but the selected campaign arm used the RGB-only baseline recipe. For class-centered rare draws, affine is disabled so the transform does not crop the selected rare-class support away. When the auxiliary model view is used, the model computes the IR/red spectral index after optical augmentation; DSM relief and its availability mask remain distinct inputs.
+The baseline radiometric operation applies a shared gain to optical channels with $p = 0.25$ and range 0.95–1.05. Baseline gamma, Gaussian noise, and DSM dropout are disabled. The enhanced recipe increases affine/gain strength and optionally enables gamma, noise, and DSM dropout, but the selected campaign arm used the RGB-only baseline recipe. For class-centered rare draws, affine is disabled so the transform does not crop the selected rare-class support away. When the auxiliary model view is used, the model computes the spectral index from near-infrared and red values after optical augmentation:
+
+$$
+\mathrm{NDVI} = \frac{\mathrm{NIR} - R}{\mathrm{NIR} + R + 10^{-6}}.
+$$
+
+DSM relief and its availability mask remain distinct inputs.
 
 ## 7. Bundles, caches, and leakage controls
 
@@ -165,7 +171,7 @@ Do not make patches first and split them later. This would allow neighboring cro
 
 ### Practical interpretation
 
-For a standard three-band run, the main operational path is: catalog the scene-matched imagery and labels; validate alignment and label decoding; freeze the current scene split; generate train and validation bundles; run the train-only sampler with the declared class-aware fraction; augment aligned raw channels and labels; then scale the configured optical bands to `[0,1]` before the model adapter. For the specialized Potsdam RGBIR run, first build and verify the separate RGBIR and DSM snapshots and cache, then use the dedicated 512 × 512 coverage-plus-rare-class sampler and its mask-aware augmenter.
+For a standard three-band run, the main operational path is: catalog the scene-matched imagery and labels; validate alignment and label decoding; freeze the current scene split; generate train and validation bundles; run the train-only sampler with the declared class-aware fraction; augment aligned raw channels and labels; then scale the configured optical bands to `[0,1]` before the model adapter. For the specialized Potsdam RGBIR run, first build and verify the separate RGBIR and DSM snapshots and cache, then use the dedicated $512 \times 512$ coverage-plus-rare-class sampler and its mask-aware augmenter.
 
 The key preparation risks are band-name/source mismatches, unverified elevation co-registration, ignoring the difference between label ignore and raster NoData, fitting statistics outside training scenes, and allowing photometric transforms to alter invalid padding. These are addressable before training and should be closed by catalog evidence, role-scoped artifacts, and augmentation replay rather than by visual inspection alone.
 

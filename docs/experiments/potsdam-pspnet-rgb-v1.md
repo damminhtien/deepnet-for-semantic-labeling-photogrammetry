@@ -19,7 +19,7 @@ as a separate experiment.
 | Phase | Data, schedule and gate |
 | --- | --- |
 | Selection | Reuse the DINOv3 cache, training index, sampler, class weights, baseline augmentation, CE/Dice and seed 42. Fit eight patches to at least 90% mIoU within 512 updates before discarding fit weights. Profile on Kaggle and proceed only if the matched schedule fits with 25% headroom. Run eight passes of 864 updates; select among full validations at passes 4 and 8 by OA, then mIoU, then earlier step. |
-| Refit | Load the selected PSPNet checkpoint and reset AdamW/scaler. Continue on the exact 24-scene participant-label cache for 1,152 updates. Encoder/head LR are 1e-4/3e-4 in selection and half those values in refit. |
+| Refit | Load the selected PSPNet checkpoint and reset AdamW/scaler. Continue on the exact 24-scene participant-label cache for 1,152 updates. Encoder and head learning rates are $10^{-4}$ and $3 \times 10^{-4}$ in selection and half those values in refit. |
 | Benchmark | Only the audited refit at update 1,152 opens the separate test cache. Score once with identity inference, 512 window, stride 256, six classes and 467,862,855 eroded-reference pixels. |
 
 This is a fixed-recipe, single-seed comparison. PSPNet can qualify for refit even
@@ -55,7 +55,7 @@ with 1,165,743,019 valid pixel presentations. The final SHA-256 is
 `a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986`.
 The [benchmark job](https://www.kaggle.com/code/damminhtien/potsdam-pspnet-rgb-v1-benchmark-run)
 version 1 scored that checkpoint once. Both models used the same historical
-14-scene cache, eroded labels, 512×512 windows, stride 256, and identity inference.
+14-scene cache, eroded labels, $512 \times 512$ windows, stride 256, and identity inference.
 The audit recomputed OA, IoU and F1 from the aggregate and per-scene matrices and
 confirmed identical class support on **467,862,855 scored pixels**.
 

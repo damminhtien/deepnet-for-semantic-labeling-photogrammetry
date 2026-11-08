@@ -95,12 +95,12 @@ The audit found no mismatch in checkpoint selection or metric arithmetic.
 
 The selected spectral adapter's third channel is approximately:
 
-```text
-z3 = -0.43493 * IR - 0.45043 * R - 0.51341 * G + 0.00967
-```
+$$
+z_3 = -0.43493\,\mathrm{IR} - 0.45043\,R - 0.51341\,G + 0.00967
+$$
 
-The weights give analytical bounds of [-1.3891, 0.0097] for the third channel on
-IRRG inputs in [0,1], and [-7.9782, -1.7615] after mean/std normalization. Test
+The weights give analytical bounds of $[-1.3891, 0.0097]$ for the third channel on
+IRRG inputs in $[0,1]$, and $[-7.9782, -1.7615]$ after mean/std normalization. Test
 the accuracy effect with a controlled adapter-initialization experiment.
 
 Other candidate explanations are unnormalized intermediate features, a larger

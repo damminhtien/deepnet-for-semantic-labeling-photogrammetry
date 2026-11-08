@@ -18,9 +18,9 @@ grids at about 5 m and 10 m per cell.
 
 | Encoder | Validation OA | Validation mIoU | Car IoU | Feature grid |
 |---|---:|---:|---:|---:|
-| UniverSat | 52.07% | 23.75% | 1.57% | 60 x 60 |
-| AnySat | 41.24% | 17.15% | 0.53% | 30 x 30, resized to 60 x 60 |
-| TerraMind | 46.07% | 20.39% | 0.92% | 14 x 14, resized to 60 x 60 |
+| UniverSat | 52.07% | 23.75% | 1.57% | $60 \times 60$ |
+| AnySat | 41.24% | 17.15% | 0.53% | $30 \times 30$, resized to $60 \times 60$ |
+| TerraMind | 46.07% | 20.39% | 0.92% | $14 \times 14$, resized to $60 \times 60$ |
 
 The majority-class baseline is 30.39% OA and 5.07% mIoU. Cars have only 113 training cells and 57 validation cells after reduction, so their IoU has very small support.
 
@@ -37,7 +37,7 @@ five classes; the 5 m averages cover six.
 
 ## RGB dataset probes
 
-Each model uses a frozen encoder and the same 96 train plus 96 validation samples per dataset. Outputs and labels are reduced to a 32 x 32 grid. The scores below use only the sampled validation data.
+Each model uses a frozen encoder and the same 96 train plus 96 validation samples per dataset. Outputs and labels are reduced to a $32 \times 32$ grid. The scores below use only the sampled validation data.
 
 | Dataset | Encoder | Validation OA | Validation mIoU | Majority baseline mIoU | Evaluated cells |
 |---|---|---:|---:|---:|---:|

@@ -313,8 +313,8 @@ def render_metrics(
             "Metrics are recomputed by summing the 14 per-scene confusion matrices "
             "for each model. "
             "Rows are complete recorded systems; only DINOv3 RGB and PSPNet RGB share "
-            "the matched input, split, eroded reference, 512×512 windows, stride 256, "
-            "batch size, and identity inference recipe. "
+            "the matched input, split, eroded reference, $512 \\times 512$ windows, "
+            "stride 256, batch size, and identity inference recipe. "
             "The benchmark was examined in earlier campaigns.",
             "",
             *rows,

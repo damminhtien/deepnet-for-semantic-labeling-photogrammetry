@@ -19,7 +19,7 @@ results, timing and saved artifacts.
 The RGBIR snapshot uses R/G/B/IR order. The encoder reads RGB. The optional
 branch combines IR, NDVI computed after augmentation, DSM relief scaled on the
 training scenes, and an availability mask. Selection chose RGB-only A with
-baseline augmentation. The benchmark uses identity inference with **512 × 512
+baseline augmentation. The benchmark uses identity inference with **$512 \times 512$
 windows and stride 256**.
 
 `deepnet.potsdam_rgbir.prepare` builds memory-mapped arrays and records source
@@ -332,8 +332,8 @@ model view described below; JPEG nDSM remains excluded.
 
 | Asset | Result against the matching IRRG reference grid | Scene match vs pixel-grid evidence |
 | --- | --- | --- |
-| DSM GeoTIFF | 37/38 have matching EPSG:32633 CRS, affine transform, width, and height (6000 x 6000). | Scene `3_13` shares CRS and affine origin/resolution but measures 5999 x 6000, with one 6000-pixel column missing. |
-| nDSM JPEG | 37/38 have the same 6000 x 6000 dimensions; `3_13` is 5999 x 6000. | The files lack CRS and affine metadata. Co-registration is unverified. |
+| DSM GeoTIFF | 37/38 have matching EPSG:32633 CRS, affine transform, width, and height ($6000 \times 6000$). | Scene `3_13` shares CRS and affine origin/resolution but measures $5999 \times 6000$, with one 6000-pixel column missing. |
+| nDSM JPEG | 37/38 have the same $6000 \times 6000$ dimensions; `3_13` is $5999 \times 6000$. | The files lack CRS and affine metadata. Co-registration is unverified. |
 
 The DSM TIFFs have no embedded vertical-unit metadata; the dataset config describes
 them as metres, but the source unit and vertical datum still need authoritative
@@ -356,7 +356,7 @@ RGB/auxiliary routing.
 ### Augmentation policy and audit
 
 `isprs-irrg-aerial-v2` uses all square symmetries and a 35% affine transform with
-scale 0.9–1.1, rotation ±12 degrees, translation ±4%, linear image interpolation,
+scale 0.9–1.1, rotation $\pm 12^\circ$, translation $\pm 4\%$, linear image interpolation,
 nearest-neighbor labels, and ignore-filled borders. Brightness/contrast, gamma,
 Gaussian noise, and 3–5 pixel blur are independently sampled with probabilities
 35%, 20%, 15%, and 10%. Photometric transforms operate only on IRRG and leave
@@ -420,8 +420,8 @@ replay trials. Model patch padding is zero because both crop sizes (512 and 288)
 divisible by DINOv3 ViT-B/16's patch size of 16.
 
 On 2026-10-31, the augmenter was corrected to preserve pre-radiometry values at
-invalid pixels. `isprs-irrg-aerial-v3` uses scale 0.95–1.05, rotation ±6°,
-translation ±2% and affine probability 0.25, with the v2 optical transforms.
+invalid pixels. `isprs-irrg-aerial-v3` uses scale 0.95–1.05, rotation $\pm 6^\circ$,
+translation $\pm 2\%$ and affine probability 0.25, with the v2 optical transforms.
 Replaying the train-only crops at DINOv2's 504/280 window sizes gave 80 trials,
 including 17 with invalid pixels. In these trials the fill stayed unchanged and
 every source-present car/clutter class survived. Reproduce with

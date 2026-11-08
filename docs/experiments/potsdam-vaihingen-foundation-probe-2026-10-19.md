@@ -23,7 +23,7 @@ The Potsdam 5 m validation probe preceding this run measured mIoU of 23.75% for 
 ### Macro-F1 correction, 2026-10-28
 
 The archived evaluator excluded zero-true-positive classes from macro-F1. The
-corrected JSON uses `F1 = 2*TP / (truth_count + prediction_count)`. Classes with
+corrected JSON uses $\mathrm{F1}_c = \frac{2\,\mathrm{TP}_c}{n_{\mathrm{truth},c} + n_{\mathrm{pred},c}}$. Classes with
 a positive denominator and zero true positives contribute zero; classes absent
 from truth and predictions are undefined. The correction recomputes 33 macro-F1
 values from the original counts.
@@ -76,7 +76,7 @@ Cars score poorly at 5 m, where majority reduction removes much of their detail.
 - The Potsdam split uses 18 participant-labeled training scenes, 6 validation scenes, and 14 held-out scenes. Held-out labels were used only for this final evaluation.
 - Vaihingen uses 16 official participant-labeled scenes for supervised probes and the 17 remaining official tiles for one held-out evaluation. The 4-fold shuffled split is scene-level; reported OOF predictions cover the 16 training tiles. Participant labels match the complete reference on those training tiles.
 - Both datasets use IR-R-G imagery remapped to R-G-NIR-as-blue. DSM and nDSM are omitted. Mean and standard deviation are estimated from source training imagery only.
-- Targets are majority-class reduced to a common approximately 5 m grid. UniverSat emits 60 x 60 features; AnySat emits 30 x 30 and TerraMind 14 x 14, which are bilinearly resized to 60 x 60. The different native feature resolutions limit direct comparison.
+- Targets are majority-class reduced to a common approximately 5 m grid. UniverSat emits $60 \times 60$ features; AnySat emits $30 \times 30$ and TerraMind $14 \times 14$, which are bilinearly resized to $60 \times 60$. The different native feature resolutions limit direct comparison.
 - Each probe trains for 100 epochs with AdamW, learning rate 0.02, weight decay 0.0001, square-root inverse-frequency class weighting from training labels, and seed 20261019.
 - Cross-domain scores apply the source-trained head and source normalization directly to the other dataset without target-label use or target-head adaptation. The low scores indicate substantial domain shift.
 

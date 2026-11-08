@@ -48,8 +48,8 @@ count, and spatial dependence may remain between scenes.
 
 Correlations between scene class prevalence and scene-level score changes are
 exploratory. For example, tree prevalence correlates with the same-class IoU gain at
-Pearson r=0.681 and Spearman ρ=0.389; building prevalence correlates with scene OA gain
-at r=−0.555 and ρ=−0.411. These are based on 14 scenes, have not been adjusted for
+Pearson $r = 0.681$ and Spearman $\rho = 0.389$; building prevalence correlates with scene OA gain
+at $r = -0.555$ and $\rho = -0.411$. These are based on 14 scenes, have not been adjusted for
 multiple comparisons, and should not be treated as causal or stable relationships.
 
 Use [`scene robustness`](data/potsdam-scene-robustness.csv),

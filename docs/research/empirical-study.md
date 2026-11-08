@@ -38,7 +38,7 @@ vegetation, tree, car, and clutter/background. Label ID 6 is ignored.
 Every benchmark table in this report is reduced from archived per-scene confusion
 matrices. The DINOv2/DINOv3 comparison covers 467,862,855 recorded valid pixels across
 the same scene IDs. DINOv3 and PSPNet additionally share the RGB cache hash, split hash,
-512×512 windows, stride 256, identity inference, and batch size 4. The source artifacts,
+$512 \times 512$ windows, stride 256, identity inference, and batch size 4. The source artifacts,
 checksums, audits, and recomputation code are listed in
 [`claims-and-evidence.md`](claims-and-evidence.md) and
 [`data/potsdam-empirical-analysis.json`](data/potsdam-empirical-analysis.json).

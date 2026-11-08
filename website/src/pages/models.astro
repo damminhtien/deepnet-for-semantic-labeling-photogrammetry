@@ -1,6 +1,7 @@
 ---
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
+import Math from '../components/Math.astro';
 import { route, source } from '../scripts/routes.mjs';
 import evidence from '../generated/evidence.json';
 const { architecture: model, study } = evidence;
@@ -9,16 +10,17 @@ const grid = side / model.backbone.patch_size;
 const { rank, alpha, dropout, target_modules } = model.backbone.lora;
 const channels = model.backbone.feature_channels;
 const pyramid = [4, 8, 16, 32].map(stride => side / stride);
+const shape = (...dimensions: (string | number)[]) => dimensions.join(' \\times ');
 const stages = [
-  { id: 'input', title: 'RGB window', size: `B × 3 × ${side} × ${side}`, kind: 'source', text: 'The verified red, green and blue bands feed the normalized encoder input. A parallel spatial branch preserves local detail.', path: 'deepnet/models/adapters.py' },
-  { id: 'tokens', title: 'Patch embedding', size: `B × ${grid ** 2} × ${channels}`, kind: 'grid', text: `${model.backbone.patch_size} × ${model.backbone.patch_size} pixels form one patch embedding. The shape counts spatial tokens only; class and register tokens also enter the encoder.`, path: 'deepnet/models/backbones.py' },
+  { id: 'input', title: 'RGB window', size: shape('B', 3, side, side), kind: 'source', text: 'The verified red, green and blue bands feed the normalized encoder input. A parallel spatial branch preserves local detail.', path: 'deepnet/models/adapters.py' },
+  { id: 'tokens', title: 'Patch embedding', size: shape('B', grid ** 2, channels), kind: 'grid', text: `One patch embedding spans ${model.backbone.patch_size} pixels per side. The shape counts spatial tokens only; class and register tokens also enter the encoder.`, path: 'deepnet/models/backbones.py' },
   ...model.backbone.feature_blocks.map((block, i) => ({
-    id: `block-${block}`, title: `Block ${block}`, size: `B × ${channels} × ${grid} × ${grid}`, kind: 'grid',
-    text: `At block ${block}, prefix tokens are removed, patch tokens are normalized and reshaped into a 2D grid. This level becomes a ${pyramid[i]} × ${pyramid[i]} decoder feature map after projection and resizing.`, path: 'deepnet/models/backbones.py',
+    id: `block-${block}`, title: `Block ${block}`, size: shape('B', channels, grid, grid), kind: 'grid',
+    text: `At block ${block}, prefix tokens are removed, patch tokens are normalized and reshaped into a 2D grid. After projection and resizing, this decoder feature map has ${pyramid[i]} pixels per side.`, path: 'deepnet/models/backbones.py',
   })),
-  { id: 'lora', title: 'LoRA adapters', size: `rank ${rank} · α ${alpha}`, kind: 'rank', text: `The frozen encoder gains low-rank updates in ${target_modules.join(', ')}. Adapter dropout is ${dropout}. This changes projection weights without changing the feature shape.`, path: 'deepnet/models/backbones.py' },
-  { id: 'decoder', title: 'Multi-scale fusion', size: `B × ${model.decoder_width} × ${pyramid[0]} × ${pyramid[0]}`, kind: 'pyramid', text: `Project each level to ${model.decoder_width} channels and resize to grids of ${pyramid.join(', ')} pixels per side. Fuse coarse to fine, then combine with the stride-four spatial branch.`, path: 'deepnet/models/decoders.py' },
-  { id: 'logits', title: 'Dense logits', size: `B × ${model.num_classes} × ${side} × ${side}`, kind: 'labels', text: 'The classifier produces one score per class at each decoder pixel. The logits are upsampled to the original window size before selecting a class.', path: 'deepnet/models/decoders.py' },
+  { id: 'lora', title: 'LoRA adapters', size: `r = ${rank},\\quad \\alpha = ${alpha}`, kind: 'rank', text: `The frozen encoder gains low-rank updates in ${target_modules.join(', ')}. Adapter dropout is ${dropout}. This changes projection weights without changing the feature shape.`, path: 'deepnet/models/backbones.py' },
+  { id: 'decoder', title: 'Multi-scale fusion', size: shape('B', model.decoder_width, pyramid[0], pyramid[0]), kind: 'pyramid', text: `Project each level to ${model.decoder_width} channels and resize to grids of ${pyramid.join(', ')} pixels per side. Fuse coarse to fine, then combine with the stride-four spatial branch.`, path: 'deepnet/models/decoders.py' },
+  { id: 'logits', title: 'Dense logits', size: shape('B', model.num_classes, side, side), kind: 'labels', text: 'The classifier produces one score per class at each decoder pixel. The logits are upsampled to the original window size before selecting a class.', path: 'deepnet/models/decoders.py' },
 ];
 ---
 <Atlas title="Model Anatomy" active="models">
@@ -35,15 +37,15 @@ const stages = [
           {stage.kind === 'source' && <img src={route() + 'schematic/image.svg'} width="512" height="512" alt="Schematic input raster" />}
           {stage.kind === 'labels' && <img src={route() + 'schematic/labels.svg'} width="512" height="512" alt="Schematic class map, not a model output" />}
           {stage.kind === 'grid' && <div class="token-grid" aria-label="32 by 32 spatial token grid"></div>}
-          {stage.kind === 'rank' && <div class="rank-figure" aria-label="Factorized low-rank update"><b>A</b><span>×</span><b>B</b><span>→</span><b>ΔW</b></div>}
-          {stage.kind === 'pyramid' && <div class="pyramid" aria-label="Four feature scales">{pyramid.map((value, j) => <span style={`--level:${j}`}>{value}²</span>)}</div>}
+          {stage.kind === 'rank' && <div class="rank-figure"><Math tex={String.raw`\Delta W = \frac{\alpha}{r} B A`} display /></div>}
+          {stage.kind === 'pyramid' && <div class="pyramid" aria-label="Four feature scales">{pyramid.map((value, j) => <span class="pyramid-level" style={`--level:${j}`}><Math tex={`${value}^2`} /></span>)}</div>}
         </div>
         <figcaption class="note">Structural schematic · no learned activations shown</figcaption>
       </figure>
       <div class="stack model-detail">
         <p class="eyebrow">DINOv3 ViT-B/16 · Module {i + 1}</p>
         <h2>{stage.title}</h2>
-        <p class="tensor-shape">{stage.size}</p>
+        <p class="tensor-shape"><Math tex={stage.size} /></p>
         <p>{stage.text}</p>
         <p class="note"><a href={source(stage.path)}>Open implementation ↗</a> · <a href={source('configs/models/dinov3-vitb16-rgbir-v2.json')}>Model configuration ↗</a></p>
       </div>
@@ -61,12 +63,9 @@ const stages = [
   .tensor-view figcaption { margin-top: .55rem; }
   .tensor-shape { font: 500 clamp(.98rem, 2vw, 1.45rem) var(--mono); color: #f3bf86; }
   .token-grid { width: min(70%, 240px); aspect-ratio: 1; margin: 1rem; background: repeating-linear-gradient(90deg, #a2c4cd80 0 1px, transparent 1px 3.125%), repeating-linear-gradient(#a2c4cd80 0 1px, transparent 1px 3.125%), radial-gradient(ellipse at 65% 28%, #668b98, #16394f 72%); border: 1px solid #7196a3; }
-  .rank-figure, .pyramid { display: flex; align-items: center; justify-content: center; gap: .55rem; font-family: var(--mono); }
-  .rank-figure b, .pyramid span { display: grid; place-items: center; background: #2b5169; border: 1px solid #82a3ab; }
-  .rank-figure b { width: 36px; height: 84px; }
-  .rank-figure b:nth-child(3) { width: 84px; height: 36px; }
-  .rank-figure b:last-child { width: 70px; height: 70px; }
-  .pyramid span { width: calc(clamp(52px, 7vw, 100px) - var(--level) * 7px); aspect-ratio: 1; }
+  .rank-figure { max-width: 100%; font-size: clamp(1.15rem, 3vw, 1.75rem); }
+  .pyramid { display: flex; align-items: center; justify-content: center; gap: .55rem; }
+  .pyramid-level { display: grid; place-items: center; background: #2b5169; border: 1px solid #82a3ab; width: calc(clamp(52px, 7vw, 100px) - var(--level) * 7px); aspect-ratio: 1; }
 </style>
 <script>
   import { restore, share } from '../scripts/state.mjs';

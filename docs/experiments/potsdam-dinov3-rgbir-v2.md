@@ -31,7 +31,7 @@ configured IR/red/green names imply **4/1/2**. The RGBIR manifest records the
 match. The encoder uses bands 1/2/3 and the auxiliary index uses bands 4/1.
 
 DSM uses the [verified snapshot](../../data/auxiliary/potsdam-dsm-v1.dvc) and
-`valid-box-101-p99abs-stride16-v1`. Relief subtracts the valid 101 × 101 local
+`valid-box-101-p99abs-stride16-v1`. Relief subtracts the valid $101 \times 101$ local
 mean, divides by the absolute p99 fitted on the original 18 training scenes, and
 clips to [-1,1]. The missing DSM column in `3_13` gets zero relief and
 availability; the image/label masks determine scoring. JPEG nDSM requires
@@ -53,7 +53,7 @@ image/label/mask equality with Rasterio on 12 fixed reference windows. The GPU
 pilot additionally requires identical full-scene confusion matrices for cached
 and Rasterio inference on scene `4_12`.
 
-Each pass covers 2,592 base windows (512 × 512), including padded edges, and
+Each pass covers 2,592 base windows ($512 \times 512$), including padded edges, and
 adds 432 car and 432 clutter windows. For each rare draw, choose an eligible
 training scene, then sample a target-class pixel uniformly within that scene
 using tile counts and jitter the center by up to 96 pixels. Four microbatches
@@ -70,8 +70,8 @@ disabled for rare draws. The model computes IR/red NDVI after optical augmentati
 
 | Recipe | Affine | Optical operations |
 | --- | --- | --- |
-| Baseline | p=.25; +/-6 degrees; scale .95-1.05; translation +/-2% | Shared RGBIR gain p=.25, .95-1.05 |
-| Enhanced | p=.35; +/-10 degrees; scale .9-1.1; translation +/-3%; 96-pixel halo | Gain p=.3, .9-1.1; gamma p=.15, .9-1.1; noise p=.1, std .005; DSM dropout p=.1 |
+| Baseline | $p = 0.25$; $\pm 6^\circ$; scale $[0.95,1.05]$; translation $\pm 2\%$ | Shared RGBIR gain $p = 0.25$, $[0.95,1.05]$ |
+| Enhanced | $p = 0.35$; $\pm 10^\circ$; scale $[0.9,1.1]$; translation $\pm 3\%$; 96-pixel halo | Gain $p = 0.3$, $[0.9,1.1]$; gamma $p = 0.15$, $[0.9,1.1]$; noise $p = 0.1$, $\sigma = 0.005$; DSM dropout $p = 0.1$ |
 
 ## Models and frozen selection
 
@@ -88,7 +88,7 @@ Both pinned snapshots passed local offline loading on a true Potsdam RGB patch.
 The smoke checks verify pretrained `norm`, four register tokens, exact selected
 feature tensors, frozen original parameters, finite logits and nonzero gradients
 in all 48 B or 96 L LoRA B matrices. Each admitted backbone must also pass the
-CUDA eight-patch >=90% train mIoU gate within 512 updates. Main runs discard fit
+CUDA eight-patch train mIoU gate of $\ge 90\%$ within 512 updates. Main runs discard fit
 weights and start from pretrained, with a zero-initialized RGB residual adapter,
 width-128 decoder, GroupNorm(8), stride-four detail branch and zero auxiliary
 gate. The 36-patch input panel records moments, extrema, percentiles, nonfinite
@@ -98,9 +98,8 @@ full validation and refit completion.
 A uses RGB with baseline augmentation; B adds IR, NDVI, relief and availability;
 C restarts the better A/B recipe with enhanced augmentation. Optional L restarts
 the best A/B/C recipe using the satellite model. A/B/C/L use seed 42. D repeats
-the selected recipe from pretrained with seed 43. LoRA rank/alpha/dropout are
-8/16/.05 on q/k/v/o. AdamW uses 1e-4 for LoRA and 3e-4 for adapter/decoder,
-5% warmup, cosine decay, gradient clipping 1 and CE/Dice .7/.3. Class weights
+the selected recipe from pretrained with seed 43. LoRA uses rank $r = 8$, scaling parameter $\alpha = 16$, and dropout $p = 0.05$ on q/k/v/o. AdamW uses $10^{-4}$ for LoRA and $3 \times 10^{-4}$ for adapter/decoder,
+5% warmup, cosine decay, gradient clipping at 1 and loss $\mathcal{L} = 0.7\,\mathcal{L}_{\mathrm{weighted\,CE}} + 0.3\,\mathcal{L}_{\mathrm{macro\,Dice}}$. Class weights
 come only from the original 18 training scenes.
 
 The pilot measures training, 72 fixed validation windows, one scene at 50%
@@ -117,7 +116,7 @@ six-class mIoU, car IoU or clutter IoU, computed from the exact stored reference
 matrix on 199,409,714 pixels. Eligible checkpoints rank by OA, mIoU, earlier
 update and A/B/C/L order. Ineligible A/B parents rank by mIoU then OA. Both seed
 42 and seed 43 must qualify before refit. Flip TTA is retained only if both
-seeds gain >=.1 OA percentage point without reducing the other three metrics
+seeds gain $\ge 0.1$ OA percentage points without reducing the other three metrics
 and inference fits the budget. TTA averages logits after undoing the flip.
 
 ## Continuation, benchmark and budget

@@ -10,7 +10,7 @@ change.
 
 ![SciencePlots difference matrix showing DINOv2 error counts minus DINOv3](figures/potsdam-confusion-difference-scienceplots.png)
 
-*Figure 1. Each cell is `D = C_DINOv2 − C_DINOv3` in millions of pixels. Positive
+*Figure 1. Each cell shows $D_{ij}/10^6$, where $D_{ij} = C_{\mathrm{DINOv2},ij} - C_{\mathrm{DINOv3},ij}$ is the difference in pixel counts. Positive
 off-diagonal values mean fewer errors of that true/predicted class pair in DINOv3;
 negative values mean more. The diagonal is the corresponding change in correct
 predictions with the opposite error interpretation.*

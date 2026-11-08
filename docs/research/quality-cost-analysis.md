@@ -3,7 +3,7 @@
 ## Matched DINOv3 and PSPNet systems
 
 DINOv3-B RGB and PSPNet–ResNet101 RGB were scored on the same input cache and the same
-14-scene, 467,862,855-pixel cohort. Both used eroded labels, 512×512 windows, stride
+14-scene, 467,862,855-pixel cohort. Both used eroded labels, $512 \times 512$ windows, stride
 256, batch size 4, identity inference, and the same recorded Kaggle T4 allocation. The
 two systems occupy different points in the measured quality–cost plane: DINOv3 has
 higher mIoU, and PSPNet has lower full-scene scoring time and training/selection cost.

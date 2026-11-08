@@ -47,7 +47,7 @@ classes and ignore label 6.
 | Microbatch / accumulation | 1 / 1 | 1 / 4 |
 | Potsdam patch presentations | 13,650 | 2,560 |
 | Vaihingen patch presentations | 0 | 2,560 |
-| Potsdam crop | 384 x 384 | 504 x 504 |
+| Potsdam crop | $384 \times 384$ | $504 \times 504$ |
 | Potsdam input pixel presentations | 2,012,774,400 | 650,280,960 |
 | Total trainable parameters | 618,182 | 11,777,170 |
 
@@ -86,7 +86,7 @@ do not time raster reads, overlap and decoding separately.
    [`get_intermediate_layers`](https://github.com/facebookresearch/dinov2/blob/main/dinov2/models/vision_transformer.py#L278)
    applies the trained final LayerNorm to each selected output by default.
 2. **The IRRG spectral projection starts randomly.** The three optical channels
-   pass through a learned 1x1 convolution with Kaiming-uniform initialization,
+   pass through a learned $1 \times 1$ convolution with Kaiming-uniform initialization,
    then ImageNet mean/std normalization. Test channel-preserving IRRG
    initialization to see whether the random mixture hurts a mostly frozen encoder.
 3. **The decoder and adapter start from random weights.** DINOv2 refinement blocks

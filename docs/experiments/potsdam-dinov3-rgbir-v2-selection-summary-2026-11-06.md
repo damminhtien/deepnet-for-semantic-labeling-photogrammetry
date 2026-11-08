@@ -15,7 +15,7 @@ review](potsdam-dinov3-rgbir-v2-selection-review-2026-11-06.md).
 ## Results and interpretation
 
 The table uses selected checkpoints at update 6,912. Full-scene validation uses
-512 × 512 windows, stride 256 and eroded labels.
+$512 \times 512$ windows, stride 256 and eroded labels.
 
 | Configuration | OA | Six-class mIoU | Car IoU | Clutter IoU |
 | --- | ---: | ---: | ---: | ---: |
@@ -56,10 +56,10 @@ the minimum OA-gain rule:
 
 | Seed | Identity OA | Horizontal-flip OA | Gain, percentage points | Required |
 | --- | ---: | ---: | ---: | ---: |
-| 42 | 93.0441% | 93.1227% | +0.0786 | >=0.1000 |
-| 43 | 92.9477% | 93.0167% | +0.0690 | >=0.1000 |
+| 42 | 93.0441% | 93.1227% | +0.0786 | $\ge 0.1000$ |
+| 43 | 92.9477% | 93.0167% | +0.0690 | $\ge 0.1000$ |
 
-The frozen policy therefore remains **identity**, with 512x512 windows and
+The frozen policy therefore remains **identity**, with $512 \times 512$ windows and
 stride 256. The seed-42 checkpoint SHA-256 is
 `fbc022c284b42ed0a4a9a25397e9fa502267b549b2c10164b8a0b196fad066fb`;
 the confirmation checkpoint is

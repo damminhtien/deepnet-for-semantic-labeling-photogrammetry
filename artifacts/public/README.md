@@ -18,7 +18,7 @@ python3 scripts/recompute_public_metrics.py --write
 
 [`evidence-manifest.json`](evidence-manifest.json) maps claim IDs to experiments,
 configuration references, split/protocol details, and SHA-256 digests. The metrics file
-contains each model's aggregate and 14 per-scene 6×6 confusion matrices. It includes
+contains each model's aggregate and 14 per-scene $6 \times 6$ confusion matrices. It includes
 source artifact digests so the exported measurements can be traced to the archived run
 outputs available to the authors.
 

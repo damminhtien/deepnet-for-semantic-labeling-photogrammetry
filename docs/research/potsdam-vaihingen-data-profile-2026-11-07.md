@@ -28,18 +28,18 @@ No model training or inference was run for this report. The current prepared man
 |---|---|---|
 | Official scene count | 38 | 33 |
 | Ground sampling distance | 5 cm | 9 cm |
-| Official tile geometry | 6,000 x 6,000 px; equal tiles of about 300 m x 300 m | Variable tile sizes; local area 3 is 3,007 x 2,006 px |
+| Official tile geometry | $6{,}000 \times 6{,}000$ px; equal tiles of about $300\,\mathrm{m} \times 300\,\mathrm{m}$ | Variable tile sizes; local area 3 is $3{,}007 \times 2{,}006$ px |
 | Official optical products | RGB, IRRG, RGBIR | Three 8-bit bands: near infrared, red, green |
 | Current three-band source mapping | The historic view is catalogued as IR/red/green, but the source audit maps it to RGBIR bands 4/2/3: NIR/green/blue | Official image order is NIR/red/green |
 | Additional local modalities | Four-band RGBIR and DSM snapshots each contain 38 scenes | The official benchmark describes DSM products, but no DSM is present in the current local prepared catalog |
 | Local geospatial metadata | Prepared Potsdam scenes record EPSG:32633 | The local Vaihingen catalog retains pixel-local pairing; CRS and affine fields are absent |
 | Current split roles | 18 train / 6 validation / 14 test | 12 train / 4 validation / 17 test |
 
-The official Potsdam page specifies 38 equal 6,000 x 6,000 pixel patches at 5 cm GSD, with RGB, IRRG, RGBIR and DSM products [ISPRS Potsdam](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx). The Vaihingen page specifies 33 different-sized patches at 9 cm GSD and three 8-bit image bands corresponding to near infrared, red and green [ISPRS Vaihingen](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-vaihingen.aspx).
+The official Potsdam page specifies 38 equal $6{,}000 \times 6{,}000$ pixel patches at 5 cm GSD, with RGB, IRRG, RGBIR and DSM products [ISPRS Potsdam](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx). The Vaihingen page specifies 33 different-sized patches at 9 cm GSD and three 8-bit image bands corresponding to near infrared, red and green [ISPRS Vaihingen](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-vaihingen.aspx).
 
 The catalog's channel names are not sufficient evidence of spectral identity. The four-band Potsdam snapshot is ordered red, green, blue, infrared, and its source audit maps historical three-band values to bands 4/2/3 (NIR, green, blue), not the nominal NIR, red, green mapping. Vaihingen's official three-band source is NIR, red, green. The spectral analysis below therefore reads Potsdam from its verified four-band source and Vaihingen from its official three-band images.
 
-The squared GSD ratio is `(9 / 5)^2 = 3.24`: a Vaihingen pixel covers 0.0081 m2, compared with 0.0025 m2 for a Potsdam pixel. Consequently, equal-sized pixel windows do not represent equal ground footprints. Patch sizes intended for cross-dataset comparison should be specified in metres and converted to pixels per dataset.
+The squared GSD ratio is $\left(\frac{9}{5}\right)^2 = 3.24$: a Vaihingen pixel covers $0.0081\,\mathrm{m}^2$, compared with $0.0025\,\mathrm{m}^2$ for a Potsdam pixel. Consequently, equal-sized pixel windows do not represent equal ground footprints. Patch sizes intended for cross-dataset comparison should be specified in metres and converted to pixels per dataset.
 
 The figure below shows representative 45 m square training windows using the verified common NIR/red/green bands. Those bands are mapped to display red/green/blue to form a false-color composite. Each crop has its own 2nd-to-98th percentile display stretch; these colors are illustrative and are not calibrated reflectance values. The paired labels use the official six-class palette.
 
@@ -53,13 +53,13 @@ The channel distributions were recomputed from the full current training and val
 
 | Dataset | Channel | Train mean ± SD (DN) | Train p05 / p50 / p95 (DN) | Train range of per-scene medians (DN) | Validation p50 (DN) |
 |---|---|---:|---:|---:|---:|
-| Potsdam | Red | 86.5 ± 35.7 | 42 / 79 / 159 | 70–84 | 76 |
-| Potsdam | Green | 92.6 ± 35.3 | 48 / 85 / 161 | 78–91 | 82 |
-| Potsdam | Blue | 85.5 ± 36.6 | 41 / 77 / 156 | 71–86 | 75 |
-| Potsdam | Near infrared | 98.7 ± 37.2 | 44 / 95 / 165 | 79–119 | 88 |
-| Vaihingen | Near infrared | 121.4 ± 55.0 | 41 / 121 / 216 | 98–150 | 112 |
-| Vaihingen | Red | 82.0 ± 40.3 | 36 / 72 / 160 | 58–101 | 71 |
-| Vaihingen | Green | 80.9 ± 38.5 | 35 / 76 / 149 | 61–97 | 74 |
+| Potsdam | Red | $86.5 \pm 35.7$ | 42 / 79 / 159 | 70–84 | 76 |
+| Potsdam | Green | $92.6 \pm 35.3$ | 48 / 85 / 161 | 78–91 | 82 |
+| Potsdam | Blue | $85.5 \pm 36.6$ | 41 / 77 / 156 | 71–86 | 75 |
+| Potsdam | Near infrared | $98.7 \pm 37.2$ | 44 / 95 / 165 | 79–119 | 88 |
+| Vaihingen | Near infrared | $121.4 \pm 55.0$ | 41 / 121 / 216 | 98–150 | 112 |
+| Vaihingen | Red | $82.0 \pm 40.3$ | 36 / 72 / 160 | 58–101 | 71 |
+| Vaihingen | Green | $80.9 \pm 38.5$ | 35 / 76 / 149 | 61–97 | 74 |
 
 Vaihingen's training NIR median is 26 DN above Potsdam's, and its NIR standard deviation is about 48% larger. In contrast, its red and green training medians are 7 and 9 DN lower. The scene-level median ranges overlap, so the pooled difference does not describe every tile. Validation medians are 1–9 DN below their training counterparts across the matched channels. These are descriptive shifts across only 6 Potsdam and 4 Vaihingen validation scenes, not independent pixel-level significance tests.
 
@@ -198,9 +198,13 @@ The profiles support five practical decisions for future joint experiments:
 
 ## 11. Methods and data audit
 
-Class proportions were computed as counts for IDs 0-5 divided by the sum of IDs 0-5. ID 6 is the ignored no-boundary label. Split areas were estimated as pixel count multiplied by squared official GSD; these are per-tile area sums, not a GIS union of scene footprints. Scene-level rare-class presence was determined from per-scene class counts in the quality manifests. The historical transfer table was read from the archived metrics JSON; no predictions were regenerated.
+Class shares are $p_c = n_c / \sum_{k=0}^{5} n_k$ for class counts $n_c$ with $c \in \{0,\dots,5\}$. ID 6 is the ignored no-boundary label. Split areas were estimated as pixel count multiplied by squared official GSD; these are per-tile area sums, not a GIS union of scene footprints. Scene-level rare-class presence was determined from per-scene class counts in the quality manifests. The historical transfer table was read from the archived metrics JSON; no predictions were regenerated.
 
-The current catalog checks report `valid` for both datasets. For every train, validation, and test role, aggregate class counts equal the sum of per-scene scored pixels. The class-share total variation between train and test is computed as one half of the L1 distance between the two six-class proportion vectors.
+The current catalog checks report `valid` for both datasets. For every train, validation, and test role, aggregate class counts equal the sum of per-scene scored pixels. Let $p$ and $q$ be the train and test class-share vectors. Their total variation is half their $\ell_1$ distance:
+
+$$
+\mathrm{TV}(p,q) = \frac{1}{2}\sum_{c=0}^{5} \lvert p_c - q_c \rvert.
+$$
 
 Optical channel histograms were counted over every pixel in the current Potsdam 18-scene training / 6-scene validation RGBIR grids and Vaihingen 12-scene training / 4-scene validation image grids. Potsdam's four channels were read in the verified RGB/IR order; Vaihingen uses the official IR/R/G order. Percentiles use the nearest-rank empirical definition. Current test scenes were excluded from the new channel files and figure. Each Potsdam DSM file in the current 18/6 roles was SHA-256 checked against the source inventory and scanned in native raster blocks; all 24 grids match their optical reference metadata. DSM p01–p99 are deterministic block-stratified sample estimates of about 100,000 pixels per tile; full-grid mean, standard deviation, minimum, and maximum are exact.
 
