@@ -19,13 +19,16 @@ raster crops. Each crop contains lossless RGB and infrared PNGs plus an RGB
 class-ID plane for reference, DINOv3, and PSPNet. Validation checks asset
 checksums, dimensions, class IDs, checkpoint bindings, and each crop's exact
 three-way confusion counts. The build does not need the original scene archive,
-local prediction outputs, a GPU, or a backend. The pipeline sampling and
-augmentation controls remain educational schematics and say so in the interface.
+local prediction outputs, a GPU, or a backend. The Pipeline starts with one
+recorded refit training draw, replayed through the implemented sampler and
+augmentation function, the final DINOv3 checkpoint, real block activations, and
+sample-only error counts. Its separate Explain controls remain labelled
+schematics.
 
-The 20 selected excerpts use project-author-approved publication of source
-imagery and eroded labels. ISPRS Potsdam remains third-party data; the Atlas does
-not grant rights to redistribute the original dataset. The generated manifest
-records that status and links the [ISPRS Potsdam dataset
+The selected excerpts use project-owner-authorized publication of rendered
+imagery and labels. The Atlas publishes a bounded set of visual assets, not a
+mirror of the full ISPRS Potsdam archive. Generated manifests record the
+authorization and link the [ISPRS Potsdam dataset
 page](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx)
 for provenance. The public build requires only committed assets and metadata.
 
@@ -52,6 +55,28 @@ writing any assets:
 The output is the bounded bundle under `website/public/evidence/scenes/` and
 `website/src/generated/public-crops.json`. A clean clone can run the static
 build and validate those assets without the local cache and prediction files.
+
+## Refresh the recorded training trace
+
+The offline exporter checks the refit cache, protocol, selection lock, pinned
+pretrained snapshot, checkpoint bytes, and checkpoint binding before it draws
+one deterministic first-pass training window and runs one CPU inference. It
+exports rendered PNGs and provenance metadata only:
+
+```bash
+.venv/bin/python website/scripts/export_pipeline_trace.py \
+  --runs-root /path/to/runs \
+  --pretrained /path/to/dinov3-vitb16-pretrain-lvd1689m \
+  --device cpu
+```
+
+The default output is `website/public/evidence/pipeline-trace/` plus
+`website/src/generated/pipeline-trace.json`. The checkpoint and cache remain
+outside the site. The example comes from final refit training data; its
+prediction and confusion counts are explicitly in-sample, not benchmark
+measurements. Activation PNGs are PCA projections of the real block 3, 6, 9,
+and 12 feature tensors. They are not attention maps or comparable activation
+magnitudes.
 
 ## Inspect paired prediction rasters privately
 

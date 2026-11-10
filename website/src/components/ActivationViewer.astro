@@ -1,0 +1,75 @@
+---
+import trace from '../generated/pipeline-trace.json';
+import { route } from '../scripts/routes.mjs';
+
+const blocks = trace.model.activations;
+const assetUrl = (block: number) => route() + 'evidence/pipeline-trace/' + trace.assets[`feature_block_${block}`].file;
+---
+
+<section class="wrap instrument activation-viewer" aria-labelledby="activation-title" data-activation-viewer>
+  <div class="activation-heading">
+    <div>
+      <p class="eyebrow">Inspect / recorded model execution</p>
+      <h2 id="activation-title">Features from the actual encoder.</h2>
+      <p>Choose a DINOv3 block to inspect its spatial feature tensor from the same 512 × 512 refit training draw shown in the Pipeline.</p>
+    </div>
+    <p class="activation-binding">DINOv3 ViT-B/16<br />checkpoint <code>{trace.model.checkpoint_sha256.slice(0, 16)}…</code><br />{trace.sample.scene_id} · row {trace.sample.window.row} · col {trace.sample.window.col}</p>
+  </div>
+
+  <div class="activation-grid">
+    <div>
+      <nav class="activation-controls" aria-label="Select encoder feature block">
+        {blocks.map((item, index) => <button type="button" data-activation-select={item.block} aria-pressed={index === 0 ? 'true' : 'false'}>Block {item.block}</button>)}
+      </nav>
+      {blocks.map((item, index) => <figure class="activation-map" data-activation-panel={item.block} hidden={index !== 0}>
+        <img
+          src={assetUrl(item.block)}
+          alt={`PCA visualization of real DINOv3 block ${item.block} features, a 32 by 32 spatial grid.`}
+          width="512"
+          height="512"
+          loading={index === 0 ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+        <figcaption>Block {item.block} · {item.tensor_shape.join(' × ')} · displayed PCA variance {item.component_explained_variance_ratio.map((value) => `${(value * 100).toFixed(1)}%`).join(' / ')}</figcaption>
+      </figure>)}
+    </div>
+    <div class="stack activation-notes">
+      <p class="callout">Each native cell is one 16 × 16 input patch. The 768-channel tensor was normalized with the pretrained LayerNorm, projected into three principal components over this sample's 32 × 32 positions, then enlarged with nearest-neighbor scaling.</p>
+      <p class="note">The RGB colors encode PCA components, not sensor bands. Each component is scaled independently from its 2nd to 98th percentile. This is a feature visualization, not an attention map or calibrated magnitude comparison across layers.</p>
+      <a href={route('pipeline') + '#trace-step-activations'}>Follow the same sample through the full pipeline ↗</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .activation-viewer { margin-block: 1.5rem 3.5rem; }
+  .activation-heading { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; margin-bottom: 1rem; }
+  .activation-heading h2 { margin: .1em 0 .35em; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+  .activation-heading > div > p:last-child { max-width: 42rem; color: var(--pale); }
+  .activation-binding { flex: 0 0 auto; margin: 0; padding-left: .8rem; border-left: 2px solid var(--amber); color: var(--pale); font: 500 .7rem/1.6 var(--mono); }
+  .activation-binding code { color: #f3bf86; }
+  .activation-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, .65fr); gap: clamp(1rem, 4vw, 3rem); align-items: center; }
+  .activation-controls { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .6rem; }
+  .activation-controls button { padding: .5rem .75rem; border: 1px solid #597386; background: transparent; color: #f6f5f0; cursor: pointer; }
+  .activation-controls button[aria-pressed="true"] { border-color: var(--amber); background: #f3bf86; color: #0b2239; }
+  .activation-map { margin: 0; background: #0b2239; }
+  .activation-map[hidden] { display: none; }
+  .activation-map img { display: block; width: min(100%, 512px); height: auto; margin-inline: auto; }
+  .activation-map figcaption { padding: .6rem .75rem; color: var(--pale); font: 500 .68rem/1.5 var(--mono); }
+  .activation-notes { color: var(--pale); }
+  @media (max-width: 760px) {
+    .activation-heading { align-items: start; flex-direction: column; }
+    .activation-grid { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-activation-viewer]')!;
+  const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-activation-select]'));
+  const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-activation-panel]'));
+  function select(block: string) {
+    for (const button of buttons) button.setAttribute('aria-pressed', String(button.dataset.activationSelect === block));
+    for (const panel of panels) panel.hidden = panel.dataset.activationPanel !== block;
+  }
+  for (const button of buttons) button.addEventListener('click', () => select(button.dataset.activationSelect!));
+</script>

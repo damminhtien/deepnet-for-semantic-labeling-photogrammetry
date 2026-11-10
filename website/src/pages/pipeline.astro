@@ -3,10 +3,12 @@ import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
 import Legend from '../components/Legend.astro';
 import RasterEvidence from '../components/RasterEvidence.astro';
+import PipelineTrace from '../components/PipelineTrace.astro';
 import { route, source } from '../scripts/routes.mjs';
 ---
 <Atlas title="Data Pipeline" active="pipeline">
-  <Intro index="02–03" category="Sampling & augmentation" title="Inside the pipeline." description="Inspect a recorded evaluation crop, then use the explicitly schematic controls to understand patch sampling and aligned transformations." />
+  <Intro index="02–03" category="Sampling & augmentation" title="Inside the pipeline." description="Trace one real Potsdam refit training draw through its data, seeded transforms, DINOv3 features, prediction, and sample-only error counts." />
+  <PipelineTrace />
   <section class="wrap instrument lab inspect-recorded" aria-labelledby="inspect-recorded-title">
     <div>
       <p class="eyebrow">Inspect / recorded RGB benchmark case</p>

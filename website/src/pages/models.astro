@@ -2,6 +2,7 @@
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
 import Math from '../components/Math.astro';
+import ActivationViewer from '../components/ActivationViewer.astro';
 import { route, source } from '../scripts/routes.mjs';
 import evidence from '../generated/evidence.json';
 const { architecture: model, study } = evidence;
@@ -51,6 +52,7 @@ const stages = [
       </div>
     </div>)}
   </section>
+  <ActivationViewer />
 </Atlas>
 <style>
   .model-flow { display: flex; flex-wrap: wrap; gap: .45rem; margin: .7rem 0 1.3rem; }

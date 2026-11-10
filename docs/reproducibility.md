@@ -43,6 +43,13 @@ The paired-case and SciencePlots regeneration commands are documented in
 external Potsdam cache, archived prediction maps, or Kaggle output files. They should
 not be described as clean-clone reproductions while those inputs remain unavailable.
 
+The Pipeline page also includes one published refit training draw. To regenerate
+its bounded PNGs and metadata from local run assets, use
+[`website/README.md`](../website/README.md#refresh-the-recorded-training-trace).
+The exporter verifies its data/model bindings and performs one targeted forward
+pass; it does not train or evaluate a benchmark. Its prediction and confusion
+counts remain an in-sample illustration.
+
 ## Inference and training (R2/R3)
 
 The four final state dictionaries used in the benchmark table are published in the

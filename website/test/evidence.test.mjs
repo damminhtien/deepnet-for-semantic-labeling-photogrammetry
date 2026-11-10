@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 const evidence = JSON.parse(readFileSync(new URL('../src/generated/evidence.json', import.meta.url)));
 const { benchmark, cases } = evidence;
 const visualEvidence = JSON.parse(readFileSync(new URL('../src/generated/visual-evidence.json', import.meta.url)));
+const pipelineTrace = JSON.parse(readFileSync(new URL('../src/generated/pipeline-trace.json', import.meta.url)));
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-12, `${actual} differs from ${expected}`);
 
 test('browser recomputes archived metrics and vegetation error share', () => {
@@ -60,7 +61,7 @@ test('published figure panels keep source checksums, crop identity, and checkpoi
     assert.equal(digest(source), asset.source_artifact_sha256);
     assert.equal(digest(published), asset.published_asset_sha256);
     assert.equal(digest(source), digest(published));
-    assert.equal(asset.distribution_rights_status, 'existing_figure; upstream_dataset_rights_not_granted');
+    assert.equal(asset.distribution_rights_status, 'project_owner_authorized_curated_derivative');
     assert.match(asset.rights_review_url, /^https:\/\/www\.isprs\.org\//);
   }
 
@@ -89,4 +90,27 @@ test('published figure panels keep source checksums, crop identity, and checkpoi
   }
   assert.deepEqual([...grouped.values()].sort(), [4, 4, 4, 4, 4]);
   assert.deepEqual([...panelSizes].sort(), ['411x411', '412x411']);
+});
+
+test('pipeline trace binds real assets to one explicitly in-sample training draw', () => {
+  assert.equal(pipelineTrace.schema_version, 1);
+  assert.equal(pipelineTrace.sample.split_role, 'final_refit_training');
+  assert.equal(pipelineTrace.sample.used_for_model_training, true);
+  assert.equal(pipelineTrace.sample_confusion.scope, 'single_refit_training_draw_only');
+  assert.deepEqual(pipelineTrace.stages.map((stage) => stage.id), [
+    'source', 'preprocessing', 'sampling', 'augmentation', 'model-input',
+    'activations', 'prediction', 'evaluation',
+  ]);
+  assert.deepEqual(pipelineTrace.model.feature_blocks, [3, 6, 9, 12]);
+
+  for (const asset of Object.values(pipelineTrace.assets)) {
+    const bytes = readFileSync(new URL(`../public/evidence/pipeline-trace/${asset.file}`, import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), asset.sha256);
+  }
+
+  const matrix = pipelineTrace.sample_confusion.confusion_matrix_reference_rows_prediction_columns;
+  const total = matrix.flat().reduce((sum, value) => sum + value, 0);
+  const errors = matrix.reduce((sum, row, truth) => sum + row.reduce((inner, value, predicted) => inner + (truth === predicted ? 0 : value), 0), 0);
+  assert.equal(total, pipelineTrace.sample_confusion.scored_pixels);
+  assert.equal(errors, pipelineTrace.sample_confusion.error_pixels);
 });

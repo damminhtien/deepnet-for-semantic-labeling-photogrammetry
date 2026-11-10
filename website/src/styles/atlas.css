@@ -173,6 +173,10 @@ code, .number { font: 500 .85em var(--mono); overflow-wrap: anywhere; }
   .exhibit-list p { grid-column: 2; grid-row: 2; }
   .footer-inner { flex-wrap: wrap; }
 }
+@media (max-width: 520px) {
+  .masthead nav { gap: .48rem; }
+  .masthead nav a { font-size: .72rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
 }

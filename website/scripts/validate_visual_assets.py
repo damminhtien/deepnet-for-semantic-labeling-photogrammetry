@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT))
 
 from scripts.recompute_public_metrics import sha256  # noqa: E402
 from website.scripts.export_visual_assets import FIGURES, crop_id, read_json  # noqa: E402
+from website.scripts.validate_pipeline_trace import validate as validate_pipeline_trace  # noqa: E402
 from website.scripts.validate_public_crops import validate as validate_public_crops  # noqa: E402
 
 
@@ -98,13 +99,16 @@ def validate() -> dict:
                 raise ValueError(f"Invalid class ID or count: {case['case_id']}")
 
     manifest["validated_public_crops"] = validate_public_crops()
+    manifest["validated_pipeline_trace"] = validate_pipeline_trace()
     return manifest
 
 
 if __name__ == "__main__":
     result = validate()
     crops = result["validated_public_crops"]
+    trace = result["validated_pipeline_trace"]
     print(
         f"Validated {len(result['assets'])} figures, {len(result['case_studies'])} "
-        f"archived cases, and {crops['assets']} pixel-aligned raster crops"
+        f"archived cases, {crops['assets']} pixel-aligned raster crops, and "
+        f"{trace['assets']} training-trace assets across {trace['stages']} stages"
     )
