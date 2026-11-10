@@ -2,7 +2,7 @@
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
 import Legend from '../components/Legend.astro';
-import PairedEvidence from '../components/PairedEvidence.astro';
+import RasterEvidence from '../components/RasterEvidence.astro';
 import { route, source } from '../scripts/routes.mjs';
 ---
 <Atlas title="Data Pipeline" active="pipeline">
@@ -13,7 +13,7 @@ import { route, source } from '../scripts/routes.mjs';
       <h2 id="inspect-recorded-title">One crop, five aligned views.</h2>
       <p class="note">This is a held-out evaluation crop with archived reference and paired predictions. It is not a captured training draw, augmentation output, or model activation trace.</p>
     </div>
-    <PairedEvidence initialGroup="vegetation_disagreement" initialCase="4_14-4608-3584" context="Pipeline" />
+    <RasterEvidence initialCase="4_14-4608-3584" context="Pipeline" />
   </section>
   <div class="wrap" data-pipeline>
     <section class="instrument lab" aria-labelledby="sampling-title">

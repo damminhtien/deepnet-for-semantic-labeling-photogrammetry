@@ -2,7 +2,7 @@
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
 import Legend from '../components/Legend.astro';
-import PairedEvidence from '../components/PairedEvidence.astro';
+import RasterEvidence from '../components/RasterEvidence.astro';
 import { route, source } from '../scripts/routes.mjs';
 import { metrics, modelKeys, percent } from '../scripts/metrics.mjs';
 import evidence from '../generated/evidence.json';
@@ -38,7 +38,7 @@ const vegetationShare = (dino[2][3] + dino[3][2]) / metrics(dino).errors;
         </div>
         <div class="panel stack">
           <p class="eyebrow">Recorded paired crops</p>
-          <p class="note">Published crop counts from the matched RGB pair. These are targeted examples. Raw rasters are not bundled here.</p>
+          <p class="note">Pixel-aligned crops from the matched RGB pair. Each region is checked against its exact three-way class counts.</p>
           <div data-crops class="crop-list"></div>
         </div>
         <p class="note"><a href={route('methods') + '#claim-005'}>Evidence trail ↗</a> · <a href={source('artifacts/public/metrics/potsdam-benchmark-confusions.json')}>Original matrices ↗</a></p>
@@ -48,9 +48,9 @@ const vegetationShare = (dino[2][3] + dino[3][2]) / metrics(dino).errors;
       <div>
         <p class="eyebrow">Public case study · recorded paired maps</p>
         <h2 id="public-preview-title">Follow the selected error into a scene.</h2>
-        <p class="note">For the matched DINOv3 RGB and PSPNet RGB pair, the matrix selects the available published crop with the most pixels in the chosen class transition. This is a crop-level context view; it does not mark exact cell coordinates inside the figure.</p>
+        <p class="note">For DINOv3 RGB and PSPNet RGB, the matrix selects a crop containing the chosen transition. The selected reference-to-prediction pixels are highlighted directly from the archived class-ID maps.</p>
       </div>
-      <PairedEvidence context="Evaluation" caseControls={false} modelControl={false} initialGroup="vegetation_disagreement" initialCase="4_14-4096-3072" />
+      <RasterEvidence context="Evaluation" caseControls={false} modelControl={false} spectralControl={false} initialCase="4_14-4096-3072" />
     </section>
     <section class="panel stack" data-local-comparison aria-labelledby="comparison-title">
       <div>

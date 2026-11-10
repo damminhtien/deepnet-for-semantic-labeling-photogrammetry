@@ -3,7 +3,7 @@ import { count, cropPixels, metrics, percent, shortClasses } from './metrics.mjs
 import { source, route } from './routes.mjs';
 import { query, restore, share } from './state.mjs';
 import { cropViewer } from './crop-viewer.mjs';
-import { explorerFor } from './paired-evidence.mjs';
+import { rasterExplorerFor } from './raster-evidence.ts';
 
 const root = document.querySelector('[data-evaluation]');
 const get = (selector) => root.querySelector(selector);
@@ -13,7 +13,7 @@ const units = get('[name=units]');
 const { benchmark, cases } = evidence;
 const names = benchmark.class_names;
 const params = query();
-const publicExplorer = explorerFor(get('[data-paired-explorer]'));
+const publicExplorer = rasterExplorerFor(get('[data-raster-explorer]'));
 function classId(key, fallback) {
   const raw = params.get(key);
   return raw !== null && /^[0-5]$/.test(raw) ? Number(raw) : fallback;
@@ -28,7 +28,8 @@ const renderLocal = cropViewer(root, cases, benchmark, () => ({ model: model.val
 
 function inspectPublicCrop(crop, matchingPixels) {
   publicExplorer.setModel(model.value);
-  publicExplorer.setCase(crop, { matchingPixels, model: model.value, publicCase: true });
+  publicExplorer.setCase(crop, { matchingPixels, model: model.value });
+  publicExplorer.setConfusion(actual, predicted);
 }
 
 function renderCrops() {
@@ -49,11 +50,11 @@ function renderCrops() {
     .filter(({ n }) => n > 0)
     .sort((a, b) => b.n - a.n);
   if (!found.length) {
-    list.textContent = 'This pair has no matching crop in the published gallery.';
-    publicExplorer.setUnavailable('No published paired crop contains this class transition and scene selection.');
+    list.textContent = 'This pair has no matching real crop in the public gallery.';
+    publicExplorer.setUnavailable('No published raster crop contains this class transition and scene selection.');
     return;
   }
-  const requested = query().get('public-case');
+  const requested = query().get('raster-case') ?? query().get('public-case');
   const selected = found.find(({ crop }) => cropId(crop) === requested) ?? found[0];
   inspectPublicCrop(selected.crop, selected.n);
   list.replaceChildren(...found.map(({ crop, n }) => {

@@ -1,0 +1,6898 @@
+{
+  "schema_version": 1,
+  "dataset_id": "isprs-potsdam",
+  "class_names": [
+    "Impervious surfaces",
+    "Building",
+    "Low vegetation",
+    "Tree",
+    "Car",
+    "Clutter/background"
+  ],
+  "ignore_class_id": 6,
+  "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4",
+  "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd",
+  "models": {
+    "dinov3": {
+      "model_id": "potsdam-dinov3-rgbir-v2",
+      "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+      "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+    },
+    "pspnet": {
+      "model_id": "potsdam-pspnet-rgb-v1",
+      "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+      "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+    }
+  },
+  "assets": [
+    {
+      "case_id": "6_14-2560-1536",
+      "case_group": "dinov3_only_correct",
+      "case_group_title": "DINOv3 corrects PSPNet",
+      "row_index": 0,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "6_14",
+      "pixel_window": {
+        "row": 2560,
+        "col": 1536,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 241743
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          11512
+        ],
+        [
+          0,
+          0,
+          1,
+          52891
+        ],
+        [
+          0,
+          0,
+          2,
+          8
+        ],
+        [
+          0,
+          1,
+          0,
+          46
+        ],
+        [
+          0,
+          1,
+          1,
+          162
+        ],
+        [
+          0,
+          1,
+          2,
+          11
+        ],
+        [
+          0,
+          2,
+          0,
+          85
+        ],
+        [
+          0,
+          2,
+          1,
+          23
+        ],
+        [
+          0,
+          2,
+          2,
+          277
+        ],
+        [
+          0,
+          5,
+          1,
+          5784
+        ],
+        [
+          1,
+          1,
+          0,
+          148
+        ],
+        [
+          1,
+          1,
+          1,
+          6231
+        ],
+        [
+          2,
+          0,
+          0,
+          91
+        ],
+        [
+          2,
+          0,
+          2,
+          86
+        ],
+        [
+          2,
+          0,
+          3,
+          15
+        ],
+        [
+          2,
+          2,
+          0,
+          45
+        ],
+        [
+          2,
+          2,
+          1,
+          4716
+        ],
+        [
+          2,
+          2,
+          2,
+          26746
+        ],
+        [
+          2,
+          2,
+          3,
+          506
+        ],
+        [
+          2,
+          3,
+          2,
+          272
+        ],
+        [
+          2,
+          3,
+          3,
+          662
+        ],
+        [
+          2,
+          5,
+          0,
+          16
+        ],
+        [
+          2,
+          5,
+          1,
+          62
+        ],
+        [
+          2,
+          5,
+          2,
+          319
+        ],
+        [
+          2,
+          5,
+          5,
+          1522
+        ],
+        [
+          3,
+          2,
+          2,
+          257
+        ],
+        [
+          3,
+          2,
+          3,
+          2
+        ],
+        [
+          3,
+          3,
+          2,
+          138
+        ],
+        [
+          3,
+          3,
+          3,
+          8426
+        ],
+        [
+          4,
+          4,
+          4,
+          117
+        ],
+        [
+          5,
+          0,
+          0,
+          2852
+        ],
+        [
+          5,
+          0,
+          1,
+          7748
+        ],
+        [
+          5,
+          0,
+          2,
+          330
+        ],
+        [
+          5,
+          2,
+          0,
+          2170
+        ],
+        [
+          5,
+          2,
+          1,
+          5296
+        ],
+        [
+          5,
+          2,
+          2,
+          2253
+        ],
+        [
+          5,
+          2,
+          5,
+          1
+        ],
+        [
+          5,
+          5,
+          1,
+          89887
+        ],
+        [
+          5,
+          5,
+          2,
+          286
+        ],
+        [
+          5,
+          5,
+          5,
+          9744
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "dinov3_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/6_14-2560-1536-rgb.png",
+          "sha256": "b4ac50a88b27f0931895767b2e5e5c6fef7aa35be0cdfa7de4201410a5447933",
+          "bytes": 397932
+        },
+        "infrared": {
+          "url": "evidence/scenes/6_14-2560-1536-ir.png",
+          "sha256": "bb1a0b4907cb97d990c46ebbd49de8f3b5b8dd345fbb690637b40e096b6e6d49",
+          "bytes": 139072
+        },
+        "class_ids": {
+          "url": "evidence/scenes/6_14-2560-1536-ids.png",
+          "sha256": "645f64ac25c62f8dc49836fa38d7433abdb0a5f76bb6d151dfbe45c16e3dfacb",
+          "bytes": 13163
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807362.6
+        ],
+        "extent": [
+          368176.5,
+          5807062.6,
+          368476.5,
+          5807362.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368253.3,
+        5807209.0,
+        368278.9,
+        5807234.6
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_6_14_RGBIR.tif",
+          "sha256": "f8f537026ada796497b32ba49d1359e7dfc23d3cd0c363daa79c066842c02dfb"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_6_14_label_noBoundary.tif",
+          "sha256": "7b9864e549178880b100e5e9e6f6973b33794cb4631102c268b41770f32b410a",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/6_14.npz",
+            "sha256": "bcc552449142c22a4210b2c4e37d1ff7134b2100d5954035db29f6bc6ead63cd"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/6_14.npz",
+            "sha256": "b932885532f7c15a691005363ed16882dac2cd3a2a68c7391d2af63fcf46d9f5"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_15-2048-5120",
+      "case_group": "dinov3_only_correct",
+      "case_group_title": "DINOv3 corrects PSPNet",
+      "row_index": 1,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_15",
+      "pixel_window": {
+        "row": 2048,
+        "col": 5120,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 250280
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          1,
+          111676
+        ],
+        [
+          0,
+          1,
+          1,
+          397
+        ],
+        [
+          0,
+          5,
+          1,
+          23
+        ],
+        [
+          1,
+          0,
+          1,
+          349
+        ],
+        [
+          1,
+          1,
+          1,
+          124394
+        ],
+        [
+          1,
+          2,
+          1,
+          7000
+        ],
+        [
+          1,
+          2,
+          2,
+          118
+        ],
+        [
+          1,
+          5,
+          1,
+          412
+        ],
+        [
+          2,
+          2,
+          1,
+          85
+        ],
+        [
+          2,
+          5,
+          1,
+          30
+        ],
+        [
+          3,
+          0,
+          1,
+          77
+        ],
+        [
+          3,
+          2,
+          1,
+          1615
+        ],
+        [
+          3,
+          2,
+          2,
+          4013
+        ],
+        [
+          5,
+          0,
+          1,
+          62
+        ],
+        [
+          5,
+          5,
+          1,
+          29
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "dinov3_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_15-2048-5120-rgb.png",
+          "sha256": "e9600e0341046aa2e33a36a35bffc4d821e221501f7e6b99ec0b90585f012dbe",
+          "bytes": 425085
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_15-2048-5120-ir.png",
+          "sha256": "c5ddccfef4d93302fdab77d0236f01a18340d47d3f8ff120891cc09a86a1fef7",
+          "bytes": 141932
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_15-2048-5120-ids.png",
+          "sha256": "7b71dd83cd6170e89e300393459bc6b2fed319094dce937f7d1882d8cac6c83d",
+          "bytes": 7456
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368476.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368476.5,
+          5807662.6,
+          368776.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368732.5,
+        5807834.6,
+        368758.1,
+        5807860.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_15_RGBIR.tif",
+          "sha256": "810f2390f22994d602303133c43c02e7297d563637f887533de0bea6f50bbfe2"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_15_label_noBoundary.tif",
+          "sha256": "8b72dc6acfdb1ea8cfcd1ad6cc66574b671f9352599271daea44763b8b28d0e2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_15.npz",
+            "sha256": "ff11dd73256678195f3123290931c861a092bae45fbac378fe5f5fce6d69d9ff"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_15.npz",
+            "sha256": "b31a2987469dcb7560428e0a44c789e54bf2d87866df40e75f4288619e5a5c3b"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "2_13-2048-512",
+      "case_group": "dinov3_only_correct",
+      "case_group_title": "DINOv3 corrects PSPNet",
+      "row_index": 2,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "2_13",
+      "pixel_window": {
+        "row": 2048,
+        "col": 512,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 258255
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          2,
+          2,
+          1,
+          88854
+        ],
+        [
+          2,
+          2,
+          2,
+          154142
+        ],
+        [
+          2,
+          2,
+          3,
+          4073
+        ],
+        [
+          2,
+          3,
+          2,
+          718
+        ],
+        [
+          2,
+          3,
+          3,
+          3203
+        ],
+        [
+          3,
+          2,
+          2,
+          844
+        ],
+        [
+          3,
+          2,
+          3,
+          258
+        ],
+        [
+          3,
+          3,
+          2,
+          11
+        ],
+        [
+          3,
+          3,
+          3,
+          6152
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "dinov3_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/2_13-2048-512-rgb.png",
+          "sha256": "82840bae7c5b9f377f47d0e8020fbf700e542dd7ecfae912a820303a42ab58be",
+          "bytes": 445695
+        },
+        "infrared": {
+          "url": "evidence/scenes/2_13-2048-512-ir.png",
+          "sha256": "f8fa3de5a9769a69970ee273aec2ebcd7484d9a1bc602888498cf9469db4cf4e",
+          "bytes": 153083
+        },
+        "class_ids": {
+          "url": "evidence/scenes/2_13-2048-512-ids.png",
+          "sha256": "f0191f4912190ea04e62c8c27fec78fdf0bef0b02e0e40760db68e66378b71fe",
+          "bytes": 5843
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          367876.5,
+          0.0,
+          -0.05,
+          5808562.6
+        ],
+        "extent": [
+          367876.5,
+          5808262.6,
+          368176.5,
+          5808562.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        367902.1,
+        5808434.6,
+        367927.7,
+        5808460.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_2_13_RGBIR.tif",
+          "sha256": "a8477f06d510a51856684830e0783c5e6d06fb7acac6994ab1c48020f6bcab44"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_2_13_label_noBoundary.tif",
+          "sha256": "76890e2ba1b62bde3b26aec64e7af7bf35cefd94e533000e411b1aeecdef616b",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/2_13.npz",
+            "sha256": "5ee815fbc0f786c1c5a1771c2b942b8a8edf45ffa84a8176a64956dd89162549"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/2_13.npz",
+            "sha256": "825d06c2452786eec452cdf044cd820f9032b511b89b0d61ceb93bbad7d759ff"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "6_13-4608-5120",
+      "case_group": "dinov3_only_correct",
+      "case_group_title": "DINOv3 corrects PSPNet",
+      "row_index": 3,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "6_13",
+      "pixel_window": {
+        "row": 4608,
+        "col": 5120,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 251663
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          44296
+        ],
+        [
+          0,
+          5,
+          0,
+          613
+        ],
+        [
+          0,
+          5,
+          2,
+          7
+        ],
+        [
+          0,
+          5,
+          5,
+          199
+        ],
+        [
+          2,
+          0,
+          0,
+          40
+        ],
+        [
+          2,
+          2,
+          0,
+          33
+        ],
+        [
+          2,
+          2,
+          2,
+          110643
+        ],
+        [
+          2,
+          2,
+          5,
+          2
+        ],
+        [
+          2,
+          5,
+          0,
+          206
+        ],
+        [
+          2,
+          5,
+          2,
+          685
+        ],
+        [
+          2,
+          5,
+          5,
+          201
+        ],
+        [
+          5,
+          0,
+          0,
+          3504
+        ],
+        [
+          5,
+          0,
+          5,
+          18
+        ],
+        [
+          5,
+          5,
+          0,
+          89657
+        ],
+        [
+          5,
+          5,
+          2,
+          5
+        ],
+        [
+          5,
+          5,
+          5,
+          1554
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "dinov3_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/6_13-4608-5120-rgb.png",
+          "sha256": "f4fd755467d356050c7620aaab9072973d2f7ee29f72fed92837c5f084598f39",
+          "bytes": 301733
+        },
+        "infrared": {
+          "url": "evidence/scenes/6_13-4608-5120-ir.png",
+          "sha256": "dc13dc413078f48f6ac03afbbf3b13630e4fab8b6587154cba1ac68e9f387da5",
+          "bytes": 107145
+        },
+        "class_ids": {
+          "url": "evidence/scenes/6_13-4608-5120-ids.png",
+          "sha256": "0b6a0572fce6ae4bf5e5058efc9d8f53bff1766a9296a52ccb9e9ee82135b371",
+          "bytes": 5112
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          367876.5,
+          0.0,
+          -0.05,
+          5807362.6
+        ],
+        "extent": [
+          367876.5,
+          5807062.6,
+          368176.5,
+          5807362.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368132.5,
+        5807106.6,
+        368158.1,
+        5807132.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_6_13_RGBIR.tif",
+          "sha256": "f310d1fdfda3dfc025355ef65debdbafa2723f4ba38333a210a7e6b859a8b13a"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_6_13_label_noBoundary.tif",
+          "sha256": "59ac1b6bf666fb159c7f6af6ac8a33c3927830645d84bc48cdca40a690822a1a",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/6_13.npz",
+            "sha256": "1c711a09879fe2ae5f332f500280e6567f5197002061c18c18b6adb1c560af3a"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/6_13.npz",
+            "sha256": "040765b34ae91be5c1fad505d16f0b534447617b889c40eb84fc0207f36d25aa"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "7_13-5120-3072",
+      "case_group": "pspnet_only_correct",
+      "case_group_title": "PSPNet corrects DINOv3",
+      "row_index": 0,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "7_13",
+      "pixel_window": {
+        "row": 5120,
+        "col": 3072,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 257636
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          1,
+          1,
+          1,
+          16803
+        ],
+        [
+          1,
+          1,
+          5,
+          70
+        ],
+        [
+          1,
+          5,
+          1,
+          2966
+        ],
+        [
+          1,
+          5,
+          5,
+          2788
+        ],
+        [
+          2,
+          5,
+          0,
+          366
+        ],
+        [
+          2,
+          5,
+          5,
+          1069
+        ],
+        [
+          5,
+          1,
+          5,
+          7
+        ],
+        [
+          5,
+          2,
+          2,
+          3
+        ],
+        [
+          5,
+          2,
+          5,
+          76375
+        ],
+        [
+          5,
+          5,
+          0,
+          216
+        ],
+        [
+          5,
+          5,
+          1,
+          34
+        ],
+        [
+          5,
+          5,
+          2,
+          7247
+        ],
+        [
+          5,
+          5,
+          5,
+          149692
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 178,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 178,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 178,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "pspnet_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/7_13-5120-3072-rgb.png",
+          "sha256": "312782e4112a785b3b8e8744447f483bf43f3081de2b75a9f3e36f5c3b50c2ca",
+          "bytes": 371291
+        },
+        "infrared": {
+          "url": "evidence/scenes/7_13-5120-3072-ir.png",
+          "sha256": "9ed862b84e779253f57d8e105e206805e603c571549ce5aef6a5461e9dff6b65",
+          "bytes": 128854
+        },
+        "class_ids": {
+          "url": "evidence/scenes/7_13-5120-3072-ids.png",
+          "sha256": "ad21c0375eb293ff37cfa516770c76112bc432302496bdd8aa8556536688bbcd",
+          "bytes": 6178
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          367876.5,
+          0.0,
+          -0.05,
+          5807062.6
+        ],
+        "extent": [
+          367876.5,
+          5806762.6,
+          368176.5,
+          5807062.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368030.1,
+        5806781.0,
+        368055.7,
+        5806806.6
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_7_13_RGBIR.tif",
+          "sha256": "016fe13e9146561ab21529f1c2ae4c7656b3dc94d9b6276c690a211a3fb6fd4d"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_7_13_label_noBoundary.tif",
+          "sha256": "4add312baf778ea0530934971c7250d6414de8fdb57a475c1d39cb2368c837e5",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/7_13.npz",
+            "sha256": "08573f32b11d0c8ad0684cfeba16f56ba09cd536cc359a30c68569b87a045855"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/7_13.npz",
+            "sha256": "0442ebc7f42a4e39457119fd87706ff22470826b4aafa9c66891a117957ac199"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "5_14-4608-4608",
+      "case_group": "pspnet_only_correct",
+      "case_group_title": "PSPNet corrects DINOv3",
+      "row_index": 1,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "5_14",
+      "pixel_window": {
+        "row": 4608,
+        "col": 4608,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 235522
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          34859
+        ],
+        [
+          0,
+          0,
+          2,
+          41
+        ],
+        [
+          0,
+          0,
+          5,
+          4154
+        ],
+        [
+          0,
+          1,
+          0,
+          123
+        ],
+        [
+          0,
+          2,
+          0,
+          1
+        ],
+        [
+          0,
+          3,
+          0,
+          1
+        ],
+        [
+          0,
+          3,
+          3,
+          13
+        ],
+        [
+          0,
+          3,
+          5,
+          17
+        ],
+        [
+          0,
+          5,
+          0,
+          204
+        ],
+        [
+          0,
+          5,
+          2,
+          14
+        ],
+        [
+          0,
+          5,
+          5,
+          369
+        ],
+        [
+          2,
+          0,
+          0,
+          10305
+        ],
+        [
+          2,
+          0,
+          2,
+          63072
+        ],
+        [
+          2,
+          0,
+          3,
+          994
+        ],
+        [
+          2,
+          0,
+          5,
+          28
+        ],
+        [
+          2,
+          1,
+          0,
+          1026
+        ],
+        [
+          2,
+          1,
+          2,
+          2919
+        ],
+        [
+          2,
+          2,
+          0,
+          599
+        ],
+        [
+          2,
+          2,
+          2,
+          69122
+        ],
+        [
+          2,
+          2,
+          3,
+          133
+        ],
+        [
+          2,
+          2,
+          5,
+          36
+        ],
+        [
+          2,
+          3,
+          2,
+          5012
+        ],
+        [
+          2,
+          3,
+          3,
+          14666
+        ],
+        [
+          2,
+          5,
+          2,
+          109
+        ],
+        [
+          2,
+          5,
+          5,
+          49
+        ],
+        [
+          3,
+          0,
+          0,
+          66
+        ],
+        [
+          3,
+          0,
+          2,
+          7
+        ],
+        [
+          3,
+          0,
+          3,
+          85
+        ],
+        [
+          3,
+          0,
+          5,
+          4
+        ],
+        [
+          3,
+          3,
+          2,
+          203
+        ],
+        [
+          3,
+          3,
+          3,
+          16372
+        ],
+        [
+          3,
+          5,
+          3,
+          3
+        ],
+        [
+          5,
+          0,
+          0,
+          236
+        ],
+        [
+          5,
+          0,
+          2,
+          1041
+        ],
+        [
+          5,
+          0,
+          5,
+          509
+        ],
+        [
+          5,
+          2,
+          2,
+          3457
+        ],
+        [
+          5,
+          3,
+          2,
+          190
+        ],
+        [
+          5,
+          3,
+          3,
+          3
+        ],
+        [
+          5,
+          5,
+          0,
+          104
+        ],
+        [
+          5,
+          5,
+          2,
+          262
+        ],
+        [
+          5,
+          5,
+          3,
+          2
+        ],
+        [
+          5,
+          5,
+          5,
+          5112
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 605,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 605,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 605,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "pspnet_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/5_14-4608-4608-rgb.png",
+          "sha256": "061a09084afd2135652a11302f0cab1660af1c2e5409392524f09e52e63df5d5",
+          "bytes": 362363
+        },
+        "infrared": {
+          "url": "evidence/scenes/5_14-4608-4608-ir.png",
+          "sha256": "b7235165b3a72ac128d95ca7f1810f79ef5ecd14cc1516b6b5ace2930ccc4622",
+          "bytes": 127357
+        },
+        "class_ids": {
+          "url": "evidence/scenes/5_14-4608-4608-ids.png",
+          "sha256": "88f036dc2629c83975f219132ddb93223344ec73951cdca8260a6e6d6373ef8a",
+          "bytes": 17145
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807662.6
+        ],
+        "extent": [
+          368176.5,
+          5807362.6,
+          368476.5,
+          5807662.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368406.9,
+        5807406.6,
+        368432.5,
+        5807432.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_5_14_RGBIR.tif",
+          "sha256": "3b9af7887f7241d1ae0ca4dae5538ed96a287c7e0379908a3caf68d1f117318d"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_5_14_label_noBoundary.tif",
+          "sha256": "ffb5cd34e9ea639f1999656878ab78acf565a52a5dc177180d7e67dfb4c0755c",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/5_14.npz",
+            "sha256": "0b114228439814487d70365a5da8471871b90e6852eab49c27e627a8a6462107"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/5_14.npz",
+            "sha256": "76cb35811f29e168a53b2eeba0fd94025edee38a9241a06a955947eb9b11c53e"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "5_15-5632-5120",
+      "case_group": "pspnet_only_correct",
+      "case_group_title": "PSPNet corrects DINOv3",
+      "row_index": 2,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "5_15",
+      "pixel_window": {
+        "row": 5632,
+        "col": 5120,
+        "height": 368,
+        "width": 512,
+        "valid_pixels": 185310
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          90085
+        ],
+        [
+          0,
+          1,
+          0,
+          66004
+        ],
+        [
+          0,
+          1,
+          1,
+          1983
+        ],
+        [
+          1,
+          1,
+          1,
+          27238
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 1033,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 1033,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 1033,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "pspnet_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/5_15-5632-5120-rgb.png",
+          "sha256": "096e09ffd40e8fe364cbad13a808a645196caff1dc883dfffd823382171e54df",
+          "bytes": 218719
+        },
+        "infrared": {
+          "url": "evidence/scenes/5_15-5632-5120-ir.png",
+          "sha256": "d92f91690818fb433d94a66ae8a883ef31d371afe61ea465c80dea7e6ec6ed4a",
+          "bytes": 74812
+        },
+        "class_ids": {
+          "url": "evidence/scenes/5_15-5632-5120-ids.png",
+          "sha256": "4011011703e4eb8f943f23307e0b8271bcc5a3feb12366ab6d968ccb72cb6de3",
+          "bytes": 2472
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368476.5,
+          0.0,
+          -0.05,
+          5807662.6
+        ],
+        "extent": [
+          368476.5,
+          5807362.6,
+          368776.5,
+          5807662.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368732.5,
+        5807362.6,
+        368758.1,
+        5807381.0
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_5_15_RGBIR.tif",
+          "sha256": "1e0af09efd929b234760e0145f1b79a7b4375952c8f7ba692949fe2c88cdb904"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_5_15_label_noBoundary.tif",
+          "sha256": "b415d199f0afbe794952eadb5165ad915d2bfdd6b2ba11812baf1fa219d897b3",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/5_15.npz",
+            "sha256": "f5c595e27c8a2197a08075325cf94aaaf1be95958b3bd2804dcffc852694fc8f"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/5_15.npz",
+            "sha256": "77355b2ae896c7fc285bfb7ed5c4c8b7c38d7596b0aa3362f53758136dc21a95"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-0-3584",
+      "case_group": "pspnet_only_correct",
+      "case_group_title": "PSPNet corrects DINOv3",
+      "row_index": 3,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 0,
+        "col": 3584,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 244482
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          59642
+        ],
+        [
+          0,
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          5,
+          67
+        ],
+        [
+          0,
+          1,
+          0,
+          167
+        ],
+        [
+          0,
+          1,
+          1,
+          471
+        ],
+        [
+          0,
+          1,
+          5,
+          59
+        ],
+        [
+          0,
+          2,
+          0,
+          31
+        ],
+        [
+          0,
+          4,
+          0,
+          7
+        ],
+        [
+          0,
+          4,
+          4,
+          13
+        ],
+        [
+          0,
+          5,
+          0,
+          57285
+        ],
+        [
+          0,
+          5,
+          3,
+          47
+        ],
+        [
+          0,
+          5,
+          5,
+          1016
+        ],
+        [
+          1,
+          1,
+          1,
+          60320
+        ],
+        [
+          2,
+          0,
+          0,
+          9727
+        ],
+        [
+          2,
+          0,
+          2,
+          19
+        ],
+        [
+          2,
+          0,
+          4,
+          4
+        ],
+        [
+          2,
+          0,
+          5,
+          128
+        ],
+        [
+          2,
+          1,
+          0,
+          35
+        ],
+        [
+          2,
+          1,
+          1,
+          47
+        ],
+        [
+          2,
+          1,
+          5,
+          17
+        ],
+        [
+          2,
+          2,
+          0,
+          6712
+        ],
+        [
+          2,
+          2,
+          2,
+          9837
+        ],
+        [
+          2,
+          2,
+          3,
+          34
+        ],
+        [
+          2,
+          2,
+          5,
+          13
+        ],
+        [
+          2,
+          4,
+          0,
+          1
+        ],
+        [
+          2,
+          4,
+          4,
+          103
+        ],
+        [
+          2,
+          5,
+          0,
+          7030
+        ],
+        [
+          2,
+          5,
+          2,
+          3138
+        ],
+        [
+          2,
+          5,
+          3,
+          33
+        ],
+        [
+          2,
+          5,
+          4,
+          23
+        ],
+        [
+          2,
+          5,
+          5,
+          2502
+        ],
+        [
+          3,
+          0,
+          0,
+          92
+        ],
+        [
+          3,
+          0,
+          3,
+          862
+        ],
+        [
+          3,
+          2,
+          0,
+          553
+        ],
+        [
+          3,
+          2,
+          3,
+          794
+        ],
+        [
+          3,
+          3,
+          0,
+          31
+        ],
+        [
+          3,
+          3,
+          3,
+          7941
+        ],
+        [
+          3,
+          5,
+          0,
+          130
+        ],
+        [
+          3,
+          5,
+          3,
+          608
+        ],
+        [
+          3,
+          5,
+          4,
+          4
+        ],
+        [
+          4,
+          4,
+          4,
+          2994
+        ],
+        [
+          5,
+          5,
+          0,
+          1953
+        ],
+        [
+          5,
+          5,
+          5,
+          9990
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 1460,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 1460,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 1460,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "pspnet_only_correct",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-0-3584-rgb.png",
+          "sha256": "6e5ba53a32becee9d199ceadc85621fcea10d6e1b525ebf684ef17c59bc9cd62",
+          "bytes": 382825
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-0-3584-ir.png",
+          "sha256": "b11243eab9e41b654ef742ea409f4bc3c0e55b8076b98ea67ee1e57f9de45fb5",
+          "bytes": 125448
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-0-3584-ids.png",
+          "sha256": "bd44b849202a5abb0db0cb5164a82c4411c94fdc58ed7ddd04c8ec5d97a9f581",
+          "bytes": 9785
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368355.7,
+        5807937.0,
+        368381.3,
+        5807962.6
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-2560-2048",
+      "case_group": "shared_errors",
+      "case_group_title": "Both models are wrong",
+      "row_index": 0,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 2560,
+        "col": 2048,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 258486
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          4588
+        ],
+        [
+          2,
+          2,
+          2,
+          4251
+        ],
+        [
+          3,
+          3,
+          3,
+          239
+        ],
+        [
+          5,
+          0,
+          0,
+          202154
+        ],
+        [
+          5,
+          0,
+          2,
+          940
+        ],
+        [
+          5,
+          0,
+          5,
+          1013
+        ],
+        [
+          5,
+          2,
+          0,
+          97
+        ],
+        [
+          5,
+          2,
+          2,
+          6597
+        ],
+        [
+          5,
+          2,
+          5,
+          35
+        ],
+        [
+          5,
+          5,
+          0,
+          33530
+        ],
+        [
+          5,
+          5,
+          2,
+          487
+        ],
+        [
+          5,
+          5,
+          5,
+          4555
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "shared_errors",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-2560-2048-rgb.png",
+          "sha256": "cdbb8588e1affd3f80f9c2981b3509021813b2210bd900a887d59c1523a5b50a",
+          "bytes": 299483
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-2560-2048-ir.png",
+          "sha256": "e450aff5fa98a41b43bc0ac4f004c6945c40ad53db726a08c9a1d4390625418e",
+          "bytes": 99360
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-2560-2048-ids.png",
+          "sha256": "8af7f35af839825be3dce655499274104fbaf998aa64efcd9b099f0b81cd7157",
+          "bytes": 4808
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368278.9,
+        5807809.0,
+        368304.5,
+        5807834.6
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-2048-2048",
+      "case_group": "shared_errors",
+      "case_group_title": "Both models are wrong",
+      "row_index": 1,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 2048,
+        "col": 2048,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 262144
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          5,
+          0,
+          0,
+          207190
+        ],
+        [
+          5,
+          0,
+          2,
+          106
+        ],
+        [
+          5,
+          0,
+          5,
+          2278
+        ],
+        [
+          5,
+          2,
+          5,
+          3037
+        ],
+        [
+          5,
+          5,
+          0,
+          40796
+        ],
+        [
+          5,
+          5,
+          2,
+          162
+        ],
+        [
+          5,
+          5,
+          5,
+          8575
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "shared_errors",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-2048-2048-rgb.png",
+          "sha256": "6435a6619d60d4712f1a727dd483775a582483fa67f5a7a17081b9a885f3fd04",
+          "bytes": 295599
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-2048-2048-ir.png",
+          "sha256": "b32ac774f86da120d5e98ed095c626d4e6551218cee895db97c361a7429cb7c2",
+          "bytes": 100540
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-2048-2048-ids.png",
+          "sha256": "4f5e6f1ba65d7c76b961de3523bfa9c421473d6279417774e1d6741dbf22f4ee",
+          "bytes": 3541
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368278.9,
+        5807834.6,
+        368304.5,
+        5807860.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-1536-3072",
+      "case_group": "shared_errors",
+      "case_group_title": "Both models are wrong",
+      "row_index": 2,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 1536,
+        "col": 3072,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 258396
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          3,
+          0,
+          0,
+          1076
+        ],
+        [
+          3,
+          0,
+          2,
+          4
+        ],
+        [
+          3,
+          0,
+          3,
+          101
+        ],
+        [
+          3,
+          2,
+          0,
+          2
+        ],
+        [
+          3,
+          2,
+          2,
+          1089
+        ],
+        [
+          3,
+          2,
+          3,
+          623
+        ],
+        [
+          3,
+          3,
+          0,
+          112
+        ],
+        [
+          3,
+          3,
+          2,
+          770
+        ],
+        [
+          3,
+          3,
+          3,
+          38866
+        ],
+        [
+          3,
+          3,
+          5,
+          37
+        ],
+        [
+          5,
+          0,
+          0,
+          63631
+        ],
+        [
+          5,
+          0,
+          2,
+          65254
+        ],
+        [
+          5,
+          0,
+          3,
+          75
+        ],
+        [
+          5,
+          0,
+          5,
+          41729
+        ],
+        [
+          5,
+          2,
+          0,
+          572
+        ],
+        [
+          5,
+          2,
+          2,
+          29037
+        ],
+        [
+          5,
+          2,
+          3,
+          700
+        ],
+        [
+          5,
+          2,
+          5,
+          12271
+        ],
+        [
+          5,
+          3,
+          0,
+          96
+        ],
+        [
+          5,
+          3,
+          2,
+          337
+        ],
+        [
+          5,
+          3,
+          3,
+          356
+        ],
+        [
+          5,
+          5,
+          2,
+          111
+        ],
+        [
+          5,
+          5,
+          5,
+          1547
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "shared_errors",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-1536-3072-rgb.png",
+          "sha256": "ea8a2a8b7da69f17441532cdd5d04a7e76e9746191e21669facd0b5f95d04eb9",
+          "bytes": 312201
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-1536-3072-ir.png",
+          "sha256": "01a00bcdaee7129069472b5168d28ef4c72f7a99bbe68992b6caea5adaad7829",
+          "bytes": 109023
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-1536-3072-ids.png",
+          "sha256": "b87d242e96f4d9c1133f4036da141dfe0e60b154db6dda0578e658ef9bf446db",
+          "bytes": 9658
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368330.1,
+        5807860.199999999,
+        368355.7,
+        5807885.8
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-2048-2560",
+      "case_group": "shared_errors",
+      "case_group_title": "Both models are wrong",
+      "row_index": 3,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 2048,
+        "col": 2560,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 262144
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          5,
+          0,
+          0,
+          4960
+        ],
+        [
+          5,
+          0,
+          2,
+          2135
+        ],
+        [
+          5,
+          0,
+          5,
+          28196
+        ],
+        [
+          5,
+          2,
+          2,
+          150778
+        ],
+        [
+          5,
+          2,
+          5,
+          21369
+        ],
+        [
+          5,
+          5,
+          2,
+          3009
+        ],
+        [
+          5,
+          5,
+          5,
+          51697
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "shared_errors",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-2048-2560-rgb.png",
+          "sha256": "087de88b68ec0a56c5f8f43e57e77e7f3daade366144d4611dc7fbab22e5187f",
+          "bytes": 326894
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-2048-2560-ir.png",
+          "sha256": "f376829120a578cb100c9f0418e40d4c2122ffec07e15b7bc0a00471d0fd5f63",
+          "bytes": 111263
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-2048-2560-ids.png",
+          "sha256": "e0a2c5e363ba349733dcdc85ad68cce907ea479c5ddc75686c82d52c6f251ac6",
+          "bytes": 6600
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368304.5,
+        5807834.6,
+        368330.1,
+        5807860.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-2048-3072",
+      "case_group": "car_clutter_disagreement",
+      "case_group_title": "Car / clutter disagreement",
+      "row_index": 0,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 2048,
+        "col": 3072,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 262144
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          5,
+          0,
+          0,
+          3526
+        ],
+        [
+          5,
+          0,
+          2,
+          90026
+        ],
+        [
+          5,
+          2,
+          2,
+          36152
+        ],
+        [
+          5,
+          2,
+          5,
+          28675
+        ],
+        [
+          5,
+          5,
+          0,
+          2714
+        ],
+        [
+          5,
+          5,
+          2,
+          65667
+        ],
+        [
+          5,
+          5,
+          5,
+          35384
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 178,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 178,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 178,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "car_clutter_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-2048-3072-rgb.png",
+          "sha256": "c9ca8ea197bf02a6e8d0da804ea53b6fa7e960a567d707a872c652a85cdfca87",
+          "bytes": 300265
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-2048-3072-ir.png",
+          "sha256": "271671c0d317fbbd3f3b505a0ef58c8ac49a78447ea068b018cbc5217ae5b7ea",
+          "bytes": 102724
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-2048-3072-ids.png",
+          "sha256": "fcfc15c5ef1d47572011e3c87220ea26782fff9436cc963e06db396c4f346025",
+          "bytes": 8801
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368330.1,
+        5807834.6,
+        368355.7,
+        5807860.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-2048-3584",
+      "case_group": "car_clutter_disagreement",
+      "case_group_title": "Car / clutter disagreement",
+      "row_index": 1,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 2048,
+        "col": 3584,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 248761
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          2,
+          2,
+          0,
+          785
+        ],
+        [
+          2,
+          2,
+          2,
+          52313
+        ],
+        [
+          2,
+          2,
+          3,
+          244
+        ],
+        [
+          2,
+          2,
+          5,
+          2
+        ],
+        [
+          2,
+          3,
+          2,
+          408
+        ],
+        [
+          2,
+          3,
+          3,
+          1301
+        ],
+        [
+          2,
+          5,
+          2,
+          63
+        ],
+        [
+          2,
+          5,
+          3,
+          30
+        ],
+        [
+          2,
+          5,
+          5,
+          273
+        ],
+        [
+          3,
+          2,
+          2,
+          466
+        ],
+        [
+          3,
+          2,
+          3,
+          502
+        ],
+        [
+          3,
+          3,
+          2,
+          781
+        ],
+        [
+          3,
+          3,
+          3,
+          62327
+        ],
+        [
+          3,
+          3,
+          5,
+          1313
+        ],
+        [
+          3,
+          5,
+          3,
+          33
+        ],
+        [
+          5,
+          0,
+          0,
+          23393
+        ],
+        [
+          5,
+          0,
+          2,
+          60506
+        ],
+        [
+          5,
+          0,
+          3,
+          168
+        ],
+        [
+          5,
+          0,
+          5,
+          2013
+        ],
+        [
+          5,
+          2,
+          0,
+          2726
+        ],
+        [
+          5,
+          2,
+          2,
+          3011
+        ],
+        [
+          5,
+          2,
+          3,
+          18
+        ],
+        [
+          5,
+          2,
+          5,
+          53
+        ],
+        [
+          5,
+          3,
+          0,
+          51
+        ],
+        [
+          5,
+          3,
+          2,
+          277
+        ],
+        [
+          5,
+          3,
+          3,
+          666
+        ],
+        [
+          5,
+          3,
+          5,
+          15
+        ],
+        [
+          5,
+          5,
+          0,
+          6010
+        ],
+        [
+          5,
+          5,
+          2,
+          2
+        ],
+        [
+          5,
+          5,
+          3,
+          255
+        ],
+        [
+          5,
+          5,
+          5,
+          28756
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 605,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 605,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 605,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "car_clutter_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-2048-3584-rgb.png",
+          "sha256": "06274a42c243ab558e0e478383cd34a51a853feeff27fc1b91ddf5897fdc7856",
+          "bytes": 343540
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-2048-3584-ir.png",
+          "sha256": "1561c433d1dedac14c972a28fd52cc51f1d3f0aaa2a943f39f86d180b4905b19",
+          "bytes": 121080
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-2048-3584-ids.png",
+          "sha256": "9ebd30e3e6ee0679dfcea6a9b527d0a2198b05765d6fe8ce13810a7b0cbb5ef1",
+          "bytes": 10607
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368355.7,
+        5807834.6,
+        368381.3,
+        5807860.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_13-2048-4096",
+      "case_group": "car_clutter_disagreement",
+      "case_group_title": "Car / clutter disagreement",
+      "row_index": 2,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_13",
+      "pixel_window": {
+        "row": 2048,
+        "col": 4096,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 234162
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          29402
+        ],
+        [
+          0,
+          0,
+          1,
+          7
+        ],
+        [
+          0,
+          0,
+          2,
+          3210
+        ],
+        [
+          0,
+          0,
+          3,
+          18
+        ],
+        [
+          0,
+          1,
+          0,
+          2
+        ],
+        [
+          0,
+          2,
+          0,
+          3
+        ],
+        [
+          0,
+          2,
+          2,
+          57
+        ],
+        [
+          0,
+          3,
+          0,
+          124
+        ],
+        [
+          0,
+          3,
+          3,
+          68
+        ],
+        [
+          0,
+          5,
+          0,
+          708
+        ],
+        [
+          0,
+          5,
+          2,
+          41
+        ],
+        [
+          0,
+          5,
+          5,
+          63
+        ],
+        [
+          1,
+          1,
+          0,
+          15
+        ],
+        [
+          1,
+          1,
+          1,
+          39771
+        ],
+        [
+          1,
+          1,
+          2,
+          1506
+        ],
+        [
+          1,
+          1,
+          5,
+          5
+        ],
+        [
+          1,
+          2,
+          1,
+          304
+        ],
+        [
+          1,
+          2,
+          2,
+          8947
+        ],
+        [
+          1,
+          2,
+          5,
+          26
+        ],
+        [
+          1,
+          3,
+          2,
+          22
+        ],
+        [
+          1,
+          3,
+          3,
+          2
+        ],
+        [
+          1,
+          5,
+          2,
+          7
+        ],
+        [
+          2,
+          2,
+          2,
+          28421
+        ],
+        [
+          2,
+          2,
+          3,
+          228
+        ],
+        [
+          2,
+          3,
+          2,
+          1198
+        ],
+        [
+          2,
+          3,
+          3,
+          1690
+        ],
+        [
+          2,
+          5,
+          2,
+          12
+        ],
+        [
+          3,
+          2,
+          3,
+          3
+        ],
+        [
+          3,
+          3,
+          3,
+          16035
+        ],
+        [
+          5,
+          0,
+          0,
+          24193
+        ],
+        [
+          5,
+          0,
+          2,
+          4
+        ],
+        [
+          5,
+          0,
+          3,
+          163
+        ],
+        [
+          5,
+          0,
+          5,
+          2663
+        ],
+        [
+          5,
+          1,
+          0,
+          40
+        ],
+        [
+          5,
+          1,
+          1,
+          113
+        ],
+        [
+          5,
+          1,
+          5,
+          6
+        ],
+        [
+          5,
+          2,
+          0,
+          54812
+        ],
+        [
+          5,
+          2,
+          2,
+          1460
+        ],
+        [
+          5,
+          2,
+          3,
+          1112
+        ],
+        [
+          5,
+          2,
+          5,
+          68
+        ],
+        [
+          5,
+          3,
+          0,
+          474
+        ],
+        [
+          5,
+          3,
+          2,
+          8
+        ],
+        [
+          5,
+          3,
+          3,
+          5084
+        ],
+        [
+          5,
+          3,
+          5,
+          14
+        ],
+        [
+          5,
+          5,
+          0,
+          3433
+        ],
+        [
+          5,
+          5,
+          1,
+          412
+        ],
+        [
+          5,
+          5,
+          2,
+          95
+        ],
+        [
+          5,
+          5,
+          3,
+          164
+        ],
+        [
+          5,
+          5,
+          5,
+          7949
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 1033,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 1033,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 1033,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "car_clutter_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_13-2048-4096-rgb.png",
+          "sha256": "0bddd12cd94ad993a548db5089696d3d340b20f74008d5bdbdcb0ac8ebc000f7",
+          "bytes": 381844
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_13-2048-4096-ir.png",
+          "sha256": "1627a58ecb27ff9a871169de6a22de4374c8b3a4e98d0c8c0489b1d3d973403e",
+          "bytes": 131429
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_13-2048-4096-ids.png",
+          "sha256": "524d819c83f495b39d7ef8f03522a5d08ad7f929486316aed800cdf06b41426c",
+          "bytes": 15738
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          367876.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          367876.5,
+          5807662.6,
+          368176.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368081.3,
+        5807834.6,
+        368106.9,
+        5807860.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_13_RGBIR.tif",
+          "sha256": "e287a997e7cc0a83ef8429a174f35a93dac6273f4b1f1305d863f5f62445887d"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_13_label_noBoundary.tif",
+          "sha256": "7ae4e6ed61b093d0aef9f500cd87dd792a0220e7a5001e7c4e8bdc497797bc84",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_13.npz",
+            "sha256": "91f19110d7949dd5566eeed7ef43f7ae7d9aae636dd5e7718e28f68658bc7e0d"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_13.npz",
+            "sha256": "4d68c629b756a2624cae08baa61f2553dde281489aa8e9c0ec51f73799676419"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "7_13-5632-1536",
+      "case_group": "car_clutter_disagreement",
+      "case_group_title": "Car / clutter disagreement",
+      "row_index": 3,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "7_13",
+      "pixel_window": {
+        "row": 5632,
+        "col": 1536,
+        "height": 368,
+        "width": 512,
+        "valid_pixels": 184427
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          6337
+        ],
+        [
+          0,
+          0,
+          2,
+          46
+        ],
+        [
+          0,
+          5,
+          0,
+          205
+        ],
+        [
+          0,
+          5,
+          2,
+          102
+        ],
+        [
+          0,
+          5,
+          5,
+          10
+        ],
+        [
+          1,
+          0,
+          1,
+          57
+        ],
+        [
+          1,
+          0,
+          5,
+          1030
+        ],
+        [
+          1,
+          1,
+          1,
+          12156
+        ],
+        [
+          1,
+          5,
+          0,
+          2
+        ],
+        [
+          1,
+          5,
+          1,
+          4989
+        ],
+        [
+          1,
+          5,
+          5,
+          2170
+        ],
+        [
+          5,
+          0,
+          0,
+          10791
+        ],
+        [
+          5,
+          0,
+          5,
+          26662
+        ],
+        [
+          5,
+          2,
+          2,
+          6098
+        ],
+        [
+          5,
+          2,
+          5,
+          5972
+        ],
+        [
+          5,
+          5,
+          0,
+          12482
+        ],
+        [
+          5,
+          5,
+          1,
+          187
+        ],
+        [
+          5,
+          5,
+          2,
+          16245
+        ],
+        [
+          5,
+          5,
+          5,
+          78886
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 161,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "reference": {
+          "x": 760,
+          "width": 411,
+          "y": 1460,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1359,
+          "width": 411,
+          "y": 1460,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1958,
+          "width": 411,
+          "y": 1460,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2556,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "car_clutter_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/7_13-5632-1536-rgb.png",
+          "sha256": "f0b258bf1440b80edb6428e3d445ce9a17697102c2642d573b64d90b8f68c10f",
+          "bytes": 275058
+        },
+        "infrared": {
+          "url": "evidence/scenes/7_13-5632-1536-ir.png",
+          "sha256": "e21157a7ab61ee04df7fc682cd3b0bb5e7aa832e3d3ca701d295b2e5e85a6d7d",
+          "bytes": 94481
+        },
+        "class_ids": {
+          "url": "evidence/scenes/7_13-5632-1536-ids.png",
+          "sha256": "0178593dfdefc7f89be9a1c88fbfd2be00bfc47b317bf9e1b1fd537c5f0c2de2",
+          "bytes": 8940
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          367876.5,
+          0.0,
+          -0.05,
+          5807062.6
+        ],
+        "extent": [
+          367876.5,
+          5806762.6,
+          368176.5,
+          5807062.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        367953.3,
+        5806762.6,
+        367978.9,
+        5806781.0
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_7_13_RGBIR.tif",
+          "sha256": "016fe13e9146561ab21529f1c2ae4c7656b3dc94d9b6276c690a211a3fb6fd4d"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_7_13_label_noBoundary.tif",
+          "sha256": "4add312baf778ea0530934971c7250d6414de8fdb57a475c1d39cb2368c837e5",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/7_13.npz",
+            "sha256": "08573f32b11d0c8ad0684cfeba16f56ba09cd536cc359a30c68569b87a045855"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/7_13.npz",
+            "sha256": "0442ebc7f42a4e39457119fd87706ff22470826b4aafa9c66891a117957ac199"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-4608-3584",
+      "case_group": "vegetation_disagreement",
+      "case_group_title": "Tree / low-vegetation disagreement",
+      "row_index": 0,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 4608,
+        "col": 3584,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 252851
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          1,
+          1,
+          1,
+          589
+        ],
+        [
+          1,
+          1,
+          2,
+          53
+        ],
+        [
+          1,
+          1,
+          3,
+          1126
+        ],
+        [
+          1,
+          1,
+          5,
+          395
+        ],
+        [
+          1,
+          3,
+          3,
+          260
+        ],
+        [
+          1,
+          5,
+          5,
+          6
+        ],
+        [
+          2,
+          0,
+          2,
+          98
+        ],
+        [
+          2,
+          0,
+          3,
+          31
+        ],
+        [
+          2,
+          0,
+          5,
+          68
+        ],
+        [
+          2,
+          1,
+          5,
+          1
+        ],
+        [
+          2,
+          2,
+          2,
+          109954
+        ],
+        [
+          2,
+          2,
+          3,
+          3163
+        ],
+        [
+          2,
+          2,
+          5,
+          55879
+        ],
+        [
+          2,
+          3,
+          2,
+          517
+        ],
+        [
+          2,
+          3,
+          3,
+          2156
+        ],
+        [
+          2,
+          5,
+          2,
+          33
+        ],
+        [
+          2,
+          5,
+          3,
+          79
+        ],
+        [
+          2,
+          5,
+          5,
+          4315
+        ],
+        [
+          3,
+          2,
+          2,
+          1361
+        ],
+        [
+          3,
+          2,
+          3,
+          3017
+        ],
+        [
+          3,
+          2,
+          5,
+          1381
+        ],
+        [
+          3,
+          3,
+          2,
+          920
+        ],
+        [
+          3,
+          3,
+          3,
+          59307
+        ],
+        [
+          3,
+          3,
+          5,
+          1804
+        ],
+        [
+          3,
+          5,
+          5,
+          157
+        ],
+        [
+          5,
+          2,
+          3,
+          70
+        ],
+        [
+          5,
+          2,
+          5,
+          47
+        ],
+        [
+          5,
+          3,
+          3,
+          923
+        ],
+        [
+          5,
+          5,
+          3,
+          1376
+        ],
+        [
+          5,
+          5,
+          5,
+          3765
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 178,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "vegetation_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-4608-3584-rgb.png",
+          "sha256": "038d43ae6d35e14c980b73edfa33d0e988bbb38491ed15875b002617bf6848e1",
+          "bytes": 422522
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-4608-3584-ir.png",
+          "sha256": "856cdeb887337eec8738a35ca46db3ab7c1a5f6d98d29e0967ed46a501e513c8",
+          "bytes": 148546
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-4608-3584-ids.png",
+          "sha256": "1da0096a011521fc794ebb4bdfc2f3d18aed076822cce7c6b23d2871ed7f6a3a",
+          "bytes": 9667
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368355.7,
+        5807706.6,
+        368381.3,
+        5807732.199999999
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-4096-3072",
+      "case_group": "vegetation_disagreement",
+      "case_group_title": "Tree / low-vegetation disagreement",
+      "row_index": 1,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 4096,
+        "col": 3072,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 240783
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          6576
+        ],
+        [
+          0,
+          0,
+          1,
+          127
+        ],
+        [
+          0,
+          0,
+          2,
+          4
+        ],
+        [
+          0,
+          1,
+          0,
+          236
+        ],
+        [
+          0,
+          1,
+          1,
+          81
+        ],
+        [
+          0,
+          2,
+          0,
+          163
+        ],
+        [
+          0,
+          2,
+          2,
+          64
+        ],
+        [
+          0,
+          5,
+          0,
+          417
+        ],
+        [
+          0,
+          5,
+          5,
+          1687
+        ],
+        [
+          1,
+          0,
+          0,
+          5
+        ],
+        [
+          1,
+          1,
+          1,
+          30767
+        ],
+        [
+          1,
+          3,
+          1,
+          30
+        ],
+        [
+          1,
+          3,
+          3,
+          8
+        ],
+        [
+          2,
+          1,
+          1,
+          28
+        ],
+        [
+          2,
+          1,
+          5,
+          16
+        ],
+        [
+          2,
+          2,
+          0,
+          19
+        ],
+        [
+          2,
+          2,
+          1,
+          19
+        ],
+        [
+          2,
+          2,
+          2,
+          21931
+        ],
+        [
+          2,
+          2,
+          3,
+          2156
+        ],
+        [
+          2,
+          2,
+          5,
+          11841
+        ],
+        [
+          2,
+          3,
+          1,
+          140
+        ],
+        [
+          2,
+          3,
+          2,
+          32083
+        ],
+        [
+          2,
+          3,
+          3,
+          2509
+        ],
+        [
+          2,
+          3,
+          5,
+          7222
+        ],
+        [
+          2,
+          5,
+          0,
+          34
+        ],
+        [
+          2,
+          5,
+          2,
+          37
+        ],
+        [
+          2,
+          5,
+          3,
+          12
+        ],
+        [
+          2,
+          5,
+          5,
+          205
+        ],
+        [
+          3,
+          0,
+          0,
+          185
+        ],
+        [
+          3,
+          1,
+          0,
+          6
+        ],
+        [
+          3,
+          2,
+          0,
+          65
+        ],
+        [
+          3,
+          2,
+          2,
+          1088
+        ],
+        [
+          3,
+          2,
+          3,
+          1987
+        ],
+        [
+          3,
+          2,
+          5,
+          1064
+        ],
+        [
+          3,
+          3,
+          0,
+          97
+        ],
+        [
+          3,
+          3,
+          1,
+          4
+        ],
+        [
+          3,
+          3,
+          2,
+          4654
+        ],
+        [
+          3,
+          3,
+          3,
+          72907
+        ],
+        [
+          3,
+          3,
+          5,
+          677
+        ],
+        [
+          3,
+          5,
+          0,
+          251
+        ],
+        [
+          3,
+          5,
+          2,
+          158
+        ],
+        [
+          3,
+          5,
+          3,
+          167
+        ],
+        [
+          3,
+          5,
+          5,
+          321
+        ],
+        [
+          5,
+          0,
+          0,
+          12115
+        ],
+        [
+          5,
+          0,
+          2,
+          1
+        ],
+        [
+          5,
+          0,
+          5,
+          374
+        ],
+        [
+          5,
+          1,
+          0,
+          1714
+        ],
+        [
+          5,
+          1,
+          1,
+          2
+        ],
+        [
+          5,
+          1,
+          5,
+          12
+        ],
+        [
+          5,
+          2,
+          0,
+          9517
+        ],
+        [
+          5,
+          2,
+          1,
+          1
+        ],
+        [
+          5,
+          2,
+          2,
+          903
+        ],
+        [
+          5,
+          2,
+          5,
+          5423
+        ],
+        [
+          5,
+          3,
+          0,
+          10
+        ],
+        [
+          5,
+          5,
+          0,
+          528
+        ],
+        [
+          5,
+          5,
+          5,
+          8135
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 605,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "vegetation_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-4096-3072-rgb.png",
+          "sha256": "ff1f5a758130c16d9aed4bc83a719cae0d32b7b9e23e7d3b3dc2fade5f953bf0",
+          "bytes": 407514
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-4096-3072-ir.png",
+          "sha256": "48c13671255bd5f31b1d6d0cd88969f2459bd0c738efb75c19ce66e41d787f71",
+          "bytes": 142210
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-4096-3072-ids.png",
+          "sha256": "0ffe90e00d6f2c8b52877cb80cce269db0d20abe8e65aaf6a6181592643e2726",
+          "bytes": 14048
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368330.1,
+        5807732.199999999,
+        368355.7,
+        5807757.8
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "4_14-0-2560",
+      "case_group": "vegetation_disagreement",
+      "case_group_title": "Tree / low-vegetation disagreement",
+      "row_index": 2,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "4_14",
+      "pixel_window": {
+        "row": 0,
+        "col": 2560,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 241304
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          0,
+          0,
+          0,
+          49923
+        ],
+        [
+          0,
+          0,
+          1,
+          81
+        ],
+        [
+          0,
+          0,
+          2,
+          56
+        ],
+        [
+          0,
+          0,
+          3,
+          2
+        ],
+        [
+          0,
+          0,
+          4,
+          1
+        ],
+        [
+          0,
+          0,
+          5,
+          672
+        ],
+        [
+          0,
+          1,
+          0,
+          7
+        ],
+        [
+          0,
+          1,
+          1,
+          246
+        ],
+        [
+          0,
+          2,
+          0,
+          715
+        ],
+        [
+          0,
+          2,
+          3,
+          25
+        ],
+        [
+          0,
+          2,
+          5,
+          25
+        ],
+        [
+          0,
+          4,
+          4,
+          5
+        ],
+        [
+          0,
+          4,
+          5,
+          14
+        ],
+        [
+          0,
+          5,
+          0,
+          48
+        ],
+        [
+          0,
+          5,
+          5,
+          570
+        ],
+        [
+          1,
+          0,
+          0,
+          13
+        ],
+        [
+          1,
+          0,
+          1,
+          81
+        ],
+        [
+          1,
+          0,
+          5,
+          2
+        ],
+        [
+          1,
+          1,
+          1,
+          59064
+        ],
+        [
+          1,
+          1,
+          5,
+          918
+        ],
+        [
+          1,
+          4,
+          1,
+          13
+        ],
+        [
+          1,
+          4,
+          4,
+          4
+        ],
+        [
+          1,
+          4,
+          5,
+          514
+        ],
+        [
+          1,
+          5,
+          1,
+          1701
+        ],
+        [
+          1,
+          5,
+          4,
+          17
+        ],
+        [
+          1,
+          5,
+          5,
+          1280
+        ],
+        [
+          2,
+          0,
+          0,
+          38403
+        ],
+        [
+          2,
+          0,
+          1,
+          43
+        ],
+        [
+          2,
+          0,
+          2,
+          111
+        ],
+        [
+          2,
+          0,
+          5,
+          1
+        ],
+        [
+          2,
+          1,
+          0,
+          265
+        ],
+        [
+          2,
+          1,
+          1,
+          1478
+        ],
+        [
+          2,
+          1,
+          2,
+          384
+        ],
+        [
+          2,
+          2,
+          0,
+          59402
+        ],
+        [
+          2,
+          2,
+          2,
+          5367
+        ],
+        [
+          2,
+          2,
+          5,
+          5
+        ],
+        [
+          2,
+          3,
+          0,
+          190
+        ],
+        [
+          2,
+          3,
+          2,
+          239
+        ],
+        [
+          2,
+          3,
+          3,
+          375
+        ],
+        [
+          2,
+          5,
+          0,
+          297
+        ],
+        [
+          2,
+          5,
+          1,
+          58
+        ],
+        [
+          2,
+          5,
+          5,
+          30
+        ],
+        [
+          3,
+          0,
+          0,
+          2
+        ],
+        [
+          3,
+          2,
+          0,
+          154
+        ],
+        [
+          3,
+          2,
+          2,
+          18
+        ],
+        [
+          3,
+          2,
+          3,
+          226
+        ],
+        [
+          3,
+          3,
+          0,
+          161
+        ],
+        [
+          3,
+          3,
+          2,
+          2
+        ],
+        [
+          3,
+          3,
+          3,
+          10114
+        ],
+        [
+          4,
+          0,
+          0,
+          3
+        ],
+        [
+          4,
+          0,
+          4,
+          44
+        ],
+        [
+          4,
+          0,
+          5,
+          39
+        ],
+        [
+          4,
+          4,
+          4,
+          2686
+        ],
+        [
+          4,
+          4,
+          5,
+          526
+        ],
+        [
+          4,
+          5,
+          5,
+          3036
+        ],
+        [
+          5,
+          0,
+          0,
+          43
+        ],
+        [
+          5,
+          1,
+          1,
+          39
+        ],
+        [
+          5,
+          5,
+          1,
+          80
+        ],
+        [
+          5,
+          5,
+          5,
+          1486
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 1033,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "vegetation_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/4_14-0-2560-rgb.png",
+          "sha256": "1e0c4f14ec6409729eab4af73cf2011fcf8174ddff72aa27434d5dbd173e88e4",
+          "bytes": 366612
+        },
+        "infrared": {
+          "url": "evidence/scenes/4_14-0-2560-ir.png",
+          "sha256": "4b8e8b3ec34aeed28e2195a88d0075fcc8f1efd6a266b7c5d0921a9b93d0e8b0",
+          "bytes": 124814
+        },
+        "class_ids": {
+          "url": "evidence/scenes/4_14-0-2560-ids.png",
+          "sha256": "88097ff6d6826ef02313fe170b145e4dcc1584e732bcd7e1549b9370dd7870ed",
+          "bytes": 8515
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          368176.5,
+          0.0,
+          -0.05,
+          5807962.6
+        ],
+        "extent": [
+          368176.5,
+          5807662.6,
+          368476.5,
+          5807962.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        368304.5,
+        5807937.0,
+        368330.1,
+        5807962.6
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_4_14_RGBIR.tif",
+          "sha256": "e2bc27e6f4d96d16806e005d8640c32ef7fe4eb50db9725996cdcdbfeea29083"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_4_14_label_noBoundary.tif",
+          "sha256": "5e381fcff828ee2b06371fae9cf4295e395cdffc626efaf4040ce0544ac106c2",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/4_14.npz",
+            "sha256": "b85441b5d91581114ccf989a3f4d5c378b4207a67ff6b40df8344b1ab14a757c"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/4_14.npz",
+            "sha256": "2e0cfddd5dd60bf7289475ee5141bde778165fc32ca8382afbf5866256e3774f"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    },
+    {
+      "case_id": "2_13-1536-512",
+      "case_group": "vegetation_disagreement",
+      "case_group_title": "Tree / low-vegetation disagreement",
+      "row_index": 3,
+      "dataset_id": "isprs-potsdam",
+      "scene_id": "2_13",
+      "pixel_window": {
+        "row": 1536,
+        "col": 512,
+        "height": 512,
+        "width": 512,
+        "valid_pixels": 258108
+      },
+      "ground_sampling_distance_m": 0.05,
+      "channel_mapping": [
+        "red",
+        "green",
+        "blue",
+        "infrared"
+      ],
+      "label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "class_names": [
+        "Impervious surfaces",
+        "Building",
+        "Low vegetation",
+        "Tree",
+        "Car",
+        "Clutter/background"
+      ],
+      "models": {
+        "dinov3": {
+          "model_id": "potsdam-dinov3-rgbir-v2",
+          "checkpoint_sha256": "5db9ab78976ad57c2d5d66d974b9ee501abf365c3a685901c726a3cf96b3a420",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        },
+        "pspnet": {
+          "model_id": "potsdam-pspnet-rgb-v1",
+          "checkpoint_sha256": "a1a1a82842714262300ddccff909ed5001205124150e139665d45c8c7eed6986",
+          "preprocessing_protocol_sha256": "db17701748df5596704e4da7f2b41d9f5c4d9cab0666e2475e81bfcdbd9edc7d"
+        }
+      },
+      "transitions": [
+        [
+          2,
+          2,
+          1,
+          35397
+        ],
+        [
+          2,
+          2,
+          2,
+          185132
+        ],
+        [
+          2,
+          2,
+          3,
+          1166
+        ],
+        [
+          2,
+          2,
+          5,
+          19723
+        ],
+        [
+          2,
+          3,
+          2,
+          169
+        ],
+        [
+          2,
+          3,
+          3,
+          1325
+        ],
+        [
+          3,
+          2,
+          2,
+          1244
+        ],
+        [
+          3,
+          2,
+          3,
+          720
+        ],
+        [
+          3,
+          2,
+          5,
+          138
+        ],
+        [
+          3,
+          3,
+          2,
+          662
+        ],
+        [
+          3,
+          3,
+          3,
+          12083
+        ],
+        [
+          3,
+          3,
+          5,
+          349
+        ]
+      ],
+      "panels": {
+        "rgb": {
+          "x": 80,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "reference": {
+          "x": 692,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "dinov3": {
+          "x": 1304,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "pspnet": {
+          "x": 1916,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        },
+        "paired_outcome": {
+          "x": 2528,
+          "width": 412,
+          "y": 1460,
+          "height": 411
+        }
+      },
+      "figure_asset_id": "vegetation_disagreement",
+      "asset_type": "pixel_aligned_potsdam_crop",
+      "files": {
+        "rgb": {
+          "url": "evidence/scenes/2_13-1536-512-rgb.png",
+          "sha256": "039058893bec6b1652e2ee7a0341d50c3a33d353171a1cf3fa9692c2f8e6bf8c",
+          "bytes": 458036
+        },
+        "infrared": {
+          "url": "evidence/scenes/2_13-1536-512-ir.png",
+          "sha256": "ca0494edd5f12f644adbc684633918b5d334dedf1b7dd53da5432981c8b2dc9a",
+          "bytes": 156392
+        },
+        "class_ids": {
+          "url": "evidence/scenes/2_13-1536-512-ids.png",
+          "sha256": "55850d1b796e55ea31618d266f1f95ffad97820adb3cf64e0e23c3cfc522cf46",
+          "bytes": 5983
+        }
+      },
+      "source_grid": {
+        "crs": "EPSG:32633",
+        "affine": [
+          0.05,
+          0.0,
+          367876.5,
+          0.0,
+          -0.05,
+          5808562.6
+        ],
+        "extent": [
+          367876.5,
+          5808262.6,
+          368176.5,
+          5808562.6
+        ],
+        "shape": [
+          6000,
+          6000
+        ]
+      },
+      "pixel_window_bounds": [
+        367902.1,
+        5808460.199999999,
+        367927.7,
+        5808485.8
+      ],
+      "preprocessing": {
+        "id": "isprs-canonical",
+        "version": 2,
+        "ignore_label": 6
+      },
+      "class_colors": [
+        [
+          255,
+          255,
+          255
+        ],
+        [
+          0,
+          0,
+          255
+        ],
+        [
+          0,
+          255,
+          255
+        ],
+        [
+          0,
+          255,
+          0
+        ],
+        [
+          255,
+          255,
+          0
+        ],
+        [
+          255,
+          0,
+          0
+        ]
+      ],
+      "source_artifacts": {
+        "rgbir": {
+          "path": "data/auxiliary/potsdam-rgbir-v2/4_Ortho_RGBIR/top_potsdam_2_13_RGBIR.tif",
+          "sha256": "a8477f06d510a51856684830e0783c5e6d06fb7acac6994ab1c48020f6bcab44"
+        },
+        "eroded_reference": {
+          "path": "data/raw/inputs/label-all-potsdam-vaihingen/5_labels_all_noboundary/top_potsdam_2_13_label_noBoundary.tif",
+          "sha256": "76890e2ba1b62bde3b26aec64e7af7bf35cefd94e533000e411b1aeecdef616b",
+          "protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded."
+        },
+        "paired_predictions": {
+          "dinov3": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/dinov3/2_13.npz",
+            "sha256": "5ee815fbc0f786c1c5a1771c2b942b8a8edf45ffa84a8176a64956dd89162549"
+          },
+          "pspnet": {
+            "path": "data/runs/potsdam-paired-error-study-v1/attempt-3/outputs/paired/predictions/pspnet/2_13.npz",
+            "sha256": "825d06c2452786eec452cdf044cd820f9032b511b89b0d61ceb93bbad7d759ff"
+          }
+        },
+        "cache_sha256": "a8a376c9a7bd112cc4a0877f8aadcb6d7f1713fb0f39e60a5a29df548765cde4"
+      },
+      "reference_label_protocol": "Eroded reference labels; six scored classes; ignored label ID 6 excluded.",
+      "evaluation_status": {
+        "analysis_kind": "supplemental-paired-prediction-inference",
+        "training_performed": false,
+        "independent_benchmark_claim": false,
+        "split_sha256": "3db0c6f6f4b07657a54bd6cf3349ff77191e7b65848c08abf1acf3474c49a9bd"
+      },
+      "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+      "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+      "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+    }
+  ],
+  "published_files": {
+    "evidence/scenes/6_14-2560-1536-rgb.png": "b4ac50a88b27f0931895767b2e5e5c6fef7aa35be0cdfa7de4201410a5447933",
+    "evidence/scenes/6_14-2560-1536-ir.png": "bb1a0b4907cb97d990c46ebbd49de8f3b5b8dd345fbb690637b40e096b6e6d49",
+    "evidence/scenes/6_14-2560-1536-ids.png": "645f64ac25c62f8dc49836fa38d7433abdb0a5f76bb6d151dfbe45c16e3dfacb",
+    "evidence/scenes/4_15-2048-5120-rgb.png": "e9600e0341046aa2e33a36a35bffc4d821e221501f7e6b99ec0b90585f012dbe",
+    "evidence/scenes/4_15-2048-5120-ir.png": "c5ddccfef4d93302fdab77d0236f01a18340d47d3f8ff120891cc09a86a1fef7",
+    "evidence/scenes/4_15-2048-5120-ids.png": "7b71dd83cd6170e89e300393459bc6b2fed319094dce937f7d1882d8cac6c83d",
+    "evidence/scenes/2_13-2048-512-rgb.png": "82840bae7c5b9f377f47d0e8020fbf700e542dd7ecfae912a820303a42ab58be",
+    "evidence/scenes/2_13-2048-512-ir.png": "f8fa3de5a9769a69970ee273aec2ebcd7484d9a1bc602888498cf9469db4cf4e",
+    "evidence/scenes/2_13-2048-512-ids.png": "f0191f4912190ea04e62c8c27fec78fdf0bef0b02e0e40760db68e66378b71fe",
+    "evidence/scenes/6_13-4608-5120-rgb.png": "f4fd755467d356050c7620aaab9072973d2f7ee29f72fed92837c5f084598f39",
+    "evidence/scenes/6_13-4608-5120-ir.png": "dc13dc413078f48f6ac03afbbf3b13630e4fab8b6587154cba1ac68e9f387da5",
+    "evidence/scenes/6_13-4608-5120-ids.png": "0b6a0572fce6ae4bf5e5058efc9d8f53bff1766a9296a52ccb9e9ee82135b371",
+    "evidence/scenes/7_13-5120-3072-rgb.png": "312782e4112a785b3b8e8744447f483bf43f3081de2b75a9f3e36f5c3b50c2ca",
+    "evidence/scenes/7_13-5120-3072-ir.png": "9ed862b84e779253f57d8e105e206805e603c571549ce5aef6a5461e9dff6b65",
+    "evidence/scenes/7_13-5120-3072-ids.png": "ad21c0375eb293ff37cfa516770c76112bc432302496bdd8aa8556536688bbcd",
+    "evidence/scenes/5_14-4608-4608-rgb.png": "061a09084afd2135652a11302f0cab1660af1c2e5409392524f09e52e63df5d5",
+    "evidence/scenes/5_14-4608-4608-ir.png": "b7235165b3a72ac128d95ca7f1810f79ef5ecd14cc1516b6b5ace2930ccc4622",
+    "evidence/scenes/5_14-4608-4608-ids.png": "88f036dc2629c83975f219132ddb93223344ec73951cdca8260a6e6d6373ef8a",
+    "evidence/scenes/5_15-5632-5120-rgb.png": "096e09ffd40e8fe364cbad13a808a645196caff1dc883dfffd823382171e54df",
+    "evidence/scenes/5_15-5632-5120-ir.png": "d92f91690818fb433d94a66ae8a883ef31d371afe61ea465c80dea7e6ec6ed4a",
+    "evidence/scenes/5_15-5632-5120-ids.png": "4011011703e4eb8f943f23307e0b8271bcc5a3feb12366ab6d968ccb72cb6de3",
+    "evidence/scenes/4_14-0-3584-rgb.png": "6e5ba53a32becee9d199ceadc85621fcea10d6e1b525ebf684ef17c59bc9cd62",
+    "evidence/scenes/4_14-0-3584-ir.png": "b11243eab9e41b654ef742ea409f4bc3c0e55b8076b98ea67ee1e57f9de45fb5",
+    "evidence/scenes/4_14-0-3584-ids.png": "bd44b849202a5abb0db0cb5164a82c4411c94fdc58ed7ddd04c8ec5d97a9f581",
+    "evidence/scenes/4_14-2560-2048-rgb.png": "cdbb8588e1affd3f80f9c2981b3509021813b2210bd900a887d59c1523a5b50a",
+    "evidence/scenes/4_14-2560-2048-ir.png": "e450aff5fa98a41b43bc0ac4f004c6945c40ad53db726a08c9a1d4390625418e",
+    "evidence/scenes/4_14-2560-2048-ids.png": "8af7f35af839825be3dce655499274104fbaf998aa64efcd9b099f0b81cd7157",
+    "evidence/scenes/4_14-2048-2048-rgb.png": "6435a6619d60d4712f1a727dd483775a582483fa67f5a7a17081b9a885f3fd04",
+    "evidence/scenes/4_14-2048-2048-ir.png": "b32ac774f86da120d5e98ed095c626d4e6551218cee895db97c361a7429cb7c2",
+    "evidence/scenes/4_14-2048-2048-ids.png": "4f5e6f1ba65d7c76b961de3523bfa9c421473d6279417774e1d6741dbf22f4ee",
+    "evidence/scenes/4_14-1536-3072-rgb.png": "ea8a2a8b7da69f17441532cdd5d04a7e76e9746191e21669facd0b5f95d04eb9",
+    "evidence/scenes/4_14-1536-3072-ir.png": "01a00bcdaee7129069472b5168d28ef4c72f7a99bbe68992b6caea5adaad7829",
+    "evidence/scenes/4_14-1536-3072-ids.png": "b87d242e96f4d9c1133f4036da141dfe0e60b154db6dda0578e658ef9bf446db",
+    "evidence/scenes/4_14-2048-2560-rgb.png": "087de88b68ec0a56c5f8f43e57e77e7f3daade366144d4611dc7fbab22e5187f",
+    "evidence/scenes/4_14-2048-2560-ir.png": "f376829120a578cb100c9f0418e40d4c2122ffec07e15b7bc0a00471d0fd5f63",
+    "evidence/scenes/4_14-2048-2560-ids.png": "e0a2c5e363ba349733dcdc85ad68cce907ea479c5ddc75686c82d52c6f251ac6",
+    "evidence/scenes/4_14-2048-3072-rgb.png": "c9ca8ea197bf02a6e8d0da804ea53b6fa7e960a567d707a872c652a85cdfca87",
+    "evidence/scenes/4_14-2048-3072-ir.png": "271671c0d317fbbd3f3b505a0ef58c8ac49a78447ea068b018cbc5217ae5b7ea",
+    "evidence/scenes/4_14-2048-3072-ids.png": "fcfc15c5ef1d47572011e3c87220ea26782fff9436cc963e06db396c4f346025",
+    "evidence/scenes/4_14-2048-3584-rgb.png": "06274a42c243ab558e0e478383cd34a51a853feeff27fc1b91ddf5897fdc7856",
+    "evidence/scenes/4_14-2048-3584-ir.png": "1561c433d1dedac14c972a28fd52cc51f1d3f0aaa2a943f39f86d180b4905b19",
+    "evidence/scenes/4_14-2048-3584-ids.png": "9ebd30e3e6ee0679dfcea6a9b527d0a2198b05765d6fe8ce13810a7b0cbb5ef1",
+    "evidence/scenes/4_13-2048-4096-rgb.png": "0bddd12cd94ad993a548db5089696d3d340b20f74008d5bdbdcb0ac8ebc000f7",
+    "evidence/scenes/4_13-2048-4096-ir.png": "1627a58ecb27ff9a871169de6a22de4374c8b3a4e98d0c8c0489b1d3d973403e",
+    "evidence/scenes/4_13-2048-4096-ids.png": "524d819c83f495b39d7ef8f03522a5d08ad7f929486316aed800cdf06b41426c",
+    "evidence/scenes/7_13-5632-1536-rgb.png": "f0b258bf1440b80edb6428e3d445ce9a17697102c2642d573b64d90b8f68c10f",
+    "evidence/scenes/7_13-5632-1536-ir.png": "e21157a7ab61ee04df7fc682cd3b0bb5e7aa832e3d3ca701d295b2e5e85a6d7d",
+    "evidence/scenes/7_13-5632-1536-ids.png": "0178593dfdefc7f89be9a1c88fbfd2be00bfc47b317bf9e1b1fd537c5f0c2de2",
+    "evidence/scenes/4_14-4608-3584-rgb.png": "038d43ae6d35e14c980b73edfa33d0e988bbb38491ed15875b002617bf6848e1",
+    "evidence/scenes/4_14-4608-3584-ir.png": "856cdeb887337eec8738a35ca46db3ab7c1a5f6d98d29e0967ed46a501e513c8",
+    "evidence/scenes/4_14-4608-3584-ids.png": "1da0096a011521fc794ebb4bdfc2f3d18aed076822cce7c6b23d2871ed7f6a3a",
+    "evidence/scenes/4_14-4096-3072-rgb.png": "ff1f5a758130c16d9aed4bc83a719cae0d32b7b9e23e7d3b3dc2fade5f953bf0",
+    "evidence/scenes/4_14-4096-3072-ir.png": "48c13671255bd5f31b1d6d0cd88969f2459bd0c738efb75c19ce66e41d787f71",
+    "evidence/scenes/4_14-4096-3072-ids.png": "0ffe90e00d6f2c8b52877cb80cce269db0d20abe8e65aaf6a6181592643e2726",
+    "evidence/scenes/4_14-0-2560-rgb.png": "1e0c4f14ec6409729eab4af73cf2011fcf8174ddff72aa27434d5dbd173e88e4",
+    "evidence/scenes/4_14-0-2560-ir.png": "4b8e8b3ec34aeed28e2195a88d0075fcc8f1efd6a266b7c5d0921a9b93d0e8b0",
+    "evidence/scenes/4_14-0-2560-ids.png": "88097ff6d6826ef02313fe170b145e4dcc1584e732bcd7e1549b9370dd7870ed",
+    "evidence/scenes/2_13-1536-512-rgb.png": "039058893bec6b1652e2ee7a0341d50c3a33d353171a1cf3fa9692c2f8e6bf8c",
+    "evidence/scenes/2_13-1536-512-ir.png": "ca0494edd5f12f644adbc684633918b5d334dedf1b7dd53da5432981c8b2dc9a",
+    "evidence/scenes/2_13-1536-512-ids.png": "55850d1b796e55ea31618d266f1f95ffad97820adb3cf64e0e23c3cfc522cf46"
+  },
+  "distribution_rights_status": "published_with_project_author_approval; upstream_terms_apply",
+  "rights_note": "The project author has approved publication of these selected research excerpts. The underlying ISPRS Potsdam imagery and labels remain third-party material; this Atlas does not grant rights to redistribute the original dataset.",
+  "rights_url": "https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx"
+}

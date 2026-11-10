@@ -1,0 +1,148 @@
+---
+import { route, source } from '../scripts/routes.mjs';
+import evidence from '../generated/public-crops.json';
+
+const {
+  initialCase = '4_14-4608-3584',
+  context = 'Home',
+  caseControls = true,
+  modelControl = true,
+  spectralControl = true,
+} = Astro.props;
+const crop = evidence.assets.find((item) => item.case_id === initialCase) ?? evidence.assets[0];
+const rgb = route() + crop.files.rgb.url;
+const stage = context === 'Pipeline' ? 'Recorded held-out crop' : 'Pixel-aligned research crop';
+---
+<section
+  class="raster-explorer"
+  data-raster-explorer
+  data-context={context}
+  data-initial-case={crop.case_id}
+  data-initial-model="dinov3"
+  data-initial-layer={context === 'Pipeline' ? 'prediction' : 'prediction'}
+>
+  {caseControls && <div class="raster-controls controls">
+    <label>Scene window
+      <select name="raster-case" data-case data-share>
+        {evidence.assets.map((item) => <option value={item.case_id} selected={item.case_id === crop.case_id}>Scene {item.scene_id} · r{item.pixel_window.row}, c{item.pixel_window.col} · {item.case_group_title}</option>)}
+      </select>
+    </label>
+    {modelControl && <label>Prediction
+      <select name="raster-model" data-model data-share>
+        <option value="dinov3">DINOv3 RGB</option>
+        <option value="pspnet">PSPNet RGB</option>
+      </select>
+    </label>}
+    <label>Displayed layer
+      <select name="raster-layer" data-layer data-share>
+        <option value="prediction">Prediction</option>
+        <option value="reference">Eroded reference</option>
+        <option value="confusion">Selected confusion pair</option>
+        <option value="error">Model errors</option>
+        <option value="paired_outcome">Paired outcome</option>
+        <option value="source">RGB source</option>
+        {spectralControl && <option value="infrared">Infrared band · grayscale</option>}
+      </select>
+    </label>
+    <label>Reference class
+      <select name="raster-truth" data-truth-class data-share>
+        <option value="all">Any class</option>
+        {evidence.class_names.map((name, id) => <option value={id}>{name}</option>)}
+      </select>
+    </label>
+    <label>Predicted class
+      <select name="raster-prediction" data-predicted-class data-share>
+        <option value="all">Any class</option>
+        {evidence.class_names.map((name, id) => <option value={id}>{name}</option>)}
+      </select>
+    </label>
+  </div>}
+
+  <div class="raster-frame">
+    <div class="raster-frame-head">
+      <span>{stage} / <b data-layer-name>Prediction</b></span>
+      <span data-source-size>{crop.pixel_window.width} × {crop.pixel_window.height} px · 5 cm GSD</span>
+    </div>
+    <figure class="raster-figure">
+      <div class="raster-viewport" data-viewport tabindex="0" role="group" aria-label="Aligned aerial image and semantic map. Drag to pan after zooming; arrow keys pan when focused.">
+        <img data-fallback src={rgb} width={crop.pixel_window.width} height={crop.pixel_window.height} alt={`Actual Potsdam RGB crop from scene ${crop.scene_id}, rows ${crop.pixel_window.row} to ${crop.pixel_window.row + crop.pixel_window.height}, columns ${crop.pixel_window.col} to ${crop.pixel_window.col + crop.pixel_window.width}.`} fetchpriority={context === 'Home' ? 'high' : undefined} />
+        <canvas data-base aria-hidden="true"></canvas>
+        <canvas data-overlay aria-hidden="true"></canvas>
+        <span class="raster-divider" data-divider aria-hidden="true"><i>↔</i></span>
+      </div>
+      <figcaption class="raster-caption">
+        <div>
+          <strong data-case-caption>Scene {crop.scene_id} · {crop.case_group_title}</strong>
+          <span data-case-detail>Rows {crop.pixel_window.row}–{crop.pixel_window.row + crop.pixel_window.height - 1}, columns {crop.pixel_window.col}–{crop.pixel_window.col + crop.pixel_window.width - 1}</span>
+          <span data-model-provenance></span>
+        </div>
+        <a href={source('artifacts/public/data/potsdam-rgbir-manifest.json')}>Open source and band audit ↗</a>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="raster-controls controls">
+    <label>Swipe <input type="range" name="raster-swipe" min="0" max="100" value="52" data-swipe data-share /></label>
+    <label>Overlay opacity <input type="range" name="raster-opacity" min="0" max="100" value="82" data-opacity data-share /></label>
+    <label>Zoom <input type="range" name="raster-zoom" min="1" max="5" step="0.25" value="1" data-zoom data-share /></label>
+  </div>
+  <p class="note raster-status" data-status role="status" aria-live="polite">Move over the image to inspect source coordinates and the three aligned class IDs.</p>
+  <ul class="legend" data-class-legend aria-label="ISPRS semantic classes">
+    {evidence.class_names.map((name, id) => <li><i style={`--swatch:rgb(${crop.class_colors[id].join(' ')})`}></i>{name}</li>)}
+  </ul>
+  <ul class="legend outcome-legend" data-outcome-legend hidden aria-label="Paired correctness outcomes">
+    <li><i style="--swatch:#009e73"></i>Both correct</li>
+    <li><i style="--swatch:#999999"></i>Both wrong, same prediction</li>
+    <li><i style="--swatch:#e69f00"></i>Both wrong, different prediction</li>
+    <li><i style="--swatch:#0072b2"></i>DINOv3 only correct</li>
+    <li><i style="--swatch:#d55e00"></i>PSPNet only correct</li>
+  </ul>
+  <p class="note raster-provenance">
+    This view uses exact source pixels, eroded reference IDs, and archived prediction IDs from the selected scene window. The paired maps are targeted examples, not a random sample. The benchmark is historical; this supplemental replay does not claim an independent benchmark. <a href={route('methods') + '#claim-008'}>Provenance and limits ↗</a>
+  </p>
+  <p class="note raster-rights">{crop.rights_note} <a href={crop.rights_url}>ISPRS Potsdam source ↗</a></p>
+</section>
+
+<style>
+  .raster-explorer { color: var(--paper); }
+  .raster-frame { border: 1px solid var(--dark-rule); background: var(--navy); }
+  .raster-frame-head { display: flex; justify-content: space-between; gap: .7rem; padding: .65rem .8rem; color: var(--pale); font: 500 .65rem/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+  .raster-frame-head b { color: var(--amber); }
+  .raster-viewport { position: relative; width: min(100%, 760px); aspect-ratio: 1; overflow: hidden; margin-inline: auto; background: #102e45; cursor: grab; touch-action: none; }
+  .raster-viewport:active { cursor: grabbing; }
+  .raster-viewport:focus-visible { outline: 3px solid var(--amber); outline-offset: -3px; }
+  .raster-viewport canvas, .raster-viewport img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
+  .raster-viewport canvas { z-index: 1; image-rendering: pixelated; transform-origin: center; }
+  .raster-viewport [data-overlay] { z-index: 2; opacity: var(--overlay-opacity, .82); clip-path: inset(0 0 0 var(--split, 52%)); }
+  .raster-viewport img { z-index: 0; }
+  [data-ready="true"] .raster-viewport img { display: none; }
+  .raster-viewport [data-divider] { position: absolute; z-index: 3; top: 0; bottom: 0; left: var(--split, 52%); width: 1px; background: #fff3d6; pointer-events: none; }
+  .raster-divider i { position: absolute; top: 50%; left: 50%; display: grid; width: 2rem; aspect-ratio: 1; place-items: center; transform: translate(-50%, -50%); border: 1px solid #fff3d6; border-radius: 50%; background: var(--navy); color: white; font-style: normal; }
+  .raster-caption { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .3rem 1rem; padding: .7rem .85rem; color: var(--pale); font-size: .78rem; }
+  .raster-caption > div { display: grid; gap: .15rem; }
+  .raster-caption strong { color: white; font-weight: 500; }
+  .raster-caption [data-model-provenance] { color: var(--pale); font: 500 .61rem/1.5 var(--mono); overflow-wrap: anywhere; }
+  .raster-caption a, .raster-provenance a, .raster-rights a { color: #b6d9e3; }
+  .raster-caption a { white-space: nowrap; }
+  .raster-controls { margin-block: .75rem; }
+  .raster-controls label { min-width: 0; flex: 1 1 10rem; }
+  .raster-controls input[type=range] { width: 100%; accent-color: var(--amber); }
+  .raster-controls select { width: 100%; min-width: 0; max-width: 100%; }
+  .raster-status, .raster-provenance, .raster-rights { color: var(--pale); }
+  .raster-provenance { margin-top: .55rem; font-size: .78rem; }
+  .raster-rights { margin-top: .45rem; font-size: .72rem; }
+  .outcome-legend { border-top: 1px solid var(--dark-rule); margin-top: .45rem; }
+  @media (max-width: 700px) {
+    .raster-frame-head { font-size: .58rem; }
+    .raster-caption { display: grid; }
+    .raster-caption a { white-space: normal; }
+    .raster-controls label { flex-basis: 7rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .raster-viewport canvas { transition: none !important; }
+  }
+</style>
+
+<script>
+  import '../scripts/raster-evidence.ts';
+</script>

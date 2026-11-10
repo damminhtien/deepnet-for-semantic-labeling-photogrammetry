@@ -27,6 +27,10 @@ __pycache__/
 # Research Atlas generated files and local dependencies
 /website/.astro/
 /website/node_modules/
-/website/src/generated/
-/website/public/evidence/
+/website/src/generated/*
+!/website/src/generated/public-crops.json
+/website/public/evidence/*
+!/website/public/evidence/scenes/
+/website/public/evidence/scenes/*
+!/website/public/evidence/scenes/*.png
 /website/.screenshots/

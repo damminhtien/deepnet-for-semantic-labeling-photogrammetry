@@ -1,11 +1,20 @@
 ---
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
+import RasterEvidence from '../components/RasterEvidence.astro';
 import { route, source } from '../scripts/routes.mjs';
 import evidence from '../generated/evidence.json';
 ---
 <Atlas title="Data Atlas" active="atlas">
-  <Intro index="01" category="Spectral microscope" title="The Data Atlas." description="Compare what a band was called with what the sensor actually measured. Browse the audited Potsdam footprint and inspect a source TIFF on your own device." />
+  <Intro index="01" category="Spectral microscope" title="The Data Atlas." description="Inspect a real Potsdam crop immediately, trace its four source bands, and compare archived labels and predictions. Browse the audited footprint or open a local TIFF." />
+  <section class="wrap instrument lab public-sample" aria-labelledby="sample-title">
+    <div>
+      <p class="eyebrow">Public sample / pixel-aligned evidence</p>
+      <h2 id="sample-title">Inspect the source before the statistics.</h2>
+      <p class="note">The infrared option displays the recorded fourth band in grayscale. The RGB view uses the original red, green, and blue digital numbers without remapping.</p>
+    </div>
+    <RasterEvidence context="Atlas" initialCase="4_14-4608-3584" />
+  </section>
   <section class="wrap instrument lab" data-atlas>
     <div class="controls">
       <label>Dataset <select name="dataset" data-share><option>Potsdam</option><option>Vaihingen</option></select></label>
@@ -68,6 +77,8 @@ import evidence from '../generated/evidence.json';
   [data-map] :global(text) { pointer-events: none; }
   .raster { width: min(100%, 640px); height: auto; cursor: crosshair; background: #081c2d; }
   blockquote { margin-inline: 0; }
+  .public-sample { margin-bottom: 1.5rem; }
+  .public-sample h2 { font-size: clamp(1.7rem, 3vw, 2.7rem); margin: .18em 0 .4em; }
 </style>
 <script>
   import '../scripts/data-atlas.mjs';

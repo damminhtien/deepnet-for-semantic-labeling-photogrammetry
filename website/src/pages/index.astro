@@ -1,6 +1,6 @@
 ---
 import Atlas from '../layouts/Atlas.astro';
-import PairedEvidence from '../components/PairedEvidence.astro';
+import RasterEvidence from '../components/RasterEvidence.astro';
 import evidence from '../generated/evidence.json';
 import { route } from '../scripts/routes.mjs';
 import { metrics, modelKeys, percent } from '../scripts/metrics.mjs';
@@ -24,10 +24,10 @@ const exhibits = [
         <h1>From Pixels<br />to <em>Proof.</em></h1>
         <p class="lede">A research atlas for aerial semantic segmentation. Inspect recorded predictions, compare them with the reference, and trace every score to its experiment.</p>
         <div class="actions"><a class="button primary" href="#journey">Follow one crop <span>↓</span></a><a class="button secondary" href={route('evaluation')}>Open evaluation <span>↗</span></a></div>
-        <p class="hero-caveat">This comparison uses an existing paired research figure; the source raster, labels, and prediction arrays are not distributed separately. The repository does not grant reuse rights for the underlying ISPRS dataset. <a href="https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx">Dataset source ↗</a></p>
+        <p class="hero-caveat">A pixel-aligned excerpt from the source RGBIR scene, eroded reference, and two archived model outputs. The comparison is tied to its scene, coordinates, checkpoint hashes, and label protocol.</p>
       </div>
       <div class="hero-plate">
-        <PairedEvidence initialGroup="vegetation_disagreement" initialCase="4_14-4608-3584" context="Home" />
+        <RasterEvidence initialCase="4_14-4608-3584" context="Home" />
       </div>
     </div>
   </section>

@@ -13,30 +13,45 @@ npm --prefix website run dev
 Open the URL printed by Astro at
 `/deepnet-for-semantic-labeling-photogrammetry/`. Use
 `npm --prefix website test` and `npm --prefix website run build` to validate a
-change. The build runs deterministic Python exporters over an explicit allowlist
-of research metadata and five paired-case figures already tracked under
-`docs/research/figures/`. The visual exporter copies those PNGs byte-for-byte,
-records their checksums and panel geometry, then validates case coordinates,
-class counts and checkpoint bindings. It never reads private rasters or
-prediction files. Public comparison panels are rendered portions of those
-archived figures (411–412 × 411 pixels), not the original 512 × 512 rasters or
-class-ID planes. The pipeline sampling and augmentation controls remain
-educational schematics and say so in the interface.
+change. The static build uses an explicit allowlist of research metadata and
+committed visual assets. It checks the five archived figures and all 20 curated
+raster crops. Each crop contains lossless RGB and infrared PNGs plus an RGB
+class-ID plane for reference, DINOv3, and PSPNet. Validation checks asset
+checksums, dimensions, class IDs, checkpoint bindings, and each crop's exact
+three-way confusion counts. The build does not need the original scene archive,
+local prediction outputs, a GPU, or a backend. The pipeline sampling and
+augmentation controls remain educational schematics and say so in the interface.
 
-The tracked figures contain derived ISPRS imagery and labels. The repository
-does not grant rights to redistribute the source dataset or pretrained weights;
-the generated manifest records that status. Review the provider's terms before
-mirroring these figures outside this repository. The [ISPRS Potsdam dataset
+The 20 selected excerpts use project-author-approved publication of source
+imagery and eroded labels. ISPRS Potsdam remains third-party data; the Atlas does
+not grant rights to redistribute the original dataset. The generated manifest
+records that status and links the [ISPRS Potsdam dataset
 page](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx)
-describes the imagery and bands; it is linked for provenance, not as a grant of
-reuse rights. The public build does not
-require a model, GPU, external map service or database.
+for provenance. The public build requires only committed assets and metadata.
 
 The route controls encode choices in the URL. The Data Atlas also accepts a
 local optical TIFF. The Potsdam viewer checks the file against the selected
 scene's audited RGBIR SHA-256; the Vaihingen viewer checks band count and bit
 depth and leaves file identity unverified. The spectral histogram describes the
 training collection, separate from the source TIFF.
+
+## Refresh the committed public crops
+
+The exporter uses the locked held-out cache and the indexed paired prediction
+run. It verifies source TIFF hashes, raw RGBIR values, decoded eroded labels,
+prediction hashes, model checkpoints, and all crop transition counts before
+writing any assets:
+
+```bash
+.venv/bin/python website/scripts/export_public_crops.py \
+  --cache /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs/potsdam-dinov3-rgbir-v2/heldout-cache \
+  --paired-output data/runs/potsdam-paired-error-study-v1/attempt-3/outputs \
+  --runs-root /Users/macbook/Data/deepnet-for-semantic-labeling-photogrammetry/runs
+```
+
+The output is the bounded bundle under `website/public/evidence/scenes/` and
+`website/src/generated/public-crops.json`. A clean clone can run the static
+build and validate those assets without the local cache and prediction files.
 
 ## Inspect paired prediction rasters privately
 
@@ -51,9 +66,9 @@ python website/scripts/export_local_crops.py \
   --output /path/outside-the-repo/new-crop-directory
 ```
 
-Use **Evaluation → Follow the selected error into a scene** to inspect an
-archived paired-case figure. Use **Evaluation → Swipe through a real crop** to
-open one `.atlas.json` file exported from the private paired rasters.
+Use the homepage, Data Atlas, Pipeline, or Evaluation Observatory to inspect a
+committed pixel-aligned example without uploading anything. Use **Evaluation →
+Swipe through a real crop** to inspect any larger local crop package.
 The exporter checks cache and prediction hashes, split, label protocol, checkpoint
 and scene geometry. It also reproduces each published crop's full joint class
 counts before writing its three aligned class-ID planes. The browser checks
