@@ -8,6 +8,7 @@ const {
   caseControls = true,
   modelControl = true,
   spectralControl = true,
+  spectralCompare = false,
 } = Astro.props;
 const crop = evidence.assets.find((item) => item.case_id === initialCase) ?? evidence.assets[0];
 const rgb = route() + crop.files.rgb.url;
@@ -27,7 +28,7 @@ const stage = context === 'Pipeline' ? 'Recorded held-out crop' : 'Pixel-aligned
         {evidence.assets.map((item) => <option value={item.case_id} selected={item.case_id === crop.case_id}>Scene {item.scene_id} · r{item.pixel_window.row}, c{item.pixel_window.col} · {item.case_group_title}</option>)}
       </select>
     </label>
-    {modelControl && <label>Prediction
+    {modelControl && <label data-spectral-irrelevant>Prediction
       <select name="raster-model" data-model data-share>
         <option value="dinov3">DINOv3 RGB</option>
         <option value="pspnet">PSPNet RGB</option>
@@ -42,15 +43,16 @@ const stage = context === 'Pipeline' ? 'Recorded held-out crop' : 'Pixel-aligned
         <option value="paired_outcome">Paired outcome</option>
         <option value="source">RGB source</option>
         {spectralControl && <option value="infrared">Infrared band · grayscale</option>}
+        {spectralCompare && <option value="spectral_compare">Spectral mapping comparison</option>}
       </select>
     </label>
-    <label>Reference class
+    <label data-spectral-irrelevant>Reference class
       <select name="raster-truth" data-truth-class data-share>
         <option value="all">Any class</option>
         {evidence.class_names.map((name, id) => <option value={id}>{name}</option>)}
       </select>
     </label>
-    <label>Predicted class
+    <label data-spectral-irrelevant>Predicted class
       <select name="raster-prediction" data-predicted-class data-share>
         <option value="all">Any class</option>
         {evidence.class_names.map((name, id) => <option value={id}>{name}</option>)}
@@ -81,6 +83,7 @@ const stage = context === 'Pipeline' ? 'Recorded held-out crop' : 'Pixel-aligned
     </figure>
   </div>
 
+  <p class="note raster-spectral-note" data-spectral-note hidden>Swipe compares the observed historical mapping, bands 4/2/3 (NIR/green/blue), on the left with the mapping implied by historical names, bands 4/1/2 (NIR/red/green), on the right. At full opacity, both views use the same recorded digital numbers; only channel assignment changes. Lower opacity blends the two display composites.</p>
   <div class="raster-controls controls">
     <label>Swipe <input type="range" name="raster-swipe" min="0" max="100" value="52" data-swipe data-share /></label>
     <label>Overlay opacity <input type="range" name="raster-opacity" min="0" max="100" value="82" data-opacity data-share /></label>
@@ -125,6 +128,7 @@ const stage = context === 'Pipeline' ? 'Recorded held-out crop' : 'Pixel-aligned
   .raster-caption a, .raster-provenance a, .raster-rights a { color: #b6d9e3; }
   .raster-caption a { white-space: nowrap; }
   .raster-controls { margin-block: .75rem; }
+  .raster-spectral-note { margin-block: .7rem; color: var(--pale); }
   .raster-controls label { min-width: 0; flex: 1 1 10rem; }
   .raster-controls input[type=range] { width: 100%; accent-color: var(--amber); }
   .raster-controls select { width: 100%; min-width: 0; max-width: 100%; }

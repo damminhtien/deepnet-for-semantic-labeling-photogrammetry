@@ -11,9 +11,9 @@ import evidence from '../generated/evidence.json';
     <div>
       <p class="eyebrow">Public sample / pixel-aligned evidence</p>
       <h2 id="sample-title">Inspect the source before the statistics.</h2>
-      <p class="note">The infrared option displays the recorded fourth band in grayscale. The RGB view uses the original red, green, and blue digital numbers without remapping.</p>
+      <p class="note">The RGB view uses original B1/B2/B3 values. Choose <strong>Spectral mapping comparison</strong> to swipe observed B4/B2/B3 against the B4/B1/B2 mapping implied by historical names. At full opacity the views use the same recorded digital numbers; only channel assignment changes.</p>
     </div>
-    <RasterEvidence context="Atlas" initialCase="4_14-4608-3584" />
+    <RasterEvidence context="Atlas" initialCase="4_14-4608-3584" spectralCompare />
   </section>
   <section class="wrap instrument lab" data-atlas>
     <div class="controls">

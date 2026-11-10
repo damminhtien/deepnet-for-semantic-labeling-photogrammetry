@@ -36,7 +36,11 @@ The route controls encode choices in the URL. The Data Atlas also accepts a
 local optical TIFF. The Potsdam viewer checks the file against the selected
 scene's audited RGBIR SHA-256; the Vaihingen viewer checks band count and bit
 depth and leaves file identity unverified. The spectral histogram describes the
-training collection, separate from the source TIFF.
+training collection, separate from the source TIFF. Its committed public sample
+also supports pixel inspection and a swipe between the observed historical
+B4/B2/B3 mapping and the B4/B1/B2 mapping implied by historical names. Both
+composites preserve the recorded digital numbers and only change channel order;
+lower overlay opacity blends the display composites.
 
 ## Refresh the committed public crops
 

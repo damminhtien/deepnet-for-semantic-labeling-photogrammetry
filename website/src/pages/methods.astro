@@ -37,8 +37,9 @@ const formulas = Array.from(
     <div class="panel stack">
       <p class="eyebrow">Public and local evidence</p>
       <h3>Where the pixels live.</h3>
-      <p>The site ships audited counts, metadata and schematic artwork. Local TIFFs and private crop packages are read by the browser. The Atlas does not host ISPRS imagery, labels, predictions, checkpoints or learned activations.</p>
+      <p>The static site publishes a bounded, project-owner-authorized Potsdam bundle: 20 pixel-aligned crops with RGB, infrared, and packed reference/DINOv3/PSPNet class IDs; five rendered paired-case figures; and 14 Pipeline previews, including PCA projections of real DINOv3 activations. Per-asset manifests record source hashes, scene windows, protocols, checkpoint identities, and publication authorization. Full-scene TIFFs, training caches, checkpoints, and raw activation tensors are not mirrored. The TIFF inspector reads files selected on the visitor's device.</p>
       <p class="note"><a href="https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/semantic-labeling.aspx">ISPRS dataset documentation ↗</a> · <a href={source('artifacts/public/README.md')}>Public evidence scope ↗</a> · <a href={route() + 'font-licenses.txt'}>Font licenses ↗</a></p>
+      <p class="note"><a href={source('website/README.md')}>Asset regeneration and verification ↗</a> · <a href={route('atlas')}>Explore public crops ↗</a> · <a href={route('pipeline')}>Inspect the training trace ↗</a></p>
     </div>
   </section>
   <section class="wrap claims stack">

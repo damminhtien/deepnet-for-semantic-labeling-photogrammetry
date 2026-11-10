@@ -174,7 +174,7 @@ code, .number { font: 500 .85em var(--mono); overflow-wrap: anywhere; }
   .footer-inner { flex-wrap: wrap; }
 }
 @media (max-width: 520px) {
-  .masthead nav { gap: .48rem; }
+  .masthead nav { gap: .35rem; }
   .masthead nav a { font-size: .72rem; }
 }
 @media (prefers-reduced-motion: reduce) {

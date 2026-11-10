@@ -5,6 +5,7 @@ import { deflateSync } from 'node:zlib';
 import { metrics, cropPixels } from '../src/scripts/metrics.mjs';
 import { readCrop } from '../src/scripts/crop-package.mjs';
 import { createHash } from 'node:crypto';
+import { composeHistoricalMappings } from '../src/scripts/spectral-mapping.mjs';
 
 const evidence = JSON.parse(readFileSync(new URL('../src/generated/evidence.json', import.meta.url)));
 const { benchmark, cases } = evidence;
@@ -113,4 +114,14 @@ test('pipeline trace binds real assets to one explicitly in-sample training draw
   const errors = matrix.reduce((sum, row, truth) => sum + row.reduce((inner, value, predicted) => inner + (truth === predicted ? 0 : value), 0), 0);
   assert.equal(total, pipelineTrace.sample_confusion.scored_pixels);
   assert.equal(errors, pipelineTrace.sample_confusion.error_pixels);
+});
+
+test('spectral identity comparison uses observed and implied source-band order', () => {
+  const rgb = new Uint8ClampedArray([10, 20, 30, 255, 40, 50, 60, 255]);
+  const infrared = new Uint8ClampedArray([70, 70, 70, 255, 80, 80, 80, 255]);
+  const { observed, implied } = composeHistoricalMappings(rgb, infrared);
+
+  assert.deepEqual([...observed], [70, 20, 30, 255, 80, 50, 60, 255]);
+  assert.deepEqual([...implied], [70, 10, 20, 255, 80, 40, 50, 255]);
+  assert.throws(() => composeHistoricalMappings(rgb, infrared.slice(0, 4)), /same RGBA pixels/);
 });

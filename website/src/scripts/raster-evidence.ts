@@ -1,9 +1,10 @@
 import manifest from '../generated/public-crops.json';
 import { restore, share } from './state.mjs';
 import { route } from './routes.mjs';
+import { composeHistoricalMappings } from './spectral-mapping.mjs';
 
 type Crop = (typeof manifest.assets)[number];
-type Layer = 'prediction' | 'reference' | 'confusion' | 'error' | 'paired_outcome' | 'source' | 'infrared';
+type Layer = 'prediction' | 'reference' | 'confusion' | 'error' | 'paired_outcome' | 'source' | 'infrared' | 'spectral_compare';
 
 const assets = new Map<string, Crop>(manifest.assets.map((asset) => [asset.case_id, asset]));
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
@@ -17,6 +18,7 @@ const layerNames: Record<Layer, string> = {
   paired_outcome: 'Paired outcome',
   source: 'RGB source',
   infrared: 'Infrared band · grayscale',
+  spectral_compare: 'Observed vs implied historical bands',
 };
 
 function parseColor(value: string): [number, number, number] {
@@ -61,6 +63,8 @@ export class RasterExplorer {
   private readonly sourceSize: HTMLElement;
   private readonly classLegend: HTMLElement;
   private readonly outcomeLegend: HTMLElement;
+  private readonly spectralNote: HTMLElement;
+  private readonly spectralIrrelevantControls: HTMLElement[];
   private selectedCase: Crop | null = null;
   private selectedModel = 'dinov3';
   private selectedLayer: Layer = 'prediction';
@@ -69,6 +73,8 @@ export class RasterExplorer {
   private ids: Uint8ClampedArray | null = null;
   private rgbPixels: Uint8ClampedArray | null = null;
   private infraredPixels: Uint8ClampedArray | null = null;
+  private spectralObserved: Uint8ClampedArray | null = null;
+  private spectralImplied: Uint8ClampedArray | null = null;
   private panX = 0;
   private panY = 0;
   private drag: { x: number; y: number; panX: number; panY: number } | null = null;
@@ -94,6 +100,8 @@ export class RasterExplorer {
     this.sourceSize = root.querySelector<HTMLElement>('[data-source-size]')!;
     this.classLegend = root.querySelector<HTMLElement>('[data-class-legend]')!;
     this.outcomeLegend = root.querySelector<HTMLElement>('[data-outcome-legend]')!;
+    this.spectralNote = root.querySelector<HTMLElement>('[data-spectral-note]')!;
+    this.spectralIrrelevantControls = Array.from(root.querySelectorAll<HTMLElement>('[data-spectral-irrelevant]'));
     this.bind();
   }
 
@@ -111,6 +119,8 @@ export class RasterExplorer {
     this.ids = null;
     this.rgbPixels = null;
     this.infraredPixels = null;
+    this.spectralObserved = null;
+    this.spectralImplied = null;
     if (this.caseSelect) this.caseSelect.value = found.case_id;
     this.fallback.src = cropAsset(found.files.rgb.url);
     this.fallback.width = found.pixel_window.width;
@@ -136,6 +146,9 @@ export class RasterExplorer {
       const infraredContext = infraredCanvas.getContext('2d', { willReadFrequently: true })!;
       infraredContext.drawImage(infraredImage, 0, 0, width, height);
       this.infraredPixels = infraredContext.getImageData(0, 0, width, height).data;
+      const spectral = composeHistoricalMappings(this.rgbPixels, this.infraredPixels);
+      this.spectralObserved = spectral.observed;
+      this.spectralImplied = spectral.implied;
       const idsCanvas = document.createElement('canvas');
       idsCanvas.width = width;
       idsCanvas.height = height;
@@ -260,7 +273,7 @@ export class RasterExplorer {
       this.inspectPixel(pointer);
     });
     this.viewport.addEventListener('pointerleave', () => {
-      if (!this.drag) this.status.textContent = 'Move over the image to inspect source coordinates and the three aligned class IDs.';
+      if (!this.drag) this.resetStatus();
     });
     this.viewport.addEventListener('pointerup', () => { this.drag = null; });
     this.viewport.addEventListener('pointercancel', () => { this.drag = null; });
@@ -303,13 +316,18 @@ export class RasterExplorer {
         ir.data[offset + 2] = gray;
       }
       baseContext.putImageData(ir, 0, 0);
+    } else if (this.selectedLayer === 'spectral_compare' && this.spectralObserved) {
+      baseContext.putImageData(new ImageData(new Uint8ClampedArray(this.spectralObserved), width, height), 0, 0);
     } else if (this.rgbPixels) {
       baseContext.putImageData(new ImageData(new Uint8ClampedArray(this.rgbPixels), width, height), 0, 0);
     }
     this.drawOverlay();
     this.layerName.textContent = layerNames[this.selectedLayer];
     this.outcomeLegend.hidden = this.selectedLayer !== 'paired_outcome';
-    this.classLegend.hidden = this.selectedLayer === 'paired_outcome';
+    this.classLegend.hidden = ['paired_outcome', 'source', 'infrared', 'spectral_compare'].includes(this.selectedLayer);
+    this.spectralNote.hidden = this.selectedLayer !== 'spectral_compare';
+    for (const control of this.spectralIrrelevantControls) control.hidden = this.selectedLayer === 'spectral_compare';
+    this.resetStatus();
     this.root.style.setProperty('--split', `${this.swipe.value}%`);
     this.root.style.setProperty('--overlay-opacity', String(Number(this.opacity.value) / 100));
     this.updateTransform();
@@ -331,6 +349,14 @@ export class RasterExplorer {
       return;
     }
     this.overlay.style.visibility = 'visible';
+    if (this.selectedLayer === 'spectral_compare') {
+      if (this.spectralImplied) {
+        context.putImageData(new ImageData(new Uint8ClampedArray(this.spectralImplied), width, height), 0, 0);
+      } else {
+        context.clearRect(0, 0, width, height);
+      }
+      return;
+    }
     for (let pixel = 0; pixel < width * height; pixel += 1) {
       const sourceOffset = pixel * 4;
       const targetOffset = sourceOffset;
@@ -387,12 +413,22 @@ export class RasterExplorer {
     const green = this.rgbPixels?.[opticalOffset + 1] ?? 0;
     const blue = this.rgbPixels?.[opticalOffset + 2] ?? 0;
     const infrared = this.infraredPixels?.[opticalOffset] ?? 0;
+    if (this.selectedLayer === 'spectral_compare') {
+      this.status.textContent = `${coordinate} · source bands B1/B2/B3/B4 ${red}/${green}/${blue}/${infrared} DN · left B4/B2/B3 · right B4/B1/B2.`;
+      return;
+    }
     if (truth === manifest.ignore_class_id) {
       this.status.textContent = `${coordinate} · RGB ${red}/${green}/${blue} · IR ${infrared} DN · ignored by the eroded-reference protocol.`;
       return;
     }
     const names = manifest.class_names;
     this.status.textContent = `${coordinate} · RGB ${red}/${green}/${blue} · IR ${infrared} DN · reference: ${names[truth]} · DINOv3: ${names[dino]} · PSPNet: ${names[psp]}`;
+  }
+
+  private resetStatus(): void {
+    this.status.textContent = this.selectedLayer === 'spectral_compare'
+      ? 'Move over the image to inspect source coordinates, B1–B4 values, and both channel mappings.'
+      : 'Move over the image to inspect source coordinates and the three aligned class IDs.';
   }
 
   private updateTransform(): void {
