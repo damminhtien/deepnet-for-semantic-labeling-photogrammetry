@@ -2,6 +2,7 @@
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
 import Legend from '../components/Legend.astro';
+import PairedEvidence from '../components/PairedEvidence.astro';
 import { route, source } from '../scripts/routes.mjs';
 import { metrics, modelKeys, percent } from '../scripts/metrics.mjs';
 import evidence from '../generated/evidence.json';
@@ -43,6 +44,14 @@ const vegetationShare = (dino[2][3] + dino[3][2]) / metrics(dino).errors;
         <p class="note"><a href={route('methods') + '#claim-005'}>Evidence trail ↗</a> · <a href={source('artifacts/public/metrics/potsdam-benchmark-confusions.json')}>Original matrices ↗</a></p>
       </div>
     </div>
+    <section class="panel stack public-preview" aria-labelledby="public-preview-title">
+      <div>
+        <p class="eyebrow">Public case study · recorded paired maps</p>
+        <h2 id="public-preview-title">Follow the selected error into a scene.</h2>
+        <p class="note">For the matched DINOv3 RGB and PSPNet RGB pair, the matrix selects the available published crop with the most pixels in the chosen class transition. This is a crop-level context view; it does not mark exact cell coordinates inside the figure.</p>
+      </div>
+      <PairedEvidence context="Evaluation" caseControls={false} modelControl={false} initialGroup="shared_errors" initialCase="4_14-2560-2048" />
+    </section>
     <section class="panel stack" data-local-comparison aria-labelledby="comparison-title">
       <div>
         <p class="eyebrow">Local raster comparison</p>
@@ -74,6 +83,8 @@ const vegetationShare = (dino[2][3] + dino[3][2]) / metrics(dino).errors;
 </Atlas>
 <style>
   [data-local-comparison] { margin-top: 1.5rem; }
+  .public-preview { margin-top: 1.5rem; }
+  .public-preview h2 { font-size: clamp(1.6rem, 3vw, 2.5rem); margin: .18em 0 .4em; }
   .local-figure canvas { width: min(100%, 512px); height: auto; image-rendering: pixelated; background: #0b2239; }
   .local-figure figcaption { margin-top: .55rem; }
   .score-line { display: flex; flex-wrap: wrap; gap: .7rem 1.2rem; }

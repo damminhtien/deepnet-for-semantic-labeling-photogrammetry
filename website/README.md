@@ -13,10 +13,24 @@ npm --prefix website run dev
 Open the URL printed by Astro at
 `/deepnet-for-semantic-labeling-photogrammetry/`. Use
 `npm --prefix website test` and `npm --prefix website run build` to validate a
-change. The build runs a Python exporter over an explicit allowlist of research
-metadata; it verifies the public evidence registry and never reads private
-rasters. The SVG city and transforms are labeled schematics. The public build
-does not require a model, GPU, external map service or database.
+change. The build runs deterministic Python exporters over an explicit allowlist
+of research metadata and five paired-case figures already tracked under
+`docs/research/figures/`. The visual exporter copies those PNGs byte-for-byte,
+records their checksums and panel geometry, then validates case coordinates,
+class counts and checkpoint bindings. It never reads private rasters or
+prediction files. Public comparison panels are rendered portions of those
+archived figures (411–412 × 411 pixels), not the original 512 × 512 rasters or
+class-ID planes. The pipeline sampling and augmentation controls remain
+educational schematics and say so in the interface.
+
+The tracked figures contain derived ISPRS imagery and labels. The repository
+does not grant rights to redistribute the source dataset or pretrained weights;
+the generated manifest records that status. Review the provider's terms before
+mirroring these figures outside this repository. The [ISPRS Potsdam dataset
+page](https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx)
+describes the imagery and bands; it is linked for provenance, not as a grant of
+reuse rights. The public build does not
+require a model, GPU, external map service or database.
 
 The route controls encode choices in the URL. The Data Atlas also accepts a
 local optical TIFF. The Potsdam viewer checks the file against the selected
@@ -37,7 +51,9 @@ python website/scripts/export_local_crops.py \
   --output /path/outside-the-repo/new-crop-directory
 ```
 
-Use **Evaluation → Swipe through a real crop** to open one `.atlas.json` file.
+Use **Evaluation → Follow the selected error into a scene** to inspect an
+archived paired-case figure. Use **Evaluation → Swipe through a real crop** to
+open one `.atlas.json` file exported from the private paired rasters.
 The exporter checks cache and prediction hashes, split, label protocol, checkpoint
 and scene geometry. It also reproduces each published crop's full joint class
 counts before writing its three aligned class-ID planes. The browser checks

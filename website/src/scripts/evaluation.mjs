@@ -3,6 +3,7 @@ import { count, cropPixels, metrics, percent, shortClasses } from './metrics.mjs
 import { source, route } from './routes.mjs';
 import { query, restore, share } from './state.mjs';
 import { cropViewer } from './crop-viewer.mjs';
+import { explorerFor } from './paired-evidence.mjs';
 
 const root = document.querySelector('[data-evaluation]');
 const get = (selector) => root.querySelector(selector);
@@ -12,6 +13,7 @@ const units = get('[name=units]');
 const { benchmark, cases } = evidence;
 const names = benchmark.class_names;
 const params = query();
+const publicExplorer = explorerFor(get('[data-paired-explorer]'));
 function classId(key, fallback) {
   const raw = params.get(key);
   return raw !== null && /^[0-5]$/.test(raw) ? Number(raw) : fallback;
@@ -24,14 +26,21 @@ const claim = () => ({ dinov3: '001', pspnet: '002', dinov2: '003', sam: '004' }
 const updateURL = () => share(root, { truth: actual, pred: predicted, crop: openCrop });
 const renderLocal = cropViewer(root, cases, benchmark, () => ({ model: model.value, actual, predicted }));
 
+function inspectPublicCrop(crop, matchingPixels) {
+  publicExplorer.setModel(model.value);
+  publicExplorer.setCase(crop, { matchingPixels, model: model.value, publicCase: true });
+}
+
 function renderCrops() {
   const list = get('[data-crops]');
   if (!pairedModel()) {
     list.textContent = 'Paired crop measurements are available for DINOv3 RGB and PSPNet RGB.';
+    publicExplorer.setUnavailable('The public paired case figures bind DINOv3 RGB and PSPNet RGB predictions only.');
     return;
   }
   if (actual === predicted) {
     list.textContent = 'Select an off-diagonal cell to explore a documented error.';
+    publicExplorer.setUnavailable('Select an off-diagonal confusion cell to find an archived paired crop.');
     return;
   }
   const found = cases
@@ -41,8 +50,12 @@ function renderCrops() {
     .sort((a, b) => b.n - a.n);
   if (!found.length) {
     list.textContent = 'This pair has no matching crop in the published gallery.';
+    publicExplorer.setUnavailable('No published paired crop contains this class transition and scene selection.');
     return;
   }
+  const requested = query().get('public-case');
+  const selected = found.find(({ crop }) => cropId(crop) === requested) ?? found[0];
+  inspectPublicCrop(selected.crop, selected.n);
   list.replaceChildren(...found.map(({ crop, n }) => {
     const details = document.createElement('details');
     details.open = cropId(crop) === openCrop;
@@ -52,8 +65,17 @@ function renderCrops() {
     const report = source(`docs/research/figures/paired-cases-${crop.case_group}.png`);
     body.innerHTML = `<p class="note">Row ${crop.row}, column ${crop.col} · ${crop.height} × ${crop.width} window</p>
       <p class="note">${crop.case_group_title} · ${percent(n / crop.valid_pixels)} of the scored crop</p>
-      <p><a href="${report}">View published case figure ↗</a> · <button type="button" data-download>Export evidence</button></p>`;
-    body.querySelector('button').addEventListener('click', () => {
+      <p><a href="${report}">View published case figure ↗</a></p>`;
+    const inspect = document.createElement('button');
+    inspect.type = 'button';
+    inspect.textContent = 'Inspect this crop';
+    inspect.addEventListener('click', () => inspectPublicCrop(crop, n));
+    const download = document.createElement('button');
+    download.type = 'button';
+    download.dataset.download = '';
+    download.textContent = 'Export evidence';
+    body.querySelector('p:last-child').append(' · ', inspect, ' · ', download);
+    download.addEventListener('click', () => {
       const { transitions, ...window } = crop;
       const content = {
         window, selection: { reference: names[actual], prediction: names[predicted], pixels: n },
@@ -77,6 +99,7 @@ function renderCrops() {
       for (const other of list.querySelectorAll('details')) other.open = false;
       details.open = !wasOpen;
       openCrop = details.open ? cropId(crop) : null;
+      if (details.open) inspectPublicCrop(crop, n);
       updateURL();
     });
     return details;

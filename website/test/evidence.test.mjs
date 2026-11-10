@@ -4,9 +4,11 @@ import { test } from 'node:test';
 import { deflateSync } from 'node:zlib';
 import { metrics, cropPixels } from '../src/scripts/metrics.mjs';
 import { readCrop } from '../src/scripts/crop-package.mjs';
+import { createHash } from 'node:crypto';
 
 const evidence = JSON.parse(readFileSync(new URL('../src/generated/evidence.json', import.meta.url)));
 const { benchmark, cases } = evidence;
+const visualEvidence = JSON.parse(readFileSync(new URL('../src/generated/visual-evidence.json', import.meta.url)));
 const close = (actual, expected) => assert.ok(Math.abs(actual - expected) < 1e-12, `${actual} differs from ${expected}`);
 
 test('browser recomputes archived metrics and vegetation error share', () => {
@@ -46,4 +48,45 @@ test('local loader accepts aligned class planes and rejects changes to evidence 
   assert.deepEqual(Array.from(result.planes), [2, 6, 3, 6, 2, 6]);
   await assert.rejects(readCrop(packageFile({ split_sha256: 'different' }), [crop], benchmark), /provenance/);
   await assert.rejects(readCrop(packageFile({ planes: deflateSync(Buffer.from([2, 6, 2, 6, 3, 6])).toString('base64') }), [crop], benchmark), /joint counts/);
+});
+
+test('published figure panels keep source checksums, crop identity, and checkpoint binding', () => {
+  assert.equal(visualEvidence.assets.length, 5);
+  assert.equal(visualEvidence.case_studies.length, 20);
+  for (const asset of visualEvidence.assets) {
+    const published = readFileSync(new URL('../public/' + asset.published_asset_path, import.meta.url));
+    const source = readFileSync(new URL('../../docs/research/figures/' + asset.file, import.meta.url));
+    const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
+    assert.equal(digest(source), asset.source_artifact_sha256);
+    assert.equal(digest(published), asset.published_asset_sha256);
+    assert.equal(digest(source), digest(published));
+    assert.equal(asset.distribution_rights_status, 'existing_figure; upstream_dataset_rights_not_granted');
+    assert.match(asset.rights_review_url, /^https:\/\/www\.isprs\.org\//);
+  }
+
+  const grouped = new Map();
+  const panelSizes = new Set();
+  for (const crop of visualEvidence.case_studies) {
+    const box = crop.pixel_window;
+    const cropId = `${crop.scene_id}-${box.row}-${box.col}`;
+    assert.equal(crop.case_id, cropId);
+    assert.equal(crop.models.dinov3.checkpoint_sha256, benchmark.models.dinov3.checkpoint_sha256);
+    assert.equal(crop.models.pspnet.checkpoint_sha256, benchmark.models.pspnet.checkpoint_sha256);
+    assert.equal(crop.label_protocol, benchmark.label_protocol);
+    assert.equal(crop.channel_mapping.join('/'), 'red/green/blue');
+    assert.equal(crop.transitions.reduce((sum, row) => sum + row[3], 0), box.valid_pixels);
+    for (const row of crop.transitions) {
+      assert.ok(row.slice(0, 3).every((classId) => Number.isInteger(classId) && classId >= 0 && classId < 6));
+      assert.ok(Number.isInteger(row[3]) && row[3] > 0);
+    }
+    const panels = Object.values(crop.panels);
+    assert.equal(panels.length, 5);
+    assert.ok(panels.every(({ width, height }) => [411, 412].includes(width) && height === 411));
+    for (const { width, height } of panels) panelSizes.add(`${width}x${height}`);
+    assert.ok(panels.every((panel) => panel.x >= 0 && panel.y >= 0 && panel.width > 0 && panel.height > 0));
+    assert.ok(panels.every((panel) => panel.x + panel.width <= visualEvidence.assets.find((asset) => asset.asset_id === crop.figure_asset_id).width_px));
+    grouped.set(crop.figure_asset_id, (grouped.get(crop.figure_asset_id) ?? 0) + 1);
+  }
+  assert.deepEqual([...grouped.values()].sort(), [4, 4, 4, 4, 4]);
+  assert.deepEqual([...panelSizes].sort(), ['411x411', '412x411']);
 });

@@ -8,10 +8,10 @@
   "scripts": {
     "dev": "astro dev",
     "preview": "astro preview",
-    "predev": "python3 scripts/export_evidence.py",
-    "prebuild": "python3 scripts/export_evidence.py",
+    "predev": "python3 scripts/export_evidence.py && python3 scripts/export_visual_assets.py && python3 scripts/validate_visual_assets.py",
+    "prebuild": "python3 scripts/export_evidence.py && python3 scripts/export_visual_assets.py && python3 scripts/validate_visual_assets.py",
     "build": "astro build",
-    "test": "python3 scripts/export_evidence.py && node --test"
+    "test": "python3 scripts/export_evidence.py && python3 scripts/export_visual_assets.py && python3 scripts/validate_visual_assets.py && node --test"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.3.0",

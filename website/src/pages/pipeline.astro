@@ -2,15 +2,24 @@
 import Atlas from '../layouts/Atlas.astro';
 import Intro from '../components/Intro.astro';
 import Legend from '../components/Legend.astro';
+import PairedEvidence from '../components/PairedEvidence.astro';
 import { route, source } from '../scripts/routes.mjs';
 ---
 <Atlas title="Data Pipeline" active="pipeline">
-  <Intro index="02–03" category="Sampling & augmentation" title="Inside the pipeline." description="A window carries image data, class IDs and a validity mask. Change which windows are drawn, then see what happens when all three layers move together." />
+  <Intro index="02–03" category="Sampling & augmentation" title="Inside the pipeline." description="Inspect a recorded evaluation crop, then use the explicitly schematic controls to understand patch sampling and aligned transformations." />
+  <section class="wrap instrument lab inspect-recorded" aria-labelledby="inspect-recorded-title">
+    <div>
+      <p class="eyebrow">Inspect / recorded RGB benchmark case</p>
+      <h2 id="inspect-recorded-title">One crop, five aligned views.</h2>
+      <p class="note">This is a held-out evaluation crop with archived reference and paired predictions. It is not a captured training draw, augmentation output, or model activation trace.</p>
+    </div>
+    <PairedEvidence initialGroup="vegetation_disagreement" initialCase="4_14-4608-3584" context="Pipeline" />
+  </section>
   <div class="wrap" data-pipeline>
     <section class="instrument lab" aria-labelledby="sampling-title">
       <div class="lab-grid">
         <div>
-          <p class="eyebrow">02 / Patch sampler simulator</p>
+          <p class="eyebrow">Explain / 02 · Patch sampler simulator · schematic grid</p>
           <h2 id="sampling-title">Which pixels get seen?</h2>
           <div class="controls">
             <label>Schedule <select name="schedule" data-share><option value="grid">Coverage grid</option><option value="rare">Coverage + car/clutter draws</option></select></label>
@@ -30,7 +39,7 @@ import { route, source } from '../scripts/routes.mjs';
     </section>
 
     <section class="instrument lab" id="augmentation" aria-labelledby="augment-title">
-      <p class="eyebrow">03 / Augmentation theatre</p>
+      <p class="eyebrow">Explain / 03 · Augmentation theatre · schematic raster</p>
       <h2 id="augment-title">One transform, three aligned layers.</h2>
       <p class="note">Image values are interpolated; class IDs and validity use nearest neighbors. Gain changes valid image pixels only. Amber marks pixels outside the source window; their class is ignored (ID 6).</p>
       <div class="controls transform-controls">
@@ -52,6 +61,8 @@ import { route, source } from '../scripts/routes.mjs';
   </div>
 </Atlas>
 <style>
+  .inspect-recorded { margin-bottom: 1.5rem; }
+  .inspect-recorded h2 { font-size: clamp(1.7rem, 3vw, 2.7rem); margin: .18em 0 .4em; }
   canvas { background: #102e45; height: auto; border: 1px solid #456175; }
   [data-sample] { width: min(100%, 512px); }
   .transform-controls label { flex: 1 1 7rem; }

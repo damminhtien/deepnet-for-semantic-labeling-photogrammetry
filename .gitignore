@@ -28,3 +28,5 @@ __pycache__/
 /website/.astro/
 /website/node_modules/
 /website/src/generated/
+/website/public/evidence/
+/website/.screenshots/

@@ -1,0 +1,150 @@
+---
+import Legend from './Legend.astro';
+import { route, source } from '../scripts/routes.mjs';
+import evidence from '../generated/visual-evidence.json';
+
+const {
+  initialGroup = 'vegetation_disagreement',
+  initialCase = '4_14-4608-3584',
+  caseControls = true,
+  modelControl = true,
+  context = 'Home',
+} = Astro.props;
+const stateName = (name) => context === 'Evaluation' ? `public-${name}` : name;
+const group = evidence.assets.find((item) => item.asset_id === initialGroup) ?? evidence.assets[0];
+const groupCases = evidence.case_studies.filter((item) => item.figure_asset_id === group.asset_id);
+const selectedCase = groupCases.find((item) => item.case_id === initialCase) ?? groupCases[0];
+const baseUrl = route('evidence/paired').replace(/\/$/, '');
+const figureUrl = `${baseUrl}/${group.file}`;
+const names = Object.fromEntries(evidence.assets.map((item) => [
+  item.asset_id,
+  evidence.case_studies.find((record) => record.figure_asset_id === item.asset_id)?.case_group_title ?? item.asset_id,
+]));
+---
+<section
+  class="paired-explorer"
+  data-paired-explorer
+  data-context={context}
+  data-base-url={baseUrl}
+  data-initial-group={group.asset_id}
+  data-initial-case={selectedCase.case_id}
+  data-initial-model="dinov3"
+>
+  {caseControls && <div class="paired-controls controls">
+    <label>Case collection
+      <select name="case-group" data-case-group data-share>
+        {evidence.assets.map((item) => <option value={item.asset_id} selected={item.asset_id === group.asset_id}>{names[item.asset_id]}</option>)}
+      </select>
+    </label>
+    <label>Scene crop
+      <select name="public-case" data-case-select data-share>
+        {groupCases.map((item) => <option value={item.case_id} selected={item.case_id === selectedCase.case_id}>{item.scene_id} · r{item.pixel_window.row}, c{item.pixel_window.col}</option>)}
+      </select>
+    </label>
+  </div>}
+  <div class="paired-frame">
+    <div class="paired-frame-head">
+      <span>ARCHIVED PAIRED FIGURE / <b data-figure-kind>INSPECT</b></span>
+      <span data-source-size>{group.width_px} × {group.height_px} px source figure</span>
+    </div>
+    <figure class="paired-figure">
+      <div class="paired-viewport" data-viewport tabindex="0" role="group" aria-label="Swipe comparison. Drag to pan after zooming; arrow keys pan when focused.">
+        <img
+          class="paired-fallback"
+          data-figure-fallback
+          src={figureUrl}
+          width={group.width_px}
+          height={group.height_px}
+          alt={`Published five-panel comparison for ${selectedCase.case_group_title}, scene ${selectedCase.scene_id}, rows ${selectedCase.pixel_window.row} to ${selectedCase.pixel_window.row + selectedCase.pixel_window.height} and columns ${selectedCase.pixel_window.col} to ${selectedCase.pixel_window.col + selectedCase.pixel_window.width}.`}
+          fetchpriority={context === 'Home' ? 'high' : undefined}
+        />
+        <canvas data-base aria-hidden="true"></canvas>
+        <canvas data-overlay aria-hidden="true"></canvas>
+        <span class="paired-divider" data-divider aria-hidden="true"><i>↔</i></span>
+      </div>
+      <figcaption class="paired-caption">
+        <div>
+          <strong data-case-caption>{selectedCase.case_group_title} · Scene {selectedCase.scene_id}</strong>
+          <span data-case-detail>Row {selectedCase.pixel_window.row}, column {selectedCase.pixel_window.col} · {selectedCase.pixel_window.height} × {selectedCase.pixel_window.width} source pixels</span>
+          <span data-model-provenance></span>
+        </div>
+        <a href={source(`docs/research/figures/${group.file}`)}>Open full published figure ↗</a>
+      </figcaption>
+    </figure>
+  </div>
+  <div class="paired-controls controls">
+    {modelControl && <label>Prediction
+      <select name={stateName('model')} data-model data-share>
+        <option value="dinov3">DINOv3 RGB</option>
+        <option value="pspnet">PSPNet RGB</option>
+      </select>
+    </label>}
+    <label>Overlay layer
+      <select name={stateName('layer')} data-layer data-share>
+        <option value="prediction">Selected prediction</option>
+        <option value="reference">Eroded reference</option>
+        <option value="paired_outcome">Paired correctness</option>
+      </select>
+    </label>
+    <label>Swipe <input type="range" name={stateName('swipe')} min="0" max="100" value="52" data-swipe data-share /></label>
+    <label>Opacity <input type="range" name={stateName('opacity')} min="0" max="100" value="88" data-opacity data-share /></label>
+    <label>Zoom <input type="range" name={stateName('zoom')} min="1" max="4" step="0.25" value="1" data-zoom data-share /></label>
+  </div>
+  <p class="note paired-pan-note" data-paired-status role="status" aria-live="polite">Drag the figure to pan when zoomed. Use arrow keys when the comparison is focused.</p>
+  <div data-class-legend><Legend /></div>
+  <ul class="legend outcome-legend" data-outcome-legend hidden aria-label="Paired correctness outcomes">
+    <li><i style="--swatch:#009e73"></i>Both correct</li>
+    <li><i style="--swatch:#999999"></i>Both wrong, same prediction</li>
+    <li><i style="--swatch:#e69f00"></i>Both wrong, different prediction</li>
+    <li><i style="--swatch:#0072b2"></i>DINOv3 only correct</li>
+    <li><i style="--swatch:#d55e00"></i>PSPNet only correct</li>
+  </ul>
+  <p class="note paired-provenance">
+    This view uses the displayed panels from an existing paired-case figure, not original 512 × 512 raster arrays. The figure panels are 411–412 × 411 rendered pixels, depending on the source figure column. Counts and coordinates come from the public case metadata; this view does not mark exact pixels for the selected confusion cell. <a href={route('methods') + '#claim-008'}>Case selection and provenance ↗</a>
+  </p>
+  <p class="note paired-rights">The existing figure contains derivatives of ISPRS imagery and labels. This repository does not grant reuse rights for the underlying dataset. <a href="https://www.isprs.org/resources/datasets/benchmarks/UrbanSemLab/2d-sem-label-potsdam.aspx">Dataset source and details ↗</a></p>
+</section>
+<style>
+  .paired-explorer { color: var(--paper); }
+  .paired-frame { border: 1px solid var(--dark-rule); background: var(--navy); }
+  .paired-frame-head { display: flex; justify-content: space-between; gap: .7rem; padding: .65rem .8rem; color: var(--pale); font: 500 .65rem/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+  .paired-frame-head b { color: var(--amber); }
+  .paired-viewport { position: relative; width: min(100%, 650px); aspect-ratio: 1.0024; overflow: hidden; margin-inline: auto; background: #102e45; cursor: grab; touch-action: none; }
+  .paired-viewport:active { cursor: grabbing; }
+  .paired-viewport:focus-visible { outline: 3px solid var(--amber); outline-offset: -3px; }
+  .paired-fallback, .paired-viewport canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+  .paired-fallback { z-index: 0; }
+  .paired-viewport canvas { z-index: 1; image-rendering: auto; transform-origin: center; }
+  .paired-viewport [data-overlay] { z-index: 2; opacity: var(--overlay-opacity, .88); clip-path: inset(0 0 0 var(--split, 52%)); }
+  [data-ready="true"] .paired-fallback { display: none; }
+  [data-unavailable="true"] .paired-fallback, [data-unavailable="true"] .paired-viewport canvas { display: none; }
+  .paired-divider { position: absolute; z-index: 3; top: 0; bottom: 0; left: var(--split, 52%); width: 1px; background: #fff3d6; pointer-events: none; }
+  .paired-divider i { position: absolute; top: 50%; left: 50%; display: grid; width: 2rem; aspect-ratio: 1; place-items: center; transform: translate(-50%, -50%); border: 1px solid #fff3d6; border-radius: 50%; background: var(--navy); color: white; font-style: normal; }
+  .paired-caption { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: .3rem 1rem; padding: .7rem .85rem; color: var(--pale); font-size: .78rem; }
+  .paired-caption > div { display: grid; gap: .15rem; }
+  .paired-caption strong { color: white; font-weight: 500; }
+  .paired-caption [data-model-provenance] { color: var(--pale); font: 500 .61rem/1.5 var(--mono); overflow-wrap: anywhere; }
+  .paired-caption a { color: #b6d9e3; white-space: nowrap; }
+  .paired-controls { margin-block: .75rem; }
+  .paired-controls label { min-width: 7.5rem; flex: 1 1 8rem; }
+  .paired-controls input[type=range] { width: 100%; accent-color: var(--amber); }
+  .paired-controls select { max-width: 100%; }
+  .paired-pan-note, .paired-provenance { color: var(--pale); }
+  .paired-provenance { margin-top: .55rem; font-size: .78rem; }
+  .paired-provenance a { color: #b6d9e3; }
+  .paired-rights { margin-top: .45rem; font-size: .72rem; }
+  .paired-rights a { color: #b6d9e3; }
+  .outcome-legend { border-top: 1px solid var(--dark-rule); margin-top: .45rem; }
+  @media (max-width: 700px) {
+    .paired-frame-head { font-size: .58rem; }
+    .paired-caption { display: grid; }
+    .paired-caption a { white-space: normal; }
+    .paired-controls label { flex-basis: 7rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .paired-viewport canvas { transition: none !important; }
+  }
+</style>
+<script>
+  import '../scripts/paired-evidence.mjs';
+</script>
